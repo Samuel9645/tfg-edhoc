@@ -216,12 +216,6 @@ int main() {
   servaddr.sin_port = htons(PORT);
   servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-  // Set socket timeout to 5 seconds
-  struct timeval tv;
-  tv.tv_sec = 5;
-  tv.tv_usec = 0;
-  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
-
   // ========================================================================
   // MESSAGE PROTOCOL FLOW
   // ========================================================================

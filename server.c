@@ -87,8 +87,8 @@ int credential_verify(void* user_context, struct edhoc_auth_creds* credentials,
   *public_key_reference = client_public_key;
   *public_key_length = sizeof(client_public_key);
 
-  credentials->key_id.cred = server_public_key;
-  credentials->key_id.cred_len = sizeof(server_public_key);
+  credentials->key_id.cred = client_public_key;
+  credentials->key_id.cred_len = sizeof(client_public_key);
   credentials->key_id.cred_is_cbor = false;
 
   return EDHOC_SUCCESS;

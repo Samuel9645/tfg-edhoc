@@ -5,6 +5,9 @@ project(EDHOC_Demo C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS ON)
 
+# Disable mbedtls tests
+set(ENABLE_TESTING OFF CACHE BOOL "Disable mbedtls tests" FORCE)
+
 # Compiler options
 option(LIBEDHOC_BUILD_COMPILER_GCC "Enable compiling library with gcc" ON)
 option(LIBEDHOC_BUILD_COMPILER_CLANG "Enable compiling library with clang" OFF)
@@ -46,25 +49,37 @@ endif()
 add_subdirectory(./libedhoc)
 
 # Define main executable
-add_executable(main main.c)
-add_executable(server server.c libedhoc/helpers/src/edhoc_cipher_suite_2.c)
-add_executable(client client.c libedhoc/helpers/src/edhoc_cipher_suite_2.c)
-
+add_executable(server
+    src/main_server.c
+    src/server.c
+    src/edhoc_setup.c
+    src/public_data.c
+    libedhoc/helpers/src/edhoc_cipher_suite_2.c
+)
+add_executable(client
+    src/main_clilent.c
+    src/client.c
+    src/edhoc_setup.c
+    src/public_data.c
+    libedhoc/helpers/src/edhoc_cipher_suite_2.c
+)
 # Link libraries
-target_link_libraries(main PRIVATE libedhoc)
 target_link_libraries(server PRIVATE libedhoc)
 target_link_libraries(client PRIVATE libedhoc)
 
 # Add helper include directories
+target_include_directories(server PRIVATE include)
 target_include_directories(server PRIVATE libedhoc/helpers/include)
+target_include_directories(client PRIVATE include)
 target_include_directories(client PRIVATE libedhoc/helpers/include)
 
 # Set output directory for executables
-set_target_properties(main server client PROPERTIES
+set_target_properties(server PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-# Optional: Enable compiler warnings
-target_compile_options(main PRIVATE -g)
 target_compile_options(server PRIVATE -g)
 target_compile_options(client PRIVATE -g)

@@ -1,0 +1,76 @@
+
+#include "edhoc_setup.h"
+
+#include <psa/crypto.h>
+#include <stdio.h>
+
+#include "edhoc_cipher_suite_2.h"
+#include "edhoc_context.h"
+
+int edhoc_setup_context(struct edhoc_context* ctx,
+                        const struct edhoc_credentials* credentials) {
+  psa_status_t psa_status = psa_crypto_init();
+  if (psa_status != PSA_SUCCESS) {
+    fprintf(stderr, "Failed to initialize PSA crypto: %d\n", psa_status);
+    return psa_status;
+  }
+  int ret = edhoc_context_init(ctx);
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to initialize context: %d\n", ret);
+    return ret;
+  }
+
+  const enum edhoc_method methods[] = {EDHOC_METHOD_0};
+  ret = edhoc_set_methods(ctx, methods, ARRAY_SIZE(methods));
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to set methods: %d\n", ret);
+    return ret;
+  }
+
+  const struct edhoc_cipher_suite cipher_suite_2 = {
+      .value = 2,
+      .aead_key_length = 16,
+      .aead_tag_length = 8,
+      .aead_iv_length = 13,
+      .hash_length = 32,
+      .mac_length = 32,
+      .ecc_key_length = 32,
+      .ecc_sign_length = 64,
+  };
+  const struct edhoc_cipher_suite cipher_suites[] = {cipher_suite_2};
+  ret = edhoc_set_cipher_suites(ctx, cipher_suites, ARRAY_SIZE(cipher_suites));
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to set cipher suites: %d\n", ret);
+    return ret;
+  }
+
+  const struct edhoc_connection_id connection_id = {
+      .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER,
+      .int_value = 21,
+      .bstr_length = 0,
+  };
+  ret = edhoc_set_connection_id(ctx, &connection_id);
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to set connection ID: %d\n", ret);
+    return ret;
+  }
+
+  ret = edhoc_bind_keys(ctx, edhoc_cipher_suite_2_get_keys());
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to bind keys: %d\n", ret);
+    return ret;
+  }
+
+  ret = edhoc_bind_crypto(ctx, edhoc_cipher_suite_2_get_crypto());
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to bind crypto: %d\n", ret);
+    return ret;
+  }
+
+  ret = edhoc_bind_credentials(ctx, credentials);
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to bind credentials: %d\n", ret);
+  }
+
+  return ret;
+}

@@ -1,12 +1,12 @@
 #include "server.h"
+
 #include "shared_credentials.h"
 #include "shared_crypto.h"
 
 static int credential_fetch(void* user_context,
                             struct edhoc_auth_creds* credentials) {
   return shared_credential_fetch(user_context, credentials, SERVER_PUBLIC_KEY,
-                                 sizeof(SERVER_PUBLIC_KEY),
-                                 SERVER_PRIVATE_KEY,
+                                 sizeof(SERVER_PUBLIC_KEY), SERVER_PRIVATE_KEY,
                                  sizeof(SERVER_PRIVATE_KEY), SERVER_KID);
 }
 
@@ -41,14 +41,15 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
                (struct sockaddr*)client_address, &client_address_len);
   printf("Received Message 1 (%zd bytes)\n", message1_length);
 
-  if (edhoc_message_1_process(context, message_buffer, message1_length) != EDHOC_SUCCESS) {
+  if (edhoc_message_1_process(context, message_buffer, message1_length) !=
+      EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 1\n");
     return -1;
   }
 
   size_t message2_length = 0;
-  if (edhoc_message_2_compose(context, message_buffer, message_buffer_size, &message2_length) !=
-      EDHOC_SUCCESS) {
+  if (edhoc_message_2_compose(context, message_buffer, message_buffer_size,
+                              &message2_length) != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to compose Message 2\n");
     return -1;
   }
@@ -62,7 +63,8 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
                (struct sockaddr*)client_address, &client_address_len);
   printf("Received Message 3 (%zd bytes)\n", message3_length);
 
-  if (edhoc_message_3_process(context, message_buffer, message3_length) != EDHOC_SUCCESS) {
+  if (edhoc_message_3_process(context, message_buffer, message3_length) !=
+      EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 3\n");
     return -1;
   }
@@ -88,8 +90,8 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
                            uint8_t* received_message_buffer,
                            size_t* received_message_length) {
   uint8_t shared_secret[EXPORTED_SECRET_LENGTH] = {0};
-  int result =
-      edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret, sizeof(shared_secret));
+  int result = edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret,
+                                         sizeof(shared_secret));
   if (result != EDHOC_SUCCESS) {
     fprintf(stderr, "Server: Failed to export PRK exporter\n");
     return result;
@@ -103,11 +105,16 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
     fprintf(stderr, "Failed to receive ciphertext\n");
     return -1;
   }
+  if (result == 0) {
+    fprintf(stderr, "Received empty message\n");
+    return -1;
+  }
 
   size_t encrypted_message_length = (size_t)result;
   const psa_status_t decrypt_status = shared_decrypt_ciphertext(
-      encrypted_message, encrypted_message_length, shared_secret, sizeof(shared_secret),
-      received_message_buffer, received_message_buffer_size, received_message_length);
+      encrypted_message, encrypted_message_length, shared_secret,
+      sizeof(shared_secret), received_message_buffer,
+      received_message_buffer_size, received_message_length);
   if (decrypt_status != PSA_SUCCESS) {
     fprintf(stderr, "Failed to decrypt ciphertext\n");
   }
@@ -115,11 +122,12 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
 }
 
 /**
- * @brief Execute EDHOC server handshake and receive encrypted message from client
- * 
+ * @brief Execute EDHOC server handshake and receive encrypted message from
+ * client
+ *
  * This function binds to a UDP socket, performs the complete EDHOC handshake
  * as a responder, and receives an encrypted message from the client.
- * 
+ *
  * @return 0 on success, negative error code on failure
  */
 int run_server() {
@@ -157,7 +165,8 @@ int run_server() {
     return -1;
   }
 
-  result = run_handshake(&context, &socket_fd, &server_address, &client_address);
+  result =
+      run_handshake(&context, &socket_fd, &server_address, &client_address);
   if (result != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to run handshake\n");
     close(socket_fd);
@@ -167,15 +176,16 @@ int run_server() {
 
   uint8_t received_message[MESSAGE_BUFFER_LENGTH] = {0};
   size_t received_message_length = 0;
-  result = receive_message(&context, socket_fd, &client_address, sizeof(received_message),
-                           received_message, &received_message_length);
+  result = receive_message(&context, socket_fd, &client_address,
+                           sizeof(received_message), received_message,
+                           &received_message_length);
   if (result != EDHOC_SUCCESS) {
     close(socket_fd);
     edhoc_context_deinit(&context);
     return result;
   }
-  printf("Server: Received message from client: %.*s\n", (int)received_message_length,
-         received_message);
+  printf("Server: Received message from client: %.*s\n",
+         (int)received_message_length, received_message);
 
   close(socket_fd);
   edhoc_context_deinit(&context);

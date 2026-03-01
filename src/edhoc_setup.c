@@ -1,6 +1,8 @@
 
 #include "edhoc_setup.h"
 
+#include <stdint.h>
+
 int edhoc_setup_context(struct edhoc_context* ctx,
                         const struct edhoc_credentials* credentials) {
   psa_status_t psa_status = psa_crypto_init();
@@ -67,4 +69,16 @@ int edhoc_setup_context(struct edhoc_context* ctx,
   }
 
   return ret;
+}
+
+void initialize_credential_key(struct edhoc_auth_creds* credentials,
+                               const uint8_t* public_key,
+                               size_t public_key_length,
+                               int32_t key_id_integer) {
+  credentials->label = EDHOC_COSE_HEADER_KID;
+  credentials->key_id.cred = public_key;
+  credentials->key_id.cred_len = public_key_length;
+  credentials->key_id.cred_is_cbor = false;
+  credentials->key_id.encode_type = EDHOC_ENCODE_TYPE_INTEGER;
+  credentials->key_id.key_id_int = key_id_integer;
 }

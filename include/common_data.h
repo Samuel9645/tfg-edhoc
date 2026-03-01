@@ -6,11 +6,15 @@
 #include <stdint.h>
 
 enum {
+  // Cryptographic constants
+  NONCE_LENGTH_BYTES = 13,
+  AES_CCM_TAG_LENGTH = 16,
 
-  PKR_EXPORT_SECRET_LEN = 32,
-  // plaintext message length + GCM tag length
-  CYPERTEXT_LEN = 256 + 16,
-  SOCKET_MESSAGE_BUFFER_LEN = 512
+  // Key and message constants
+  EXPORTED_SECRET_LENGTH = 32,
+  PLAINTEXT_MAX_LENGTH = 256,
+  CIPHERTEXT_MAX_LENGTH = PLAINTEXT_MAX_LENGTH + AES_CCM_TAG_LENGTH,
+  MESSAGE_BUFFER_LENGTH = 512,
 };
 
 extern const int32_t SERVER_KID;

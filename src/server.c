@@ -6,12 +6,8 @@ static int credential_fetch(void* user_context,
   if (credentials == NULL)
     return EDHOC_ERROR_INVALID_ARGUMENT;
 
-  credentials->label = EDHOC_COSE_HEADER_KID;
-  credentials->key_id.cred = SERVER_PUBLIC_KEY;
-  credentials->key_id.cred_len = sizeof(SERVER_PUBLIC_KEY);
-  credentials->key_id.cred_is_cbor = false;
-  credentials->key_id.encode_type = EDHOC_ENCODE_TYPE_INTEGER;
-  credentials->key_id.key_id_int = SERVER_KID;
+  initialize_credential_key(credentials, SERVER_PUBLIC_KEY,
+                            sizeof(SERVER_PUBLIC_KEY), SERVER_KID);
 
   int ret = edhoc_cipher_suite_2_key_import(
       user_context, EDHOC_KT_SIGNATURE, SERVER_PRIVATE_KEY,
@@ -44,50 +40,49 @@ static int credential_verify(void* user_context,
   *public_key_reference = CLIENT_PUBLIC_KEY;
   *public_key_length = ARRAY_SIZE(CLIENT_PUBLIC_KEY);
 
-  credentials->key_id.cred = CLIENT_PUBLIC_KEY;
-  credentials->key_id.cred_len = ARRAY_SIZE(CLIENT_PUBLIC_KEY);
-  credentials->key_id.cred_is_cbor = false;
+  initialize_credential_key(credentials, CLIENT_PUBLIC_KEY,
+                            ARRAY_SIZE(CLIENT_PUBLIC_KEY), CLIENT_KID);
 
   return EDHOC_SUCCESS;
 }
 
-static int run_handshake(struct edhoc_context* ctx, int* socket_fd,
+static int run_handshake(struct edhoc_context* context, int* socket_fd,
                          struct sockaddr_in* server_address,
                          struct sockaddr_in* client_address) {
   socklen_t client_address_len = sizeof(*client_address);
 
   printf("Server listening on port %d...\n", ntohs(server_address->sin_port));
 
-  uint8_t msg_buf[SOCKET_MESSAGE_BUFFER_LEN] = {0};
-  const size_t msg_buf_size = sizeof(msg_buf);
+  uint8_t message_buffer[MESSAGE_BUFFER_LENGTH] = {0};
+  const size_t message_buffer_size = sizeof(message_buffer);
 
-  ssize_t msg1_len =
-      recvfrom(*socket_fd, msg_buf, msg_buf_size, 0,
+  ssize_t message1_length =
+      recvfrom(*socket_fd, message_buffer, message_buffer_size, 0,
                (struct sockaddr*)client_address, &client_address_len);
-  printf("Received Message 1 (%zd bytes)\n", msg1_len);
+  printf("Received Message 1 (%zd bytes)\n", message1_length);
 
-  if (edhoc_message_1_process(ctx, msg_buf, msg1_len) != EDHOC_SUCCESS) {
+  if (edhoc_message_1_process(context, message_buffer, message1_length) != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 1\n");
     return -1;
   }
 
-  size_t msg2_len = 0;
-  if (edhoc_message_2_compose(ctx, msg_buf, msg_buf_size, &msg2_len) !=
+  size_t message2_length = 0;
+  if (edhoc_message_2_compose(context, message_buffer, message_buffer_size, &message2_length) !=
       EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to compose Message 2\n");
     return -1;
   }
 
-  sendto(*socket_fd, msg_buf, msg2_len, 0,
+  sendto(*socket_fd, message_buffer, message2_length, 0,
          (const struct sockaddr*)client_address, client_address_len);
-  printf("Sent Message 2 (%zu bytes)\n", msg2_len);
+  printf("Sent Message 2 (%zu bytes)\n", message2_length);
 
-  ssize_t msg3_len =
-      recvfrom(*socket_fd, msg_buf, msg_buf_size, 0,
+  ssize_t message3_length =
+      recvfrom(*socket_fd, message_buffer, message_buffer_size, 0,
                (struct sockaddr*)client_address, &client_address_len);
-  printf("Received Message 3 (%zd bytes)\n", msg3_len);
+  printf("Received Message 3 (%zd bytes)\n", message3_length);
 
-  if (edhoc_message_3_process(ctx, msg_buf, msg3_len) != EDHOC_SUCCESS) {
+  if (edhoc_message_3_process(context, message_buffer, message3_length) != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 3\n");
     return -1;
   }
@@ -98,72 +93,72 @@ static int run_handshake(struct edhoc_context* ctx, int* socket_fd,
 }
 
 /**
- * @param ciphertext
- * @param ciphertext_len
- * @param key
- * @param key_len
- * @param[out] plaintext
- * @param[out] plaintext_len
- * @return
+ * @brief Decrypt ciphertext using AES-CCM
+ * @param ciphertext_buffer Buffer containing ciphertext to decrypt
+ * @param ciphertext_length Length of ciphertext
+ * @param key_material Decryption key material
+ * @param key_length Key length in bytes
+ * @param[out] plaintext_buffer Output buffer for decrypted data
+ * @param plaintext_buffer_size Size of output buffer
+ * @param[out] plaintext_output_length Actual length of plaintext
+ * @return Status code
  */
-static int decrypt_cyphertext(const uint8_t* ciphertext, size_t ciphertext_len,
-                              const uint8_t* key, size_t key_len,
-                              uint8_t* plaintext, size_t plaintext_size,
-                              size_t* plaintext_len) {
+static int decrypt_ciphertext(const uint8_t* ciphertext_buffer, size_t ciphertext_length,
+                               const uint8_t* key_material, size_t key_length,
+                               uint8_t* plaintext_buffer, size_t plaintext_buffer_size,
+                               size_t* plaintext_output_length) {
   psa_key_id_t key_id;
   psa_status_t status =
-      setup_psa_crypto(PSA_KEY_USAGE_DECRYPT, key, key_len, &key_id);
+      setup_psa_crypto(PSA_KEY_USAGE_DECRYPT, key_material, key_length, &key_id);
   if (status != PSA_SUCCESS) {
     return status;
   }
 
-  uint8_t nonce[13] = {0};
+  uint8_t nonce[NONCE_LENGTH_BYTES] = {0};
   // Decrypt with AES-CCM
   status = psa_aead_decrypt(
       key_id, PSA_ALG_CCM, nonce, sizeof(nonce), NULL, 0,  // No AAD
-      ciphertext, ciphertext_len, plaintext, plaintext_size, plaintext_len);
+      ciphertext_buffer, ciphertext_length, plaintext_buffer, plaintext_buffer_size, plaintext_output_length);
   // Clean up
   return psa_destroy_key(key_id);
 }
 
 /**
- * @brief
- * @param ctx
- * @param socket_fd
- * @param client_address
- * @param recieved_message_size
- * @param[out] recieved_message
- * @param[out] recieved_message_len
- * @return
+ * @brief Receive and decrypt a message from the client after handshake
+ * @param context EDHOC context for exporting shared secret
+ * @param socket_fd UDP socket file descriptor
+ * @param client_address Client address structure
+ * @param received_message_buffer_size Size of output buffer
+ * @param[out] received_message_buffer Output buffer for decrypted message
+ * @param[out] received_message_length Actual length of decrypted message
+ * @return Status code
  */
-static int recieve_message(struct edhoc_context* ctx, int socket_fd,
+static int receive_message(struct edhoc_context* context, int socket_fd,
                            struct sockaddr_in* client_address,
-                           size_t recieved_message_size,
-                           uint8_t* recieved_message,
-                           size_t* recieved_message_len) {
-  uint8_t secret[PKR_EXPORT_SECRET_LEN] = {0};
-  int ret =
-      edhoc_export_prk_exporter(ctx, PKR_OUT_LABEL, secret, sizeof(secret));
-  if (ret != EDHOC_SUCCESS) {
+                           size_t received_message_buffer_size,
+                           uint8_t* received_message_buffer,
+                           size_t* received_message_length) {
+  uint8_t shared_secret[EXPORTED_SECRET_LENGTH] = {0};
+  int result =
+      edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret, sizeof(shared_secret));
+  if (result != EDHOC_SUCCESS) {
     fprintf(stderr, "Server: Failed to export PRK exporter\n");
-    return ret;
+    return result;
   }
 
-  uint8_t ciphertext[CYPERTEXT_LEN] = {0};
+  uint8_t encrypted_message[CIPHERTEXT_MAX_LENGTH] = {0};
   socklen_t client_address_len = sizeof(*client_address);
-  ret = recvfrom(socket_fd, ciphertext, sizeof(ciphertext), 0,
-                 (struct sockaddr*)client_address, &client_address_len);
-  if (ret < 0) {
+  result = recvfrom(socket_fd, encrypted_message, sizeof(encrypted_message), 0,
+                    (struct sockaddr*)client_address, &client_address_len);
+  if (result < 0) {
     fprintf(stderr, "Failed to receive ciphertext\n");
     return -1;
   }
 
-  size_t ciphertext_len = (size_t)ret;
-  // printf("Server: Received ciphertext from client: %.*s\n", (int)ciphertext_len,
-  //        ciphertext);
-  const psa_status_t decrypt_status = decrypt_cyphertext(
-      ciphertext, ciphertext_len, secret, sizeof(secret), recieved_message,
-      recieved_message_size, recieved_message_len);
+  size_t encrypted_message_length = (size_t)result;
+  const psa_status_t decrypt_status = decrypt_ciphertext(
+      encrypted_message, encrypted_message_length, shared_secret, sizeof(shared_secret),
+      received_message_buffer, received_message_buffer_size, received_message_length);
   if (decrypt_status != PSA_SUCCESS) {
     fprintf(stderr, "Failed to decrypt ciphertext\n");
   }
@@ -171,16 +166,16 @@ static int recieve_message(struct edhoc_context* ctx, int socket_fd,
 }
 
 int run_server() {
-  struct edhoc_context ctx = {0};
+  struct edhoc_context context = {0};
   const struct edhoc_credentials credentials = {
       .fetch = credential_fetch,
       .verify = credential_verify,
   };
 
-  int ret = edhoc_setup_context(&ctx, &credentials);
-  if (ret != EDHOC_SUCCESS) {
-    edhoc_context_deinit(&ctx);
-    return ret;
+  int result = edhoc_setup_context(&context, &credentials);
+  if (result != EDHOC_SUCCESS) {
+    edhoc_context_deinit(&context);
+    return result;
   }
 
   int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -205,28 +200,28 @@ int run_server() {
     return -1;
   }
 
-  ret = run_handshake(&ctx, &socket_fd, &server_address, &client_address);
-  if (ret != EDHOC_SUCCESS) {
+  result = run_handshake(&context, &socket_fd, &server_address, &client_address);
+  if (result != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to run handshake\n");
     close(socket_fd);
-    edhoc_context_deinit(&ctx);
-    return ret;
+    edhoc_context_deinit(&context);
+    return result;
   }
 
-  u_int8_t message[SOCKET_MESSAGE_BUFFER_LEN] = {0};
-  size_t message_len = 0;
-  ret = recieve_message(&ctx, socket_fd, &client_address, sizeof(message),
-                        message, &message_len);
-  if (ret != EDHOC_SUCCESS) {
+  uint8_t received_message[MESSAGE_BUFFER_LENGTH] = {0};
+  size_t received_message_length = 0;
+  result = receive_message(&context, socket_fd, &client_address, sizeof(received_message),
+                           received_message, &received_message_length);
+  if (result != EDHOC_SUCCESS) {
     close(socket_fd);
-    edhoc_context_deinit(&ctx);
-    return ret;
+    edhoc_context_deinit(&context);
+    return result;
   }
-  printf("Server: Received message from client: %.*s\n", (int)message_len,
-         message);
+  printf("Server: Received message from client: %.*s\n", (int)received_message_length,
+         received_message);
 
   close(socket_fd);
-  edhoc_context_deinit(&ctx);
+  edhoc_context_deinit(&context);
 
   return 0;
 }

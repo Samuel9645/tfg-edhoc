@@ -22,4 +22,16 @@
 int edhoc_setup_context(struct edhoc_context* ctx,
                         const struct edhoc_credentials* credentials);
 
+/**
+ * @brief Initialize credential key information in EDHOC credentials structure
+ * @param credentials Pointer to EDHOC credentials structure
+ * @param public_key Public key bytes
+ * @param public_key_length Length of public key
+ * @param key_id_integer Key identifier as integer
+ */
+void initialize_credential_key(struct edhoc_auth_creds* credentials,
+                               const uint8_t* public_key,
+                               size_t public_key_length,
+                               int32_t key_id_integer);
+
 #endif

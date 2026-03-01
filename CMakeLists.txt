@@ -57,7 +57,7 @@ add_executable(server
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 add_executable(client
-    src/main_clilent.c
+    src/main_client.c
     src/client.c
     src/edhoc_setup.c
     src/public_data.c

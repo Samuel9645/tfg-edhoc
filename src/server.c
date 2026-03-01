@@ -64,41 +64,20 @@ static int credential_verify(void* user_context,
   return EDHOC_SUCCESS;
 }
 
-static int run_handshake(struct edhoc_context* ctx, const char* server_ip,
-                         const uint16_t port) {
-  int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd < 0) {
-    perror("Socket creation failed");
-    return -1;
-  }
+static int run_handshake(struct edhoc_context* ctx, int* socket_fd,
+                         struct sockaddr_in* server_address,
+                         struct sockaddr_in* client_address) {
+  uint8_t msg_buf[SOCKET_MESSAGE_BUFFER_LEN] = {0};
+  socklen_t client_address_len = sizeof(*client_address);
 
-  struct sockaddr_in servaddr;
-  struct sockaddr_in cliaddr;
-  memset(&servaddr, 0, sizeof(servaddr));
-  memset(&cliaddr, 0, sizeof(cliaddr));
+  printf("Server listening on port %d...\n", ntohs(server_address->sin_port));
 
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = inet_addr(server_ip);
-  servaddr.sin_port = htons(port);
-
-  if (bind(sockfd, (const struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
-    perror("Bind failed");
-    close(sockfd);
-    return -1;
-  }
-
-  uint8_t msg_buf[256] = {0};
-  socklen_t len = sizeof(cliaddr);
-
-  printf("Server listening on port %d...\n", port);
-
-  ssize_t msg1_len = recvfrom(sockfd, msg_buf, sizeof(msg_buf), 0,
-                              (struct sockaddr*)&cliaddr, &len);
+  ssize_t msg1_len = recvfrom(*socket_fd, msg_buf, sizeof(msg_buf), 0,
+                              (struct sockaddr*)client_address, &client_address_len);
   printf("Received Message 1 (%zd bytes)\n", msg1_len);
 
   if (edhoc_message_1_process(ctx, msg_buf, msg1_len) != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 1\n");
-    close(sockfd);
     return -1;
   }
 
@@ -106,25 +85,23 @@ static int run_handshake(struct edhoc_context* ctx, const char* server_ip,
   if (edhoc_message_2_compose(ctx, msg_buf, sizeof(msg_buf), &msg2_len) !=
       EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to compose Message 2\n");
-    close(sockfd);
     return -1;
   }
 
-  sendto(sockfd, msg_buf, msg2_len, 0, (const struct sockaddr*)&cliaddr, len);
+  sendto(*socket_fd, msg_buf, msg2_len, 0,
+         (const struct sockaddr*)client_address, client_address_len);
   printf("Sent Message 2 (%zu bytes)\n", msg2_len);
 
-  ssize_t msg3_len = recvfrom(sockfd, msg_buf, sizeof(msg_buf), 0,
-                              (struct sockaddr*)&cliaddr, &len);
+  ssize_t msg3_len = recvfrom(*socket_fd, msg_buf, sizeof(msg_buf), 0,
+                              (struct sockaddr*)client_address, &client_address_len);
   printf("Received Message 3 (%zd bytes)\n", msg3_len);
 
   if (edhoc_message_3_process(ctx, msg_buf, msg3_len) != EDHOC_SUCCESS) {
     fprintf(stderr, "Failed to process Message 3\n");
-    close(sockfd);
     return -1;
   }
 
   printf("Server: EDHOC Handshake Completed Successfully!\n");
-  close(sockfd);
 
   return EDHOC_SUCCESS;
 }
@@ -142,7 +119,30 @@ int run_server() {
     return ret;
   }
 
-  ret = run_handshake(&ctx, SERVER_URI, SERVER_PORT);
+  int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (sockfd < 0) {
+    perror("Socket creation failed");
+    return -1;
+  }
+
+  struct sockaddr_in server_address;
+  struct sockaddr_in client_address;
+  memset(&server_address, 0, sizeof(server_address));
+  memset(&client_address, 0, sizeof(client_address));
+
+  server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+  server_address.sin_port = htons(SERVER_PORT);
+  server_address.sin_family = AF_INET;
+
+  if (bind(sockfd, (const struct sockaddr*)&server_address,
+           sizeof(server_address)) < 0) {
+    perror("Bind failed");
+    close(sockfd);
+    return -1;
+  }
+
+  ret = run_handshake(&ctx, &sockfd, &server_address, &client_address);
+  close(sockfd);
   edhoc_context_deinit(&ctx);
   return ret;
 }

@@ -6,6 +6,7 @@
 
 #include "edhoc_cipher_suite_2.h"
 #include "edhoc_context.h"
+#include <netinet/in.h>
 
 int edhoc_setup_context(struct edhoc_context* ctx,
                         const struct edhoc_credentials* credentials) {
@@ -73,4 +74,20 @@ int edhoc_setup_context(struct edhoc_context* ctx,
   }
 
   return ret;
+}
+
+static int setup_socket(const in_addr_t server_addr, const uint16_t server_port,
+                        int* socket_fd, struct sockaddr_in* servaddr) {
+  *socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (*socket_fd < 0) {
+    perror("Socket creation failed");
+    return -1;
+  }
+  memset(servaddr, 0, sizeof(*servaddr));
+  servaddr->sin_family = AF_INET;
+  servaddr->sin_port = htons(server_port);
+  servaddr->sin_addr.s_addr = server_addr;
+
+  uint8_t msg_buf[256] = {0};
+  return 0;
 }

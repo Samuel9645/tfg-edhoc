@@ -14,10 +14,6 @@
 #include "edhoc_setup.h"
 #include "public_data.h"
 
-#define MAX_MESSAGE_LEN 256
-#define GCM_TAG_LEN 16
-#define SECRET_BITS 32 * 8
-
 static int credential_fetch(void* user_context,
                             struct edhoc_auth_creds* credentials) {
   if (credentials == NULL)
@@ -89,7 +85,7 @@ static int run_handshake(struct edhoc_context* ctx, const char* server_ip,
   servaddr->sin_port = htons(server_port);
   servaddr->sin_addr.s_addr = inet_addr(server_ip);
 
-  uint8_t msg_buf[256] = {0};
+  uint8_t msg_buf[SOCKET_MESSAGE_BUFFER_LEN] = {0};
 
   printf("Client: Waiting for server to be ready...\n");
   sleep(1);
@@ -106,9 +102,10 @@ static int run_handshake(struct edhoc_context* ctx, const char* server_ip,
          sizeof(*servaddr));
   printf("Client: Sent Message 1 (%zu bytes)\n", msg1_len);
 
-  socklen_t len = sizeof(*servaddr);
-  ssize_t msg2_len = recvfrom(*socket_fd, msg_buf, sizeof(msg_buf), 0,
-                              (struct sockaddr*)servaddr, &len);
+  socklen_t server_address_length = sizeof(*servaddr);
+  ssize_t msg2_len =
+      recvfrom(*socket_fd, msg_buf, sizeof(msg_buf), 0,
+               (struct sockaddr*)servaddr, &server_address_length);
   if (msg2_len < 0) {
     fprintf(stderr,
             "Failed to receive Message 2 from server. Make sure server is "
@@ -167,7 +164,8 @@ static int encrypt(const uint8_t* plaintext, size_t plaintext_len,
   psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_ENCRYPT);
   psa_set_key_algorithm(&attr, PSA_ALG_CCM);
   psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
-  psa_set_key_bits(&attr, SECRET_BITS);
+  const size_t key_bits = key_len * 8;
+  psa_set_key_bits(&attr, key_bits);
 
   // Import the key
   psa_key_id_t key_id;
@@ -215,9 +213,9 @@ int run_client() {
     return ret;
   }
 
-  uint8_t secret[32] = {0};
-  const size_t label = EDHOC_PRK_EXPORTER_PRIVATE_LABEL_MINIMUM + 1;
-  ret = edhoc_export_prk_exporter(&ctx, label, secret, sizeof(secret));
+  uint8_t secret[PKR_EXPORT_SECRET_LEN] = {0};
+  ret = edhoc_export_prk_exporter(&ctx, OSCORE_EXTRACT_LABEL_MASTER_SECRET,
+                                  secret, sizeof(secret));
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "Client: Failed to export PRK exporter\n");
     edhoc_context_deinit(&ctx);
@@ -226,7 +224,7 @@ int run_client() {
   }
 
   const uint8_t* message = "Hello Server!";
-  uint8_t ciphertext[MAX_MESSAGE_LEN + GCM_TAG_LEN] = {0};
+  uint8_t ciphertext[CYPERTEXT_LEN] = {0};
   size_t ciphertext_len = 0;
   ret = encrypt(message, strlen(message), secret, sizeof(secret), ciphertext,
                 sizeof(ciphertext), &ciphertext_len);

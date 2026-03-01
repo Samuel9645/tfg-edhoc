@@ -1,48 +1,30 @@
 #include "client.h"
 
+#include "shared_credentials.h"
+#include "shared_crypto.h"
+
 static int credential_fetch(void* user_context,
                             struct edhoc_auth_creds* credentials) {
-  if (credentials == NULL)
-    return EDHOC_ERROR_INVALID_ARGUMENT;
-
-  initialize_credential_key(credentials, CLIENT_PUBLIC_KEY,
-                            ARRAY_SIZE(CLIENT_PUBLIC_KEY), CLIENT_KID);
-
-  int ret = edhoc_cipher_suite_2_key_import(
-      user_context, EDHOC_KT_SIGNATURE, CLIENT_PRIVATE_KEY,
-      ARRAY_SIZE(CLIENT_PRIVATE_KEY), credentials->priv_key_id);
-
-  if (ret != EDHOC_SUCCESS) {
-    return EDHOC_ERROR_CREDENTIALS_FAILURE;
-  }
-
-  return EDHOC_SUCCESS;
+  return shared_credential_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
+                                 ARRAY_SIZE(CLIENT_PUBLIC_KEY),
+                                 CLIENT_PRIVATE_KEY,
+                                 ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
 
 static int credential_verify(void* user_context,
                              struct edhoc_auth_creds* credentials,
                              const uint8_t** public_key_reference,
                              size_t* public_key_length) {
-  (void)user_context;
-  if (NULL == credentials)
-    return EDHOC_ERROR_INVALID_ARGUMENT;
+  int result = shared_credential_verify(
+      user_context, credentials, SERVER_KID, SERVER_PUBLIC_KEY,
+      ARRAY_SIZE(SERVER_PUBLIC_KEY), public_key_reference, public_key_length);
 
-  if (EDHOC_COSE_HEADER_KID != credentials->label)
-    return EDHOC_ERROR_CREDENTIALS_FAILURE;
+  if (result == EDHOC_SUCCESS) {
+    initialize_credential_key(credentials, SERVER_PUBLIC_KEY,
+                              ARRAY_SIZE(SERVER_PUBLIC_KEY), SERVER_KID);
+  }
 
-  if (EDHOC_ENCODE_TYPE_INTEGER != credentials->key_id.encode_type)
-    return EDHOC_ERROR_CREDENTIALS_FAILURE;
-
-  if (SERVER_KID != credentials->key_id.key_id_int)
-    return EDHOC_ERROR_CREDENTIALS_FAILURE;
-
-  *public_key_reference = SERVER_PUBLIC_KEY;
-  *public_key_length = ARRAY_SIZE(SERVER_PUBLIC_KEY);
-
-  initialize_credential_key(credentials, SERVER_PUBLIC_KEY,
-                            ARRAY_SIZE(SERVER_PUBLIC_KEY), SERVER_KID);
-
-  return EDHOC_SUCCESS;
+  return result;
 }
 
 static int run_handshake(struct edhoc_context* context, int* socket_fd,
@@ -100,42 +82,6 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
   return EDHOC_SUCCESS;
 }
 
-/**
- * @brief Encrypt plaintext message using AES-CCM
- * @param plaintext_buffer Buffer containing plaintext to encrypt
- * @param plaintext_length Length of plaintext
- * @param key_material Encryption key material
- * @param key_length Key length in bytes
- * @param[out] ciphertext_buffer Output buffer for encrypted data
- * @param ciphertext_buffer_size Size of output buffer
- * @param[out] ciphertext_output_length Actual length of ciphertext
- * @return Status code
- */
-static int encrypt_plaintext(const uint8_t* plaintext_buffer,
-                             size_t plaintext_length,
-                             const uint8_t* key_material, size_t key_length,
-                             uint8_t* ciphertext_buffer,
-                             size_t ciphertext_buffer_size,
-                             size_t* ciphertext_output_length) {
-  psa_key_id_t key_id;
-  psa_status_t status = setup_psa_crypto(PSA_KEY_USAGE_ENCRYPT, key_material,
-                                         key_length, &key_id);
-  if (status != PSA_SUCCESS) {
-    return status;
-  }
-
-  uint8_t nonce[NONCE_LENGTH_BYTES] = {0};
-  // Encrypt with AES-CCM
-  status =
-      psa_aead_encrypt(key_id, PSA_ALG_CCM, nonce, sizeof(nonce), NULL,
-                       0,  // No AAD
-                       plaintext_buffer, plaintext_length, ciphertext_buffer,
-                       ciphertext_buffer_size, ciphertext_output_length);
-
-  // Clean up
-  return psa_destroy_key(key_id);
-}
-
 static int send_message(struct edhoc_context* context, int socket_fd,
                         const struct sockaddr_in* server_address,
                         const uint8_t* plaintext_message) {
@@ -149,7 +95,7 @@ static int send_message(struct edhoc_context* context, int socket_fd,
 
   uint8_t encrypted_message[CIPHERTEXT_MAX_LENGTH] = {0};
   size_t encrypted_message_length = 0;
-  const psa_status_t encrypt_status = encrypt_plaintext(
+  const psa_status_t encrypt_status = shared_encrypt_plaintext(
       plaintext_message, strlen((const char*)plaintext_message), shared_secret,
       sizeof(shared_secret), encrypted_message, sizeof(encrypted_message),
       &encrypted_message_length);
@@ -164,6 +110,14 @@ static int send_message(struct edhoc_context* context, int socket_fd,
   return EDHOC_SUCCESS;
 }
 
+/**
+ * @brief Execute EDHOC client handshake and send encrypted message to server
+ *
+ * This function performs the complete EDHOC handshake as an initiator,
+ * establishes a secure context, and sends an encrypted message to the server.
+ *
+ * @return EDHOC_SUCCESS on success, error code on failure
+ */
 int run_client() {
   struct edhoc_context context = {0};
   const struct edhoc_credentials credentials = {

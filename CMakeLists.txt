@@ -56,6 +56,8 @@ add_executable(server
     src/psa_setup.c
     src/public_data.c
     src/common_data.c
+    src/shared_credentials.c
+    src/shared_crypto.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 add_executable(client
@@ -65,6 +67,8 @@ add_executable(client
     src/psa_setup.c
     src/public_data.c
     src/common_data.c
+    src/shared_credentials.c
+    src/shared_crypto.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 # Link libraries

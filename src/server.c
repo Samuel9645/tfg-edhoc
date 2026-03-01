@@ -1,18 +1,5 @@
 #include "server.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#include "edhoc_cipher_suite_2.h"
-#include "edhoc_context.h"
-#include "edhoc_setup.h"
-#include "public_data.h"
-
 static int credential_fetch(void* user_context,
                             struct edhoc_auth_creds* credentials) {
   (void)user_context;
@@ -110,6 +97,79 @@ static int run_handshake(struct edhoc_context* ctx, int* socket_fd,
   return EDHOC_SUCCESS;
 }
 
+/**
+ * @param ciphertext
+ * @param ciphertext_len
+ * @param key
+ * @param key_len
+ * @param[out] plaintext
+ * @param[out] plaintext_len
+ * @return
+ */
+static int decrypt_cyphertext(const uint8_t* ciphertext, size_t ciphertext_len,
+                              const uint8_t* key, size_t key_len,
+                              uint8_t* plaintext, size_t plaintext_size,
+                              size_t* plaintext_len) {
+  psa_key_id_t key_id;
+  psa_status_t status =
+      setup_psa_crypto(PSA_KEY_USAGE_DECRYPT, key, key_len, &key_id);
+  if (status != PSA_SUCCESS) {
+    return status;
+  }
+
+  uint8_t nonce[13] = {0};
+  // Decrypt with AES-CCM
+  status = psa_aead_decrypt(
+      key_id, PSA_ALG_CCM, nonce, sizeof(nonce), NULL, 0,  // No AAD
+      ciphertext, ciphertext_len, plaintext, plaintext_size, plaintext_len);
+  // Clean up
+  return psa_destroy_key(key_id);
+}
+
+/**
+ * @brief
+ * @param ctx
+ * @param socket_fd
+ * @param client_address
+ * @param recieved_message_size
+ * @param[out] recieved_message
+ * @param[out] recieved_message_len
+ * @return
+ */
+static int recieve_message(struct edhoc_context* ctx, int socket_fd,
+                           struct sockaddr_in* client_address,
+                           size_t recieved_message_size,
+                           uint8_t* recieved_message,
+                           size_t* recieved_message_len) {
+  uint8_t secret[PKR_EXPORT_SECRET_LEN] = {0};
+  int ret =
+      edhoc_export_prk_exporter(ctx, PKR_OUT_LABEL, secret, sizeof(secret));
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Server: Failed to export PRK exporter\n");
+    return ret;
+  }
+
+  uint8_t ciphertext[CYPERTEXT_LEN] = {0};
+  socklen_t client_address_len = sizeof(*client_address);
+  ret = recvfrom(socket_fd, ciphertext, sizeof(ciphertext), 0,
+                 (struct sockaddr*)client_address, &client_address_len);
+  if (ret < 0) {
+    fprintf(stderr, "Failed to receive ciphertext\n");
+    return -1;
+  }
+
+  size_t ciphertext_len = (size_t)ret;
+  // printf("Server: Received ciphertext from client: %.*s\n", (int)ciphertext_len,
+  //        ciphertext);
+  const psa_status_t decrypt_status = decrypt_cyphertext(
+      ciphertext, ciphertext_len, secret, sizeof(secret), recieved_message,
+      recieved_message_size, recieved_message_len);
+  if (decrypt_status != PSA_SUCCESS) {
+    fprintf(stderr, "Failed to decrypt ciphertext\n");
+  }
+  return EDHOC_SUCCESS;
+}
+
 int run_server() {
   struct edhoc_context ctx = {0};
   const struct edhoc_credentials credentials = {
@@ -123,9 +183,9 @@ int run_server() {
     return ret;
   }
 
-  int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sock_fd < 0) {
-    perror("Socket creation failed");
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_fd < 0) {
+    fprintf(stderr, "Socket creation failed\n");
     return -1;
   }
 
@@ -138,16 +198,35 @@ int run_server() {
   server_address.sin_port = htons(SERVER_PORT);
   server_address.sin_family = AF_INET;
 
-  if (bind(sock_fd, (const struct sockaddr*)&server_address,
+  if (bind(socket_fd, (const struct sockaddr*)&server_address,
            sizeof(server_address)) < 0) {
-    perror("Bind failed");
-    close(sock_fd);
+    fprintf(stderr, "Bind failed\n");
+    close(socket_fd);
     return -1;
   }
 
+  ret = run_handshake(&ctx, &socket_fd, &server_address, &client_address);
+  if (ret != EDHOC_SUCCESS) {
+    fprintf(stderr, "Failed to run handshake\n");
+    close(socket_fd);
+    edhoc_context_deinit(&ctx);
+    return ret;
+  }
 
-  ret = run_handshake(&ctx, &sock_fd, &server_address, &client_address);
-  close(sock_fd);
+  u_int8_t message[SOCKET_MESSAGE_BUFFER_LEN] = {0};
+  size_t message_len = 0;
+  ret = recieve_message(&ctx, socket_fd, &client_address, sizeof(message),
+                        message, &message_len);
+  if (ret != EDHOC_SUCCESS) {
+    close(socket_fd);
+    edhoc_context_deinit(&ctx);
+    return ret;
+  }
+  printf("Server: Received message from client: %.*s\n", (int)message_len,
+         message);
+
+  close(socket_fd);
   edhoc_context_deinit(&ctx);
-  return ret;
+
+  return 0;
 }

@@ -53,14 +53,18 @@ add_executable(server
     src/main_server.c
     src/server.c
     src/edhoc_setup.c
+    src/psa_setup.c
     src/public_data.c
+    src/common_data.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 add_executable(client
     src/main_client.c
     src/client.c
     src/edhoc_setup.c
+    src/psa_setup.c
     src/public_data.c
+    src/common_data.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 # Link libraries
@@ -81,5 +85,5 @@ set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-target_compile_options(server PRIVATE -g)
-target_compile_options(client PRIVATE -g)
+target_compile_options(server PRIVATE -g -Wall -Wextra -Wpedantic) 
+target_compile_options(client PRIVATE -g -Wall -Wextra -Wpedantic)

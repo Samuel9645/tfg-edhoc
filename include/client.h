@@ -1,7 +1,20 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include "common_data.h"
+#include "edhoc_cipher_suite_2.h"
+#include "edhoc_context.h"
+#include "edhoc_setup.h"
+#include "psa_setup.h"
+#include "public_data.h"
 
 int run_client();
 

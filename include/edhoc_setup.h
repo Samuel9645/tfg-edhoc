@@ -1,7 +1,15 @@
 #ifndef EDHOC_SETUP_H
 #define EDHOC_SETUP_H
 
+#include <netinet/in.h>
+#include <psa/crypto.h>
+#include <psa/crypto_types.h>
+#include <psa/crypto_values.h>
+#include <stdio.h>
+
 #include "edhoc.h"
+#include "edhoc_cipher_suite_2.h"
+#include "edhoc_context.h"
 
 /**
  * Initializes PSA crypto and configures EDHOC context with cipher suite,

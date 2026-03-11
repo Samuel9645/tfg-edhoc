@@ -4,7 +4,6 @@
 [submodule "libcoap"]
 	path = libcoap
 	url = https://github.com/obgm/libcoap.git
-# TODO: REMOVE WHEN DONE
 [submodule "libcoap-minimal"]
-	path = libcoap
+	path = libcoap-minimal
 	url = https://github.com/obgm/libcoap-minimal.git

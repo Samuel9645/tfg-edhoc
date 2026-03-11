@@ -1,0 +1,6 @@
+[submodule "libedhoc"]
+  path = libedhoc
+  url = https://github.com/kamil-kielbasa/libedhoc.git
+[submodule "libcoap"]
+	path = libcoap
+	url = https://github.com/obgm/libcoap.git

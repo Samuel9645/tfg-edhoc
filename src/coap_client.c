@@ -1,5 +1,6 @@
 #include "client.h"
 #include "coap3/coap.h"
+#include "coap_shared.h"
 #include "shared_credentials.h"
 #include "shared_crypto.h"
 
@@ -27,16 +28,7 @@ static int credential_verify(void* user_context,
   return result;
 }
 
-static int end_coap_session(coap_optlist_t* options, coap_session_t* session,
-                            coap_context_t* context) {
-  coap_delete_optlist(options);
-  coap_session_release(session);
-  coap_free_context(context);
-  coap_cleanup();
-  return -1;
-}
-
-static int have_response = 0;
+static bool have_response = false;
 
 static coap_response_t response_handler(coap_session_t* session,
                                         const coap_pdu_t* sent,
@@ -46,14 +38,13 @@ static coap_response_t response_handler(coap_session_t* session,
   (void)sent;
   (void)id;
 
+  have_response = true;
+  coap_show_pdu(COAP_LOG_WARN, received);
+
   size_t len;
   const uint8_t* databuf;
   size_t offset;
   size_t total;
-
-  have_response = 1;
-  coap_show_pdu(COAP_LOG_WARN, received);
-
   if (coap_get_data_large(received, &len, &databuf, &offset, &total)) {
     fwrite(databuf, 1, len, stdout);
     fwrite("\n", 1, 1, stdout);
@@ -154,35 +145,55 @@ static int send_message(struct edhoc_context* context, int socket_fd,
  * @return EDHOC_SUCCESS on success, error code on failure
  */
 int run_client() {
-  struct edhoc_context edhoc_session_context = {0};
-  const struct edhoc_credentials credentials = {
-      .fetch = credential_fetch,
-      .verify = credential_verify,
-  };
+  // struct edhoc_context edhoc_session_context = {0};
+  // const struct edhoc_credentials credentials = {
+  //     .fetch = credential_fetch,
+  //     .verify = credential_verify,
+  // };
 
-  int result = edhoc_setup_context(&edhoc_session_context, &credentials);
-  if (result != EDHOC_SUCCESS) {
-    edhoc_context_deinit(&edhoc_session_context);
-    return result;
-  }
-  const int BUFFER_SIZE = 1000;
-  const unsigned char scratch[BUFFER_SIZE] = {0};
+  // int result = edhoc_setup_context(&edhoc_session_context, &credentials);
+  // if (result != EDHOC_SUCCESS) {
+  //   edhoc_context_deinit(&edhoc_session_context);
+  //   return result;
+  // }
 
+  // struct sockaddr_in server_address;
+  // memset(&server_address, 0, sizeof(server_address));
+  // server_address.sin_family = AF_INET;
+  // server_address.sin_port = htons(SERVER_PORT);
+  // server_address.sin_addr.s_addr = inet_addr(SERVER_URI);
+  // result = run_handshake(&edhoc_session_context, &socket_fd,
+  // &server_address); if (result != EDHOC_SUCCESS) {
+  //   edhoc_context_deinit(&edhoc_session_context);
+  //   return result;
+  // }
+
+  // result = send_message(&edhoc_session_context, socket_fd,
+  // &server_address,
+  //                       (const uint8_t*)"Hello Server!");
+  // if (result != EDHOC_SUCCESS) {
+  //   edhoc_context_deinit(&edhoc_session_context);
+  //   close(socket_fd);
+  //   return result;
+  // }
+
+  // close(socket_fd);
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
 
-  const char* coap_uri = "coap://localhost:5683/hello";
+  static const char CLIENT_COAP_URI[] = "coap://localhost:5683/hello";
   coap_uri_t client_uri = {0};
-  result = coap_split_uri((const unsigned char*)coap_uri, strlen(coap_uri),
-                          &client_uri);
+  int result = coap_split_uri((const unsigned char*)CLIENT_COAP_URI,
+                              strlen(CLIENT_COAP_URI), &client_uri);
   if (result != 0) {
-    coap_log_warn("Failed to parse uri %s\n", coap_uri);
+    coap_log_warn("Failed to parse uri %s\n", CLIENT_COAP_URI);
     return end_coap_session(NULL, NULL, NULL);
   }
 
   coap_address_t destination_address = {0};
+  const uint32_t masked_protocol = 1 << client_uri.scheme;
   result = resolve_address(&client_uri.host, client_uri.port,
-                           &destination_address, 1 << client_uri.scheme);
+                           &destination_address, masked_protocol);
   if (result <= 0) {
     coap_log_warn("Failed to resolve address %*.*s\n",
                   (int)client_uri.host.length, (int)client_uri.host.length,
@@ -198,7 +209,7 @@ int run_client() {
   }
 
   coap_context_set_block_mode(coap_session_context,
-                              COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY);
+                              USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
 
   coap_session_t* coap_session = NULL;
   coap_address_t* local_interface = NULL;
@@ -224,7 +235,8 @@ int run_client() {
   }
 
   coap_optlist_t* optlist = NULL;
-  const int ADD_PORT_OPTION = 1;
+  enum { ADD_PORT_OPTION = 1, BUFFER_SIZE = 1000 };
+  const unsigned char scratch[BUFFER_SIZE] = {0};
   result = coap_uri_into_options(&client_uri, &destination_address, &optlist,
                                  ADD_PORT_OPTION, scratch, sizeof(scratch));
   if (result != 0) {
@@ -247,15 +259,15 @@ int run_client() {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
 
-  const int TIMEOUT_MS = 1000;
+  enum { TIMEOUT_MS = 1000 };
   int wait_ms =
       (coap_session_get_default_leisure(coap_session).integer_part + 1) *
       TIMEOUT_MS;
   int miliseconds_spent_on_function = 0;
-  while (have_response == 0 || is_mcast) {
+  while (!have_response || is_mcast) {
     miliseconds_spent_on_function =
         coap_io_process(coap_session_context, TIMEOUT_MS);
-    if (miliseconds_spent_on_function <= 0) {
+    if (miliseconds_spent_on_function < 0) {
       coap_log_err("CoAP I/O process failed\n");
       return end_coap_session(optlist, coap_session, coap_session_context);
     }
@@ -265,27 +277,5 @@ int run_client() {
     }
     wait_ms -= miliseconds_spent_on_function;
   }
-
-  // struct sockaddr_in server_address;
-  // memset(&server_address, 0, sizeof(server_address));
-  // server_address.sin_family = AF_INET;
-  // server_address.sin_port = htons(SERVER_PORT);
-  // server_address.sin_addr.s_addr = inet_addr(SERVER_URI);
-  // result = run_handshake(&edhoc_session_context, &socket_fd,
-  // &server_address); if (result != EDHOC_SUCCESS) {
-  //   edhoc_context_deinit(&edhoc_session_context);
-  //   return result;
-  // }
-
-  // result = send_message(&edhoc_session_context, socket_fd,
-  // &server_address,
-  //                       (const uint8_t*)"Hello Server!");
-  // if (result != EDHOC_SUCCESS) {
-  //   edhoc_context_deinit(&edhoc_session_context);
-  //   close(socket_fd);
-  //   return result;
-  // }
-
-  // close(socket_fd);
   return 0;
 }

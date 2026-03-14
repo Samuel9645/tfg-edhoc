@@ -8,7 +8,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/bin/server",
+      "program": "${workspaceFolder}/build/bin/client",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
@@ -26,7 +26,11 @@
           "text": "-gdb-set disassembly-flavor intel",
           "ignoreFailures": true
         }
-      ]
+      ],
     }
-  ]
+  ],
+  "env": {
+    "ASAN_OPTIONS": "detect_leaks=0",
+    "LSAN_OPTIONS": "verbosity=1:log_threads=1"
+  }
 }

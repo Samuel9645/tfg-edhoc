@@ -201,28 +201,12 @@ int run_client() {
                               COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY);
 
   coap_session_t* coap_session = NULL;
-  if (client_uri.scheme == COAP_URI_SCHEME_COAP) {
-    coap_session = coap_new_client_session(
-        coap_session_context, NULL, &destination_address, COAP_PROTO_UDP);
-  } else if (client_uri.scheme == COAP_URI_SCHEME_COAP_TCP) {
-    coap_session = coap_new_client_session(
-        coap_session_context, NULL, &destination_address, COAP_PROTO_TCP);
-  }
-  if (!coap_session) {
-    coap_log_emerg("cannot create client session\n");
-    return end_coap_session(NULL, coap_session, coap_session_context);
-  }
-
-  coap_context_set_block_mode(coap_session_context,
-                              COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY);
-
-  if (client_uri.scheme == COAP_URI_SCHEME_COAP) {
-    coap_session = coap_new_client_session(
-        coap_session_context, NULL, &destination_address, COAP_PROTO_UDP);
-  } else if (client_uri.scheme == COAP_URI_SCHEME_COAP_TCP) {
-    coap_session = coap_new_client_session(
-        coap_session_context, NULL, &destination_address, COAP_PROTO_TCP);
-  }
+  coap_address_t* local_interface = NULL;
+  coap_proto_t protocol = client_uri.scheme == COAP_URI_SCHEME_COAP_TCP
+                              ? COAP_PROTO_TCP
+                              : COAP_PROTO_UDP;
+  coap_session = coap_new_client_session(coap_session_context, &local_interface,
+                                         &destination_address, protocol);
   if (!coap_session) {
     coap_log_emerg("cannot create client session\n");
     return end_coap_session(NULL, coap_session, coap_session_context);
@@ -240,8 +224,9 @@ int run_client() {
   }
 
   coap_optlist_t* optlist = NULL;
-  result = coap_uri_into_options(&client_uri, &destination_address, &optlist, 1,
-                                 scratch, sizeof(scratch));
+  const int ADD_PORT_OPTION = 1;
+  result = coap_uri_into_options(&client_uri, &destination_address, &optlist,
+                                 ADD_PORT_OPTION, scratch, sizeof(scratch));
   if (result != 0) {
     coap_log_err("Failed to create options\n");
     return end_coap_session(optlist, coap_session, coap_session_context);

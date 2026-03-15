@@ -20,7 +20,6 @@ set(BASE_SOURCES
     src/shared_credentials.c
     src/sockets/shared_crypto.c
     src/coap_shared.c
-    src/minimal_coap_common.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 
@@ -41,11 +40,15 @@ add_executable(client
 target_link_libraries(server PRIVATE libedhoc libcoap::coap-3)
 target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
 
-# Add helper include directories
+# Suppress warnings from helpers
+set_source_files_properties(libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
+
+# Add helper include directories SYSTEM is set to suppress warnings from external 
+# code
 target_include_directories(server PRIVATE include)
-target_include_directories(server PRIVATE libedhoc/helpers/include)
+target_include_directories(server SYSTEM PRIVATE libedhoc/helpers/include)
 target_include_directories(client PRIVATE include)
-target_include_directories(client PRIVATE libedhoc/helpers/include)
+target_include_directories(client SYSTEM PRIVATE libedhoc/helpers/include)
 
 # Set output directory for executables
 set_target_properties(server PROPERTIES

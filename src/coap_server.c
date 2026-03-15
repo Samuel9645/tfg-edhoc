@@ -240,14 +240,14 @@ int run_server() {
     return end_coap_session(NULL, NULL, coap_context);
   }
 
-  result = coap_server_add_get_resource(coap_context, "hello",
-                                        first_resource_get_handler);
+  result = coap_server_add_post_resource(coap_context, ".well-known/edhoc",
+                                         first_resource_get_handler);
   if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }
 
-  result = coap_server_add_get_resource(coap_context, "hello/my",
-                                        second_resource_get_handler);
+  result = coap_server_add_post_resource(coap_context, "hello/my",
+                                         second_resource_get_handler);
   if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }

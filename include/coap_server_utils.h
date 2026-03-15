@@ -48,7 +48,7 @@ CoapServerUtilsResult coap_server_join_multicast_group(
  * @return COAP_SERVER_UTILS_SUCCESS on success, COAP_SERVER_UTILS_ERROR on
  * failure.
  */
-CoapServerUtilsResult coap_server_add_get_resource(
+CoapServerUtilsResult coap_server_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler);
 

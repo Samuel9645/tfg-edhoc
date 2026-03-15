@@ -1,83 +1,122 @@
+/**
+ * @file coap_client_utils.h
+ *
+ * @brief Client-side utilities for CoAP.
+ *
+ * @note This file uses the libcoap library for CoAP protocol handling.
+ *
+ * @see [libcoap project](https://libcoap.net/)
+ *
+ * @note Portions of this code are adapted from the libcoap-minimal client.hh
+ * example.
+ * @see [libcoap-minimal
+ * repository](https://github.com/obgm/libcoap-minimal.git)
+ *
+ * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
+ */
+
 #ifndef COAP_CLIENT_UTILS_H
 #define COAP_CLIENT_UTILS_H
 
 #include <stdbool.h>
 
 #include "coap3/coap.h"
+#include "coap_status.h"
 
-typedef enum CoapUtilsResult {
-  COAP_UTILS_SUCCESS = 0,
-  COAP_UTILS_ERROR = -1
-} CoapUtilsResult;
+// TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
 /**
- * Parse a CoAP URI and resolve the destination endpoint.
+ * @brief Parse a CoAP URI and resolve the destination endpoint.
  *
  * @param[in] uri_string Input URI string (for example:
  * coap://localhost:5683/hello).
  * @param[out] parsed_uri Output parsed URI structure.
  * @param[out] destination_address Output resolved socket address.
- * @param[out] is_mcast Output multicast flag (non-zero if multicast
- * destination).
- * @return COAP_UTILS_SUCCESS on success, COAP_UTILS_ERROR on failure.
+ * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapUtilsResult parse_and_resolve_coap_uri(const char* uri_string,
-                                           coap_uri_t* parsed_uri,
-                                           coap_address_t* destination_address,
-                                           int* is_mcast);
+CoapStatusResult parse_and_resolve_coap_uri(
+    const char* uri_string, coap_uri_t* parsed_uri,
+    coap_address_t* destination_address);
 
 /**
- * Create and configure a CoAP client context/session.
+ * @brief Create and configure a CoAP client context/session.
  *
  * @param[in] client_uri Input parsed URI used to select transport protocol.
  * @param[in] destination_address Input remote destination address.
  * @param[in] response_handler Input response callback used by libcoap.
  * @param[out] coap_session_context Output created CoAP context.
  * @param[out] coap_session Output created CoAP session.
- * @return COAP_UTILS_SUCCESS on success, COAP_UTILS_ERROR on failure.
+ * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ *
+ * @note On failure, both output parameters (context and session) are set to
+ * NULL and any allocated resources are freed.
  */
-CoapUtilsResult create_coap_client_session(
+CoapStatusResult create_coap_client_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session);
 
 /**
- * Build a GET request PDU and its URI options.
+ * @brief Create a CoAP options list with EDHOC-specific options.
+ *
+ * @see [RFC 9528: The Forward Message
+ * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
+ * for details on option creation.
+ *
+ * @see [RFC 9528: CoAP Content
+ * Formats](https://datatracker.ietf.org/doc/html/rfc9528/#name-coap-content-formats-regist)
+ * for details on the content format value.
+ * @return Pointer to created options list on success, NULL on failure.
+ *
+ * @note On failure, any allocated resources are freed.
+ */
+coap_optlist_t* create_coap_edhoc_optlist();
+
+/**
+ * @brief Build a POST request PDU and its URI options.
  *
  * @param[in] client_uri Input parsed URI.
  * @param[in] destination_address Input destination address.
- * @param[in] is_mcast Input multicast flag.
  * @param[in] coap_session Input active CoAP session.
- * @param[out] protocol_data_unit Output created request PDU.
- * @param[out] optlist Output created option list.
- * @return COAP_UTILS_SUCCESS on success, COAP_UTILS_ERROR on failure.
+ * @param[in] optlist Input pointer to options list used for PDU.
+ *
+ * @see [RFC 9528: The Forward Message
+ * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
+ * for details on option creation.
+ * @return Pointer to created PDU on success, NULL on failure.
+ *
+ * @note On failure, only the PDU is freed.
+ *
+ * @warning Storage allocated for the result must be released with
+ * coap_delete_pdu() if coap_send() is not called. The caller must not use or
+ * delete the pdu after calling coap_send(). Check the libcoap documentation for
+ * details on PDU ownership and lifecycle.
  */
-CoapUtilsResult prepare_coap_get_request(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    int is_mcast, coap_session_t* coap_session, coap_pdu_t** protocol_data_unit,
-    coap_optlist_t** optlist);
+coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
+                                      const coap_address_t* destination_address,
+                                      coap_session_t* coap_session,
+                                      coap_optlist_t* optlist);
 
 /**
- * Send a prepared CoAP request.
+ * @brief Send a prepared CoAP request.
  *
  * @param[in] coap_session Input active CoAP session.
  * @param[in] protocol_data_unit Input prepared request PDU.
- * @return COAP_UTILS_SUCCESS on success, COAP_UTILS_ERROR on failure.
+ * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapUtilsResult send_coap_request(coap_session_t* coap_session,
-                                  coap_pdu_t* protocol_data_unit);
+CoapStatusResult send_coap_request(coap_session_t* coap_session,
+                                   coap_pdu_t* protocol_data_unit);
 
 /**
- * Process CoAP I/O until response arrives or timeout is reached.
+ * @brief Process CoAP I/O until response arrives or timeout is reached.
  *
  * @param[in] coap_session_context Input active CoAP context.
  * @param[in] coap_session Input active CoAP session.
  * @param[in] have_response Input pointer to response flag updated by callback.
- * @param[in] is_mcast Input multicast flag.
- * @return COAP_UTILS_SUCCESS on success, COAP_UTILS_ERROR on failure.
+ * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapUtilsResult wait_for_coap_response(coap_context_t* coap_session_context,
-                                       coap_session_t* coap_session,
-                                       const bool* have_response, int is_mcast);
+CoapStatusResult wait_for_coap_response(coap_context_t* coap_session_context,
+                                        coap_session_t* coap_session,
+                                        const bool* have_response);
 
-#endif
+#endif  // COAP_CLIENT_UTILS_H

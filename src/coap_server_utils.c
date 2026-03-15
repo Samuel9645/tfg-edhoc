@@ -15,7 +15,7 @@ CoapServerUtilsResult coap_server_create_context(
 
   *coap_context = coap_new_context(NULL);
   if (!*coap_context) {
-    coap_log_emerg("cannot create libcoap context\n");
+    coap_log_err("cannot create libcoap context\n");
     return COAP_SERVER_UTILS_ERROR;
   }
 
@@ -83,7 +83,7 @@ CoapServerUtilsResult coap_server_join_multicast_group(
   return COAP_SERVER_UTILS_SUCCESS;
 }
 
-CoapServerUtilsResult coap_server_add_get_resource(
+CoapServerUtilsResult coap_server_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler) {
   if (!coap_context || !resource_path || !resource_handler) {
@@ -94,11 +94,11 @@ CoapServerUtilsResult coap_server_add_get_resource(
   coap_resource_t* resource = coap_resource_init(
       coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS);
   if (!resource) {
-    coap_log_emerg("cannot create resource\n");
+    coap_log_err("cannot create resource\n");
     return COAP_SERVER_UTILS_ERROR;
   }
 
-  coap_register_request_handler(resource, COAP_REQUEST_GET, resource_handler);
+  coap_register_request_handler(resource, COAP_REQUEST_POST, resource_handler);
   coap_add_resource(coap_context, resource);
   return COAP_SERVER_UTILS_SUCCESS;
 }

@@ -182,13 +182,13 @@ int run_client() {
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
 
-  static const char CLIENT_COAP_URI[] = "coap://localhost:5683/hello";
+  static const char CLIENT_COAP_URI[] =
+      "coap://localhost:5683/.well-known/edhoc";
   coap_uri_t client_uri = {0};
   coap_address_t destination_address = {0};
-  int is_mcast = 0;
-  CoapUtilsResult result = parse_and_resolve_coap_uri(
-      CLIENT_COAP_URI, &client_uri, &destination_address, &is_mcast);
-  if (result != COAP_UTILS_SUCCESS) {
+  CoapStatusResult result = parse_and_resolve_coap_uri(
+      CLIENT_COAP_URI, &client_uri, &destination_address);
+  if (result != COAP_STATUS_SUCCESS) {
     return end_coap_session(NULL, NULL, NULL);
   }
 
@@ -197,28 +197,29 @@ int run_client() {
   result = create_coap_client_session(&client_uri, &destination_address,
                                       response_handler, &coap_session_context,
                                       &coap_session);
-  if (result != COAP_UTILS_SUCCESS) {
+  if (result != COAP_STATUS_SUCCESS) {
     return end_coap_session(NULL, coap_session, coap_session_context);
   }
 
-  coap_pdu_t* protocol_data_unit = NULL;
-  coap_optlist_t* optlist = NULL;
-  result =
-      prepare_coap_get_request(&client_uri, &destination_address, is_mcast,
-                               coap_session, &protocol_data_unit, &optlist);
-  if (result != COAP_UTILS_SUCCESS) {
+  coap_optlist_t* optlist = create_coap_edhoc_optlist();
+  if (!optlist) {
+    return end_coap_session(NULL, coap_session, coap_session_context);
+  }
+  coap_pdu_t* protocol_data_unit = prepare_coap_post_request(
+      &client_uri, &destination_address, coap_session, optlist);
+  if (!protocol_data_unit) {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
   coap_show_pdu(COAP_LOG_WARN, protocol_data_unit);
 
   result = send_coap_request(coap_session, protocol_data_unit);
-  if (result != COAP_UTILS_SUCCESS) {
+  if (result != COAP_STATUS_SUCCESS) {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
 
   result = wait_for_coap_response(coap_session_context, coap_session,
-                                  &have_response, is_mcast);
-  if (result != COAP_UTILS_SUCCESS) {
+                                  &have_response);
+  if (result != COAP_STATUS_SUCCESS) {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
   return 0;

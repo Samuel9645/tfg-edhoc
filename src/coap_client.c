@@ -1,5 +1,6 @@
 #include "client.h"
 #include "coap3/coap.h"
+#include "coap_client_utils.h"
 #include "coap_shared.h"
 #include "shared_credentials.h"
 #include "shared_crypto.h"
@@ -183,99 +184,42 @@ int run_client() {
 
   static const char CLIENT_COAP_URI[] = "coap://localhost:5683/hello";
   coap_uri_t client_uri = {0};
-  int result = coap_split_uri((const unsigned char*)CLIENT_COAP_URI,
-                              strlen(CLIENT_COAP_URI), &client_uri);
-  if (result != 0) {
-    coap_log_warn("Failed to parse uri %s\n", CLIENT_COAP_URI);
-    return end_coap_session(NULL, NULL, NULL);
-  }
-
   coap_address_t destination_address = {0};
-  const uint32_t masked_protocol = 1 << client_uri.scheme;
-  result = resolve_address(&client_uri.host, client_uri.port,
-                           &destination_address, masked_protocol);
-  if (result <= 0) {
-    coap_log_warn("Failed to resolve address %*.*s\n",
-                  (int)client_uri.host.length, (int)client_uri.host.length,
-                  (const char*)client_uri.host.s);
+  int is_mcast = 0;
+  CoapUtilsResult result = parse_and_resolve_coap_uri(
+      CLIENT_COAP_URI, &client_uri, &destination_address, &is_mcast);
+  if (result != COAP_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, NULL);
   }
-  const int is_mcast = coap_is_mcast(&destination_address);
 
-  coap_context_t* coap_session_context = coap_new_context(NULL);
-  if (!coap_session_context) {
-    coap_log_emerg("cannot create libcoap context\n");
-    return end_coap_session(NULL, NULL, coap_session_context);
-  }
-
-  coap_context_set_block_mode(coap_session_context,
-                              USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
-
+  coap_context_t* coap_session_context = NULL;
   coap_session_t* coap_session = NULL;
-  coap_address_t* local_interface = NULL;
-  coap_proto_t protocol = client_uri.scheme == COAP_URI_SCHEME_COAP_TCP
-                              ? COAP_PROTO_TCP
-                              : COAP_PROTO_UDP;
-  coap_session = coap_new_client_session(coap_session_context, &local_interface,
-                                         &destination_address, protocol);
-  if (!coap_session) {
-    coap_log_emerg("cannot create client session\n");
+  result = create_coap_client_session(&client_uri, &destination_address,
+                                      response_handler, &coap_session_context,
+                                      &coap_session);
+  if (result != COAP_UTILS_SUCCESS) {
     return end_coap_session(NULL, coap_session, coap_session_context);
   }
 
-  coap_register_response_handler(coap_session_context, response_handler);
-
-  coap_pdu_t* message_format_header =
-      coap_pdu_init(is_mcast ? COAP_MESSAGE_NON : COAP_MESSAGE_CON,
-                    COAP_REQUEST_CODE_GET, coap_new_message_id(coap_session),
-                    coap_session_max_pdu_size(coap_session));
-  if (!message_format_header) {
-    coap_log_emerg("cannot create PDU\n");
-    return end_coap_session(NULL, coap_session, coap_session_context);
-  }
-
+  coap_pdu_t* protocol_data_unit = NULL;
   coap_optlist_t* optlist = NULL;
-  enum { ADD_PORT_OPTION = 1, BUFFER_SIZE = 1000 };
-  const unsigned char scratch[BUFFER_SIZE] = {0};
-  result = coap_uri_into_options(&client_uri, &destination_address, &optlist,
-                                 ADD_PORT_OPTION, scratch, sizeof(scratch));
-  if (result != 0) {
-    coap_log_err("Failed to create options\n");
+  result =
+      prepare_coap_get_request(&client_uri, &destination_address, is_mcast,
+                               coap_session, &protocol_data_unit, &optlist);
+  if (result != COAP_UTILS_SUCCESS) {
+    return end_coap_session(optlist, coap_session, coap_session_context);
+  }
+  coap_show_pdu(COAP_LOG_WARN, protocol_data_unit);
+
+  result = send_coap_request(coap_session, protocol_data_unit);
+  if (result != COAP_UTILS_SUCCESS) {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
 
-  if (optlist) {
-    result = coap_add_optlist_pdu(message_format_header, &optlist);
-    if (result != 1) {
-      coap_log_err("Failed to add options to PDU\n");
-      return end_coap_session(optlist, coap_session, coap_session_context);
-    }
-  }
-
-  coap_show_pdu(COAP_LOG_WARN, message_format_header);
-
-  if (coap_send(coap_session, message_format_header) == COAP_INVALID_MID) {
-    coap_log_err("cannot send CoAP pdu\n");
+  result = wait_for_coap_response(coap_session_context, coap_session,
+                                  &have_response, is_mcast);
+  if (result != COAP_UTILS_SUCCESS) {
     return end_coap_session(optlist, coap_session, coap_session_context);
-  }
-
-  enum { TIMEOUT_MS = 1000 };
-  int wait_ms =
-      (coap_session_get_default_leisure(coap_session).integer_part + 1) *
-      TIMEOUT_MS;
-  int miliseconds_spent_on_function = 0;
-  while (!have_response || is_mcast) {
-    miliseconds_spent_on_function =
-        coap_io_process(coap_session_context, TIMEOUT_MS);
-    if (miliseconds_spent_on_function < 0) {
-      coap_log_err("CoAP I/O process failed\n");
-      return end_coap_session(optlist, coap_session, coap_session_context);
-    }
-    if (wait_ms < 0 || miliseconds_spent_on_function >= wait_ms) {
-      coap_log_warn("No response received within timeout\n");
-      return end_coap_session(optlist, coap_session, coap_session_context);
-    }
-    wait_ms -= miliseconds_spent_on_function;
   }
   return 0;
 }

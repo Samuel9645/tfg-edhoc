@@ -33,6 +33,7 @@ add_executable(server
 add_executable(client
     src/main_client.c
     src/coap_client.c
+    src/coap_client_utils.c
     ${BASE_SOURCES}
 )
 # Link libraries

@@ -221,14 +221,14 @@ int run_server() {
 
   // close(socket_fd);
   // edhoc_context_deinit(&context);
-  coap_context_t* coap_context = NULL;
-  CoapServerUtilsResult result = coap_server_create_context(&coap_context);
-  if (result != COAP_SERVER_UTILS_SUCCESS) {
+  coap_context_t* coap_context = coap_server_create_context();
+  if (!coap_context) {
     return end_coap_session(NULL, NULL, coap_context);
   }
 
   static const char COAP_LISTEN_UCAST_IP[] = "::";
-  result = coap_server_setup_endpoints(coap_context, COAP_LISTEN_UCAST_IP);
+  CoapServerUtilsResult result =
+      coap_server_setup_endpoints(coap_context, COAP_LISTEN_UCAST_IP);
   if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }

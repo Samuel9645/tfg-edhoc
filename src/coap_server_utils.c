@@ -4,24 +4,19 @@
 
 #include "coap_shared.h"
 
-CoapServerUtilsResult coap_server_create_context(
-    coap_context_t** coap_context) {
-  if (!coap_context) {
-    return COAP_SERVER_UTILS_ERROR;
-  }
-
+coap_context_t* coap_server_create_context() {
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
 
-  *coap_context = coap_new_context(NULL);
-  if (!*coap_context) {
+  coap_context_t* coap_context = coap_new_context(NULL);
+  if (!coap_context) {
     coap_log_err("cannot create libcoap context\n");
-    return COAP_SERVER_UTILS_ERROR;
+    return NULL;
   }
 
   coap_context_set_block_mode(
-      *coap_context, COAP_SHARED_USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
-  return COAP_SERVER_UTILS_SUCCESS;
+      coap_context, COAP_SHARED_USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
+  return coap_context;
 }
 
 CoapServerUtilsResult coap_server_setup_endpoints(

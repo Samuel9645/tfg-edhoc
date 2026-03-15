@@ -11,11 +11,12 @@ typedef enum CoapServerUtilsResult {
 /**
  * Initialize libcoap and create a server context with configured block mode.
  *
- * @param[out] coap_context Output created context.
- * @return COAP_SERVER_UTILS_SUCCESS on success, COAP_SERVER_UTILS_ERROR on
- * failure.
+ * @return Pointer to created CoAP context on success, NULL on failure.
+ *
+ * @note On failure, any allocated resources are freed and libcoap is cleaned
+ * up.
  */
-CoapServerUtilsResult coap_server_create_context(coap_context_t** coap_context);
+coap_context_t* coap_server_create_context();
 
 /**
  * Resolve local interfaces and create server endpoints.

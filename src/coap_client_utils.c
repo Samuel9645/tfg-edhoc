@@ -40,8 +40,9 @@ CoapUtilsResult create_coap_client_session(
     return COAP_UTILS_ERROR;
   }
 
-  coap_context_set_block_mode(*coap_session_context,
-                              USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
+  coap_context_set_block_mode(
+      *coap_session_context,
+      COAP_SHARED_USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
 
   const coap_proto_t protocol = client_uri->scheme == COAP_URI_SCHEME_COAP_TCP
                                     ? COAP_PROTO_TCP

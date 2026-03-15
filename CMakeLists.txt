@@ -28,6 +28,7 @@ set(BASE_SOURCES
 add_executable(server
     src/main_server.c
     src/coap_server.c
+    src/coap_server_utils.c
     ${BASE_SOURCES}
 )
 add_executable(client

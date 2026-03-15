@@ -1,4 +1,5 @@
 #include "coap3/coap.h"
+#include "coap_server_utils.h"
 #include "coap_shared.h"
 #include "server.h"
 #include "shared_credentials.h"
@@ -94,7 +95,6 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
   int result = edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret,
                                          sizeof(shared_secret));
   if (result != EDHOC_SUCCESS) {
-    fprintf(stderr, "Server: Failed to export PRK exporter\n");
     return result;
   }
 
@@ -221,75 +221,42 @@ int run_server() {
 
   // close(socket_fd);
   // edhoc_context_deinit(&context);
-  coap_startup();
-  coap_set_log_level(COAP_LOG_WARN);
-  coap_context_t* coap_context = coap_new_context(NULL);
-  if (!coap_context) {
-    coap_log_emerg("cannot create libcoap context\n");
+  coap_context_t* coap_context = NULL;
+  CoapServerUtilsResult result = coap_server_create_context(&coap_context);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }
 
-  coap_context_set_block_mode(coap_context,
-                              USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA);
-  const bool HAS_PKI_PSK_INFO = false;
-  const bool USE_WEB_SOCKETS = false;
-  uint32_t scheme_hints_bits = coap_get_available_scheme_hint_bits(
-      HAS_PKI_PSK_INFO, USE_WEB_SOCKETS, COAP_PROTO_NONE);
-
   static const char COAP_LISTEN_UCAST_IP[] = "::";
-  const coap_str_const_t* listen_address =
-      coap_make_str_const(COAP_LISTEN_UCAST_IP);
-  enum { USE_DEFAULT_PORT_DATA = 0, NO_AI_HINT_FLAGS = 0 };
-  coap_addr_info_t* endpoint_info_list = coap_resolve_address_info(
-      listen_address, USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA,
-      USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA, NO_AI_HINT_FLAGS,
-      scheme_hints_bits, COAP_RESOLVE_TYPE_LOCAL);
-
-  bool has_endpoint = false;
-  for (coap_addr_info_t* endpoint_info = endpoint_info_list;
-       endpoint_info != NULL; endpoint_info = endpoint_info->next) {
-    coap_endpoint_t* endpoint = coap_new_endpoint(
-        coap_context, &endpoint_info->addr, endpoint_info->proto);
-    if (!endpoint) {
-      coap_log_warn("cannot create endpoint for CoAP proto %u\n",
-                    endpoint_info->proto);
-    } else {
-      has_endpoint = true;
-    }
-  }
-  coap_free_address_info(endpoint_info_list);
-  if (!has_endpoint) {
-    coap_log_err("No context available for interface '%s'\n",
-                 (const char*)listen_address->s);
+  result = coap_server_setup_endpoints(coap_context, COAP_LISTEN_UCAST_IP);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }
 
   static const char COAP_LISTEN_MCAST_IPV6[] = "ff02::fd";
-  coap_join_mcast_group_intf(coap_context, COAP_LISTEN_MCAST_IPV6, NULL);
-
-  /* Create a resource that the server can respond to with information */
-  enum { MEMORY_HANDLING_FLAGS = 0 };
-  coap_resource_t* resource =
-      coap_resource_init(coap_make_str_const("hello"), MEMORY_HANDLING_FLAGS);
-  if (!resource) {
-    coap_log_emerg("cannot create resource\n");
+  result =
+      coap_server_join_multicast_group(coap_context, COAP_LISTEN_MCAST_IPV6);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }
-  coap_register_request_handler(resource, COAP_REQUEST_GET,
-                                first_resource_get_handler);
-  coap_add_resource(coap_context, resource);
 
-  resource = coap_resource_init(coap_make_str_const("hello/my"),
-                                MEMORY_HANDLING_FLAGS);
-  if (!resource) {
-    coap_log_emerg("cannot create resource\n");
+  result = coap_server_add_get_resource(coap_context, "hello",
+                                        first_resource_get_handler);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
     return end_coap_session(NULL, NULL, coap_context);
   }
-  coap_register_request_handler(resource, COAP_REQUEST_GET,
-                                second_resource_get_handler);
-  while (true) {
-    coap_io_process(coap_context, COAP_IO_WAIT);
+
+  result = coap_server_add_get_resource(coap_context, "hello/my",
+                                        second_resource_get_handler);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
+    return end_coap_session(NULL, NULL, coap_context);
   }
+
+  result = coap_server_run_input_output_loop(coap_context);
+  if (result != COAP_SERVER_UTILS_SUCCESS) {
+    return end_coap_session(NULL, NULL, coap_context);
+  }
+
   end_coap_session(NULL, NULL, coap_context);
   return 0;
 }

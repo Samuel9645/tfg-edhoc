@@ -1,7 +1,10 @@
 
-#include "edhoc_setup.h"
+#include "edhoc/common/setup.h"
 
+#include <edhoc_cipher_suite_2.h>
+#include <psa/crypto.h>
 #include <stdint.h>
+#include <stdio.h>
 
 int edhoc_setup_context(struct edhoc_context* ctx,
                         const struct edhoc_credentials* credentials) {

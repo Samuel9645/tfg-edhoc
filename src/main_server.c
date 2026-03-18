@@ -1,3 +1,3 @@
 #include "server.h"
 
-int main() { return run_server(); }
+int main(void) { return run_server(); }

@@ -9,31 +9,29 @@ include(libedhoc_config.cmake)
 
 # Add the libedhoc library
 # (It will automatically handle its own fallback configs for Zephyr)
-add_subdirectory(./libedhoc)
-add_subdirectory(./libcoap)
+add_subdirectory(libedhoc)
+add_subdirectory(libcoap)
 
 set(BASE_SOURCES
-    src/edhoc/edhoc_setup.c
-    src/sockets/psa_setup.c
-    src/public_data.c
-    src/common_data.c
-    src/shared_credentials.c
-    src/sockets/shared_crypto.c
-    src/coap_shared.c
+    src/edhoc/common/setup.c
+    src/edhoc/common/config.c
+    src/edhoc/credentials/public_data.c
+    src/edhoc/credentials/authentication.c
+    src/coap/common/helpers.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 
 # Define main executable
 add_executable(server
     src/main_server.c
-    src/coap_server.c
-    src/coap_server_utils.c
+    src/server.c
+    src/coap/server_utils.c
     ${BASE_SOURCES}
 )
 add_executable(client
     src/main_client.c
-    src/coap_client.c
-    src/coap_client_utils.c
+    src/client.c
+    src/coap/client_utils.c
     ${BASE_SOURCES}
 )
 # Link libraries

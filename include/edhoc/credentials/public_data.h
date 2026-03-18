@@ -1,0 +1,16 @@
+#ifndef EDHOC_CREDENTIALS_PUBLIC_DATA_H_
+#define EDHOC_CREDENTIALS_PUBLIC_DATA_H_
+
+#include <stdint.h>
+
+enum { PUBLIC_DATA_PRE_GENERATED_PUBLIC_KEY_LEN = 65 };
+extern const uint8_t
+    CLIENT_PUBLIC_KEY[PUBLIC_DATA_PRE_GENERATED_PUBLIC_KEY_LEN];
+extern const uint8_t
+    SERVER_PUBLIC_KEY[PUBLIC_DATA_PRE_GENERATED_PUBLIC_KEY_LEN];
+extern const int32_t SERVER_KID;
+extern const int32_t CLIENT_KID;
+extern const uint16_t SERVER_PORT;
+extern const char SERVER_URI[];
+
+#endif  // EDHOC_CREDENTIALS_PUBLIC_DATA_H_

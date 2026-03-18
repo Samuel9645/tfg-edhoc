@@ -3,10 +3,7 @@
 
 #include <coap3/coap.h>
 
-typedef enum CoapServerUtilsResult {
-  COAP_SERVER_UTILS_SUCCESS = 0,
-  COAP_SERVER_UTILS_ERROR = -1
-} CoapServerUtilsResult;
+#include "coap/common/status.h"
 
 /**
  * Initialize libcoap and create a server context with configured block mode.
@@ -16,7 +13,7 @@ typedef enum CoapServerUtilsResult {
  * @note On failure, any allocated resources are freed and libcoap is cleaned
  * up.
  */
-coap_context_t* coap_server_create_context();
+coap_context_t* coap_server_create_context(void);
 
 /**
  * Resolve local interfaces and create server endpoints.
@@ -26,7 +23,7 @@ coap_context_t* coap_server_create_context();
  * @return COAP_SERVER_UTILS_SUCCESS on success, COAP_SERVER_UTILS_ERROR on
  * failure.
  */
-CoapServerUtilsResult coap_server_setup_endpoints(
+coap_status_result_t coap_server_setup_endpoints(
     coap_context_t* coap_context, const char* listen_address_string);
 
 /**
@@ -37,7 +34,7 @@ CoapServerUtilsResult coap_server_setup_endpoints(
  * @return COAP_SERVER_UTILS_SUCCESS on success, COAP_SERVER_UTILS_ERROR on
  * failure.
  */
-CoapServerUtilsResult coap_server_join_multicast_group(
+coap_status_result_t coap_server_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string);
 
 /**
@@ -49,7 +46,7 @@ CoapServerUtilsResult coap_server_join_multicast_group(
  * @return COAP_SERVER_UTILS_SUCCESS on success, COAP_SERVER_UTILS_ERROR on
  * failure.
  */
-CoapServerUtilsResult coap_server_add_post_resource(
+coap_status_result_t coap_server_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler);
 
@@ -60,7 +57,7 @@ CoapServerUtilsResult coap_server_add_post_resource(
  * @return COAP_SERVER_UTILS_SUCCESS on graceful stop, COAP_SERVER_UTILS_ERROR
  * on I/O failure.
  */
-CoapServerUtilsResult coap_server_run_input_output_loop(
+coap_status_result_t coap_server_run_input_output_loop(
     coap_context_t* coap_context);
 
 #endif  // COAP_SERVER_UTILS_H_

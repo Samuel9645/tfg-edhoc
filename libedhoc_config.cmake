@@ -1,5 +1,10 @@
-# Disable mbedtls tests
-set(ENABLE_TESTING OFF CACHE BOOL "Disable mbedtls tests" FORCE)
+# Silence Mbed TLS (libedhoc)
+set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
+
+# Silence libcoap
+set(ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ENABLE_DTLS ON CACHE BOOL "" FORCE) # Keep this on though!
 
 # Compiler options
 option(LIBEDHOC_BUILD_COMPILER_GCC "Enable compiling library with gcc" ON)

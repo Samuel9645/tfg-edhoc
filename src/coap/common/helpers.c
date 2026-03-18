@@ -32,10 +32,10 @@ int end_coap_session(coap_optlist_t* options, coap_session_t* session,
   return -1;
 }
 
-CoapStatusResult resolve_address(coap_str_const_t* host, uint16_t port,
-                                 int scheme_hint_bits,
-                                 coap_address_t* destination_address) {
-  CoapStatusResult result = COAP_STATUS_ERROR;
+coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
+                                     int scheme_hint_bits,
+                                     coap_address_t* destination_address) {
+  coap_status_result_t result = COAP_STATUS_ERROR;
   coap_addr_info_t* addr_info;
 
   addr_info =

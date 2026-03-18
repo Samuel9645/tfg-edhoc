@@ -34,7 +34,7 @@
  * @param[out] destination_address Output resolved socket address.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapStatusResult parse_and_resolve_coap_uri(
+coap_status_result_t parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address);
 
@@ -51,7 +51,7 @@ CoapStatusResult parse_and_resolve_coap_uri(
  * @note On failure, both output parameters (context and session) are set to
  * NULL and any allocated resources are freed.
  */
-CoapStatusResult create_coap_client_session(
+coap_status_result_t create_coap_client_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session);
@@ -70,7 +70,7 @@ CoapStatusResult create_coap_client_session(
  *
  * @note On failure, any allocated resources are freed.
  */
-coap_optlist_t* create_coap_edhoc_optlist();
+coap_optlist_t* create_coap_edhoc_optlist(void);
 
 /**
  * @brief Build a POST request PDU and its URI options.
@@ -104,8 +104,8 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
  * @param[in] protocol_data_unit Prepared request PDU.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapStatusResult send_coap_request(coap_session_t* coap_session,
-                                   coap_pdu_t* protocol_data_unit);
+coap_status_result_t send_coap_request(coap_session_t* coap_session,
+                                       coap_pdu_t* protocol_data_unit);
 
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.
@@ -115,8 +115,8 @@ CoapStatusResult send_coap_request(coap_session_t* coap_session,
  * @param[in] have_response Pointer to response flag updated by callback.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
-CoapStatusResult wait_for_coap_response(coap_context_t* coap_session_context,
-                                        coap_session_t* coap_session,
-                                        const bool* have_response);
+coap_status_result_t wait_for_coap_response(
+    coap_context_t* coap_session_context, coap_session_t* coap_session,
+    const bool* have_response);
 
 #endif  // COAP_CLIENT_UTILS_H_

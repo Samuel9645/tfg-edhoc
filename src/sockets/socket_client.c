@@ -1,14 +1,12 @@
 #include "client.h"
-
 #include "shared_credentials.h"
 #include "shared_crypto.h"
 
 static int credential_fetch(void* user_context,
                             struct edhoc_auth_creds* credentials) {
-  return shared_credential_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
-                                 ARRAY_SIZE(CLIENT_PUBLIC_KEY),
-                                 CLIENT_PRIVATE_KEY,
-                                 ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
+  return credential_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
+                          ARRAY_SIZE(CLIENT_PUBLIC_KEY), CLIENT_PRIVATE_KEY,
+                          ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
 
 static int credential_verify(void* user_context,

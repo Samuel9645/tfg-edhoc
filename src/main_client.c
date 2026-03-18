@@ -1,3 +1,3 @@
 #include "client.h"
 
-int main() { return run_client(); }
+int main(void) { return run_client(); }

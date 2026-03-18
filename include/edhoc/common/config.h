@@ -1,7 +1,6 @@
 #ifndef EDHOC_COMMON_CONFIG_H_
 #define EDHOC_COMMON_CONFIG_H_
 
-#include <edhoc_values.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -17,11 +16,7 @@ enum {
   MESSAGE_BUFFER_LENGTH = 512,
 };
 
-extern const int32_t SERVER_KID;
-extern const int32_t CLIENT_KID;
 extern const int32_t CONNECTION_ID;
-extern const uint16_t SERVER_PORT;
-extern const char SERVER_URI[];
 extern const size_t PKR_OUT_LABEL;
 
 #endif  // EDHOC_COMMON_CONFIG_H_

@@ -23,15 +23,6 @@
 #include "coap/common/status.h"
 
 /**
- * @brief Bitmask for CoAP block mode configuration to use libcoap for both
- * request and single body data handling.
- */
-enum {
-  COAP_SHARED_USE_LIBCOAP_FOR_REQUEST_AND_SINGLE_BODY_DATA =
-      COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY
-};
-
-/**
  * @brief Cleanup function to end a CoAP session and free associated resources.
  * @param[in] options CoAP options list to delete (can be NULL).
  * @param[in] session CoAP session to release (can be NULL).
@@ -71,8 +62,8 @@ int end_coap_session(coap_optlist_t* options, coap_session_t* session,
  * Inspired by libcoap-minimal common.cc and common.hh files:
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
-CoapStatusResult resolve_address(coap_str_const_t* host, uint16_t port,
-                                 int scheme_hint_bits,
-                                 coap_address_t* destination_address);
+coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
+                                     int scheme_hint_bits,
+                                     coap_address_t* destination_address);
 
 #endif  // COAP_COMMON_HELPERS_H_

@@ -11,14 +11,17 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
+#include <coap3/coap.h>
 #include <stdbool.h>
 #include <string.h>
 
+#include "coap/common/config.h"
 #include "coap/common/helpers.h"
+#include "coap/common/status.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
-CoapStatusResult parse_and_resolve_coap_uri(
+coap_status_result_t parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address) {
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
@@ -28,7 +31,7 @@ CoapStatusResult parse_and_resolve_coap_uri(
   }
 
   const uint32_t masked_protocol = 1 << parsed_uri->scheme;
-  CoapStatusResult resolve_status =
+  coap_status_result_t resolve_status =
       resolve_address(&parsed_uri->host, parsed_uri->port, masked_protocol,
                       destination_address);
   if (resolve_status != COAP_STATUS_SUCCESS) {
@@ -40,7 +43,7 @@ CoapStatusResult parse_and_resolve_coap_uri(
   return COAP_STATUS_SUCCESS;
 }
 
-CoapStatusResult create_coap_client_session(
+coap_status_result_t create_coap_client_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session) {
@@ -72,7 +75,7 @@ CoapStatusResult create_coap_client_session(
   return COAP_STATUS_SUCCESS;
 }
 
-coap_optlist_t* create_coap_edhoc_optlist() {
+coap_optlist_t* create_coap_edhoc_optlist(void) {
   enum { CREATE_PORT_HOST_OPTION = 1 };
   coap_optlist_t* optlist = NULL;
   enum { APPLICATION_CID_EDHOC_CBOR_SEQ = 65 };
@@ -135,8 +138,8 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
   return protocol_data_unit;
 }
 
-CoapStatusResult send_coap_request(coap_session_t* coap_session,
-                                   coap_pdu_t* protocol_data_unit) {
+coap_status_result_t send_coap_request(coap_session_t* coap_session,
+                                       coap_pdu_t* protocol_data_unit) {
   if (coap_send(coap_session, protocol_data_unit) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
     return COAP_STATUS_ERROR;
@@ -145,9 +148,9 @@ CoapStatusResult send_coap_request(coap_session_t* coap_session,
   return COAP_STATUS_SUCCESS;
 }
 
-CoapStatusResult wait_for_coap_response(coap_context_t* coap_session_context,
-                                        coap_session_t* coap_session,
-                                        const bool* have_response) {
+coap_status_result_t wait_for_coap_response(
+    coap_context_t* coap_session_context, coap_session_t* coap_session,
+    const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };
   const u_int16_t maximum_rounded_wait_seconds =
       coap_session_get_default_leisure(coap_session).integer_part + 1;

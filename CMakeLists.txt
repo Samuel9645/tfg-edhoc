@@ -17,6 +17,7 @@ set(BASE_SOURCES
     src/edhoc/common/config.c
     src/edhoc/credentials/public_data.c
     src/edhoc/credentials/authentication.c
+    src/common/cleanup.c
     src/coap/common/helpers.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )

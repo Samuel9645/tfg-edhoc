@@ -1,0 +1,9 @@
+#ifndef COMMON_EMULATION_STATUS_H_
+#define COMMON_EMULATION_STATUS_H_
+
+typedef enum {
+  EMULATION_SUCCESS = 0,
+  EMULATION_FAILURE = -1,
+} emulation_status_t;
+
+#endif  // COMMON_EMULATION_STATUS_H_

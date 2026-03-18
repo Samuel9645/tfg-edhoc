@@ -17,21 +17,6 @@
 
 #include "coap/common/helpers.h"
 
-int end_coap_session(coap_optlist_t* options, coap_session_t* session,
-                     coap_context_t* context) {
-  if (options) {
-    coap_delete_optlist(options);
-  }
-  if (session) {
-    coap_session_release(session);
-  }
-  if (context) {
-    coap_free_context(context);
-  }
-  coap_cleanup();
-  return -1;
-}
-
 coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
                                      int scheme_hint_bits,
                                      coap_address_t* destination_address) {

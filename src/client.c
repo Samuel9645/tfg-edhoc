@@ -10,6 +10,7 @@
 #include "coap/client_utils.h"
 #include "coap/common/helpers.h"
 #include "coap/common/status.h"
+#include "common/cleanup.h"
 #include "edhoc/common/config.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
@@ -70,17 +71,11 @@ static coap_response_t response_handler(coap_session_t* session,
   return COAP_RESPONSE_OK;
 }
 
-/**
- * @brief Execute EDHOC client handshake and send encrypted message to server
- *
- * This function performs the complete EDHOC handshake as an initiator,
- * establishes a secure context, and sends an encrypted message to the server.
- *
- * @return EDHOC_SUCCESS on success, error code on failure
- */
-int run_client(void) {
+emulation_status_t run_client(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
+
+  session_resources_t client_resources = {0};
 
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
@@ -89,26 +84,28 @@ int run_client(void) {
   coap_status_result_t coap_result = parse_and_resolve_coap_uri(
       CLIENT_COAP_URI, &client_uri, &destination_address);
   if (coap_result != COAP_STATUS_SUCCESS) {
-    return end_coap_session(NULL, NULL, NULL);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
-
-  coap_context_t* coap_session_context = NULL;
-  coap_session_t* coap_session = NULL;
   coap_result = create_coap_client_session(
       &client_uri, &destination_address, response_handler,
-      &coap_session_context, &coap_session);
+      &client_resources.coap_context, &client_resources.coap_session);
   if (coap_result != COAP_STATUS_SUCCESS) {
-    return end_coap_session(NULL, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
   coap_optlist_t* optlist = create_coap_edhoc_optlist();
   if (!optlist) {
-    return end_coap_session(NULL, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
-  coap_pdu_t* protocol_data_unit = prepare_coap_post_request(
-      &client_uri, &destination_address, coap_session, optlist);
+  coap_pdu_t* protocol_data_unit =
+      prepare_coap_post_request(&client_uri, &destination_address,
+                                client_resources.coap_session, optlist);
   if (!protocol_data_unit) {
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
   struct edhoc_context edhoc_session_context = {0};
@@ -119,8 +116,8 @@ int run_client(void) {
 
   int edhoc_result = edhoc_setup_context(&edhoc_session_context, &credentials);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edhoc_context_deinit(&edhoc_session_context);
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
   // https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow
@@ -133,33 +130,38 @@ int run_client(void) {
       edhoc_message_1_compose(&edhoc_session_context, &payload_buffer[1],
                               MESSAGE_BUFFER_LENGTH - 1, &message1_length);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edhoc_context_deinit(&edhoc_session_context);
-    coap_log_err("cannot compose message 1\n");
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
   const size_t TOTAL_PAYLOAD_LENGTH = message1_length + 1;
   enum { LIBCOAP_ERROR = 0 };
   if (coap_add_data(protocol_data_unit, TOTAL_PAYLOAD_LENGTH, payload_buffer) ==
       LIBCOAP_ERROR) {
-    edhoc_context_deinit(&edhoc_session_context);
     coap_log_err("cannot add payload to PDU\n");
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
   coap_show_pdu(COAP_LOG_WARN, protocol_data_unit);
 
-  coap_result = send_coap_request(coap_session, protocol_data_unit);
+  coap_result =
+      send_coap_request(client_resources.coap_session, protocol_data_unit);
   if (coap_result != COAP_STATUS_SUCCESS) {
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
 
-  coap_result = wait_for_coap_response(coap_session_context, coap_session,
-                                       &have_response);
+  coap_result =
+      wait_for_coap_response(client_resources.coap_context,
+                             client_resources.coap_session, &have_response);
   if (coap_result != COAP_STATUS_SUCCESS) {
-    return end_coap_session(optlist, coap_session, coap_session_context);
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
   }
-  return 0;
+
+  cleanup_resources(&client_resources);
+  return EMULATION_SUCCESS;
 }
 
 // static int run_handshake(struct edhoc_context* context, int* socket_fd,

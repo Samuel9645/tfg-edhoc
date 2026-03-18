@@ -2,6 +2,7 @@
 
 #include <coap3/coap.h>
 #include <coap3/coap_session.h>
+#include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -17,6 +18,8 @@
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/public_data.h"
 #include "edhoc/credentials/server_private_key.h"
+
+// TODO: Check for reverse flow support
 
 static int server_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -71,9 +74,23 @@ static void edhoc_post_handler(coap_resource_t* resource,
   }
   // TODO: EXTRACT THIS INTO FUNCTION
   const bool is_message_1 = (size > 0 && request_pdu_data[0] == CBOR_TRUE);
+  struct edhoc_context* edhoc_ctx =
+      (struct edhoc_context*)coap_session_get_app_data(session);
+
+  coap_optlist_t* optlist =
+      create_coap_edhoc_optlist(APPLICATION_EDHOC_CBOR_SEQ);
+  if (!optlist) {
+    coap_log_err("cannot create options list\n");
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    return;
+  }
+  if (!coap_add_optlist_pdu(response, &optlist)) {
+    coap_log_err("cannot add options to response\n");
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    return;
+  }
+
   if (is_message_1) {
-    struct edhoc_context* edhoc_ctx =
-        (struct edhoc_context*)coap_session_get_app_data(session);
     if (edhoc_ctx != NULL) {
       coap_log_err("EDHOC context already exists for this session\n");
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
@@ -101,10 +118,8 @@ static void edhoc_post_handler(coap_resource_t* resource,
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
       return;
     }
-
-    int result =
-        edhoc_message_1_process(edhoc_ctx, edhoc_msg1_bytes, edhoc_msg1_len);
-    if (result != EDHOC_SUCCESS) {
+    if (edhoc_message_1_process(edhoc_ctx, edhoc_msg1_bytes, edhoc_msg1_len) !=
+        EDHOC_SUCCESS) {
       // TODO: Check if the error from the EDHOC context can be used to set a
       // more specific CoAP response code
       // https://kamil-kielbasa.github.io/libedhoc/api.html#_CPPv427edhoc_message_error_processPK7uint8_t6size_tP16edhoc_error_codeP16edhoc_error_info
@@ -121,10 +136,9 @@ static void edhoc_post_handler(coap_resource_t* resource,
 
     size_t message2_len = 0;
     uint8_t message2_buffer[MESSAGE_BUFFER_LENGTH] = {0};
-
-    result = edhoc_message_2_compose(edhoc_ctx, message2_buffer,
-                                     MESSAGE_BUFFER_LENGTH, &message2_len);
-    if (result != EDHOC_SUCCESS) {
+    if (edhoc_message_2_compose(edhoc_ctx, message2_buffer,
+                                MESSAGE_BUFFER_LENGTH,
+                                &message2_len) != EDHOC_SUCCESS) {
       enum edhoc_error_code err;
       if (edhoc_error_get_code(edhoc_ctx, &err) != EDHOC_SUCCESS) {
         coap_log_err("cannot get error code from EDHOC context\n");
@@ -132,19 +146,6 @@ static void edhoc_post_handler(coap_resource_t* resource,
         return;
       }
       coap_log_err("cannot compose Message 2, error code: %d\n", err);
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
-      return;
-    }
-
-    coap_optlist_t* optlist =
-        create_coap_edhoc_optlist(APPLICATION_EDHOC_CBOR_SEQ);
-    if (!optlist) {
-      coap_log_err("cannot create options list\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
-      return;
-    }
-    if (!coap_add_optlist_pdu(response, &optlist)) {
-      coap_log_err("cannot add options to response\n");
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
       return;
     }
@@ -156,7 +157,56 @@ static void edhoc_post_handler(coap_resource_t* resource,
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_CHANGED);
 
   } else {
-    printf("TODO: process Message 3\n");
+    if (!edhoc_ctx) {
+      coap_log_err("no EDHOC context for this session\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
+
+    struct edhoc_extracted_fields extracted_fields = {
+        .buffer = request_pdu_data,
+        .buffer_size = size,
+        .edhoc_message_ptr = request_pdu_data,
+        .edhoc_message_size = size};
+    if (edhoc_extract_connection_id(&extracted_fields) != EDHOC_SUCCESS) {
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
+    if (!edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
+                                   &edhoc_ctx->private_cid)) {
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
+
+    if (edhoc_message_3_process(edhoc_ctx, extracted_fields.edhoc_message_ptr,
+                                extracted_fields.edhoc_message_size) !=
+        EDHOC_SUCCESS) {
+      enum edhoc_error_code err;
+      if (edhoc_error_get_code(edhoc_ctx, &err) != EDHOC_SUCCESS) {
+        coap_log_err("cannot get error code from EDHOC context\n");
+        coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+        return;
+      }
+      coap_log_err("cannot process Message 3, error code: %d\n", err);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
+    size_t message4_len = 0;
+    uint8_t message4_buffer[MESSAGE_BUFFER_LENGTH] = {0};
+
+    if (edhoc_message_4_compose(edhoc_ctx, message4_buffer,
+                                MESSAGE_BUFFER_LENGTH,
+                                &message4_len) != EDHOC_SUCCESS) {
+      coap_log_err("cannot compose Message 4\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    if (!coap_add_data(response, message4_len, message4_buffer)) {
+      coap_log_err("cannot add data to response\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_CHANGED);
   }
 }
 

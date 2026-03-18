@@ -49,6 +49,16 @@ static coap_response_t response_handler(coap_session_t* session,
   (void)sent;
   (void)id;
 
+  coap_pdu_code_t response_code = coap_pdu_get_code(received);
+  if (response_code == COAP_EMPTY_CODE) {
+    coap_log_info("received empty response\n");
+    return COAP_RESPONSE_OK;
+  } else if (response_code != COAP_RESPONSE_CODE_CHANGED) {
+    coap_log_err("received error response code: %d.%02d\n", response_code >> 5,
+                 response_code & 0x1F);
+    return COAP_RESPONSE_FAIL;
+  }
+
   have_response = true;
   coap_show_pdu(COAP_LOG_WARN, received);
 
@@ -77,16 +87,15 @@ emulation_status_t run_client(void) {
       "coap://localhost:5683/.well-known/edhoc";
   coap_uri_t client_uri = {0};
   coap_address_t destination_address = {0};
-  coap_status_result_t coap_result = parse_and_resolve_coap_uri(
-      CLIENT_COAP_URI, &client_uri, &destination_address);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
+                                 &destination_address) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-  coap_result = create_coap_client_session(
-      &client_uri, &destination_address, response_handler,
-      &client_resources.coap_context, &client_resources.coap_session);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (create_coap_client_session(
+          &client_uri, &destination_address, response_handler,
+          &client_resources.coap_context,
+          &client_resources.coap_session) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -111,8 +120,8 @@ emulation_status_t run_client(void) {
       .verify = client_credential_verify,
   };
 
-  int edhoc_result = edhoc_setup_context(&edhoc_session_context, &credentials);
-  if (edhoc_result != EDHOC_SUCCESS) {
+  if (edhoc_setup_context(&edhoc_session_context, &credentials) !=
+      EDHOC_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -122,10 +131,9 @@ emulation_status_t run_client(void) {
   payload_buffer[0] = CBOR_TRUE;
   size_t message1_length = 0;
 
-  edhoc_result =
-      edhoc_message_1_compose(&edhoc_session_context, &payload_buffer[1],
-                              MESSAGE_BUFFER_LENGTH - 1, &message1_length);
-  if (edhoc_result != EDHOC_SUCCESS) {
+  if (edhoc_message_1_compose(&edhoc_session_context, &payload_buffer[1],
+                              MESSAGE_BUFFER_LENGTH - 1,
+                              &message1_length) != EDHOC_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -141,24 +149,23 @@ emulation_status_t run_client(void) {
 
   coap_show_pdu(COAP_LOG_WARN, message1_protocol_data_unit);
 
-  coap_result = send_coap_request(client_resources.coap_session,
-                                  message1_protocol_data_unit);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (send_coap_request(client_resources.coap_session,
+                        message1_protocol_data_unit) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  coap_result =
-      wait_for_coap_response(client_resources.coap_context,
-                             client_resources.coap_session, &have_response);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (wait_for_coap_response(client_resources.coap_context,
+                             client_resources.coap_session,
+                             &have_response) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  edhoc_result = edhoc_message_2_process(
-      &edhoc_session_context, incoming_message_buffer, incoming_message_length);
-  if (edhoc_result != EDHOC_SUCCESS) {
+  have_response = false;
+
+  if (edhoc_message_2_process(&edhoc_session_context, incoming_message_buffer,
+                              incoming_message_length) != EDHOC_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -179,10 +186,10 @@ emulation_status_t run_client(void) {
   }
 
   size_t message3_length = 0;
-  edhoc_result = edhoc_message_3_compose(
-      &edhoc_session_context, prepended_fields.edhoc_message_ptr,
-      prepended_fields.edhoc_message_size, &message3_length);
-  if (edhoc_result != EDHOC_SUCCESS) {
+  if (edhoc_message_3_compose(&edhoc_session_context,
+                              prepended_fields.edhoc_message_ptr,
+                              prepended_fields.edhoc_message_size,
+                              &message3_length) != EDHOC_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -210,29 +217,42 @@ emulation_status_t run_client(void) {
   // Needs to be updated before recalculating size
   prepended_fields.edhoc_message_size = message3_length;
 
-  edhoc_prepend_recalculate_size(&prepended_fields);
+  if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
 
-  coap_add_data(message3_protocol_data_unit, prepended_fields.buffer_size,
-                prepended_fields.buffer);
+  if (!coap_add_data(message3_protocol_data_unit, prepended_fields.buffer_size,
+                     prepended_fields.buffer)) {
+    coap_log_err("cannot add data to Message 3 PDU\n");
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
 
   coap_show_pdu(COAP_LOG_WARN, message3_protocol_data_unit);
 
-  coap_result = send_coap_request(client_resources.coap_session,
-                                  message3_protocol_data_unit);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (send_coap_request(client_resources.coap_session,
+                        message3_protocol_data_unit) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  coap_result =
-      wait_for_coap_response(client_resources.coap_context,
-                             client_resources.coap_session, &have_response);
-  if (coap_result != COAP_STATUS_SUCCESS) {
+  if (wait_for_coap_response(client_resources.coap_context,
+                             client_resources.coap_session,
+                             &have_response) != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  printf("We are good!\n");
+  have_response = false;
+
+  if (edhoc_message_4_process(&edhoc_session_context, incoming_message_buffer,
+                              incoming_message_length) != EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  printf("Client: EDHOC Handshake Completed Successfully!\n");
 
   cleanup_resources(&client_resources);
   return EMULATION_SUCCESS;

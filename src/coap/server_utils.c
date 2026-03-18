@@ -1,8 +1,8 @@
-#include "coap_server_utils.h"
+#include "coap/server_utils.h"
 
 #include <stdbool.h>
 
-#include "coap_shared.h"
+#include "coap/common/helpers.h"
 
 coap_context_t* coap_server_create_context() {
   coap_startup();

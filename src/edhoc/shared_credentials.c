@@ -1,4 +1,4 @@
-#include "shared_credentials.h"
+#include "edhoc/edhoc_shared_credentials.h"
 
 #include "edhoc_cipher_suite_2.h"
 #include "edhoc_macros.h"

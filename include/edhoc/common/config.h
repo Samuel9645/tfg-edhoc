@@ -1,5 +1,5 @@
-#ifndef COMMON_DATA_H
-#define COMMON_DATA_H
+#ifndef EDHOC_COMMON_CONFIG_H_
+#define EDHOC_COMMON_CONFIG_H_
 
 #include <edhoc_values.h>
 #include <stddef.h>
@@ -21,7 +21,7 @@ extern const int32_t SERVER_KID;
 extern const int32_t CLIENT_KID;
 extern const int32_t CONNECTION_ID;
 extern const uint16_t SERVER_PORT;
-extern const char* SERVER_URI;
+extern const char SERVER_URI[];
 extern const size_t PKR_OUT_LABEL;
 
-#endif
+#endif  // EDHOC_COMMON_CONFIG_H_

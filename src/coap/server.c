@@ -1,7 +1,9 @@
-#include "coap3/coap.h"
-#include "coap_server_utils.h"
-#include "coap_shared.h"
 #include "server.h"
+
+#include <coap3/coap.h>
+
+#include "coap/common/helpers.h"
+#include "coap/server_utils.h"
 #include "shared_credentials.h"
 #include "shared_crypto.h"
 

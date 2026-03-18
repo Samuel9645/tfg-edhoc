@@ -1,7 +1,7 @@
-#ifndef COAP_SERVER_UTILS_H
-#define COAP_SERVER_UTILS_H
+#ifndef COAP_SERVER_UTILS_H_
+#define COAP_SERVER_UTILS_H_
 
-#include "coap3/coap.h"
+#include <coap3/coap.h>
 
 typedef enum CoapServerUtilsResult {
   COAP_SERVER_UTILS_SUCCESS = 0,
@@ -63,4 +63,4 @@ CoapServerUtilsResult coap_server_add_post_resource(
 CoapServerUtilsResult coap_server_run_input_output_loop(
     coap_context_t* coap_context);
 
-#endif
+#endif  // COAP_SERVER_UTILS_H_

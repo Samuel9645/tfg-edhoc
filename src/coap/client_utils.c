@@ -11,11 +11,10 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#include "coap_client_utils.h"
-
+#include <stdbool.h>
 #include <string.h>
 
-#include "coap_shared.h"
+#include "coap/common/helpers.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 

@@ -1,8 +1,7 @@
+#include <coap3/coap.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "coap3/coap.h"
 
 static int have_response = 0;
 

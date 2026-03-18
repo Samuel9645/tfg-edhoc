@@ -1,7 +1,9 @@
 #include "client.h"
-#include "coap3/coap.h"
-#include "coap_client_utils.h"
-#include "coap_shared.h"
+
+#include <coap3/coap.h>
+
+#include "coap/client_utils.h"
+#include "coap/common/helpers.h"
 #include "shared_credentials.h"
 #include "shared_crypto.h"
 
@@ -30,6 +32,9 @@ static int credential_verify(void* user_context,
 }
 
 static bool have_response = false;
+enum { MAX_PDU_SIZE = 1024 };
+static uint8_t incoming_message_buffer[MAX_PDU_SIZE] = {0};
+static size_t incoming_message_length = 0;
 
 static coap_response_t response_handler(coap_session_t* session,
                                         const coap_pdu_t* sent,
@@ -46,10 +51,18 @@ static coap_response_t response_handler(coap_session_t* session,
   const uint8_t* databuf;
   size_t offset;
   size_t total;
-  if (coap_get_data_large(received, &len, &databuf, &offset, &total)) {
-    fwrite(databuf, 1, len, stdout);
-    fwrite("\n", 1, 1, stdout);
+  enum { ERROR_CODE = 0 };
+  if (coap_get_data_large(received, &len, &databuf, &offset, &total) ==
+      ERROR_CODE) {
+    coap_log_err("cannot get response data in handler\n");
+    return COAP_RESPONSE_FAIL;
   }
+  if (total > MAX_PDU_SIZE) {
+    coap_log_err("response data too large\n");
+    return COAP_RESPONSE_FAIL;
+  }
+  memcpy(incoming_message_buffer, databuf, len);
+  incoming_message_length = len;
 
   return COAP_RESPONSE_OK;
 }
@@ -146,39 +159,18 @@ static int send_message(struct edhoc_context* context, int socket_fd,
  * @return EDHOC_SUCCESS on success, error code on failure
  */
 int run_client() {
-  // struct edhoc_context edhoc_session_context = {0};
-  // const struct edhoc_credentials credentials = {
-  //     .fetch = credential_fetch,
-  //     .verify = credential_verify,
-  // };
+  struct edhoc_context edhoc_session_context = {0};
+  const struct edhoc_credentials credentials = {
+      .fetch = credential_fetch,
+      .verify = credential_verify,
+  };
 
-  // int result = edhoc_setup_context(&edhoc_session_context, &credentials);
-  // if (result != EDHOC_SUCCESS) {
-  //   edhoc_context_deinit(&edhoc_session_context);
-  //   return result;
-  // }
+  int result = edhoc_setup_context(&edhoc_session_context, &credentials);
+  if (result != EDHOC_SUCCESS) {
+    edhoc_context_deinit(&edhoc_session_context);
+    return result;
+  }
 
-  // struct sockaddr_in server_address;
-  // memset(&server_address, 0, sizeof(server_address));
-  // server_address.sin_family = AF_INET;
-  // server_address.sin_port = htons(SERVER_PORT);
-  // server_address.sin_addr.s_addr = inet_addr(SERVER_URI);
-  // result = run_handshake(&edhoc_session_context, &socket_fd,
-  // &server_address); if (result != EDHOC_SUCCESS) {
-  //   edhoc_context_deinit(&edhoc_session_context);
-  //   return result;
-  // }
-
-  // result = send_message(&edhoc_session_context, socket_fd,
-  // &server_address,
-  //                       (const uint8_t*)"Hello Server!");
-  // if (result != EDHOC_SUCCESS) {
-  //   edhoc_context_deinit(&edhoc_session_context);
-  //   close(socket_fd);
-  //   return result;
-  // }
-
-  // close(socket_fd);
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
 
@@ -210,6 +202,7 @@ int run_client() {
   if (!protocol_data_unit) {
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
+
   coap_show_pdu(COAP_LOG_WARN, protocol_data_unit);
 
   result = send_coap_request(coap_session, protocol_data_unit);

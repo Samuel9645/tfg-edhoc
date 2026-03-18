@@ -15,20 +15,20 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#ifndef COAP_CLIENT_UTILS_H
-#define COAP_CLIENT_UTILS_H
+#ifndef COAP_CLIENT_UTILS_H_
+#define COAP_CLIENT_UTILS_H_
 
+#include <coap3/coap.h>
 #include <stdbool.h>
 
-#include "coap3/coap.h"
-#include "coap_status.h"
+#include "coap/common/status.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
 /**
  * @brief Parse a CoAP URI and resolve the destination endpoint.
  *
- * @param[in] uri_string Input URI string (for example:
+ * @param[in] uri_string URI string (for example:
  * coap://localhost:5683/hello).
  * @param[out] parsed_uri Output parsed URI structure.
  * @param[out] destination_address Output resolved socket address.
@@ -41,9 +41,9 @@ CoapStatusResult parse_and_resolve_coap_uri(
 /**
  * @brief Create and configure a CoAP client context/session.
  *
- * @param[in] client_uri Input parsed URI used to select transport protocol.
- * @param[in] destination_address Input remote destination address.
- * @param[in] response_handler Input response callback used by libcoap.
+ * @param[in] client_uri Parsed URI used to select transport protocol.
+ * @param[in] destination_address Remote destination address.
+ * @param[in] response_handler Response callback used by libcoap.
  * @param[out] coap_session_context Output created CoAP context.
  * @param[out] coap_session Output created CoAP session.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
@@ -75,10 +75,10 @@ coap_optlist_t* create_coap_edhoc_optlist();
 /**
  * @brief Build a POST request PDU and its URI options.
  *
- * @param[in] client_uri Input parsed URI.
- * @param[in] destination_address Input destination address.
- * @param[in] coap_session Input active CoAP session.
- * @param[in] optlist Input pointer to options list used for PDU.
+ * @param[in] client_uri Parsed URI.
+ * @param[in] destination_address Destination address.
+ * @param[in] coap_session Active CoAP session.
+ * @param[in] optlist Pointer to options list used for PDU.
  *
  * @see [RFC 9528: The Forward Message
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
@@ -100,8 +100,8 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
 /**
  * @brief Send a prepared CoAP request.
  *
- * @param[in] coap_session Input active CoAP session.
- * @param[in] protocol_data_unit Input prepared request PDU.
+ * @param[in] coap_session Active CoAP session.
+ * @param[in] protocol_data_unit Prepared request PDU.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
 CoapStatusResult send_coap_request(coap_session_t* coap_session,
@@ -110,13 +110,13 @@ CoapStatusResult send_coap_request(coap_session_t* coap_session,
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.
  *
- * @param[in] coap_session_context Input active CoAP context.
- * @param[in] coap_session Input active CoAP session.
- * @param[in] have_response Input pointer to response flag updated by callback.
+ * @param[in] coap_session_context Active CoAP context.
+ * @param[in] coap_session Active CoAP session.
+ * @param[in] have_response Pointer to response flag updated by callback.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
 CoapStatusResult wait_for_coap_response(coap_context_t* coap_session_context,
                                         coap_session_t* coap_session,
                                         const bool* have_response);
 
-#endif  // COAP_CLIENT_UTILS_H
+#endif  // COAP_CLIENT_UTILS_H_

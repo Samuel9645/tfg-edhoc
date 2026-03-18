@@ -15,11 +15,12 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#ifndef COAP_SHARED_H
-#define COAP_SHARED_H
+#ifndef COAP_COMMON_HELPERS_H_
+#define COAP_COMMON_HELPERS_H_
 
-#include "coap3/coap.h"
-#include "coap_status.h"
+#include <coap3/coap.h>
+
+#include "coap/common/status.h"
 
 /**
  * @brief Bitmask for CoAP block mode configuration to use libcoap for both
@@ -74,4 +75,4 @@ CoapStatusResult resolve_address(coap_str_const_t* host, uint16_t port,
                                  int scheme_hint_bits,
                                  coap_address_t* destination_address);
 
-#endif  // COAP_SHARED_H
+#endif  // COAP_COMMON_HELPERS_H_

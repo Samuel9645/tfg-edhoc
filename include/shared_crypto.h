@@ -1,5 +1,5 @@
-#ifndef SHARED_CRYPTO_H
-#define SHARED_CRYPTO_H
+#ifndef SHARED_CRYPTO_H_
+#define SHARED_CRYPTO_H_
 
 #include <psa/crypto.h>
 #include <stddef.h>
@@ -38,4 +38,4 @@ psa_status_t shared_decrypt_ciphertext(
     const uint8_t* key_material, size_t key_length, uint8_t* plaintext_buffer,
     size_t plaintext_buffer_size, size_t* plaintext_output_length);
 
-#endif
+#endif  // SHARED_CRYPTO_H_

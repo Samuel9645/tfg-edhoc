@@ -1,7 +1,9 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef EDHOC_CLIENT_H_
+#define EDHOC_CLIENT_H_
 
 #include <arpa/inet.h>
+#include <edhoc_cipher_suite_2.h>
+#include <edhoc_context.h>
 #include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,12 +11,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "common_data.h"
-#include "edhoc_cipher_suite_2.h"
-#include "edhoc_context.h"
-#include "edhoc_setup.h"
+#include "edhoc/common/config.h"
+#include "edhoc/common/setup.h"
+#include "edhoc/public_data.h"
 #include "psa_setup.h"
-#include "public_data.h"
 
 int run_client();
 
@@ -22,4 +22,5 @@ static const uint8_t CLIENT_PRIVATE_KEY[] = {
     0x97, 0x45, 0x6c, 0x36, 0x90, 0x89, 0x0e, 0xc0, 0xa5, 0x06, 0x01,
     0x69, 0xf8, 0xc0, 0xb1, 0x80, 0xf8, 0xe3, 0xd8, 0x12, 0x3f, 0xf7,
     0xd0, 0x92, 0x3f, 0x34, 0x77, 0xb6, 0x9a, 0xea, 0x21, 0x0f};
-#endif
+
+#endif  // EDHOC_CLIENT_H_

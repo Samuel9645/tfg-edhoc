@@ -1,5 +1,5 @@
-#ifndef PUBLIC_DATA_H
-#define PUBLIC_DATA_H
+#ifndef EDHOC_PUBLIC_DATA_H_
+#define EDHOC_PUBLIC_DATA_H_
 
 #include <stdint.h>
 
@@ -9,4 +9,4 @@ extern const uint8_t
 extern const uint8_t
     SERVER_PUBLIC_KEY[PUBLIC_DATA_PRE_GENERATED_PUBLIC_KEY_LEN];
 
-#endif
+#endif  // EDHOC_PUBLIC_DATA_H_

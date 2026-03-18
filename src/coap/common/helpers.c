@@ -15,7 +15,7 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#include "coap_shared.h"
+#include "coap/common/helpers.h"
 
 int end_coap_session(coap_optlist_t* options, coap_session_t* session,
                      coap_context_t* context) {

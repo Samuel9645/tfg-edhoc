@@ -1,7 +1,9 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef EDHOC_SERVER_H_
+#define EDHOC_SERVER_H_
 
 #include <arpa/inet.h>
+#include <edhoc_cipher_suite_2.h>
+#include <edhoc_context.h>
 #include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,12 +11,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "common_data.h"
-#include "edhoc_cipher_suite_2.h"
-#include "edhoc_context.h"
-#include "edhoc_setup.h"
+#include "edhoc/common/config.h"
+#include "edhoc/common/setup.h"
+#include "edhoc/public_data.h"
 #include "psa_setup.h"
-#include "public_data.h"
 
 int run_server();
 
@@ -23,4 +23,4 @@ static const uint8_t SERVER_PRIVATE_KEY[] = {
     0xf5, 0x0b, 0xbe, 0x12, 0x92, 0xbd, 0xda, 0x1a, 0x8a, 0x92, 0xb1,
     0xcd, 0x75, 0xff, 0x42, 0x0d, 0x72, 0x0f, 0xc1, 0x94, 0xff};
 
-#endif
+#endif  // EDHOC_SERVER_H_

@@ -1,15 +1,14 @@
-#ifndef EDHOC_SETUP_H
-#define EDHOC_SETUP_H
+#ifndef EDHOC_COMMON_SETUP_H_
+#define EDHOC_COMMON_SETUP_H_
 
+#include <edhoc.h>
+#include <edhoc_cipher_suite_2.h>
+#include <edhoc_context.h>
 #include <netinet/in.h>
 #include <psa/crypto.h>
 #include <psa/crypto_types.h>
 #include <psa/crypto_values.h>
 #include <stdio.h>
-
-#include "edhoc.h"
-#include "edhoc_cipher_suite_2.h"
-#include "edhoc_context.h"
 
 /**
  * Initializes PSA crypto and configures EDHOC context with cipher suite,
@@ -34,4 +33,4 @@ void initialize_credential_key(struct edhoc_auth_creds* credentials,
                                size_t public_key_length,
                                int32_t key_id_integer);
 
-#endif
+#endif  // EDHOC_COMMON_SETUP_H_

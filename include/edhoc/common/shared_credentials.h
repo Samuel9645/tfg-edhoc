@@ -1,10 +1,9 @@
-#ifndef SHARED_CREDENTIALS_H
-#define SHARED_CREDENTIALS_H
+#ifndef EDHOC_COMMON_SHARED_CREDENTIALS_H_
+#define EDHOC_COMMON_SHARED_CREDENTIALS_H_
 
+#include <edhoc_context.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "edhoc_context.h"
 
 /**
  * @brief Fetch and setup authentication credentials
@@ -42,4 +41,4 @@ int shared_credential_verify(void* user_context,
                              const uint8_t** public_key_reference,
                              size_t* public_key_length);
 
-#endif
+#endif  // EDHOC_COMMON_SHARED_CREDENTIALS_H_

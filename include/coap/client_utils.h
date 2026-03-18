@@ -57,22 +57,6 @@ coap_status_result_t create_coap_client_session(
     coap_context_t** coap_session_context, coap_session_t** coap_session);
 
 /**
- * @brief Create a CoAP options list with EDHOC-specific options.
- *
- * @see [RFC 9528: The Forward Message
- * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
- * for details on option creation.
- *
- * @see [RFC 9528: CoAP Content
- * Formats](https://datatracker.ietf.org/doc/html/rfc9528/#name-coap-content-formats-regist)
- * for details on the content format value.
- * @return Pointer to created options list on success, NULL on failure.
- *
- * @note On failure, any allocated resources are freed.
- */
-coap_optlist_t* create_coap_edhoc_optlist(void);
-
-/**
  * @brief Build a POST request PDU and its URI options.
  *
  * @param[in] client_uri Parsed URI.

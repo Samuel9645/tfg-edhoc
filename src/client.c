@@ -1,6 +1,7 @@
 #include "client.h"
 
 #include <coap3/coap.h>
+#include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -8,14 +9,17 @@
 #include <string.h>
 
 #include "coap/client_utils.h"
+#include "coap/common/config.h"
 #include "coap/common/helpers.h"
-#include "coap/common/status.h"
 #include "common/cleanup.h"
 #include "edhoc/common/config.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"
 #include "edhoc/credentials/public_data.h"
+
+// TODO: SEND ERROR RESPONSES TO SERVER IN CASE OF FAILURE INSTEAD OF JUST
+// FAILING SILENTLY
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -34,7 +38,6 @@ static int client_credential_verify(void* user_context,
 }
 
 static bool have_response = false;
-enum { MAX_PDU_SIZE = 1024 };
 static uint8_t incoming_message_buffer[MAX_PDU_SIZE] = {0};
 static size_t incoming_message_length = 0;
 
@@ -50,20 +53,13 @@ static coap_response_t response_handler(coap_session_t* session,
   coap_show_pdu(COAP_LOG_WARN, received);
 
   size_t len;
-  const uint8_t* databuf;
-  size_t offset;
-  size_t total;
-  enum { ERROR_CODE = 0 };
-  if (coap_get_data_large(received, &len, &databuf, &offset, &total) ==
-      ERROR_CODE) {
-    coap_log_err("cannot get response data in handler\n");
+  const uint8_t* recieved_pdu_data;
+  if (!coap_get_data(received, &len, &recieved_pdu_data)) {
+    coap_log_err("cannot get request request pdu data\n");
     return COAP_RESPONSE_FAIL;
   }
-  if (total > MAX_PDU_SIZE) {
-    coap_log_err("response data too large\n");
-    return COAP_RESPONSE_FAIL;
-  }
-  memcpy(incoming_message_buffer, databuf, len);
+
+  memcpy(incoming_message_buffer, recieved_pdu_data, len);
   incoming_message_length = len;
   // TODO: REMOVE THIS PRINT STATEMENT
   fprintf(stdout, "Received response data (%zu bytes)\n", len);
@@ -95,15 +91,16 @@ emulation_status_t run_client(void) {
     return EMULATION_FAILURE;
   }
 
-  coap_optlist_t* optlist = create_coap_edhoc_optlist();
-  if (!optlist) {
+  coap_optlist_t* message1_optlist =
+      create_coap_edhoc_optlist(APPLICATION_CID_EDHOC_CBOR_SEQ);
+  if (!message1_optlist) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-  coap_pdu_t* protocol_data_unit =
-      prepare_coap_post_request(&client_uri, &destination_address,
-                                client_resources.coap_session, optlist);
-  if (!protocol_data_unit) {
+  coap_pdu_t* message1_protocol_data_unit = prepare_coap_post_request(
+      &client_uri, &destination_address, client_resources.coap_session,
+      message1_optlist);
+  if (!message1_protocol_data_unit) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -122,7 +119,6 @@ emulation_status_t run_client(void) {
 
   // https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow
   uint8_t payload_buffer[MESSAGE_BUFFER_LENGTH] = {0};
-  enum { CBOR_TRUE = 0xF5 };
   payload_buffer[0] = CBOR_TRUE;
   size_t message1_length = 0;
 
@@ -136,17 +132,17 @@ emulation_status_t run_client(void) {
 
   const size_t TOTAL_PAYLOAD_LENGTH = message1_length + 1;
   enum { LIBCOAP_ERROR = 0 };
-  if (coap_add_data(protocol_data_unit, TOTAL_PAYLOAD_LENGTH, payload_buffer) ==
-      LIBCOAP_ERROR) {
+  if (coap_add_data(message1_protocol_data_unit, TOTAL_PAYLOAD_LENGTH,
+                    payload_buffer) == LIBCOAP_ERROR) {
     coap_log_err("cannot add payload to PDU\n");
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  coap_show_pdu(COAP_LOG_WARN, protocol_data_unit);
+  coap_show_pdu(COAP_LOG_WARN, message1_protocol_data_unit);
 
-  coap_result =
-      send_coap_request(client_resources.coap_session, protocol_data_unit);
+  coap_result = send_coap_request(client_resources.coap_session,
+                                  message1_protocol_data_unit);
   if (coap_result != COAP_STATUS_SUCCESS) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
@@ -159,6 +155,84 @@ emulation_status_t run_client(void) {
     cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
+
+  edhoc_result = edhoc_message_2_process(
+      &edhoc_session_context, incoming_message_buffer, incoming_message_length);
+  if (edhoc_result != EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  struct edhoc_prepended_fields prepended_fields = {
+      .buffer = payload_buffer,
+      .buffer_size = MESSAGE_BUFFER_LENGTH,
+      .edhoc_message_ptr = payload_buffer,
+      .edhoc_message_size = MESSAGE_BUFFER_LENGTH};
+
+  // TODO: MAYBE FIND A BETTER WAY TO FIND THE PEER CID since extract only works
+  // in the 3 message case
+  if (edhoc_prepend_connection_id(&prepended_fields,
+                                  &edhoc_session_context.private_peer_cid) !=
+      EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  size_t message3_length = 0;
+  edhoc_result = edhoc_message_3_compose(
+      &edhoc_session_context, prepended_fields.edhoc_message_ptr,
+      prepended_fields.edhoc_message_size, &message3_length);
+  if (edhoc_result != EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  coap_optlist_t* message3_optlist =
+      create_coap_edhoc_optlist(APPLICATION_CID_EDHOC_CBOR_SEQ);
+  if (!message3_optlist) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  coap_pdu_t* message3_protocol_data_unit = prepare_coap_post_request(
+      &client_uri, &destination_address, client_resources.coap_session,
+      message3_optlist);
+  if (!message3_protocol_data_unit) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  // Needs to be updated before recalculating size
+  prepended_fields.edhoc_message_size = message3_length;
+
+  edhoc_prepend_recalculate_size(&prepended_fields);
+
+  coap_add_data(message3_protocol_data_unit, prepended_fields.buffer_size,
+                prepended_fields.buffer);
+
+  coap_show_pdu(COAP_LOG_WARN, message3_protocol_data_unit);
+
+  coap_result = send_coap_request(client_resources.coap_session,
+                                  message3_protocol_data_unit);
+  if (coap_result != COAP_STATUS_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  coap_result =
+      wait_for_coap_response(client_resources.coap_context,
+                             client_resources.coap_session, &have_response);
+  if (coap_result != COAP_STATUS_SUCCESS) {
+    cleanup_resources(&client_resources);
+    return EMULATION_FAILURE;
+  }
+
+  printf("We are good!\n");
 
   cleanup_resources(&client_resources);
   return EMULATION_SUCCESS;

@@ -20,11 +20,13 @@
 
 #include <coap3/coap.h>
 
+#include "coap/common/config.h"
 #include "coap/common/status.h"
 
 /**
  * @brief Resolve a host and port to a CoAP address structure, using scheme
  * hints for protocol selection.
+ *
  * @param[in] host Host string to resolve (for example: "localhost").
  * @param[in] port Port number to resolve.
  * @param[in] scheme_hint_bits Scheme hint bits for protocol selection.
@@ -45,5 +47,25 @@
 coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
                                      int scheme_hint_bits,
                                      coap_address_t* destination_address);
+
+/**
+ * @brief Create a CoAP options list with EDHOC-specific options.
+ *
+ * @param[in] content_format Content format value to include in the options
+ * list.
+ *
+ * @see [RFC 9528: The Forward Message
+ * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
+ * for details on option creation.
+ *
+ * @see [RFC 9528: CoAP Content
+ * Formats](https://datatracker.ietf.org/doc/html/rfc9528/#name-coap-content-formats-regist)
+ * for details on the content format value.
+ * @return Pointer to created options list on success, NULL on failure.
+ *
+ * @note On failure, any allocated resources are freed.
+ */
+coap_optlist_t* create_coap_edhoc_optlist(
+    content_format_edhoc_values_t content_format);
 
 #endif  // COAP_COMMON_HELPERS_H_

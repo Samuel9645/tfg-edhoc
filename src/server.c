@@ -1,13 +1,15 @@
 #include "server.h"
 
 #include <coap3/coap.h>
+#include <coap3/coap_session.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "coap/common/config.h"
 #include "coap/common/helpers.h"
-#include "coap/common/status.h"
 #include "coap/server_utils.h"
 #include "common/cleanup.h"
 #include "edhoc/common/config.h"
@@ -16,50 +18,146 @@
 #include "edhoc/credentials/public_data.h"
 #include "edhoc/credentials/server_private_key.h"
 
-// static int server_credential_fetch(void* user_context,
-//                                    struct edhoc_auth_creds* credentials) {
-//   return credential_fetch(user_context, credentials, SERVER_PUBLIC_KEY,
-//                           sizeof(SERVER_PUBLIC_KEY), SERVER_PRIVATE_KEY,
-//                           sizeof(SERVER_PRIVATE_KEY), SERVER_KID);
-// }
-
-// static int server_credential_verify(void* user_context,
-//                                     struct edhoc_auth_creds* credentials,
-//                                     const uint8_t** public_key_reference,
-//                                     size_t* public_key_length) {
-//   return credential_verify(user_context, credentials, CLIENT_KID,
-//                            CLIENT_PUBLIC_KEY, ARRAY_SIZE(CLIENT_PUBLIC_KEY),
-//                            public_key_reference, public_key_length);
-// }
-
-static void first_resource_get_handler(coap_resource_t* resource,
-                                       coap_session_t* session,
-                                       const coap_pdu_t* request,
-                                       const coap_string_t* query,
-                                       coap_pdu_t* response) {
-  (void)resource;
-  (void)session;
-  (void)query;
-
-  coap_show_pdu(COAP_LOG_WARN, request);
-  coap_pdu_set_code(response, COAP_RESPONSE_CODE_CONTENT);
-  coap_add_data(response, 5, (const uint8_t*)"world");
-  coap_show_pdu(COAP_LOG_WARN, response);
+static int server_credential_fetch(void* user_context,
+                                   struct edhoc_auth_creds* credentials) {
+  return credential_fetch(user_context, credentials, SERVER_PUBLIC_KEY,
+                          sizeof(SERVER_PUBLIC_KEY), SERVER_PRIVATE_KEY,
+                          sizeof(SERVER_PRIVATE_KEY), SERVER_KID);
 }
 
-static void second_resource_get_handler(coap_resource_t* resource,
-                                        coap_session_t* session,
-                                        const coap_pdu_t* request,
-                                        const coap_string_t* query,
-                                        coap_pdu_t* response) {
+static int server_credential_verify(void* user_context,
+                                    struct edhoc_auth_creds* credentials,
+                                    const uint8_t** public_key_reference,
+                                    size_t* public_key_length) {
+  return credential_verify(user_context, credentials, CLIENT_KID,
+                           CLIENT_PUBLIC_KEY, ARRAY_SIZE(CLIENT_PUBLIC_KEY),
+                           public_key_reference, public_key_length);
+}
+
+static const struct edhoc_credentials credentials = {
+    .fetch = server_credential_fetch,
+    .verify = server_credential_verify,
+};
+
+static void edhoc_post_handler(coap_resource_t* resource,
+                               coap_session_t* session,
+                               const coap_pdu_t* request,
+                               const coap_string_t* query,
+                               coap_pdu_t* response) {
   (void)resource;
   (void)session;
   (void)query;
+  coap_opt_iterator_t opt_iter = {0};
+  coap_opt_t* option =
+      coap_check_option(request, COAP_OPTION_CONTENT_FORMAT, &opt_iter);
+  if (!option) {
+    coap_log_err("missing content format option\n");
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+    return;
+  }
+  uint16_t content_format =
+      coap_decode_var_bytes(coap_opt_value(option), coap_opt_length(option));
+  if (content_format != APPLICATION_CID_EDHOC_CBOR_SEQ) {
+    coap_log_err("invalid content format\n");
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+    return;
+  }
+  size_t size = 0;
+  const uint8_t* request_pdu_data = NULL;
+  if (!coap_get_data(request, &size, &request_pdu_data)) {
+    coap_log_err("cannot get request request pdu data\n");
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+    return;
+  }
+  // TODO: EXTRACT THIS INTO FUNCTION
+  const bool is_message_1 = (size > 0 && request_pdu_data[0] == CBOR_TRUE);
+  if (is_message_1) {
+    struct edhoc_context* edhoc_ctx =
+        (struct edhoc_context*)coap_session_get_app_data(session);
+    if (edhoc_ctx != NULL) {
+      coap_log_err("EDHOC context already exists for this session\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    const uint8_t* edhoc_msg1_bytes = request_pdu_data + 1;
+    size_t edhoc_msg1_len = size - 1;
 
-  coap_show_pdu(COAP_LOG_WARN, request);
-  coap_pdu_set_code(response, COAP_RESPONSE_CODE_CONTENT);
-  coap_add_data(response, 8, (const uint8_t*)"my world");
-  coap_show_pdu(COAP_LOG_WARN, response);
+    edhoc_ctx = malloc(sizeof(struct edhoc_context));
+    if (!edhoc_ctx) {
+      coap_log_err("cannot allocate memory for EDHOC context\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+
+    if (edhoc_setup_context(edhoc_ctx, &credentials) != EDHOC_SUCCESS) {
+      coap_log_err("cannot setup EDHOC context\n");
+      free(edhoc_ctx);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    if (coap_session_set_app_data2(session, edhoc_ctx, free) != NULL) {
+      coap_log_err("app data for session already set\n");
+      free(edhoc_ctx);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+
+    int result =
+        edhoc_message_1_process(edhoc_ctx, edhoc_msg1_bytes, edhoc_msg1_len);
+    if (result != EDHOC_SUCCESS) {
+      // TODO: Check if the error from the EDHOC context can be used to set a
+      // more specific CoAP response code
+      // https://kamil-kielbasa.github.io/libedhoc/api.html#_CPPv427edhoc_message_error_processPK7uint8_t6size_tP16edhoc_error_codeP16edhoc_error_info
+      enum edhoc_error_code err;
+      if (edhoc_error_get_code(edhoc_ctx, &err) != EDHOC_SUCCESS) {
+        coap_log_err("cannot get error code from EDHOC context\n");
+        coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+        return;
+      }
+      coap_log_err("cannot process Message 1, error code: %d\n", err);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
+
+    size_t message2_len = 0;
+    uint8_t message2_buffer[MESSAGE_BUFFER_LENGTH] = {0};
+
+    result = edhoc_message_2_compose(edhoc_ctx, message2_buffer,
+                                     MESSAGE_BUFFER_LENGTH, &message2_len);
+    if (result != EDHOC_SUCCESS) {
+      enum edhoc_error_code err;
+      if (edhoc_error_get_code(edhoc_ctx, &err) != EDHOC_SUCCESS) {
+        coap_log_err("cannot get error code from EDHOC context\n");
+        coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+        return;
+      }
+      coap_log_err("cannot compose Message 2, error code: %d\n", err);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+
+    coap_optlist_t* optlist =
+        create_coap_edhoc_optlist(APPLICATION_EDHOC_CBOR_SEQ);
+    if (!optlist) {
+      coap_log_err("cannot create options list\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    if (!coap_add_optlist_pdu(response, &optlist)) {
+      coap_log_err("cannot add options to response\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    if (!coap_add_data(response, message2_len, message2_buffer)) {
+      coap_log_err("cannot add data to response\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      return;
+    }
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_CHANGED);
+
+  } else {
+    printf("TODO: process Message 3\n");
+  }
 }
 
 emulation_status_t run_server(void) {
@@ -79,28 +177,15 @@ emulation_status_t run_server(void) {
     return EMULATION_FAILURE;
   }
 
-  static const char COAP_LISTEN_MCAST_IPV6[] = "ff02::fd";
-  result = coap_server_join_multicast_group(server_resources.coap_context,
-                                            COAP_LISTEN_MCAST_IPV6);
-  if (result != COAP_STATUS_SUCCESS) {
-    cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
-  }
-
-  result = coap_server_add_post_resource(server_resources.coap_context,
-                                         ".well-known/edhoc",
-                                         first_resource_get_handler);
-  if (result != COAP_STATUS_SUCCESS) {
-    cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
-  }
-
   result = coap_server_add_post_resource(
-      server_resources.coap_context, "hello/my", second_resource_get_handler);
+      server_resources.coap_context, ".well-known/edhoc", edhoc_post_handler);
   if (result != COAP_STATUS_SUCCESS) {
     cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }
+
+  // coap_session_set_app_data2(server_resources.coap_session,
+  //                            &edhoc_session_context, NULL);
 
   result = coap_server_run_input_output_loop(server_resources.coap_context);
   if (result != COAP_STATUS_SUCCESS) {
@@ -186,8 +271,8 @@ emulation_status_t run_server(void) {
 
 //   uint8_t encrypted_message[CIPHERTEXT_MAX_LENGTH] = {0};
 //   socklen_t client_address_len = sizeof(*client_address);
-//   result = recvfrom(socket_fd, encrypted_message, sizeof(encrypted_message),
-//   0,
+//   result = recvfrom(socket_fd, encrypted_message,
+//   sizeof(encrypted_message), 0,
 //                     (struct sockaddr*)client_address, &client_address_len);
 //   if (result < 0) {
 //     fprintf(stderr, "cannot receive ciphertext\n");

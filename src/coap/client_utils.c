@@ -73,33 +73,6 @@ coap_status_result_t create_coap_client_session(
   return COAP_STATUS_SUCCESS;
 }
 
-coap_optlist_t* create_coap_edhoc_optlist(void) {
-  enum { CREATE_PORT_HOST_OPTION = 1 };
-  coap_optlist_t* optlist = NULL;
-  enum { APPLICATION_CID_EDHOC_CBOR_SEQ = 65 };
-  enum { ENCODE_BUFFER_SIZE = 4 };
-  uint8_t content_format_value[ENCODE_BUFFER_SIZE];
-  const unsigned int compressed_length =
-      coap_encode_var_safe(content_format_value, sizeof(content_format_value),
-                           APPLICATION_CID_EDHOC_CBOR_SEQ);
-  if (compressed_length == 0) {
-    coap_log_err("cannot encode content format\n");
-    return NULL;
-  }
-  coap_optlist_t* edhoc_optlist = coap_new_optlist(
-      COAP_OPTION_CONTENT_FORMAT, compressed_length, content_format_value);
-  if (!edhoc_optlist) {
-    coap_log_err("cannot create EDHOC options\n");
-    return NULL;
-  }
-  if (coap_insert_optlist(&optlist, edhoc_optlist) == 0) {
-    coap_log_err("cannot add EDHOC options to list\n");
-    coap_delete_optlist(edhoc_optlist);
-    return NULL;
-  }
-  return optlist;
-}
-
 coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
                                       const coap_address_t* destination_address,
                                       coap_session_t* coap_session,
@@ -118,7 +91,7 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
     return NULL;
   }
 
-  enum { ADD_PORT_OPTION = 1, LIBCOAP_ERROR = 0 };
+  enum { ADD_PORT_OPTION = 1 };
   if (coap_uri_into_optlist(client_uri, destination_address, &optlist,
                             ADD_PORT_OPTION) == LIBCOAP_ERROR) {
     coap_log_err("cannot create options from URI\n");

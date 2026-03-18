@@ -20,6 +20,7 @@ set(BASE_SOURCES
     src/common/cleanup.c
     src/coap/common/helpers.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    libedhoc/helpers/src/edhoc_helpers.c
 )
 
 # Define main executable

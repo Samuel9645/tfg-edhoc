@@ -26,7 +26,7 @@ coap_status_result_t parse_and_resolve_coap_uri(
     coap_address_t* destination_address) {
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
                      parsed_uri) != 0) {
-    coap_log_warn("Failed to parse uri %s\n", uri_string);
+    coap_log_warn("cannot parse uri %s\n", uri_string);
     return COAP_STATUS_ERROR;
   }
 
@@ -35,7 +35,7 @@ coap_status_result_t parse_and_resolve_coap_uri(
       resolve_address(&parsed_uri->host, parsed_uri->port, masked_protocol,
                       destination_address);
   if (resolve_status != COAP_STATUS_SUCCESS) {
-    coap_log_warn("Failed to resolve address %*.*s\n",
+    coap_log_warn("cannot resolve address %*.*s\n",
                   (int)parsed_uri->host.length, (int)parsed_uri->host.length,
                   (const char*)parsed_uri->host.s);
     return COAP_STATUS_ERROR;
@@ -50,7 +50,6 @@ coap_status_result_t create_coap_client_session(
   *coap_session_context = coap_new_context(NULL);
   if (!*coap_session_context) {
     coap_log_err("cannot create libcoap context\n");
-    coap_free_context(*coap_session_context);
     return COAP_STATUS_ERROR;
   }
 
@@ -67,7 +66,6 @@ coap_status_result_t create_coap_client_session(
                               destination_address, protocol);
   if (!*coap_session) {
     coap_log_err("cannot create client session\n");
-    coap_free_context(*coap_session_context);
     return COAP_STATUS_ERROR;
   }
 
@@ -91,11 +89,11 @@ coap_optlist_t* create_coap_edhoc_optlist(void) {
   coap_optlist_t* edhoc_optlist = coap_new_optlist(
       COAP_OPTION_CONTENT_FORMAT, compressed_length, content_format_value);
   if (!edhoc_optlist) {
-    coap_log_err("cannot create options\n");
+    coap_log_err("cannot create EDHOC options\n");
     return NULL;
   }
   if (coap_insert_optlist(&optlist, edhoc_optlist) == 0) {
-    coap_log_err("Failed to create options\n");
+    coap_log_err("cannot add EDHOC options to list\n");
     coap_delete_optlist(edhoc_optlist);
     return NULL;
   }
@@ -117,20 +115,19 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
                     coap_session_max_pdu_size(coap_session));
   if (!protocol_data_unit) {
     coap_log_err("cannot create PDU\n");
-    coap_delete_pdu(protocol_data_unit);
     return NULL;
   }
 
   enum { ADD_PORT_OPTION = 1, LIBCOAP_ERROR = 0 };
   if (coap_uri_into_optlist(client_uri, destination_address, &optlist,
                             ADD_PORT_OPTION) == LIBCOAP_ERROR) {
-    coap_log_err("Failed to create options from URI\n");
+    coap_log_err("cannot create options from URI\n");
     coap_delete_pdu(protocol_data_unit);
     return NULL;
   }
 
   if (coap_add_optlist_pdu(protocol_data_unit, &optlist) == LIBCOAP_ERROR) {
-    coap_log_err("Failed to add options to PDU\n");
+    coap_log_err("cannot add options to PDU\n");
     coap_delete_pdu(protocol_data_unit);
     return NULL;
   }

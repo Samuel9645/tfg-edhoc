@@ -6,23 +6,23 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int edhoc_setup_context(struct edhoc_context* ctx,
+int edhoc_setup_context(struct edhoc_context* context,
                         const struct edhoc_credentials* credentials) {
   psa_status_t psa_status = psa_crypto_init();
   if (psa_status != PSA_SUCCESS) {
-    fprintf(stderr, "Failed to initialize PSA crypto: %d\n", psa_status);
+    fprintf(stderr, "cannot initialize PSA crypto: %d\n", psa_status);
     return psa_status;
   }
-  int ret = edhoc_context_init(ctx);
+  int ret = edhoc_context_init(context);
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to initialize context: %d\n", ret);
+    fprintf(stderr, "cannot initialize context: %d\n", ret);
     return ret;
   }
 
   const enum edhoc_method methods[] = {EDHOC_METHOD_0};
-  ret = edhoc_set_methods(ctx, methods, ARRAY_SIZE(methods));
+  ret = edhoc_set_methods(context, methods, ARRAY_SIZE(methods));
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to set methods: %d\n", ret);
+    fprintf(stderr, "cannot set methods: %d\n", ret);
     return ret;
   }
 
@@ -37,9 +37,10 @@ int edhoc_setup_context(struct edhoc_context* ctx,
       .ecc_sign_length = 64,
   };
   const struct edhoc_cipher_suite cipher_suites[] = {cipher_suite_2};
-  ret = edhoc_set_cipher_suites(ctx, cipher_suites, ARRAY_SIZE(cipher_suites));
+  ret = edhoc_set_cipher_suites(context, cipher_suites,
+                                ARRAY_SIZE(cipher_suites));
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to set cipher suites: %d\n", ret);
+    fprintf(stderr, "cannot set cipher suites: %d\n", ret);
     return ret;
   }
 
@@ -48,27 +49,27 @@ int edhoc_setup_context(struct edhoc_context* ctx,
       .int_value = 21,
       .bstr_length = 0,
   };
-  ret = edhoc_set_connection_id(ctx, &connection_id);
+  ret = edhoc_set_connection_id(context, &connection_id);
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to set connection ID: %d\n", ret);
+    fprintf(stderr, "cannot set connection ID: %d\n", ret);
     return ret;
   }
 
-  ret = edhoc_bind_keys(ctx, edhoc_cipher_suite_2_get_keys());
+  ret = edhoc_bind_keys(context, edhoc_cipher_suite_2_get_keys());
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to bind keys: %d\n", ret);
+    fprintf(stderr, "cannot bind keys: %d\n", ret);
     return ret;
   }
 
-  ret = edhoc_bind_crypto(ctx, edhoc_cipher_suite_2_get_crypto());
+  ret = edhoc_bind_crypto(context, edhoc_cipher_suite_2_get_crypto());
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to bind crypto: %d\n", ret);
+    fprintf(stderr, "cannot bind crypto: %d\n", ret);
     return ret;
   }
 
-  ret = edhoc_bind_credentials(ctx, credentials);
+  ret = edhoc_bind_credentials(context, credentials);
   if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to bind credentials: %d\n", ret);
+    fprintf(stderr, "cannot bind credentials: %d\n", ret);
   }
 
   return ret;

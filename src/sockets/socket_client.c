@@ -35,7 +35,7 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
   size_t message1_length = 0;
   if (edhoc_message_1_compose(context, message_buffer, message_buffer_size,
                               &message1_length) != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to compose Message 1\n");
+    fprintf(stderr, "cannot compose Message 1\n");
     close(*socket_fd);
     return -1;
   }
@@ -50,7 +50,7 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
                (struct sockaddr*)server_address, &server_address_length);
   if (message2_length < 0) {
     fprintf(stderr,
-            "Failed to receive Message 2 from server. Make sure server is "
+            "cannot receive Message 2 from server. Make sure server is "
             "running!\n");
     close(*socket_fd);
     return -1;
@@ -59,7 +59,7 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
 
   if (edhoc_message_2_process(context, message_buffer, message2_length) !=
       EDHOC_SUCCESS) {
-    fprintf(stderr, "Client: Failed to process Message 2\n");
+    fprintf(stderr, "Client: cannot process Message 2\n");
     close(*socket_fd);
     return -1;
   }
@@ -67,7 +67,7 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
   size_t message3_length = 0;
   if (edhoc_message_3_compose(context, message_buffer, message_buffer_size,
                               &message3_length) != EDHOC_SUCCESS) {
-    fprintf(stderr, "Client: Failed to compose Message 3\n");
+    fprintf(stderr, "Client: cannot compose Message 3\n");
     close(*socket_fd);
     return -1;
   }
@@ -87,7 +87,7 @@ static int send_message(struct edhoc_context* context, int socket_fd,
   int result = edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret,
                                          sizeof(shared_secret));
   if (result != EDHOC_SUCCESS) {
-    fprintf(stderr, "Client: Failed to export PRK exporter\n");
+    fprintf(stderr, "Client: cannot export PRK exporter\n");
     return result;
   }
 
@@ -98,7 +98,7 @@ static int send_message(struct edhoc_context* context, int socket_fd,
       sizeof(shared_secret), encrypted_message, sizeof(encrypted_message),
       &encrypted_message_length);
   if (encrypt_status != PSA_SUCCESS) {
-    fprintf(stderr, "Failed to encrypt the send message\n");
+    fprintf(stderr, "cannot encrypt the send message\n");
     return encrypt_status;
   }
 

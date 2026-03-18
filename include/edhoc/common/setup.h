@@ -6,20 +6,20 @@
 /**
  * Initializes PSA crypto and configures EDHOC context with cipher suite,
  * methods, and credentials.
- * @param ctx Pointer to uninitialized edhoc_context
- * @param credentials Pointer to edhoc_credentials struct with fetch/verify
+ * @param[in] context Pointer to uninitialized edhoc_context
+ * @param[in] credentials Pointer to edhoc_credentials struct with fetch/verify
  * callbacks
  * @return EDHOC_SUCCESS on success, error code otherwise
  */
-int edhoc_setup_context(struct edhoc_context* ctx,
+int edhoc_setup_context(struct edhoc_context* context,
                         const struct edhoc_credentials* credentials);
 
 /**
- * @brief Initialize credential key information in EDHOC credentials structure
- * @param credentials Pointer to EDHOC credentials structure
- * @param public_key Public key bytes
- * @param public_key_length Length of public key
- * @param key_id_integer Key identifier as integer
+ * @brief Initializes credential key information in EDHOC credentials structure
+ * @param[in] credentials Pointer to EDHOC credentials structure
+ * @param[in] public_key Public key bytes
+ * @param[in] public_key_length Length of public key
+ * @param[in] key_id_integer Key identifier as integer
  */
 void initialize_credential_key(struct edhoc_auth_creds* credentials,
                                const uint8_t* public_key,

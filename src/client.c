@@ -134,7 +134,7 @@ int run_client(void) {
                               MESSAGE_BUFFER_LENGTH - 1, &message1_length);
   if (edhoc_result != EDHOC_SUCCESS) {
     edhoc_context_deinit(&edhoc_session_context);
-    coap_log_err("failed to compose message 1\n");
+    coap_log_err("cannot compose message 1\n");
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
 
@@ -143,7 +143,7 @@ int run_client(void) {
   if (coap_add_data(protocol_data_unit, TOTAL_PAYLOAD_LENGTH, payload_buffer) ==
       LIBCOAP_ERROR) {
     edhoc_context_deinit(&edhoc_session_context);
-    coap_log_err("failed to add payload to PDU\n");
+    coap_log_err("cannot add payload to PDU\n");
     return end_coap_session(optlist, coap_session, coap_session_context);
   }
 
@@ -172,7 +172,7 @@ int run_client(void) {
 //   size_t message1_length = 0;
 //   if (edhoc_message_1_compose(context, message_buffer, message_buffer_size,
 //                               &message1_length) != EDHOC_SUCCESS) {
-//     fprintf(stderr, "Failed to compose Message 1\n");
+//     fprintf(stderr, "cannot compose Message 1\n");
 //     close(*socket_fd);
 //     return -1;
 //   }
@@ -187,7 +187,7 @@ int run_client(void) {
 //                (struct sockaddr*)server_address, &server_address_length);
 //   if (message2_length < 0) {
 //     fprintf(stderr,
-//             "Failed to receive Message 2 from server. Make sure server is "
+//             "cannot receive Message 2 from server. Make sure server is "
 //             "running!\n");
 //     close(*socket_fd);
 //     return -1;
@@ -196,7 +196,7 @@ int run_client(void) {
 
 //   if (edhoc_message_2_process(context, message_buffer, message2_length) !=
 //       EDHOC_SUCCESS) {
-//     fprintf(stderr, "Client: Failed to process Message 2\n");
+//     fprintf(stderr, "Client: cannot process Message 2\n");
 //     close(*socket_fd);
 //     return -1;
 //   }
@@ -204,7 +204,7 @@ int run_client(void) {
 //   size_t message3_length = 0;
 //   if (edhoc_message_3_compose(context, message_buffer, message_buffer_size,
 //                               &message3_length) != EDHOC_SUCCESS) {
-//     fprintf(stderr, "Client: Failed to compose Message 3\n");
+//     fprintf(stderr, "Client: cannot compose Message 3\n");
 //     close(*socket_fd);
 //     return -1;
 //   }
@@ -225,7 +225,7 @@ int run_client(void) {
 //   shared_secret,
 //                                          sizeof(shared_secret));
 //   if (result != EDHOC_SUCCESS) {
-//     fprintf(stderr, "Client: Failed to export PRK exporter\n");
+//     fprintf(stderr, "Client: cannot export PRK exporter\n");
 //     return result;
 //   }
 
@@ -236,7 +236,7 @@ int run_client(void) {
 //       shared_secret, sizeof(shared_secret), encrypted_message,
 //       sizeof(encrypted_message), &encrypted_message_length);
 //   if (encrypt_status != PSA_SUCCESS) {
-//     fprintf(stderr, "Failed to encrypt the send message\n");
+//     fprintf(stderr, "cannot encrypt the send message\n");
 //     return encrypt_status;
 //   }
 

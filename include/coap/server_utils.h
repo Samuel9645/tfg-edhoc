@@ -6,7 +6,8 @@
 #include "coap/common/status.h"
 
 /**
- * Initialize libcoap and create a server context with configured block mode.
+ * @brief Initialize libcoap and create a server context with configured block
+ * mode.
  *
  * @return Pointer to created CoAP context on success, NULL on failure.
  *
@@ -16,7 +17,7 @@
 coap_context_t* coap_server_create_context(void);
 
 /**
- * Resolve local interfaces and create server endpoints.
+ * @brief Resolve local interfaces and create server endpoints.
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] listen_address_string Local address to bind (for example: "::").
@@ -27,7 +28,7 @@ coap_status_result_t coap_server_setup_endpoints(
     coap_context_t* coap_context, const char* listen_address_string);
 
 /**
- * Join a multicast group for discovery traffic.
+ * @brief Join a multicast group for discovery traffic.
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] multicast_address_string Multicast group address.
@@ -38,7 +39,7 @@ coap_status_result_t coap_server_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string);
 
 /**
- * Add a GET resource and register its request handler.
+ * @brief Add a GET resource and register its request handler.
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] resource_path Resource URI path.
@@ -51,7 +52,7 @@ coap_status_result_t coap_server_add_post_resource(
     coap_method_handler_t resource_handler);
 
 /**
- * Run the server I/O loop.
+ * @brief Run the server I/O loop.
  *
  * @param[in] coap_context Active CoAP context.
  * @return COAP_SERVER_UTILS_SUCCESS on graceful stop, COAP_SERVER_UTILS_ERROR

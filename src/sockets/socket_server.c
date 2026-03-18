@@ -42,14 +42,14 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
 
   if (edhoc_message_1_process(context, message_buffer, message1_length) !=
       EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to process Message 1\n");
+    fprintf(stderr, "cannot process Message 1\n");
     return -1;
   }
 
   size_t message2_length = 0;
   if (edhoc_message_2_compose(context, message_buffer, message_buffer_size,
                               &message2_length) != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to compose Message 2\n");
+    fprintf(stderr, "cannot compose Message 2\n");
     return -1;
   }
 
@@ -64,7 +64,7 @@ static int run_handshake(struct edhoc_context* context, int* socket_fd,
 
   if (edhoc_message_3_process(context, message_buffer, message3_length) !=
       EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to process Message 3\n");
+    fprintf(stderr, "cannot process Message 3\n");
     return -1;
   }
 
@@ -92,7 +92,7 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
   int result = edhoc_export_prk_exporter(context, PKR_OUT_LABEL, shared_secret,
                                          sizeof(shared_secret));
   if (result != EDHOC_SUCCESS) {
-    fprintf(stderr, "Server: Failed to export PRK exporter\n");
+    fprintf(stderr, "Server: cannot export PRK exporter\n");
     return result;
   }
 
@@ -101,7 +101,7 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
   result = recvfrom(socket_fd, encrypted_message, sizeof(encrypted_message), 0,
                     (struct sockaddr*)client_address, &client_address_len);
   if (result < 0) {
-    fprintf(stderr, "Failed to receive ciphertext\n");
+    fprintf(stderr, "cannot receive ciphertext\n");
     return -1;
   }
   if (result == 0) {
@@ -115,7 +115,7 @@ static int receive_message(struct edhoc_context* context, int socket_fd,
       sizeof(shared_secret), received_message_buffer,
       received_message_buffer_size, received_message_length);
   if (decrypt_status != PSA_SUCCESS) {
-    fprintf(stderr, "Failed to decrypt ciphertext\n");
+    fprintf(stderr, "cannot decrypt ciphertext\n");
   }
   return EDHOC_SUCCESS;
 }
@@ -167,7 +167,7 @@ int run_server() {
   result =
       run_handshake(&context, &socket_fd, &server_address, &client_address);
   if (result != EDHOC_SUCCESS) {
-    fprintf(stderr, "Failed to run handshake\n");
+    fprintf(stderr, "cannot run handshake\n");
     close(socket_fd);
     edhoc_context_deinit(&context);
     return result;

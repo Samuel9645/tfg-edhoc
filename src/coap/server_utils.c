@@ -72,8 +72,7 @@ coap_status_result_t coap_server_join_multicast_group(
   const int join_result =
       coap_join_mcast_group_intf(coap_context, multicast_address_string, NULL);
   if (join_result < 0) {
-    coap_log_warn("Failed to join multicast group %s\n",
-                  multicast_address_string);
+    coap_log_warn("cannot join multicast group %s\n", multicast_address_string);
     return COAP_STATUS_ERROR;
   }
 

@@ -58,13 +58,13 @@ int main(int argc, char* argv[]) {
 
   len = coap_split_uri((const unsigned char*)coap_uri, strlen(coap_uri), &uri);
   if (len != 0) {
-    coap_log_warn("Failed to parse uri %s\n", coap_uri);
+    coap_log_warn("cannot parse uri %s\n", coap_uri);
     goto finish;
   }
 
   len = resolve_address(&uri.host, uri.port, &dst, 1 << uri.scheme);
   if (len <= 0) {
-    coap_log_warn("Failed to resolve address %*.*s\n", (int)uri.host.length,
+    coap_log_warn("cannot resolve address %*.*s\n", (int)uri.host.length,
                   (int)uri.host.length, (const char*)uri.host.s);
     goto finish;
   }
@@ -102,14 +102,14 @@ int main(int argc, char* argv[]) {
   len =
       coap_uri_into_options(&uri, &dst, &optlist, 1, scratch, sizeof(scratch));
   if (len) {
-    coap_log_warn("Failed to create options\n");
+    coap_log_warn("cannot create options\n");
     goto finish;
   }
 
   if (optlist) {
     res = coap_add_optlist_pdu(pdu, &optlist);
     if (res != 1) {
-      coap_log_warn("Failed to add options to PDU\n");
+      coap_log_warn("cannot add options to PDU\n");
       goto finish;
     }
   }

@@ -2,7 +2,7 @@
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
-#include <stdlib.h>
+#include <string.h>
 
 #include "coap/common/config.h"
 #include "edhoc/common/config.h"
@@ -10,10 +10,6 @@
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"
 #include "edhoc/credentials/public_data.h"
-
-typedef struct client_edhoc_flow_t {
-  struct edhoc_context context;
-} client_edhoc_flow_t;
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -31,16 +27,12 @@ static int client_credential_verify(void* user_context,
                            public_key_reference, public_key_length);
 }
 
-client_edhoc_flow_status_t client_edhoc_flow_init(
-    client_edhoc_flow_t** flow_out) {
-  if (!flow_out) {
+client_edhoc_flow_status_t client_edhoc_flow_init(client_edhoc_flow_t* flow) {
+  if (!flow) {
     return CLIENT_EDHOC_FLOW_INVALID_ARGUMENT;
   }
 
-  client_edhoc_flow_t* flow = calloc(1, sizeof(client_edhoc_flow_t));
-  if (!flow) {
-    return CLIENT_EDHOC_FLOW_MEMORY_ALLOCATION_FAILED;
-  }
+  memset(flow, 0, sizeof(*flow));
 
   const struct edhoc_credentials credentials = {
       .fetch = client_credential_fetch,
@@ -48,11 +40,9 @@ client_edhoc_flow_status_t client_edhoc_flow_init(
   };
 
   if (edhoc_setup_context(&flow->context, &credentials) != EDHOC_SUCCESS) {
-    free(flow);
     return CLIENT_EDHOC_FLOW_CONTEXT_SETUP_FAILED;
   }
 
-  *flow_out = flow;
   return CLIENT_EDHOC_FLOW_SUCCESS;
 }
 
@@ -139,11 +129,11 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
   return CLIENT_EDHOC_FLOW_SUCCESS;
 }
 
-void client_edhoc_flow_deinit(client_edhoc_flow_t** flow_ptr) {
-  if (!flow_ptr || !*flow_ptr) {
+void client_edhoc_flow_deinit(client_edhoc_flow_t* flow) {
+  if (!flow) {
     return;
   }
 
-  free(*flow_ptr);
-  *flow_ptr = NULL;
+  (void)edhoc_context_deinit(&flow->context);
+  memset(flow, 0, sizeof(*flow));
 }

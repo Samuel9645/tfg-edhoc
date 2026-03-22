@@ -1,13 +1,16 @@
 #ifndef EDHOC_CLIENT_CLIENT_FLOW_H_
 #define EDHOC_CLIENT_CLIENT_FLOW_H_
 
+#include <edhoc.h>
 #include <stddef.h>
 #include <stdint.h>
 
 /**
- * @brief Opaque EDHOC client flow state.
+ * @brief EDHOC client flow state.
  */
-typedef struct client_edhoc_flow_t client_edhoc_flow_t;
+typedef struct client_edhoc_flow_t {
+  struct edhoc_context context;
+} client_edhoc_flow_t;
 
 /**
  * @brief Result codes for EDHOC client flow operations.
@@ -28,15 +31,13 @@ typedef enum {
 /**
  * @brief Initialize EDHOC client flow context.
  *
- * @param[out] flow_out Allocated flow instance.
+ * @param[in,out] flow Caller-owned flow state.
  * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
  *
- * @warning Allocates memory with calloc(). Caller must call
- * client_edhoc_flow_deinit() before application exit to free allocated
- * resources.
+ * @note This function does not allocate memory. The caller owns flow storage
+ * and must keep it alive for all flow operations.
  */
-client_edhoc_flow_status_t client_edhoc_flow_init(
-    client_edhoc_flow_t** flow_out);
+client_edhoc_flow_status_t client_edhoc_flow_init(client_edhoc_flow_t* flow);
 
 /**
  * @brief Compose EDHOC Message 1 including CBOR marker.
@@ -89,10 +90,8 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
 /**
  * @brief Destroy EDHOC client flow context.
  *
- * @param[in,out] flow_ptr Flow pointer to destroy.
- * @warning Frees memory allocated by client_edhoc_flow_init(). Sets flow_ptr to
- * NULL.
+ * @param[in,out] flow Caller-owned flow state to clean up.
  */
-void client_edhoc_flow_deinit(client_edhoc_flow_t** flow_ptr);
+void client_edhoc_flow_deinit(client_edhoc_flow_t* flow);
 
 #endif  // EDHOC_CLIENT_CLIENT_FLOW_H_

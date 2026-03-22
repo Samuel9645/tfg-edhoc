@@ -1,9 +1,12 @@
 [submodule "libedhoc"]
-  path = libedhoc
-  url = https://github.com/kamil-kielbasa/libedhoc.git
+	path = externals/libedhoc
+	url = https://github.com/kamil-kielbasa/libedhoc.git
 [submodule "libcoap"]
-	path = libcoap
+	path = externals/libcoap
 	url = https://github.com/obgm/libcoap.git
 [submodule "libcoap-minimal"]
-	path = libcoap-minimal
+	path = externals/libcoap-minimal
 	url = https://github.com/obgm/libcoap-minimal.git
+[submodule "externals/unity"]
+	path = externals/unity
+	url = https://github.com/ThrowTheSwitch/Unity.git

@@ -18,6 +18,8 @@ const coap_server_edhoc_dispatch_deps_t
         .handle_message_1 = server_edhoc_handle_message_1,
         .handle_message_3 = server_edhoc_handle_message_3,
         .add_response_payload = coap_shared_add_response_payload,
+        .get_session_app_data = coap_session_get_app_data,
+        .set_response_code = coap_pdu_set_code,
 };
 
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
@@ -27,7 +29,8 @@ static inline bool coap_server_dispatch_has_invalid_deps_or_args(
          !deps->validate_edhoc_request || !deps->add_edhoc_response_options ||
          !deps->is_message_1 || !deps->is_message_3 ||
          !deps->handle_message_1 || !deps->handle_message_3 ||
-         !deps->add_response_payload;
+         !deps->add_response_payload || !deps->get_session_app_data ||
+         !deps->set_response_code;
 }
 
 void coap_server_dispatch_edhoc_post(coap_session_t* session,
@@ -55,14 +58,14 @@ void coap_server_dispatch_edhoc_post_with_deps(
                                    &request_payload,
                                    &request_len) != COAP_STATUS_SUCCESS) {
     coap_log_err("failed to validate EDHOC request\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+    deps->set_response_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
     return;
   }
 
   if (deps->add_edhoc_response_options(response, APPLICATION_EDHOC_CBOR_SEQ) !=
       COAP_STATUS_SUCCESS) {
     coap_log_err("failed to add EDHOC response options\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    deps->set_response_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
 
@@ -79,12 +82,12 @@ void coap_server_dispatch_edhoc_post_with_deps(
   struct edhoc_extracted_fields message_3_extracted_fields = {0};
 
   struct edhoc_context* edhoc_ctx =
-      (struct edhoc_context*)coap_session_get_app_data(session);
+      (struct edhoc_context*)deps->get_session_app_data(session);
 
   if (deps->is_message_1(request_payload, request_len)) {
     if (edhoc_ctx != NULL) {
       coap_log_err("EDHOC context already exists for this session\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      deps->set_response_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
       return;
     }
 
@@ -107,7 +110,7 @@ void coap_server_dispatch_edhoc_post_with_deps(
                                 &message_3_extracted_fields)) {
     if (edhoc_ctx == NULL) {
       coap_log_err("received Message 3 without EDHOC context\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      deps->set_response_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
       return;
     }
 
@@ -128,7 +131,7 @@ void coap_server_dispatch_edhoc_post_with_deps(
     response_code = deps->handle_message_3(&request_data, &response_data);
   } else {
     coap_log_err("received invalid or unexpected EDHOC message\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    deps->set_response_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
 
@@ -136,9 +139,9 @@ void coap_server_dispatch_edhoc_post_with_deps(
       deps->add_response_payload(response, response_payload, response_len) !=
           COAP_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    deps->set_response_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
 
-  coap_pdu_set_code(response, response_code);
+  deps->set_response_code(response, response_code);
 }

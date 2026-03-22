@@ -29,6 +29,8 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
   coap_status_result_t (*add_response_payload)(coap_pdu_t* response,
                                                const uint8_t* payload,
                                                size_t payload_len);
+  void* (*get_session_app_data)(const coap_session_t* session);
+  void (*set_response_code)(coap_pdu_t* response, coap_pdu_code_t code);
 } coap_server_edhoc_dispatch_deps_t;
 
 extern const coap_server_edhoc_dispatch_deps_t

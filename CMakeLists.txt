@@ -5,12 +5,10 @@ project(EDHOC_Demo C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS ON)
 
-include(libedhoc_config.cmake)
+include(cmake_configs/libedhoc_config.cmake)
 
-# Add the libedhoc library
-# (It will automatically handle its own fallback configs for Zephyr)
-add_subdirectory(libedhoc)
-add_subdirectory(libcoap)
+# Third-party dependencies are managed in externals/.
+add_subdirectory(externals)
 
 set(BASE_SOURCES
     src/edhoc/common/setup.c
@@ -21,8 +19,8 @@ set(BASE_SOURCES
     src/coap/common/helpers.c
     src/coap/shared/edhoc_request.c
     src/coap/shared/edhoc_response.c
-    libedhoc/helpers/src/edhoc_cipher_suite_2.c
-    libedhoc/helpers/src/edhoc_helpers.c
+    externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    externals/libedhoc/helpers/src/edhoc_helpers.c
 )
 
 # Define main executable
@@ -50,14 +48,14 @@ target_link_libraries(server PRIVATE libedhoc libcoap::coap-3)
 target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
 
 # Suppress warnings from helpers
-set_source_files_properties(libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
 
 # Add helper include directories SYSTEM is set to suppress warnings from external 
 # code
 target_include_directories(server PRIVATE include)
-target_include_directories(server SYSTEM PRIVATE libedhoc/helpers/include)
+target_include_directories(server SYSTEM PRIVATE externals/libedhoc/helpers/include)
 target_include_directories(client PRIVATE include)
-target_include_directories(client SYSTEM PRIVATE libedhoc/helpers/include)
+target_include_directories(client SYSTEM PRIVATE externals/libedhoc/helpers/include)
 
 # Set output directory for executables
 set_target_properties(server PROPERTIES
@@ -73,3 +71,5 @@ target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS})
 target_compile_options(client PRIVATE ${CUSTOM_COMPILE_FLAGS})
 target_link_options(server PRIVATE ${MEMORY_CHECK_FLAGS})
 target_link_options(client PRIVATE ${MEMORY_CHECK_FLAGS})
+
+include(cmake_configs/testing_config.cmake)

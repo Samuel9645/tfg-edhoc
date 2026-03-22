@@ -37,7 +37,7 @@ typedef enum {
  * @brief Initialize EDHOC client flow context.
  *
  * @param[in,out] flow Caller-owned flow state.
- * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
+ * @return CLIENT_EDHOC_FLOW_SUCCESS on success, error code otherwise.
  *
  * @note This function does not allocate memory. The caller owns flow storage
  * and must keep it alive for all flow operations.
@@ -51,7 +51,7 @@ client_edhoc_flow_status_t client_edhoc_flow_init(client_edhoc_flow_t* flow);
  * @param[in] payload_capacity Capacity of payload buffer.
  * @param[out] payload Output payload buffer.
  * @param[out] payload_len Number of bytes written.
- * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
+ * @return CLIENT_EDHOC_FLOW_SUCCESS on success, error code otherwise.
  */
 client_edhoc_flow_status_t client_edhoc_flow_compose_message_1(
     client_edhoc_flow_t* flow, size_t payload_capacity, uint8_t* payload,
@@ -63,7 +63,7 @@ client_edhoc_flow_status_t client_edhoc_flow_compose_message_1(
  * @param[in] flow Initialized flow.
  * @param[in] payload Message payload.
  * @param[in] payload_len Payload length.
- * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
+ * @return CLIENT_EDHOC_FLOW_SUCCESS on success, error code otherwise.
  */
 client_edhoc_flow_status_t client_edhoc_flow_process_message_2(
     client_edhoc_flow_t* flow, const uint8_t* payload, size_t payload_len);
@@ -75,7 +75,7 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_2(
  * @param[in] payload_capacity Capacity of payload buffer.
  * @param[out] payload Output payload buffer.
  * @param[out] payload_len Number of bytes written.
- * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
+ * @return CLIENT_EDHOC_FLOW_SUCCESS on success, error code otherwise.
  */
 client_edhoc_flow_status_t client_edhoc_flow_compose_message_3(
     client_edhoc_flow_t* flow, size_t payload_capacity, uint8_t* payload,
@@ -87,7 +87,7 @@ client_edhoc_flow_status_t client_edhoc_flow_compose_message_3(
  * @param[in] flow Initialized flow.
  * @param[in] payload Message payload.
  * @param[in] payload_len Payload length.
- * @return CLIENT_EDHOC_FLOW_SUCCESS on success, descriptive error otherwise.
+ * @return CLIENT_EDHOC_FLOW_SUCCESS on success, error code otherwise.
  */
 client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
     client_edhoc_flow_t* flow, const uint8_t* payload, size_t payload_len);

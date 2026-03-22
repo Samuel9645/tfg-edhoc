@@ -1,11 +1,11 @@
-#include "coap/client_edhoc_exchange.h"
+#include "coap/client/edhoc_exchange.h"
 
 #include <edhoc.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include "coap/client/log_edhoc_error_response.h"
-#include "coap/client_utils.h"
+#include "coap/client/utils.h"
 #include "coap/common/helpers.h"
 
 static bool client_response_has_edhoc_content_format(

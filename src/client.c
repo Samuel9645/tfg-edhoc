@@ -3,10 +3,10 @@
 #include <coap3/coap.h>
 #include <stdio.h>
 
-#include "coap/client_edhoc_exchange.h"
-#include "coap/client_utils.h"
+#include "coap/client/cleanup.h"
+#include "coap/client/edhoc_exchange.h"
+#include "coap/client/utils.h"
 #include "coap/common/config.h"
-#include "common/cleanup.h"
 #include "edhoc/client/client_flow.h"
 #include "edhoc/common/config.h"
 

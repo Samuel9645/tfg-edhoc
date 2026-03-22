@@ -1,4 +1,4 @@
-#include "coap/server_edhoc_dispatch.h"
+#include "coap/server/server_edhoc_dispatch.h"
 
 #include <edhoc_helpers.h>
 

@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "coap/shared/edhoc_error_map.h"
+#include "coap/server/map_edhoc_error_to_response.h"
 #include "coap/shared/edhoc_request.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
@@ -92,8 +92,8 @@ coap_pdu_code_t server_edhoc_handle_message_1(
   int edhoc_api_result =
       edhoc_setup_context(edhoc_context, &SERVER_CREDENTIALS);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    coap_pdu_code_t response_code = coap_shared_map_edhoc_failure_to_response(
-        edhoc_context, "setup EDHOC context", COAP_SHARED_EDHOC_INTERNAL_ERROR,
+    coap_pdu_code_t response_code = coap_server_map_edhoc_failure_to_response(
+        edhoc_context, "setup EDHOC context", COAP_SERVER_EDHOC_INTERNAL_ERROR,
         edhoc_api_result, request_data->base_data.response, response_data);
     free(edhoc_context);
     return response_code;
@@ -109,8 +109,8 @@ coap_pdu_code_t server_edhoc_handle_message_1(
   edhoc_api_result =
       edhoc_message_1_process(edhoc_context, edhoc_msg1_bytes, edhoc_msg1_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_shared_map_edhoc_failure_to_response(
-        edhoc_context, "process Message 1", COAP_SHARED_EDHOC_PROTOCOL_ERROR,
+    return coap_server_map_edhoc_failure_to_response(
+        edhoc_context, "process Message 1", COAP_SERVER_EDHOC_PROTOCOL_ERROR,
         edhoc_api_result, request_data->base_data.response, response_data);
   }
 
@@ -118,8 +118,8 @@ coap_pdu_code_t server_edhoc_handle_message_1(
       edhoc_context, response_data->payload, response_data->payload_capacity,
       response_data->payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_shared_map_edhoc_failure_to_response(
-        edhoc_context, "compose Message 2", COAP_SHARED_EDHOC_INTERNAL_ERROR,
+    return coap_server_map_edhoc_failure_to_response(
+        edhoc_context, "compose Message 2", COAP_SERVER_EDHOC_INTERNAL_ERROR,
         edhoc_api_result, request_data->base_data.response, response_data);
   }
 
@@ -141,8 +141,8 @@ coap_pdu_code_t server_edhoc_handle_message_3(
       request_data->message_3_extracted_fields->edhoc_message_ptr,
       request_data->message_3_extracted_fields->edhoc_message_size);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_shared_map_edhoc_failure_to_response(
-        edhoc_context, "process Message 3", COAP_SHARED_EDHOC_PROTOCOL_ERROR,
+    return coap_server_map_edhoc_failure_to_response(
+        edhoc_context, "process Message 3", COAP_SERVER_EDHOC_PROTOCOL_ERROR,
         edhoc_api_result, request_data->base_data.response, response_data);
   }
 
@@ -150,8 +150,8 @@ coap_pdu_code_t server_edhoc_handle_message_3(
       edhoc_context, response_data->payload, response_data->payload_capacity,
       response_data->payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_shared_map_edhoc_failure_to_response(
-        edhoc_context, "compose Message 4", COAP_SHARED_EDHOC_INTERNAL_ERROR,
+    return coap_server_map_edhoc_failure_to_response(
+        edhoc_context, "compose Message 4", COAP_SERVER_EDHOC_INTERNAL_ERROR,
         edhoc_api_result, request_data->base_data.response, response_data);
   }
 

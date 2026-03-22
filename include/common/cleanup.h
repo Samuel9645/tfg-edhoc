@@ -4,9 +4,8 @@
 #include <coap3/coap.h>
 #include <edhoc.h>
 
+#include "coap/client_edhoc_exchange.h"
 #include "edhoc/client/client_flow.h"
-
-struct client_edhoc_exchange_t;
 
 /**
  * @brief Holder for all resources allocated during a CoAP session, including
@@ -41,8 +40,8 @@ typedef struct {
   /** Client EDHOC flow state owned by the caller. */
   client_edhoc_flow_t flow;
 
-  /** Exchange handle allocated by client_edhoc_exchange_init(). */
-  struct client_edhoc_exchange_t* exchange;
+  /** Exchange state owned by the caller. */
+  client_edhoc_exchange_t exchange;
 } client_session_resources_t;
 
 /**
@@ -66,8 +65,7 @@ void cleanup_resources(session_resources_t* resources);
  * @note Preferred single cleanup entry point for client flow/exchange state.
  *
  * @warning When using this function, avoid manual calls to
- * client_edhoc_flow_deinit() and client_edhoc_exchange_deinit() for the same
- * resources in the same control path.
+ * client_edhoc_flow_deinit() for the same resources in the same control path.
  */
 void cleanup_client_resources(client_session_resources_t* resources);
 

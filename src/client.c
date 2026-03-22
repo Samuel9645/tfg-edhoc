@@ -92,14 +92,14 @@ emulation_status_t run_client(void) {
 
   request_data.request_data.payload_len = request_len;
 
-  if (client_edhoc_exchange_send(client_resources.exchange, &request_data) !=
+  if (client_edhoc_exchange_send(&client_resources.exchange, &request_data) !=
       COAP_STATUS_SUCCESS) {
     cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   if (client_edhoc_exchange_wait_and_get(
-          client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
+          &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
       client_edhoc_flow_process_message_2(&client_resources.flow,
                                           response_payload, response_len) !=
           CLIENT_EDHOC_FLOW_SUCCESS) {
@@ -107,7 +107,7 @@ emulation_status_t run_client(void) {
     return EMULATION_FAILURE;
   }
 
-  client_edhoc_exchange_reset(client_resources.exchange);
+  client_edhoc_exchange_reset(&client_resources.exchange);
 
   if (client_edhoc_flow_compose_message_3(
           &client_resources.flow, MESSAGE_BUFFER_LENGTH, request_payload,
@@ -118,10 +118,10 @@ emulation_status_t run_client(void) {
 
   request_data.request_data.payload_len = request_len;
 
-  if (client_edhoc_exchange_send(client_resources.exchange, &request_data) !=
+  if (client_edhoc_exchange_send(&client_resources.exchange, &request_data) !=
           COAP_STATUS_SUCCESS ||
       client_edhoc_exchange_wait_and_get(
-          client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
+          &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
       client_edhoc_flow_process_message_4(&client_resources.flow,
                                           response_payload, response_len) !=
           CLIENT_EDHOC_FLOW_SUCCESS) {

@@ -2,6 +2,7 @@
 #define COAP_CLIENT_EDHOC_EXCHANGE_H_
 
 #include <coap3/coap.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -10,9 +11,33 @@
 #include "coap/common/status.h"
 
 /**
- * @brief Opaque CoAP exchange state for EDHOC client messages.
+ * @brief CoAP exchange state for EDHOC client messages.
  */
-typedef struct client_edhoc_exchange_t client_edhoc_exchange_t;
+typedef struct client_edhoc_exchange_t {
+  /** Context used by wait loop and response callback registration. */
+  coap_context_t* context;
+
+  /** Session used to send requests and store app-data pointer. */
+  coap_session_t* session;
+
+  /** Cached URI used for outgoing EDHOC POST requests. */
+  coap_uri_t uri;
+
+  /** Cached destination address associated with uri. */
+  coap_address_t destination;
+
+  /** Response-ready flag set by response callback. */
+  bool have_response;
+
+  /** Internal receive buffer populated by response callback. */
+  uint8_t incoming_message[MAX_PDU_SIZE];
+
+  /** Number of valid bytes currently stored in incoming_message. */
+  size_t incoming_message_len;
+
+  /** Last non-empty response code received for this exchange. */
+  coap_pdu_code_t last_response_code;
+} client_edhoc_exchange_t;
 
 /**
  * @brief Input data used to initialize client exchange state.
@@ -40,16 +65,12 @@ typedef struct {
  * @brief Initialize exchange state and register response handler.
  *
  * @param[in] session_data Session and endpoint data required for init.
- * @param[out] exchange_out Allocated exchange state.
+ * @param[out] exchange Exchange state storage provided by caller.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
- *
- * @warning Allocates memory with calloc(). Caller must call
- * client_edhoc_exchange_deinit() before application exit to free allocated
- * resources.
  */
 coap_status_result_t client_edhoc_exchange_init(
     const client_edhoc_exchange_session_data_t* session_data,
-    client_edhoc_exchange_t** exchange_out);
+    client_edhoc_exchange_t* exchange);
 
 /**
  * @brief Send EDHOC payload in a CoAP POST request.
@@ -67,7 +88,11 @@ coap_status_result_t client_edhoc_exchange_send(
  *
  * @param[in,out] exchange Initialized exchange state.
  * @param[out] response_data Response output buffer metadata.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return COAP_STATUS_SUCCESS on 2.04 Changed responses,
+ * COAP_STATUS_ERROR on transport failures or CoAP error responses.
+ *
+ * @note For CoAP error responses, the EDHOC error payload is still copied to
+ * response_data when present and valid.
  */
 coap_status_result_t client_edhoc_exchange_wait_and_get(
     client_edhoc_exchange_t* exchange,
@@ -79,19 +104,5 @@ coap_status_result_t client_edhoc_exchange_wait_and_get(
  * @param[in,out] exchange Initialized exchange state.
  */
 void client_edhoc_exchange_reset(client_edhoc_exchange_t* exchange);
-
-/**
- * @brief Destroy exchange state and unregister app-data.
- *
- * @param[in,out] exchange_ptr Exchange pointer to destroy.
- *
- * @note If exchange is managed through client_session_resources_t, prefer
- * calling cleanup_client_resources() instead of invoking this function
- * directly.
- *
- * @warning Frees memory allocated by client_edhoc_exchange_init(). Sets
- * exchange_ptr to NULL.
- */
-void client_edhoc_exchange_deinit(client_edhoc_exchange_t** exchange_ptr);
 
 #endif  // COAP_CLIENT_EDHOC_EXCHANGE_H_

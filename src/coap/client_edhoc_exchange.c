@@ -1,34 +1,27 @@
 #include "coap/client_edhoc_exchange.h"
 
+#include <edhoc.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 
+#include "coap/client/log_edhoc_error_response.h"
 #include "coap/client_utils.h"
 #include "coap/common/helpers.h"
 
-typedef struct client_edhoc_exchange_t {
-  /** Context used by wait loop and response callback registration. */
-  coap_context_t* context;
+static bool client_response_has_edhoc_content_format(
+    const coap_pdu_t* response) {
+  coap_opt_iterator_t option_iterator = {0};
+  coap_opt_t* content_format_option =
+      coap_check_option(response, COAP_OPTION_CONTENT_FORMAT, &option_iterator);
+  if (!content_format_option) {
+    return false;
+  }
 
-  /** Session used to send requests and store app-data pointer. */
-  coap_session_t* session;
-
-  /** Cached URI used for outgoing EDHOC POST requests. */
-  coap_uri_t uri;
-
-  /** Cached destination address associated with uri. */
-  coap_address_t destination;
-
-  /** Response-ready flag set by response callback. */
-  bool have_response;
-
-  /** Internal receive buffer populated by response callback. */
-  uint8_t incoming_message[MAX_PDU_SIZE];
-
-  /** Number of valid bytes currently stored in incoming_message. */
-  size_t incoming_message_len;
-} client_edhoc_exchange_t;
+  uint16_t content_format =
+      coap_decode_var_bytes(coap_opt_value(content_format_option),
+                            coap_opt_length(content_format_option));
+  return content_format == APPLICATION_EDHOC_CBOR_SEQ;
+}
 
 static coap_response_t client_edhoc_response_handler(coap_session_t* session,
                                                      const coap_pdu_t* sent,
@@ -44,50 +37,55 @@ static coap_response_t client_edhoc_response_handler(coap_session_t* session,
     return COAP_RESPONSE_FAIL;
   }
 
+  exchange->have_response = true;
+  exchange->incoming_message_len = 0;
+
   coap_pdu_code_t response_code = coap_pdu_get_code(received);
+  exchange->last_response_code = response_code;
   if (response_code == COAP_EMPTY_CODE) {
     coap_log_info("received empty response\n");
     return COAP_RESPONSE_OK;
   }
 
-  if (response_code != COAP_RESPONSE_CODE_CHANGED) {
-    coap_log_err("received error response code: %d.%02d\n", response_code >> 5,
-                 response_code & 0x1F);
-    return COAP_RESPONSE_FAIL;
+  if (!client_response_has_edhoc_content_format(received)) {
+    coap_log_err("missing or invalid EDHOC content format in response\n");
+    return COAP_RESPONSE_OK;
   }
 
   size_t payload_len = 0;
   const uint8_t* payload = NULL;
-  if (!coap_get_data(received, &payload_len, &payload)) {
+  if (!coap_get_data(received, &payload_len, &payload) || payload_len == 0) {
     coap_log_err("cannot get response pdu data\n");
-    return COAP_RESPONSE_FAIL;
+    return COAP_RESPONSE_OK;
   }
 
   if (payload_len > sizeof(exchange->incoming_message)) {
     coap_log_err("response payload too large\n");
-    return COAP_RESPONSE_FAIL;
+    return COAP_RESPONSE_OK;
   }
 
   memcpy(exchange->incoming_message, payload, payload_len);
   exchange->incoming_message_len = payload_len;
-  exchange->have_response = true;
+
+  if (response_code != COAP_RESPONSE_CODE_CHANGED) {
+    coap_client_log_received_edhoc_error_response(response_code, payload,
+                                                  payload_len);
+    return COAP_RESPONSE_OK;
+  }
+
   return COAP_RESPONSE_OK;
 }
 
 coap_status_result_t client_edhoc_exchange_init(
     const client_edhoc_exchange_session_data_t* session_data,
-    client_edhoc_exchange_t** exchange_out) {
-  if (!exchange_out || !session_data || !session_data->session_data.context ||
+    client_edhoc_exchange_t* exchange) {
+  if (!exchange || !session_data || !session_data->session_data.context ||
       !session_data->session_data.session || !session_data->endpoint_data.uri ||
       !session_data->endpoint_data.destination) {
     return COAP_STATUS_ERROR;
   }
 
-  client_edhoc_exchange_t* exchange =
-      calloc(1, sizeof(client_edhoc_exchange_t));
-  if (!exchange) {
-    return COAP_STATUS_ERROR;
-  }
+  memset(exchange, 0, sizeof(*exchange));
 
   exchange->context = session_data->session_data.context;
   exchange->session = session_data->session_data.session;
@@ -97,14 +95,12 @@ coap_status_result_t client_edhoc_exchange_init(
   if (coap_session_set_app_data2(session_data->session_data.session, exchange,
                                  NULL) != NULL) {
     coap_log_err("unexpected existing session app-data in client\n");
-    free(exchange);
     return COAP_STATUS_ERROR;
   }
 
   coap_register_response_handler(session_data->session_data.context,
                                  client_edhoc_response_handler);
 
-  *exchange_out = exchange;
   return COAP_STATUS_SUCCESS;
 }
 
@@ -157,13 +153,17 @@ coap_status_result_t client_edhoc_exchange_wait_and_get(
     return COAP_STATUS_ERROR;
   }
 
+  bool is_error_response =
+      exchange->last_response_code != COAP_RESPONSE_CODE_CHANGED;
+
   memcpy(response_data->payload, exchange->incoming_message,
          exchange->incoming_message_len);
   *response_data->payload_len = exchange->incoming_message_len;
   exchange->have_response = false;
   exchange->incoming_message_len = 0;
+  exchange->last_response_code = COAP_EMPTY_CODE;
 
-  return COAP_STATUS_SUCCESS;
+  return is_error_response ? COAP_STATUS_ERROR : COAP_STATUS_SUCCESS;
 }
 
 void client_edhoc_exchange_reset(client_edhoc_exchange_t* exchange) {
@@ -173,17 +173,5 @@ void client_edhoc_exchange_reset(client_edhoc_exchange_t* exchange) {
 
   exchange->have_response = false;
   exchange->incoming_message_len = 0;
-}
-
-void client_edhoc_exchange_deinit(client_edhoc_exchange_t** exchange_ptr) {
-  if (!exchange_ptr || !*exchange_ptr) {
-    return;
-  }
-
-  if ((*exchange_ptr)->session) {
-    coap_session_set_app_data2((*exchange_ptr)->session, NULL, NULL);
-  }
-
-  free(*exchange_ptr);
-  *exchange_ptr = NULL;
+  exchange->last_response_code = COAP_EMPTY_CODE;
 }

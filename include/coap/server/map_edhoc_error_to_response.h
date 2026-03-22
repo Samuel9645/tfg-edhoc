@@ -1,5 +1,5 @@
-#ifndef COAP_SHARED_EDHOC_ERROR_MAP_H_
-#define COAP_SHARED_EDHOC_ERROR_MAP_H_
+#ifndef COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_
+#define COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_
 
 #include <coap3/coap.h>
 #include <edhoc.h>
@@ -10,9 +10,9 @@
  * @brief Classifies EDHOC failure source for CoAP response mapping.
  */
 typedef enum {
-  COAP_SHARED_EDHOC_PROTOCOL_ERROR,
-  COAP_SHARED_EDHOC_INTERNAL_ERROR,
-} coap_shared_edhoc_failure_type_t;
+  COAP_SERVER_EDHOC_PROTOCOL_ERROR,
+  COAP_SERVER_EDHOC_INTERNAL_ERROR,
+} coap_server_edhoc_failure_type_t;
 
 /**
  * @brief Map EDHOC failure to CoAP response code and compose error message.
@@ -38,9 +38,9 @@ typedef enum {
  * @see [RFC 9528 A.2.3 - Errors in EDHOC over
  * CoAP](https://datatracker.ietf.org/doc/html/rfc9528/#name-errors-in-edhoc-over-coap)
  */
-coap_pdu_code_t coap_shared_map_edhoc_failure_to_response(
+coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     struct edhoc_context* edhoc_ctx, const char* operation_label,
-    coap_shared_edhoc_failure_type_t failure_type, int edhoc_api_result,
+    coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
     coap_pdu_t* response, coap_response_data_t* response_data);
 
-#endif  // COAP_SHARED_EDHOC_ERROR_MAP_H_
+#endif  // COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_

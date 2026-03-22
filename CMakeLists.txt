@@ -19,6 +19,9 @@ set(BASE_SOURCES
     src/edhoc/credentials/authentication.c
     src/common/cleanup.c
     src/coap/common/helpers.c
+    src/coap/shared/edhoc_request.c
+    src/coap/shared/edhoc_response.c
+    src/coap/shared/edhoc_error_map.c
     libedhoc/helpers/src/edhoc_cipher_suite_2.c
     libedhoc/helpers/src/edhoc_helpers.c
 )
@@ -28,12 +31,16 @@ add_executable(server
     src/main_server.c
     src/server.c
     src/coap/server_utils.c
+    src/coap/server_edhoc_dispatch.c
+    src/edhoc/server/server_flow.c
     ${BASE_SOURCES}
 )
 add_executable(client
     src/main_client.c
     src/client.c
     src/coap/client_utils.c
+    src/coap/client_edhoc_exchange.c
+    src/edhoc/client/client_flow.c
     ${BASE_SOURCES}
 )
 # Link libraries

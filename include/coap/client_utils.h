@@ -43,10 +43,12 @@ coap_status_result_t parse_and_resolve_coap_uri(
  *
  * @param[in] client_uri Parsed URI used to select transport protocol.
  * @param[in] destination_address Remote destination address.
- * @param[in] response_handler Response callback used by libcoap.
+ * @param[in] response_handler Optional response callback used by libcoap.
  * @param[out] coap_session_context Output created CoAP context.
  * @param[out] coap_session Output created CoAP session.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ *
+ * @note If response_handler is NULL, no callback is registered.
  *
  * @note On failure, both output parameters (context and session) are set to
  * NULL and any allocated resources are freed.

@@ -69,7 +69,9 @@ coap_status_result_t create_coap_client_session(
     return COAP_STATUS_ERROR;
   }
 
-  coap_register_response_handler(*coap_session_context, response_handler);
+  if (response_handler != NULL) {
+    coap_register_response_handler(*coap_session_context, response_handler);
+  }
   return COAP_STATUS_SUCCESS;
 }
 

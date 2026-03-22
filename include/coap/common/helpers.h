@@ -33,16 +33,15 @@
  * @param[out] destination_address Output resolved socket address.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  *
- * @note On failure, the output destination_address is not modified
+ * @note On failure, the output destination_address is not modified.
  *
  * @note This function manages all internal memory used during the DNS
  * resolution process. The caller must provide a valid pointer to an existing
  * `coap_address_t` structure (typically allocated on the stack) to hold the
  * output.
  *
- *
- * Inspired by libcoap-minimal common.cc and common.hh files:
- * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
+ * @note Inspired by libcoap-minimal common.cc and common.hh files:
+ * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>.
  */
 coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
                                      int scheme_hint_bits,
@@ -53,6 +52,7 @@ coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
  *
  * @param[in] content_format Content format value to include in the options
  * list.
+ * @return Pointer to created options list on success, NULL on failure.
  *
  * @see [RFC 9528: The Forward Message
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
@@ -61,7 +61,6 @@ coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
  * @see [RFC 9528: CoAP Content
  * Formats](https://datatracker.ietf.org/doc/html/rfc9528/#name-coap-content-formats-regist)
  * for details on the content format value.
- * @return Pointer to created options list on success, NULL on failure.
  *
  * @note On failure, any allocated resources are freed.
  */

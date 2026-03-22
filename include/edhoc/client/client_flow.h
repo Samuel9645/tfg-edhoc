@@ -9,6 +9,7 @@
  * @brief EDHOC client flow state.
  */
 typedef struct client_edhoc_flow_t {
+  /** Internal EDHOC protocol context used across message 1-4 operations. */
   struct edhoc_context context;
 } client_edhoc_flow_t;
 

@@ -34,16 +34,20 @@ static const struct edhoc_credentials SERVER_CREDENTIALS = {
 };
 
 coap_pdu_code_t server_edhoc_handle_message_1(
-    coap_session_t* session, const uint8_t* request_payload, size_t request_len,
-    size_t response_capacity, coap_pdu_t* response, uint8_t* response_payload,
-    size_t* response_len) {
-  if (!session || !request_payload || request_len <= 1 || !response_payload ||
-      !response_len || !response) {
+    const server_edhoc_message_1_request_data_t* request_data,
+    const coap_response_data_t* response_data) {
+  if (!request_data || !response_data || !request_data->session ||
+      !request_data->response || !request_data->request_data.payload ||
+      request_data->request_data.payload_len <= 1 || !response_data->payload ||
+      !response_data->payload_len) {
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }
 
+  const uint8_t* request_payload = request_data->request_data.payload;
+  size_t request_len = request_data->request_data.payload_len;
+
   struct edhoc_context* edhoc_ctx =
-      (struct edhoc_context*)coap_session_get_app_data(session);
+      (struct edhoc_context*)coap_session_get_app_data(request_data->session);
   if (edhoc_ctx != NULL) {
     coap_log_err("EDHOC context already exists for this session\n");
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -64,7 +68,8 @@ coap_pdu_code_t server_edhoc_handle_message_1(
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 
-  if (coap_session_set_app_data2(session, edhoc_ctx, free) != NULL) {
+  if (coap_session_set_app_data2(request_data->session, edhoc_ctx, free) !=
+      NULL) {
     coap_log_err("app data for session already set\n");
     free(edhoc_ctx);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -73,49 +78,53 @@ coap_pdu_code_t server_edhoc_handle_message_1(
   if (edhoc_message_1_process(edhoc_ctx, edhoc_msg1_bytes, edhoc_msg1_len) !=
       EDHOC_SUCCESS) {
     coap_shared_map_edhoc_failure_to_response(edhoc_ctx, "process Message 1",
-                                              true, response);
-    return coap_pdu_get_code(response);
+                                              true, request_data->response);
+    return coap_pdu_get_code(request_data->response);
   }
 
-  if (edhoc_message_2_compose(edhoc_ctx, response_payload, response_capacity,
-                              response_len) != EDHOC_SUCCESS) {
+  if (edhoc_message_2_compose(edhoc_ctx, response_data->payload,
+                              response_data->payload_capacity,
+                              response_data->payload_len) != EDHOC_SUCCESS) {
     coap_shared_map_edhoc_failure_to_response(edhoc_ctx, "compose Message 2",
-                                              false, response);
-    return coap_pdu_get_code(response);
+                                              false, request_data->response);
+    return coap_pdu_get_code(request_data->response);
   }
 
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
 coap_pdu_code_t server_edhoc_handle_message_3(
-    coap_session_t* session, const uint8_t* request_payload, size_t request_len,
-    size_t response_capacity, struct edhoc_extracted_fields* extracted_fields,
-    coap_pdu_t* response, uint8_t* response_payload, size_t* response_len) {
-  if (!session || !request_payload || request_len == 0 || !response_payload ||
-      !response_len || !response || !extracted_fields) {
+    const server_edhoc_message_3_request_data_t* request_data,
+    const coap_response_data_t* response_data) {
+  if (!request_data || !response_data || !request_data->session ||
+      !request_data->response || !request_data->request_data.payload ||
+      request_data->request_data.payload_len == 0 || !response_data->payload ||
+      !response_data->payload_len || !request_data->extracted_fields) {
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }
 
   struct edhoc_context* edhoc_ctx =
-      (struct edhoc_context*)coap_session_get_app_data(session);
+      (struct edhoc_context*)coap_session_get_app_data(request_data->session);
   if (!edhoc_ctx) {
     coap_log_err("no EDHOC context for this session\n");
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }
 
-  if (edhoc_message_3_process(edhoc_ctx, extracted_fields->edhoc_message_ptr,
-                              extracted_fields->edhoc_message_size) !=
+  if (edhoc_message_3_process(
+          edhoc_ctx, request_data->extracted_fields->edhoc_message_ptr,
+          request_data->extracted_fields->edhoc_message_size) !=
       EDHOC_SUCCESS) {
     coap_shared_map_edhoc_failure_to_response(edhoc_ctx, "process Message 3",
-                                              true, response);
-    return coap_pdu_get_code(response);
+                                              true, request_data->response);
+    return coap_pdu_get_code(request_data->response);
   }
 
-  if (edhoc_message_4_compose(edhoc_ctx, response_payload, response_capacity,
-                              response_len) != EDHOC_SUCCESS) {
+  if (edhoc_message_4_compose(edhoc_ctx, response_data->payload,
+                              response_data->payload_capacity,
+                              response_data->payload_len) != EDHOC_SUCCESS) {
     coap_shared_map_edhoc_failure_to_response(edhoc_ctx, "compose Message 4",
-                                              false, response);
-    return coap_pdu_get_code(response);
+                                              false, request_data->response);
+    return coap_pdu_get_code(request_data->response);
   }
 
   return COAP_RESPONSE_CODE_CHANGED;

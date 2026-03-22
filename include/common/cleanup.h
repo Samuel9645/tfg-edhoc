@@ -10,10 +10,19 @@
  * resources in case of errors or at the end of the session.
  */
 typedef struct {
+  /** CoAP option list allocated while building a request. */
   coap_optlist_t* options;
+
+  /** Active CoAP client/server session handle. */
   coap_session_t* coap_session;
+
+  /** Active CoAP context handle. */
   coap_context_t* coap_context;
+
+  /** CoAP protocol data unit allocated for send/receive operations. */
   coap_pdu_t* pdu;
+
+  /** Current EDHOC context associated with this session (if any). */
   struct edhoc_context* edhoc_current_context;
 } session_resources_t;
 

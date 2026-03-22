@@ -33,6 +33,12 @@ void coap_server_dispatch_edhoc_post(coap_session_t* session,
   uint8_t response_payload[MESSAGE_BUFFER_LENGTH] = {0};
   size_t response_len = 0;
 
+  coap_response_data_t response_data = {
+      .payload = response_payload,
+      .payload_capacity = MESSAGE_BUFFER_LENGTH,
+      .payload_len = &response_len,
+  };
+
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
 
   struct edhoc_context* edhoc_ctx =
@@ -40,15 +46,32 @@ void coap_server_dispatch_edhoc_post(coap_session_t* session,
 
   if (coap_shared_is_properly_formatted_message_1(request_payload,
                                                   request_len)) {
-    response_code = server_edhoc_handle_message_1(
-        session, request_payload, request_len, MESSAGE_BUFFER_LENGTH, response,
-        response_payload, &response_len);
+    server_edhoc_message_1_request_data_t request_data = {
+        .session = session,
+        .response = response,
+        .request_data =
+            {
+                .payload = request_payload,
+                .payload_len = request_len,
+            },
+    };
+    response_code =
+        server_edhoc_handle_message_1(&request_data, &response_data);
   } else if (edhoc_ctx != NULL && coap_shared_is_properly_formatted_message_3(
                                       request_payload, request_len, edhoc_ctx,
                                       &g_extracted_fields)) {
-    response_code = server_edhoc_handle_message_3(
-        session, request_payload, request_len, MESSAGE_BUFFER_LENGTH,
-        &g_extracted_fields, response, response_payload, &response_len);
+    server_edhoc_message_3_request_data_t request_data = {
+        .session = session,
+        .response = response,
+        .request_data =
+            {
+                .payload = request_payload,
+                .payload_len = request_len,
+            },
+        .extracted_fields = &g_extracted_fields,
+    };
+    response_code =
+        server_edhoc_handle_message_3(&request_data, &response_data);
   } else {
     coap_log_err("received invalid or unexpected EDHOC message\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);

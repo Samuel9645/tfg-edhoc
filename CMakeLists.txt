@@ -29,19 +29,19 @@ set(BASE_SOURCES
 add_executable(server
     src/main_server.c
     src/server.c
-    src/coap/server_utils.c
+    src/coap/server/utils.c
     src/coap/server/map_edhoc_error_to_response.c
-    src/coap/server_edhoc_dispatch.c
+    src/coap/server/edhoc_dispatch.c
     src/edhoc/server/server_flow.c
     ${BASE_SOURCES}
 )
 add_executable(client
     src/main_client.c
     src/client.c
-    src/common/client_cleanup.c
-    src/coap/client_utils.c
+    src/coap/client/cleanup.c
+    src/coap/client/utils.c
     src/coap/client/log_edhoc_error_response.c
-    src/coap/client_edhoc_exchange.c
+    src/coap/client/edhoc_exchange.c
     src/edhoc/client/client_flow.c
     ${BASE_SOURCES}
 )

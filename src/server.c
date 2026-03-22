@@ -3,8 +3,8 @@
 #include <coap3/coap.h>
 #include <coap3/coap_session.h>
 
-#include "coap/server_edhoc_dispatch.h"
-#include "coap/server_utils.h"
+#include "coap/server/edhoc_dispatch.h"
+#include "coap/server/utils.h"
 #include "common/cleanup.h"
 
 static void edhoc_post_handler(coap_resource_t* resource,

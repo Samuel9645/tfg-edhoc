@@ -84,6 +84,11 @@ void client_edhoc_exchange_reset(client_edhoc_exchange_t* exchange);
  * @brief Destroy exchange state and unregister app-data.
  *
  * @param[in,out] exchange_ptr Exchange pointer to destroy.
+ *
+ * @note If exchange is managed through client_session_resources_t, prefer
+ * calling cleanup_client_resources() instead of invoking this function
+ * directly.
+ *
  * @warning Frees memory allocated by client_edhoc_exchange_init(). Sets
  * exchange_ptr to NULL.
  */

@@ -4,6 +4,7 @@ void cleanup_resources(session_resources_t* resources) {
   if (resources == NULL) {
     return;
   }
+
   if (resources->options) {
     coap_delete_optlist(resources->options);
     resources->options = NULL;

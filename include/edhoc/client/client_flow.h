@@ -2,6 +2,7 @@
 #define EDHOC_CLIENT_CLIENT_FLOW_H_
 
 #include <edhoc.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -11,6 +12,9 @@
 typedef struct client_edhoc_flow_t {
   /** Internal EDHOC protocol context used across message 1-4 operations. */
   struct edhoc_context context;
+
+  /** Tracks whether context setup completed successfully. */
+  bool initialized;
 } client_edhoc_flow_t;
 
 /**
@@ -92,6 +96,9 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
  * @brief Destroy EDHOC client flow context.
  *
  * @param[in,out] flow Caller-owned flow state to clean up.
+ *
+ * @note If flow is managed through client_session_resources_t, prefer calling
+ * cleanup_client_resources() instead of invoking this function directly.
  */
 void client_edhoc_flow_deinit(client_edhoc_flow_t* flow);
 

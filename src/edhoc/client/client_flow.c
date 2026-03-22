@@ -43,6 +43,8 @@ client_edhoc_flow_status_t client_edhoc_flow_init(client_edhoc_flow_t* flow) {
     return CLIENT_EDHOC_FLOW_CONTEXT_SETUP_FAILED;
   }
 
+  flow->initialized = true;
+
   return CLIENT_EDHOC_FLOW_SUCCESS;
 }
 
@@ -130,7 +132,7 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
 }
 
 void client_edhoc_flow_deinit(client_edhoc_flow_t* flow) {
-  if (!flow) {
+  if (!flow || !flow->initialized) {
     return;
   }
 

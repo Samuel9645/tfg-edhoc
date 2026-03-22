@@ -17,9 +17,7 @@ emulation_status_t run_client(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_WARN);
 
-  session_resources_t client_resources = {0};
-  client_edhoc_flow_t flow = {0};
-  client_edhoc_exchange_t* exchange = NULL;
+  client_session_resources_t client_resources = {0};
 
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
@@ -27,22 +25,23 @@ emulation_status_t run_client(void) {
   coap_address_t destination_address = {0};
   if (parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
                                  &destination_address) != COAP_STATUS_SUCCESS) {
-    cleanup_resources(&client_resources);
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-  if (create_coap_client_session(&client_uri, &destination_address, NULL,
-                                 &client_resources.coap_context,
-                                 &client_resources.coap_session) !=
+  if (create_coap_client_session(
+          &client_uri, &destination_address, NULL,
+          &client_resources.session_resources.coap_context,
+          &client_resources.session_resources.coap_session) !=
       COAP_STATUS_SUCCESS) {
-    cleanup_resources(&client_resources);
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   client_edhoc_exchange_session_data_t exchange_session_data = {
       .session_data =
           {
-              .context = client_resources.coap_context,
-              .session = client_resources.coap_session,
+              .context = client_resources.session_resources.coap_context,
+              .session = client_resources.session_resources.coap_session,
           },
       .endpoint_data =
           {
@@ -51,15 +50,16 @@ emulation_status_t run_client(void) {
           },
   };
 
-  if (client_edhoc_exchange_init(&exchange_session_data, &exchange) !=
+  if (client_edhoc_exchange_init(&exchange_session_data,
+                                 &client_resources.exchange) !=
       COAP_STATUS_SUCCESS) {
-    cleanup_resources(&client_resources);
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  if (client_edhoc_flow_init(&flow) != CLIENT_EDHOC_FLOW_SUCCESS) {
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+  if (client_edhoc_flow_init(&client_resources.flow) !=
+      CLIENT_EDHOC_FLOW_SUCCESS) {
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
@@ -83,64 +83,54 @@ emulation_status_t run_client(void) {
       .payload_len = &response_len,
   };
 
-  if (client_edhoc_flow_compose_message_1(&flow, MESSAGE_BUFFER_LENGTH,
-                                          request_payload, &request_len) !=
-      CLIENT_EDHOC_FLOW_SUCCESS) {
-    client_edhoc_flow_deinit(&flow);
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+  if (client_edhoc_flow_compose_message_1(
+          &client_resources.flow, MESSAGE_BUFFER_LENGTH, request_payload,
+          &request_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   request_data.request_data.payload_len = request_len;
 
-  if (client_edhoc_exchange_send(exchange, &request_data) !=
+  if (client_edhoc_exchange_send(client_resources.exchange, &request_data) !=
       COAP_STATUS_SUCCESS) {
-    client_edhoc_flow_deinit(&flow);
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  if (client_edhoc_exchange_wait_and_get(exchange, &response_data) !=
-          COAP_STATUS_SUCCESS ||
-      client_edhoc_flow_process_message_2(
-          &flow, response_payload, response_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
-    client_edhoc_flow_deinit(&flow);
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+  if (client_edhoc_exchange_wait_and_get(
+          client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
+      client_edhoc_flow_process_message_2(&client_resources.flow,
+                                          response_payload, response_len) !=
+          CLIENT_EDHOC_FLOW_SUCCESS) {
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
-  client_edhoc_exchange_reset(exchange);
+  client_edhoc_exchange_reset(client_resources.exchange);
 
-  if (client_edhoc_flow_compose_message_3(&flow, MESSAGE_BUFFER_LENGTH,
-                                          request_payload, &request_len) !=
-      CLIENT_EDHOC_FLOW_SUCCESS) {
-    client_edhoc_flow_deinit(&flow);
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+  if (client_edhoc_flow_compose_message_3(
+          &client_resources.flow, MESSAGE_BUFFER_LENGTH, request_payload,
+          &request_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   request_data.request_data.payload_len = request_len;
 
-  if (client_edhoc_exchange_send(exchange, &request_data) !=
+  if (client_edhoc_exchange_send(client_resources.exchange, &request_data) !=
           COAP_STATUS_SUCCESS ||
-      client_edhoc_exchange_wait_and_get(exchange, &response_data) !=
-          COAP_STATUS_SUCCESS ||
-      client_edhoc_flow_process_message_4(
-          &flow, response_payload, response_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
-    client_edhoc_flow_deinit(&flow);
-    client_edhoc_exchange_deinit(&exchange);
-    cleanup_resources(&client_resources);
+      client_edhoc_exchange_wait_and_get(
+          client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
+      client_edhoc_flow_process_message_4(&client_resources.flow,
+                                          response_payload, response_len) !=
+          CLIENT_EDHOC_FLOW_SUCCESS) {
+    cleanup_client_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   printf("Client: EDHOC Handshake Completed Successfully!\n");
 
-  client_edhoc_flow_deinit(&flow);
-  client_edhoc_exchange_deinit(&exchange);
-  cleanup_resources(&client_resources);
+  cleanup_client_resources(&client_resources);
   return EMULATION_SUCCESS;
 }

@@ -38,6 +38,7 @@ add_executable(server
 add_executable(client
     src/main_client.c
     src/client.c
+    src/common/client_cleanup.c
     src/coap/client_utils.c
     src/coap/client_edhoc_exchange.c
     src/edhoc/client/client_flow.c

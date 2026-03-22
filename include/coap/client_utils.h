@@ -87,11 +87,11 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
  * @brief Send a prepared CoAP request.
  *
  * @param[in] coap_session Active CoAP session.
- * @param[in] protocol_data_unit Prepared request PDU.
+ * @param[in] request_pdu Prepared request PDU.
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
 coap_status_result_t send_coap_request(coap_session_t* coap_session,
-                                       coap_pdu_t* protocol_data_unit);
+                                       coap_pdu_t* request_pdu);
 
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.

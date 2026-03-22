@@ -12,16 +12,17 @@ coap_status_result_t coap_shared_validate_edhoc_request(
     return COAP_STATUS_ERROR;
   }
 
-  coap_opt_iterator_t opt_iter = {0};
-  coap_opt_t* option =
-      coap_check_option(request, COAP_OPTION_CONTENT_FORMAT, &opt_iter);
-  if (!option) {
+  coap_opt_iterator_t option_iterator = {0};
+  coap_opt_t* content_format_option =
+      coap_check_option(request, COAP_OPTION_CONTENT_FORMAT, &option_iterator);
+  if (!content_format_option) {
     coap_log_err("missing content format option\n");
     return COAP_STATUS_ERROR;
   }
 
   uint16_t content_format =
-      coap_decode_var_bytes(coap_opt_value(option), coap_opt_length(option));
+      coap_decode_var_bytes(coap_opt_value(content_format_option),
+                            coap_opt_length(content_format_option));
   if (content_format != expected_format) {
     coap_log_err("invalid content format\n");
     return COAP_STATUS_ERROR;

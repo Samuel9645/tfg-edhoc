@@ -84,11 +84,11 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
     return NULL;
   }
 
-  coap_pdu_t* protocol_data_unit =
+  coap_pdu_t* request_pdu =
       coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
                     coap_new_message_id(coap_session),
                     coap_session_max_pdu_size(coap_session));
-  if (!protocol_data_unit) {
+  if (!request_pdu) {
     coap_log_err("cannot create PDU\n");
     return NULL;
   }
@@ -97,22 +97,22 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
   if (coap_uri_into_optlist(client_uri, destination_address, &optlist,
                             ADD_PORT_OPTION) == LIBCOAP_ERROR) {
     coap_log_err("cannot create options from URI\n");
-    coap_delete_pdu(protocol_data_unit);
+    coap_delete_pdu(request_pdu);
     return NULL;
   }
 
-  if (coap_add_optlist_pdu(protocol_data_unit, &optlist) == LIBCOAP_ERROR) {
+  if (coap_add_optlist_pdu(request_pdu, &optlist) == LIBCOAP_ERROR) {
     coap_log_err("cannot add options to PDU\n");
-    coap_delete_pdu(protocol_data_unit);
+    coap_delete_pdu(request_pdu);
     return NULL;
   }
 
-  return protocol_data_unit;
+  return request_pdu;
 }
 
 coap_status_result_t send_coap_request(coap_session_t* coap_session,
-                                       coap_pdu_t* protocol_data_unit) {
-  if (coap_send(coap_session, protocol_data_unit) == COAP_INVALID_MID) {
+                                       coap_pdu_t* request_pdu) {
+  if (coap_send(coap_session, request_pdu) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
     return COAP_STATUS_ERROR;
   }
@@ -126,22 +126,23 @@ coap_status_result_t wait_for_coap_response(
   enum { SECONDS_TO_MS = 1000 };
   const u_int16_t maximum_rounded_wait_seconds =
       coap_session_get_default_leisure(coap_session).integer_part + 1;
-  int wait_miliseconds = maximum_rounded_wait_seconds * SECONDS_TO_MS;
-  int miliseconds_spent_on_function = 0;
-  const u_int16_t MAX_WAIT_MILISECONDS = 1 * SECONDS_TO_MS;
+  int remaining_wait_milliseconds =
+      maximum_rounded_wait_seconds * SECONDS_TO_MS;
+  int elapsed_milliseconds = 0;
+  const u_int16_t max_wait_milliseconds = 1 * SECONDS_TO_MS;
   while (!*have_response) {
-    miliseconds_spent_on_function =
-        coap_io_process(coap_session_context, MAX_WAIT_MILISECONDS);
-    if (miliseconds_spent_on_function < 0) {
+    elapsed_milliseconds =
+        coap_io_process(coap_session_context, max_wait_milliseconds);
+    if (elapsed_milliseconds < 0) {
       coap_log_err("CoAP I/O process failed\n");
       return COAP_STATUS_ERROR;
     }
-    if (wait_miliseconds > 0 &&
-        miliseconds_spent_on_function >= wait_miliseconds) {
+    if (remaining_wait_milliseconds > 0 &&
+        elapsed_milliseconds >= remaining_wait_milliseconds) {
       coap_log_debug("timeout reached\n");
       break;
     }
-    wait_miliseconds -= miliseconds_spent_on_function;
+    remaining_wait_milliseconds -= elapsed_milliseconds;
   }
 
   return COAP_STATUS_SUCCESS;

@@ -11,52 +11,61 @@ include(cmake_configs/libedhoc_config.cmake)
 add_subdirectory(externals)
 
 set(BASE_SOURCES
-    src/edhoc/common/setup.c
-    src/edhoc/edhoc_config.c
-    src/edhoc/credentials/public_data.c
-    src/edhoc/credentials/authentication.c
-    src/common/cleanup.c
-    src/coap/common/helpers.c
-    src/coap/shared/request.c
-    src/coap/shared/response.c
-    externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
-    externals/libedhoc/helpers/src/edhoc_helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/shared/request.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/shared/response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
+)
+
+set(SERVER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/map_error_to_response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/edhoc_dispatch_engine.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
+    ${BASE_SOURCES}
+)
+
+set(CLIENT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/client.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
+    ${BASE_SOURCES}
 )
 
 # Define main executable
-add_executable(server
-    src/main_server.c
-    src/core/server.c
-    src/coap/server/utils.c
-    src/coap/server/map_error_to_response.c
-    src/coap/server/dispatch.c
-    src/coap/server/internal/edhoc_dispatch_engine.c
-    src/edhoc/server/handshake.c
-    ${BASE_SOURCES}
+add_executable(server 
+  ${SERVER_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_server.c
 )
-add_executable(client
-    src/main_client.c
-    src/core/client.c
-    src/coap/client/cleanup.c
-    src/coap/client/utils.c
-    src/coap/client/log_error_response.c
-    src/coap/client/exchange.c
-    src/edhoc/client/handshake.c
-    ${BASE_SOURCES}
+add_executable(client 
+  ${CLIENT_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_client.c
 )
+    
 # Link libraries
 target_link_libraries(server PRIVATE libedhoc libcoap::coap-3)
 target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
 
 # Suppress warnings from helpers
-set_source_files_properties(externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
 
 # Add helper include directories SYSTEM is set to suppress warnings from external 
 # code
 target_include_directories(server PRIVATE include)
-target_include_directories(server SYSTEM PRIVATE externals/libedhoc/helpers/include)
+target_include_directories(server SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 target_include_directories(client PRIVATE include)
-target_include_directories(client SYSTEM PRIVATE externals/libedhoc/helpers/include)
+target_include_directories(client SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 
 # Set output directory for executables
 set_target_properties(server PROPERTIES
@@ -65,7 +74,7 @@ set_target_properties(server PROPERTIES
 set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
-# set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined")
+set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined")
 set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" ${MEMORY_CHECK_FLAGS})
 
 target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS}) 

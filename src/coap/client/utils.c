@@ -75,10 +75,9 @@ coap_status_result_t coap_client_create_coap_session(
   return COAP_STATUS_SUCCESS;
 }
 
-coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
-                                      const coap_address_t* destination_address,
-                                      coap_session_t* coap_session,
-                                      coap_optlist_t* optlist) {
+coap_pdu_t* coap_client_prepare_post_request(
+    const coap_uri_t* client_uri, const coap_address_t* destination_address,
+    coap_session_t* coap_session, coap_optlist_t* optlist) {
   if (!optlist) {
     coap_log_err("options list is null\n");
     return NULL;
@@ -90,6 +89,7 @@ coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
                     coap_session_max_pdu_size(coap_session));
   if (!request_pdu) {
     coap_log_err("cannot create PDU\n");
+    coap_delete_optlist(optlist);
     return NULL;
   }
 
@@ -98,20 +98,22 @@ coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
                             ADD_PORT_OPTION) == LIBCOAP_ERROR) {
     coap_log_err("cannot create options from URI\n");
     coap_delete_pdu(request_pdu);
+    coap_delete_optlist(optlist);
     return NULL;
   }
 
   if (coap_add_optlist_pdu(request_pdu, &optlist) == LIBCOAP_ERROR) {
     coap_log_err("cannot add options to PDU\n");
     coap_delete_pdu(request_pdu);
+    coap_delete_optlist(optlist);
     return NULL;
   }
-
+  coap_delete_optlist(optlist);
   return request_pdu;
 }
 
 coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
-                                       coap_pdu_t* request_pdu) {
+                                                   coap_pdu_t* request_pdu) {
   if (coap_send(coap_session, request_pdu) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
     return COAP_STATUS_ERROR;

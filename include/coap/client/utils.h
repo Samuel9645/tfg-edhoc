@@ -73,10 +73,8 @@ coap_status_result_t coap_client_create_coap_session(
  *
  * @note On failure, only the PDU is freed.
  *
- * @warning Storage allocated for the result must be released with
- * coap_delete_pdu() if coap_send() is not called. The caller must not use or
- * delete the pdu after calling coap_send(). Check the libcoap documentation for
- * details on PDU ownership and lifecycle.
+ * @warning Cleanups the optlist on both success and failure paths. Callers
+ * should not attempt to use or free the optlist after calling this function.
  */
 coap_pdu_t* coap_client_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,

@@ -3,6 +3,17 @@
 #include "coap/common/config.h"
 #include "edhoc/common/config.h"
 
+static inline coap_status_result_t remove_cbor_true_prefix(
+    server_edhoc_message_1_request_data_t* request_data) {
+  if (!request_data || !request_data->base_data.request_data.payload ||
+      request_data->base_data.request_data.payload_len == 0) {
+    return COAP_STATUS_ERROR;
+  }
+  request_data->base_data.request_data.payload += 1;
+  request_data->base_data.request_data.payload_len -= 1;
+  return COAP_STATUS_SUCCESS;
+}
+
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
     const coap_pdu_t* response, const coap_server_edhoc_dispatch_deps_t* deps) {
@@ -78,6 +89,8 @@ void coap_server_dispatch_edhoc_post_with_dependencies(
                     },
             },
     };
+
+    remove_cbor_true_prefix(&request_data);
     response_code = deps->handle_message_1(&request_data, &response_data);
   } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,
                                 &message_3_extracted_fields)) {

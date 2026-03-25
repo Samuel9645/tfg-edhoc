@@ -1,4 +1,4 @@
-#include "edhoc/common/config.h"
+#include "edhoc/edhoc_config.h"
 
 #include <edhoc_values.h>
 

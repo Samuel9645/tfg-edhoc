@@ -1,5 +1,5 @@
-#ifndef EDHOC_COMMON_CONFIG_H_
-#define EDHOC_COMMON_CONFIG_H_
+#ifndef EDHOC_CONFIG_H_
+#define EDHOC_CONFIG_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -19,4 +19,4 @@ enum {
 extern const int32_t CONNECTION_ID;
 extern const size_t PKR_OUT_LABEL;
 
-#endif  // EDHOC_COMMON_CONFIG_H_
+#endif  // EDHOC_CONFIG_H_

@@ -1,5 +1,5 @@
-#ifndef EDHOC_SERVER_FLOW_H_
-#define EDHOC_SERVER_FLOW_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_H_
+#define EDHOC_SERVER_HANDSHAKE_H_
 
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
@@ -58,7 +58,8 @@ typedef struct {
  * @warning Allocates EDHOC context with calloc() and registers as session
  * app-data with free() as destructor. Before process exit, caller must clean
  * the CoAP session/context resources associated with this handshake; use
- * session_resources_t + cleanup_resources() for centralized teardown.
+ * session_resources_t + tfg_common_cleanup_resources() for centralized
+ * teardown.
  */
 coap_pdu_code_t server_edhoc_handle_message_1(
     const server_edhoc_message_1_request_data_t* request_data,
@@ -77,10 +78,10 @@ coap_pdu_code_t server_edhoc_handle_message_1(
  *
  * @warning Before process exit, caller must clean the CoAP session/context
  * resources associated with this handshake; use session_resources_t +
- * cleanup_resources() for centralized teardown.
+ * tfg_common_cleanup_resources() for centralized teardown.
  */
 coap_pdu_code_t server_edhoc_handle_message_3(
     const server_edhoc_message_3_request_data_t* request_data,
     coap_response_data_t* response_data);
 
-#endif  // EDHOC_SERVER_FLOW_H_
+#endif // EDHOC_SERVER_HANDSHAKE_H_

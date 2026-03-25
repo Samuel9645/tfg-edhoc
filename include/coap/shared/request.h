@@ -1,5 +1,5 @@
-#ifndef COAP_SHARED_EDHOC_REQUEST_H_
-#define COAP_SHARED_EDHOC_REQUEST_H_
+#ifndef COAP_SHARED_REQUEST_H_
+#define COAP_SHARED_REQUEST_H_
 
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/status.h"
 
 /**
@@ -51,4 +51,4 @@ bool coap_shared_is_properly_formatted_message_3(
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields);
 
-#endif  // COAP_SHARED_EDHOC_REQUEST_H_
+#endif // COAP_SHARED_REQUEST_H_

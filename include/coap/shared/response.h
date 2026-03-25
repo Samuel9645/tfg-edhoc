@@ -1,11 +1,11 @@
-#ifndef COAP_SHARED_EDHOC_RESPONSE_H_
-#define COAP_SHARED_EDHOC_RESPONSE_H_
+#ifndef COAP_SHARED_RESPONSE_H_
+#define COAP_SHARED_RESPONSE_H_
 
 #include <coap3/coap.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/status.h"
 
 /**
@@ -30,4 +30,4 @@ coap_status_result_t coap_shared_add_response_payload(coap_pdu_t* response,
                                                       const uint8_t* payload,
                                                       size_t payload_len);
 
-#endif  // COAP_SHARED_EDHOC_RESPONSE_H_
+#endif // COAP_SHARED_RESPONSE_H_

@@ -61,4 +61,4 @@ coap_status_result_t coap_server_add_post_resource(
 coap_status_result_t coap_server_run_input_output_loop(
     coap_context_t* coap_context);
 
-#endif  // COAP_SERVER_UTILS_H_
+#endif // COAP_SERVER_UTILS_H_

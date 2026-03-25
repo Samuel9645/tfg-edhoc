@@ -1,11 +1,11 @@
-#include "edhoc/client/flow.h"
+#include "edhoc/client/handshake.h"
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <string.h>
 
-#include "coap/common/config.h"
-#include "edhoc/common/config.h"
+#include "coap/coap_config.h"
+#include "edhoc/edhoc_config.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"
@@ -13,7 +13,7 @@
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
-  return credential_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
+  return edhoc_credential_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
                           ARRAY_SIZE(CLIENT_PUBLIC_KEY), CLIENT_PRIVATE_KEY,
                           ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
@@ -22,7 +22,7 @@ static int client_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
                                     size_t* public_key_length) {
-  return credential_verify(user_context, credentials, SERVER_KID,
+  return edhoc_credential_verify(user_context, credentials, SERVER_KID,
                            SERVER_PUBLIC_KEY, ARRAY_SIZE(SERVER_PUBLIC_KEY),
                            public_key_reference, public_key_length);
 }

@@ -5,7 +5,7 @@
 
 #include "edhoc/common/setup.h"
 
-int credential_fetch(void* user_context, struct edhoc_auth_creds* credentials,
+int edhoc_credential_fetch(void* user_context, struct edhoc_auth_creds* credentials,
                      const uint8_t* own_public_key,
                      size_t own_public_key_length,
                      const uint8_t* own_private_key,
@@ -14,7 +14,7 @@ int credential_fetch(void* user_context, struct edhoc_auth_creds* credentials,
     return EDHOC_ERROR_INVALID_ARGUMENT;
   }
 
-  initialize_credential_key(credentials, own_public_key, own_public_key_length,
+  edhoc_initialize_credential_key(credentials, own_public_key, own_public_key_length,
                             own_key_id);
 
   if (edhoc_cipher_suite_2_key_import(
@@ -26,7 +26,7 @@ int credential_fetch(void* user_context, struct edhoc_auth_creds* credentials,
   return EDHOC_SUCCESS;
 }
 
-int credential_verify(void* user_context, struct edhoc_auth_creds* credentials,
+int edhoc_credential_verify(void* user_context, struct edhoc_auth_creds* credentials,
                       int32_t expected_key_id, const uint8_t* peer_public_key,
                       size_t peer_public_key_length,
                       const uint8_t** public_key_reference,
@@ -45,7 +45,7 @@ int credential_verify(void* user_context, struct edhoc_auth_creds* credentials,
   *public_key_reference = peer_public_key;
   *public_key_length = peer_public_key_length;
 
-  initialize_credential_key(credentials, peer_public_key,
+  edhoc_initialize_credential_key(credentials, peer_public_key,
                             peer_public_key_length, expected_key_id);
 
   return EDHOC_SUCCESS;

@@ -75,7 +75,7 @@ int edhoc_setup_context(struct edhoc_context* context,
   return ret;
 }
 
-void initialize_credential_key(struct edhoc_auth_creds* credentials,
+void edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
                                const uint8_t* public_key,
                                size_t public_key_length,
                                int32_t key_id_integer) {

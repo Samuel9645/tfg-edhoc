@@ -12,9 +12,9 @@
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/status.h"
-#include "edhoc/server/flow.h"
+#include "edhoc/server/handshake.h"
 
 coap_status_result_t successful_extract_payload_stub(
     const coap_pdu_t* request, content_format_edhoc_values_t expected_format,

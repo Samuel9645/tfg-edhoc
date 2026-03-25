@@ -36,6 +36,6 @@ typedef struct {
  * @note The function will check each resource for NULL before attempting to
  * free it, and will set each pointer to NULL after freeing.
  */
-void cleanup_resources(session_resources_t* resources);
+void tfg_common_cleanup_resources(session_resources_t* resources);
 
 #endif  // COMMON_CLEANUP_H_

@@ -12,13 +12,13 @@ add_subdirectory(externals)
 
 set(BASE_SOURCES
     src/edhoc/common/setup.c
-    src/edhoc/common/config.c
+    src/edhoc/edhoc_config.c
     src/edhoc/credentials/public_data.c
     src/edhoc/credentials/authentication.c
     src/common/cleanup.c
     src/coap/common/helpers.c
-    src/coap/shared/edhoc_request.c
-    src/coap/shared/edhoc_response.c
+    src/coap/shared/request.c
+    src/coap/shared/response.c
     externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     externals/libedhoc/helpers/src/edhoc_helpers.c
 )
@@ -26,22 +26,22 @@ set(BASE_SOURCES
 # Define main executable
 add_executable(server
     src/main_server.c
-    src/server.c
+    src/core/server.c
     src/coap/server/utils.c
-    src/coap/server/map_edhoc_error_to_response.c
-    src/coap/server/edhoc_dispatch.c
+    src/coap/server/map_error_to_response.c
+    src/coap/server/dispatch.c
     src/coap/server/internal/edhoc_dispatch_engine.c
-    src/edhoc/server/flow.c
+    src/edhoc/server/handshake.c
     ${BASE_SOURCES}
 )
 add_executable(client
     src/main_client.c
-    src/client.c
+    src/core/client.c
     src/coap/client/cleanup.c
     src/coap/client/utils.c
-    src/coap/client/log_edhoc_error_response.c
-    src/coap/client/edhoc_exchange.c
-    src/edhoc/client/flow.c
+    src/coap/client/log_error_response.c
+    src/coap/client/exchange.c
+    src/edhoc/client/handshake.c
     ${BASE_SOURCES}
 )
 # Link libraries

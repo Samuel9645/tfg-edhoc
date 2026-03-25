@@ -1,5 +1,5 @@
-#ifndef COAP_COMMON_CONFIG_H_
-#define COAP_COMMON_CONFIG_H_
+#ifndef COAP_COAP_CONFIG_H_
+#define COAP_COAP_CONFIG_H_
 
 #include <coap3/coap.h>
 
@@ -19,4 +19,4 @@ typedef enum {
   APPLICATION_EDHOC_CBOR_SEQ = 64
 } content_format_edhoc_values_t;
 
-#endif  // COAP_COMMON_CONFIG_H_
+#endif  // COAP_COAP_CONFIG_H_

@@ -1,4 +1,4 @@
-#include "coap/shared/edhoc_response.h"
+#include "coap/shared/response.h"
 
 #include "coap/common/helpers.h"
 

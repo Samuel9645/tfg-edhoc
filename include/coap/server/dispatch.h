@@ -1,5 +1,5 @@
-#ifndef COAP_SERVER_EDHOC_DISPATCH_H_
-#define COAP_SERVER_EDHOC_DISPATCH_H_
+#ifndef COAP_SERVER_DISPATCH_H_
+#define COAP_SERVER_DISPATCH_H_
 
 #include <coap3/coap.h>
 
@@ -18,4 +18,4 @@ void coap_server_dispatch_edhoc_post(coap_session_t* session,
                                      const coap_pdu_t* request,
                                      coap_pdu_t* response);
 
-#endif  // COAP_SERVER_EDHOC_DISPATCH_H_
+#endif // COAP_SERVER_DISPATCH_H_

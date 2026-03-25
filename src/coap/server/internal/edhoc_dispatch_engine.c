@@ -1,7 +1,7 @@
-#include "coap/server/internal/edhoc_dispatch_engine.h"
+#include "edhoc_dispatch_engine.h"
 
-#include "coap/common/config.h"
-#include "edhoc/common/config.h"
+#include "coap/coap_config.h"
+#include "edhoc/edhoc_config.h"
 
 static inline coap_status_result_t remove_cbor_true_prefix(
     server_edhoc_message_1_request_data_t* request_data) {

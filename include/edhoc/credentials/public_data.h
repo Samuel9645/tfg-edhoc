@@ -13,4 +13,4 @@ extern const int32_t CLIENT_KID;
 extern const uint16_t SERVER_PORT;
 extern const char SERVER_URI[];
 
-#endif  // EDHOC_CREDENTIALS_PUBLIC_DATA_H_
+#endif // EDHOC_CREDENTIALS_PUBLIC_DATA_H_

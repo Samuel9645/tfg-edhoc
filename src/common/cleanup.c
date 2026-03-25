@@ -1,6 +1,6 @@
 #include "common/cleanup.h"
 
-void cleanup_resources(session_resources_t* resources) {
+void tfg_common_cleanup_resources(session_resources_t* resources) {
   if (resources == NULL) {
     return;
   }

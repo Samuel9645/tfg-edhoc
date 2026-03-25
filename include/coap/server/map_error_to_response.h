@@ -1,5 +1,5 @@
-#ifndef COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_
-#define COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_
+#ifndef COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
+#define COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
 
 #include <coap3/coap.h>
 #include <edhoc.h>
@@ -43,4 +43,4 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
     coap_pdu_t* response, coap_response_data_t* response_data);
 
-#endif  // COAP_SERVER_MAP_EDHOC_ERROR_TO_RESPONSE_H_
+#endif // COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_

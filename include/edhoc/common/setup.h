@@ -21,9 +21,9 @@ int edhoc_setup_context(struct edhoc_context* context,
  * @param[in] public_key_length Length of public key
  * @param[in] key_id_integer Key identifier as integer
  */
-void initialize_credential_key(struct edhoc_auth_creds* credentials,
-                               const uint8_t* public_key,
-                               size_t public_key_length,
-                               int32_t key_id_integer);
+void edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
+                                     const uint8_t* public_key,
+                                     size_t public_key_length,
+                                     int32_t key_id_integer);
 
 #endif  // EDHOC_COMMON_SETUP_H_

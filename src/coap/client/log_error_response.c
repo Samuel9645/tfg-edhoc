@@ -1,4 +1,4 @@
-#include "coap/client/log_edhoc_error_response.h"
+#include "coap/client/log_error_response.h"
 
 #include <edhoc.h>
 

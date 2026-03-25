@@ -1,3 +1,3 @@
-#include "server.h"
+#include "core/server.h"
 
-int main(void) { return run_server(); }
+int main(void) { return tfg_run_server(); }

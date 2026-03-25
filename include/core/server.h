@@ -1,5 +1,5 @@
-#ifndef SERVER_H_
-#define SERVER_H_
+#ifndef CORE_SERVER_H_
+#define CORE_SERVER_H_
 
 #include "common/emulation_status.h"
 
@@ -9,6 +9,6 @@
  *
  * @return EMULATION_SUCCESS on success, EMULATION_FAILURE on failure
  */
-emulation_status_t run_server(void);
+emulation_status_t tfg_run_server(void);
 
-#endif  // SERVER_H_
+#endif  // CORE_SERVER_H_

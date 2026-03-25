@@ -1,4 +1,4 @@
-#include "coap/server/map_edhoc_error_to_response.h"
+#include "coap/server/map_error_to_response.h"
 
 coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     struct edhoc_context* edhoc_ctx, const char* operation_label,

@@ -1,5 +1,5 @@
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#ifndef CORE_CLIENT_H_
+#define CORE_CLIENT_H_
 
 #include "common/emulation_status.h"
 
@@ -8,6 +8,6 @@
  *
  * @return EMULATION_SUCCESS on success, EMULATION_FAILURE on failure
  */
-emulation_status_t run_client(void);
+emulation_status_t tfg_run_client(void);
 
-#endif  // CLIENT_H_
+#endif  // CORE_CLIENT_H_

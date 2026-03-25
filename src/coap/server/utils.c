@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/helpers.h"
 #include "coap/common/status.h"
 

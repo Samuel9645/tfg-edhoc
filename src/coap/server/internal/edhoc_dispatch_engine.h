@@ -4,11 +4,11 @@
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/data_models.h"
 #include "coap/common/status.h"
-#include "coap/server/edhoc_dispatch.h"
-#include "edhoc/server/flow.h"
+#include "coap/server/dispatch.h"
+#include "edhoc/server/handshake.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.

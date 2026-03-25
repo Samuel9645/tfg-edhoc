@@ -1,5 +1,5 @@
-#ifndef EDHOC_CLIENT_FLOW_H_
-#define EDHOC_CLIENT_FLOW_H_
+#ifndef EDHOC_CLIENT_HANDSHAKE_H_
+#define EDHOC_CLIENT_HANDSHAKE_H_
 
 #include <edhoc.h>
 #include <stdbool.h>
@@ -97,9 +97,10 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
  *
  * @param[in,out] flow Caller-owned flow state to clean up.
  *
- * @note If flow is managed through client_session_resources_t, prefer calling
- * cleanup_client_resources() instead of invoking this function directly.
+ * @note If flow is managed through coap_client_session_resources_t, prefer
+ * calling coap_client_cleanup_resources() instead of invoking this function
+ * directly.
  */
 void client_edhoc_flow_deinit(client_edhoc_flow_t* flow);
 
-#endif  // EDHOC_CLIENT_FLOW_H_
+#endif  // EDHOC_CLIENT_HANDSHAKE_H_

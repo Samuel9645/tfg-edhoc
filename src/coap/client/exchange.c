@@ -1,10 +1,10 @@
-#include "coap/client/edhoc_exchange.h"
+#include "coap/client/exchange.h"
 
 #include <edhoc.h>
 #include <stdbool.h>
 #include <string.h>
 
-#include "coap/client/log_edhoc_error_response.h"
+#include "coap/client/log_error_response.h"
 #include "coap/client/utils.h"
 #include "coap/common/helpers.h"
 
@@ -23,15 +23,15 @@ static bool client_response_has_edhoc_content_format(
   return content_format == APPLICATION_EDHOC_CBOR_SEQ;
 }
 
-static coap_response_t client_edhoc_response_handler(coap_session_t* session,
+static coap_response_t coap_client_response_handler(coap_session_t* session,
                                                      const coap_pdu_t* sent,
                                                      const coap_pdu_t* received,
                                                      const coap_mid_t id) {
   (void)sent;
   (void)id;
 
-  client_edhoc_exchange_t* exchange =
-      (client_edhoc_exchange_t*)coap_session_get_app_data(session);
+  coap_client_exchange_t* exchange =
+      (coap_client_exchange_t*)coap_session_get_app_data(session);
   if (!exchange) {
     coap_log_err("missing client exchange state in response handler\n");
     return COAP_RESPONSE_FAIL;
@@ -76,9 +76,9 @@ static coap_response_t client_edhoc_response_handler(coap_session_t* session,
   return COAP_RESPONSE_OK;
 }
 
-coap_status_result_t client_edhoc_exchange_init(
-    const client_edhoc_exchange_session_data_t* session_data,
-    client_edhoc_exchange_t* exchange) {
+coap_status_result_t coap_client_exchange_init(
+    const coap_client_exchange_session_data_t* session_data,
+    coap_client_exchange_t* exchange) {
   if (!exchange || !session_data || !session_data->session_data.context ||
       !session_data->session_data.session || !session_data->endpoint_data.uri ||
       !session_data->endpoint_data.destination) {
@@ -99,14 +99,14 @@ coap_status_result_t client_edhoc_exchange_init(
   }
 
   coap_register_response_handler(session_data->session_data.context,
-                                 client_edhoc_response_handler);
+                                 coap_client_response_handler);
 
   return COAP_STATUS_SUCCESS;
 }
 
-coap_status_result_t client_edhoc_exchange_send(
-    client_edhoc_exchange_t* exchange,
-    const client_edhoc_exchange_request_data_t* request_data) {
+coap_status_result_t coap_client_exchange_send(
+    coap_client_exchange_t* exchange,
+    const coap_client_exchange_request_data_t* request_data) {
   if (!exchange || !request_data || !request_data->request_data.payload ||
       request_data->request_data.payload_len == 0) {
     return COAP_STATUS_ERROR;
@@ -118,7 +118,7 @@ coap_status_result_t client_edhoc_exchange_send(
     return COAP_STATUS_ERROR;
   }
 
-  coap_pdu_t* request_pdu = prepare_coap_post_request(
+  coap_pdu_t* request_pdu = coap_client_prepare_post_request(
       &exchange->uri, &exchange->destination, exchange->session, optlist);
   if (!request_pdu) {
     return COAP_STATUS_ERROR;
@@ -132,18 +132,18 @@ coap_status_result_t client_edhoc_exchange_send(
   }
 
   coap_show_pdu(COAP_LOG_WARN, request_pdu);
-  return send_coap_request(exchange->session, request_pdu);
+  return coap_client_send_coap_request(exchange->session, request_pdu);
 }
 
-coap_status_result_t client_edhoc_exchange_wait_and_get(
-    client_edhoc_exchange_t* exchange,
+coap_status_result_t coap_client_exchange_wait_and_get(
+    coap_client_exchange_t* exchange,
     const coap_response_data_t* response_data) {
   if (!exchange || !response_data || !response_data->payload ||
       !response_data->payload_len || response_data->payload_capacity == 0) {
     return COAP_STATUS_ERROR;
   }
 
-  if (wait_for_coap_response(exchange->context, exchange->session,
+  if (coap_client_wait_for_coap_response(exchange->context, exchange->session,
                              &exchange->have_response) != COAP_STATUS_SUCCESS) {
     return COAP_STATUS_ERROR;
   }
@@ -166,7 +166,7 @@ coap_status_result_t client_edhoc_exchange_wait_and_get(
   return is_error_response ? COAP_STATUS_ERROR : COAP_STATUS_SUCCESS;
 }
 
-void client_edhoc_exchange_reset(client_edhoc_exchange_t* exchange) {
+void coap_client_exchange_reset(coap_client_exchange_t* exchange) {
   if (!exchange) {
     return;
   }

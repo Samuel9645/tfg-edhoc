@@ -1,13 +1,13 @@
-#include "coap/server/edhoc_dispatch.h"
+#include "coap/server/dispatch.h"
 
 #include <edhoc_helpers.h>
 
-#include "coap/common/config.h"
-#include "coap/server/internal/edhoc_dispatch_engine.h"
-#include "coap/shared/edhoc_request.h"
-#include "coap/shared/edhoc_response.h"
-#include "edhoc/common/config.h"
-#include "edhoc/server/flow.h"
+#include "coap/coap_config.h"
+#include "coap/shared/request.h"
+#include "coap/shared/response.h"
+#include "edhoc/edhoc_config.h"
+#include "edhoc/server/handshake.h"
+#include "internal/edhoc_dispatch_engine.h"
 
 static const coap_server_edhoc_dispatch_deps_t
     coap_server_edhoc_dispatch_default_deps = {

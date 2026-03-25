@@ -1,4 +1,4 @@
-#include "coap/shared/edhoc_request.h"
+#include "coap/shared/request.h"
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>

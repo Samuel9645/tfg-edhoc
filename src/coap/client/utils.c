@@ -15,13 +15,13 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "coap/common/config.h"
+#include "coap/coap_config.h"
 #include "coap/common/helpers.h"
 #include "coap/common/status.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
-coap_status_result_t parse_and_resolve_coap_uri(
+coap_status_result_t coap_client_parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address) {
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
@@ -43,7 +43,7 @@ coap_status_result_t parse_and_resolve_coap_uri(
   return COAP_STATUS_SUCCESS;
 }
 
-coap_status_result_t create_coap_client_session(
+coap_status_result_t coap_client_create_coap_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session) {
@@ -75,7 +75,7 @@ coap_status_result_t create_coap_client_session(
   return COAP_STATUS_SUCCESS;
 }
 
-coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
+coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
                                       const coap_address_t* destination_address,
                                       coap_session_t* coap_session,
                                       coap_optlist_t* optlist) {
@@ -110,7 +110,7 @@ coap_pdu_t* prepare_coap_post_request(const coap_uri_t* client_uri,
   return request_pdu;
 }
 
-coap_status_result_t send_coap_request(coap_session_t* coap_session,
+coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
                                        coap_pdu_t* request_pdu) {
   if (coap_send(coap_session, request_pdu) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
@@ -120,7 +120,7 @@ coap_status_result_t send_coap_request(coap_session_t* coap_session,
   return COAP_STATUS_SUCCESS;
 }
 
-coap_status_result_t wait_for_coap_response(
+coap_status_result_t coap_client_wait_for_coap_response(
     coap_context_t* coap_session_context, coap_session_t* coap_session,
     const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };

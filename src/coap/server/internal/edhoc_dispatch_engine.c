@@ -14,7 +14,7 @@ static inline bool coap_server_dispatch_has_invalid_deps_or_args(
          !deps->get_session_app_data;
 }
 
-void coap_server_dispatch_edhoc_post_with_deps(
+void coap_server_dispatch_edhoc_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
     const coap_server_edhoc_dispatch_deps_t* deps) {
   if (coap_server_dispatch_has_invalid_deps_or_args(session, request, response,

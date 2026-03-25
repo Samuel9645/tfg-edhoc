@@ -21,7 +21,7 @@
  * @note Each function pointer may be NULL if not used by a particular test
  * scenario, but all pointers must be non-NULL when passed to the dispatcher.
  *
- * @see coap_server_dispatch_edhoc_post_with_deps for usage.
+ * @see coap_server_dispatch_edhoc_post_with_dependencies for usage.
  */
 typedef struct coap_server_edhoc_dispatch_deps_t {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
@@ -89,7 +89,7 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * for protocol details on Message 1 and Message 3 handling.
  */
-void coap_server_dispatch_edhoc_post_with_deps(
+void coap_server_dispatch_edhoc_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
     const coap_server_edhoc_dispatch_deps_t* deps);
 

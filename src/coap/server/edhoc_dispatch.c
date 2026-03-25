@@ -25,6 +25,6 @@ static const coap_server_edhoc_dispatch_deps_t
 void coap_server_dispatch_edhoc_post(coap_session_t* session,
                                      const coap_pdu_t* request,
                                      coap_pdu_t* response) {
-  coap_server_dispatch_edhoc_post_with_deps(
+  coap_server_dispatch_edhoc_post_with_dependencies(
       session, request, response, &coap_server_edhoc_dispatch_default_deps);
 }

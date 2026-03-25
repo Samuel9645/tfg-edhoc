@@ -1,4 +1,4 @@
-#include "coap/server/test_edhoc_dispatch_stubs.h"
+#include "coap/server/dispatch/stubs.h"
 
 coap_status_result_t successful_extract_payload_stub(
     const coap_pdu_t* request, content_format_edhoc_values_t expected_format,

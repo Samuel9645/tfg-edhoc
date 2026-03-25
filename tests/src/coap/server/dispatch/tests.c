@@ -13,110 +13,111 @@
 #include <string.h>
 #include <unity.h>
 
-#include "coap/server/test_edhoc_dispatch_deps_builder.h"
+#include "coap/server/dispatch/create_base_dependencies.h"
 
-/**
- * Since libcoap's coap_pdu_t and coap_session_t are opaque structs, we can't
- * directly instantiate them in our tests. Instead, we create raw byte arrays to
- * serve as backing memory for these structs, and then cast pointers to these
- * arrays as needed.
- */
-enum { INITIALIZATION_SIZE = 512 };
-static uint8_t session_mem[INITIALIZATION_SIZE];
-static uint8_t request_mem[INITIALIZATION_SIZE];
-static uint8_t response_mem[INITIALIZATION_SIZE];
-
-static coap_session_t* dummy_session = (coap_session_t*)session_mem;
-static coap_pdu_t* dummy_request = (coap_pdu_t*)request_mem;
-static coap_pdu_t* dummy_response = (coap_pdu_t*)response_mem;
+static coap_session_t* dummy_session = NULL;
+static coap_pdu_t* dummy_request = NULL;
+static coap_pdu_t* dummy_response = NULL;
+static int fake_session_memory = 0;
 
 void setUp(void) {
-  memset(session_mem, 0, sizeof(session_mem));
-  memset(request_mem, 0, sizeof(request_mem));
-  memset(response_mem, 0, sizeof(response_mem));
+  dummy_session = (coap_session_t*)&fake_session_memory;
+  dummy_request = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
+  dummy_response = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
 }
 
-void tearDown(void) {}
+void tearDown(void) {
+  if (dummy_request) {
+    coap_delete_pdu(dummy_request);
+  }
+  if (dummy_response) {
+    coap_delete_pdu(dummy_response);
+  }
+  dummy_request = NULL;
+  dummy_response = NULL;
+  dummy_session = NULL;
+}
 
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.extract_payload_if_valid_edhoc_request = failed_extract_payload_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_internal_error_on_server_side_failure(void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.add_edhoc_response_options = failed_add_response_options_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_internal_error_if_context_already_exists(void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_sends_changed_response_for_valid_message_1(void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.get_session_app_data = get_null_session_app_data_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
   deps.is_message_3 = is_message_3_stub;
   deps.get_session_app_data = get_null_session_app_data_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_sends_changed_response_for_valid_message_3(void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
   deps.is_message_3 = is_message_3_stub;
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_internal_error_for_unrecognized_message_format(
     void) {
-  coap_server_edhoc_dispatch_deps_t deps = make_base_deps();
+  coap_server_edhoc_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
   deps.is_message_3 = is_not_message_3_stub;
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
-  coap_server_dispatch_edhoc_post_with_deps(dummy_session, dummy_request,
-                                            dummy_response, &deps);
+  coap_server_dispatch_edhoc_post_with_dependencies(
+      dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
 
 int main(void) {
+  coap_set_log_level(COAP_LOG_ALERT);
   UNITY_BEGIN();
   RUN_TEST(test_server_responds_with_bad_request_for_malformed_edhoc_message);
   RUN_TEST(test_server_responds_with_internal_error_on_server_side_failure);

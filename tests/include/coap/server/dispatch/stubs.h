@@ -6,8 +6,8 @@
  * Each function updates trace state and returns deterministic results to drive
  * success and error paths through the dispatcher.
  */
-#ifndef COAP_SERVER_TEST_EDHOC_DISPATCH_STUBS_H_
-#define COAP_SERVER_TEST_EDHOC_DISPATCH_STUBS_H_
+#ifndef COAP_SERVER_DISPATCH_STUBS_H_
+#define COAP_SERVER_DISPATCH_STUBS_H_
 
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
@@ -69,4 +69,4 @@ coap_status_result_t failed_add_response_payload_stub(coap_pdu_t* response,
                                                       const uint8_t* payload,
                                                       size_t payload_len);
 
-#endif  // COAP_SERVER_TEST_EDHOC_DISPATCH_STUBS_H_
+#endif  // COAP_SERVER_DISPATCH_STUBS_H_

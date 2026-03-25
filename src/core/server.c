@@ -1,7 +1,6 @@
 #include "core/server.h"
 
 #include <coap3/coap.h>
-#include <coap3/coap_session.h>
 
 #include "coap/server/dispatch.h"
 #include "coap/server/utils.h"
@@ -27,22 +26,22 @@ emulation_status_t tfg_run_server(void) {
   }
 
   static const char COAP_LISTEN_UCAST_IP[] = "::";
-  coap_status_result_t result = coap_server_setup_endpoints(
-      server_resources.coap_context, COAP_LISTEN_UCAST_IP);
-  if (result != COAP_STATUS_SUCCESS) {
+  if (coap_server_setup_endpoints(server_resources.coap_context,
+                                  COAP_LISTEN_UCAST_IP) !=
+      COAP_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }
 
-  result = coap_server_add_post_resource(
-      server_resources.coap_context, ".well-known/edhoc", edhoc_post_handler);
-  if (result != COAP_STATUS_SUCCESS) {
+  if (coap_server_add_post_resource(server_resources.coap_context,
+                                    ".well-known/edhoc", edhoc_post_handler) !=
+      COAP_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }
 
-  result = coap_server_run_input_output_loop(server_resources.coap_context);
-  if (result != COAP_STATUS_SUCCESS) {
+  if (coap_server_run_input_output_loop(server_resources.coap_context) !=
+      COAP_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }

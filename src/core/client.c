@@ -24,7 +24,8 @@ emulation_status_t tfg_run_client(void) {
   coap_uri_t client_uri = {0};
   coap_address_t destination_address = {0};
   if (coap_client_parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
-                                 &destination_address) != COAP_STATUS_SUCCESS) {
+                                             &destination_address) !=
+      COAP_STATUS_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -51,7 +52,7 @@ emulation_status_t tfg_run_client(void) {
   };
 
   if (coap_client_exchange_init(&exchange_session_data,
-                                 &client_resources.exchange) !=
+                                &client_resources.exchange) !=
       COAP_STATUS_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
@@ -100,8 +101,8 @@ emulation_status_t tfg_run_client(void) {
 
   if (coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
-      client_edhoc_handshake_process_message_2(&client_resources.handshake,
-                                          response_payload, response_len) !=
+      client_edhoc_handshake_process_message_2(
+          &client_resources.handshake, response_payload, response_len) !=
           CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
@@ -122,14 +123,12 @@ emulation_status_t tfg_run_client(void) {
           COAP_STATUS_SUCCESS ||
       coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
-      client_edhoc_handshake_process_message_4(&client_resources.handshake,
-                                          response_payload, response_len) !=
+      client_edhoc_handshake_process_message_4(
+          &client_resources.handshake, response_payload, response_len) !=
           CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-
-  printf("Client: EDHOC Handshake Completed Successfully!\n");
 
   coap_client_cleanup_resources(&client_resources);
   return EMULATION_SUCCESS;

@@ -1,5 +1,5 @@
 /**
- * @file coap_client_utils.c
+ * @file utils.c
  *
  * @brief Client-side utilities for CoAP.
  *

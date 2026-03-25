@@ -1,5 +1,5 @@
 /**
- * @file test_edhoc_dispatch_with_deps.c
+ * @file tests.c
  *
  * @brief Unit tests for the CoAP server EDHOC dispatcher with dependency
  * injection.

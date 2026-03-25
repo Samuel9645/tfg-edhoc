@@ -1,5 +1,5 @@
 /**
- * @file coap_shared.c
+ * @file helpers.c
  *
  * @brief Shared utilities for CoAP client and server implementations.
  *

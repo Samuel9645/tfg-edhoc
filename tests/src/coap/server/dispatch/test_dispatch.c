@@ -24,6 +24,8 @@ static coap_pdu_t* dummy_response = NULL;
 static int fake_session_memory = 0;
 
 void setUp(void) {
+  coap_startup();
+  coap_set_log_level(COAP_LOG_CRIT);
   dummy_session = (coap_session_t*)&fake_session_memory;
   dummy_request = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
   dummy_response = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
@@ -32,13 +34,14 @@ void setUp(void) {
 void tearDown(void) {
   if (dummy_request) {
     coap_delete_pdu(dummy_request);
+    dummy_request = NULL;
   }
   if (dummy_response) {
     coap_delete_pdu(dummy_response);
+    dummy_response = NULL;
   }
-  dummy_request = NULL;
-  dummy_response = NULL;
   dummy_session = NULL;
+  coap_cleanup();
 }
 
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {

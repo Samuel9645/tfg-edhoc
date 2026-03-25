@@ -10,7 +10,7 @@
 #define COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_
 
 #include "coap/server/dispatch/stubs.h"
-#include "internal/edhoc_dispatch_engine.h"
+#include "coap/server/internal/edhoc_dispatch_engine.h"
 
 /**
  * @brief Creates default dependency table backed by local test stubs.

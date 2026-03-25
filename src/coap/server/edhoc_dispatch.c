@@ -7,11 +7,7 @@
 #include "coap/shared/edhoc_request.h"
 #include "coap/shared/edhoc_response.h"
 #include "edhoc/common/config.h"
-#include "edhoc/server/server_flow.h"
-
-static void coap_server_default_log_error(const char* message) {
-  coap_log_err("%s", message);
-}
+#include "edhoc/server/flow.h"
 
 static const coap_server_edhoc_dispatch_deps_t
     coap_server_edhoc_dispatch_default_deps = {
@@ -24,8 +20,6 @@ static const coap_server_edhoc_dispatch_deps_t
         .handle_message_3 = server_edhoc_handle_message_3,
         .add_response_payload = coap_shared_add_response_payload,
         .get_session_app_data = coap_session_get_app_data,
-        .set_response_code = coap_pdu_set_code,
-        .log_error = coap_server_default_log_error,
 };
 
 void coap_server_dispatch_edhoc_post(coap_session_t* session,

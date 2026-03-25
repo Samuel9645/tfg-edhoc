@@ -31,7 +31,7 @@ add_executable(server
     src/coap/server/map_edhoc_error_to_response.c
     src/coap/server/edhoc_dispatch.c
     src/coap/server/internal/edhoc_dispatch_engine.c
-    src/edhoc/server/server_flow.c
+    src/edhoc/server/flow.c
     ${BASE_SOURCES}
 )
 add_executable(client
@@ -41,7 +41,7 @@ add_executable(client
     src/coap/client/utils.c
     src/coap/client/log_edhoc_error_response.c
     src/coap/client/edhoc_exchange.c
-    src/edhoc/client/client_flow.c
+    src/edhoc/client/flow.c
     ${BASE_SOURCES}
 )
 # Link libraries

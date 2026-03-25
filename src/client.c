@@ -7,7 +7,7 @@
 #include "coap/client/edhoc_exchange.h"
 #include "coap/client/utils.h"
 #include "coap/common/config.h"
-#include "edhoc/client/client_flow.h"
+#include "edhoc/client/flow.h"
 #include "edhoc/common/config.h"
 
 // TODO: SEND ERROR RESPONSES TO SERVER IN CASE OF FAILURE INSTEAD OF JUST

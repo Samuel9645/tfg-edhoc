@@ -3,7 +3,7 @@
 
 #include "coap/client/edhoc_exchange.h"
 #include "common/cleanup.h"
-#include "edhoc/client/client_flow.h"
+#include "edhoc/client/flow.h"
 
 /**
  * @brief Client-specific resource bundle that extends generic session cleanup

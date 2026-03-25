@@ -9,6 +9,7 @@
 #ifndef TEST_EDHOC_DISPATCH_DEPS_BUILDER_H_
 #define TEST_EDHOC_DISPATCH_DEPS_BUILDER_H_
 
+#include "coap/server/internal/edhoc_dispatch_engine.h"
 #include "coap/server/test_edhoc_dispatch_stubs.h"
 
 /**

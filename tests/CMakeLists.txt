@@ -1,6 +1,5 @@
 add_executable(coap_server_dispatch_tests
     src/coap/server/test_edhoc_dispatch_with_deps.c
-    src/coap/server/test_edhoc_dispatch_fixture.c
     src/coap/server/test_edhoc_dispatch_stubs.c
     src/coap/server/test_edhoc_dispatch_deps_builder.c
     ${CMAKE_SOURCE_DIR}/src/coap/server/internal/edhoc_dispatch_engine.c

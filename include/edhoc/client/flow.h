@@ -1,5 +1,5 @@
-#ifndef EDHOC_CLIENT_CLIENT_FLOW_H_
-#define EDHOC_CLIENT_CLIENT_FLOW_H_
+#ifndef EDHOC_CLIENT_FLOW_H_
+#define EDHOC_CLIENT_FLOW_H_
 
 #include <edhoc.h>
 #include <stdbool.h>
@@ -102,4 +102,4 @@ client_edhoc_flow_status_t client_edhoc_flow_process_message_4(
  */
 void client_edhoc_flow_deinit(client_edhoc_flow_t* flow);
 
-#endif  // EDHOC_CLIENT_CLIENT_FLOW_H_
+#endif  // EDHOC_CLIENT_FLOW_H_

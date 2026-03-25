@@ -1,4 +1,4 @@
-#include "edhoc/client/client_flow.h"
+#include "edhoc/client/flow.h"
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>

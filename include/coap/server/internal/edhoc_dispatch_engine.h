@@ -8,7 +8,7 @@
 #include "coap/common/data_models.h"
 #include "coap/common/status.h"
 #include "coap/server/edhoc_dispatch.h"
-#include "edhoc/server/server_flow.h"
+#include "edhoc/server/flow.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.
@@ -61,12 +61,6 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);
-
-  /** Sets the CoAP response code for error or success outcomes. */
-  void (*set_response_code)(coap_pdu_t* response, coap_pdu_code_t code);
-
-  /** Logs error messages during dispatch processing. */
-  void (*log_error)(const char* message);
 } coap_server_edhoc_dispatch_deps_t;
 
 /**
@@ -99,4 +93,4 @@ void coap_server_dispatch_edhoc_post_with_deps(
     coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
     const coap_server_edhoc_dispatch_deps_t* deps);
 
-#endif // COAP_SERVER_INTERNAL_EDHOC_DISPATCH_ENGINE_H_
+#endif  // COAP_SERVER_INTERNAL_EDHOC_DISPATCH_ENGINE_H_

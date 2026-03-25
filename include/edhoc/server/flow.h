@@ -1,5 +1,5 @@
-#ifndef EDHOC_SERVER_SERVER_FLOW_H_
-#define EDHOC_SERVER_SERVER_FLOW_H_
+#ifndef EDHOC_SERVER_FLOW_H_
+#define EDHOC_SERVER_FLOW_H_
 
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
@@ -83,4 +83,4 @@ coap_pdu_code_t server_edhoc_handle_message_3(
     const server_edhoc_message_3_request_data_t* request_data,
     coap_response_data_t* response_data);
 
-#endif  // EDHOC_SERVER_SERVER_FLOW_H_
+#endif  // EDHOC_SERVER_FLOW_H_

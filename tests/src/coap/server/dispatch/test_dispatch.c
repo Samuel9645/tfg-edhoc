@@ -8,6 +8,9 @@
  * A.2](https://datatracker.ietf.org/doc/html/rfc9528#appendix-A.2.1) for
  * expected behavior of the dispatcher in handling EDHOC messages and error
  * conditions.
+ *
+ * @see [Helper Unity
+ * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
  */
 #include <coap3/coap.h>
 #include <string.h>
@@ -114,19 +117,4 @@ void test_server_responds_with_internal_error_for_unrecognized_message_format(
       dummy_session, dummy_request, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
-}
-
-int main(void) {
-  coap_set_log_level(COAP_LOG_ALERT);
-  UNITY_BEGIN();
-  RUN_TEST(test_server_responds_with_bad_request_for_malformed_edhoc_message);
-  RUN_TEST(test_server_responds_with_internal_error_on_server_side_failure);
-  RUN_TEST(test_server_responds_with_internal_error_if_context_already_exists);
-  RUN_TEST(test_server_sends_changed_response_for_valid_message_1);
-  RUN_TEST(
-      test_server_responds_with_bad_request_for_message_3_without_active_context);
-  RUN_TEST(test_server_sends_changed_response_for_valid_message_3);
-  RUN_TEST(
-      test_server_responds_with_internal_error_for_unrecognized_message_format);
-  return UNITY_END();
 }

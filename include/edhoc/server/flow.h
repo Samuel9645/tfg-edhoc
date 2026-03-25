@@ -21,7 +21,7 @@ typedef struct {
   /** Response PDU used to set response codes on failure paths. */
   coap_pdu_t* response;
 
-  /** Incoming Message 1 payload bytes and size. */
+  /** Incoming Message payload bytes and size. */
   coap_request_data_t request_data;
 } server_edhoc_common_request_data_t;
 

@@ -67,4 +67,4 @@ coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
 coap_optlist_t* create_coap_edhoc_optlist(
     content_format_edhoc_values_t content_format);
 
-#endif // COAP_COMMON_HELPERS_H_
+#endif  // COAP_COMMON_HELPERS_H_

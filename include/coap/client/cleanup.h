@@ -7,14 +7,14 @@
 
 /**
  * @brief Client-specific resource bundle that extends generic session cleanup
- * data with EDHOC client flow/exchange ownership.
+ * data with EDHOC client handshake/exchange ownership.
  */
 typedef struct {
   /** Generic CoAP/EDHOC session resources. */
   session_resources_t session_resources;
 
-  /** Client EDHOC flow state owned by the caller. */
-  client_edhoc_flow_t flow;
+  /** Client EDHOC handshake state owned by the caller. */
+  client_edhoc_handshake_t handshake;
 
   /** Exchange state owned by the caller. */
   coap_client_exchange_t exchange;
@@ -26,10 +26,10 @@ typedef struct {
  * @param resources Pointer to coap_client_session_resources_t containing
  * generic and client-specific resources.
  *
- * @note Preferred single cleanup entry point for client flow/exchange state.
+ * @note Preferred single cleanup entry point for client handshake/exchange state.
  *
  * @warning When using this function, avoid manual calls to
- * client_edhoc_flow_deinit() for the same resources in the same control path.
+ * client_edhoc_handshake_deinit() for the same resources in the same control path.
  */
 void coap_client_cleanup_resources(coap_client_session_resources_t* resources);
 

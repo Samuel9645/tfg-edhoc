@@ -78,10 +78,9 @@ coap_status_result_t coap_client_create_coap_session(
  * delete the pdu after calling coap_send(). Check the libcoap documentation for
  * details on PDU ownership and lifecycle.
  */
-coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
-                                      const coap_address_t* destination_address,
-                                      coap_session_t* coap_session,
-                                      coap_optlist_t* optlist);
+coap_pdu_t* coap_client_prepare_post_request(
+    const coap_uri_t* client_uri, const coap_address_t* destination_address,
+    coap_session_t* coap_session, coap_optlist_t* optlist);
 
 /**
  * @brief Send a prepared CoAP request.
@@ -91,7 +90,7 @@ coap_pdu_t* coap_client_prepare_post_request(const coap_uri_t* client_uri,
  * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
  */
 coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
-                                       coap_pdu_t* request_pdu);
+                                                   coap_pdu_t* request_pdu);
 
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.
@@ -105,4 +104,4 @@ coap_status_result_t coap_client_wait_for_coap_response(
     coap_context_t* coap_session_context, coap_session_t* coap_session,
     const bool* have_response);
 
-#endif // COAP_CLIENT_UTILS_H_
+#endif  // COAP_CLIENT_UTILS_H_

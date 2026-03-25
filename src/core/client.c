@@ -57,8 +57,8 @@ emulation_status_t tfg_run_client(void) {
     return EMULATION_FAILURE;
   }
 
-  if (client_edhoc_flow_init(&client_resources.flow) !=
-      CLIENT_EDHOC_FLOW_SUCCESS) {
+  if (client_edhoc_handshake_init(&client_resources.handshake) !=
+      CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -83,9 +83,9 @@ emulation_status_t tfg_run_client(void) {
       .payload_len = &response_len,
   };
 
-  if (client_edhoc_flow_compose_message_1(
-          &client_resources.flow, MESSAGE_BUFFER_LENGTH, request_payload,
-          &request_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
+  if (client_edhoc_handshake_compose_message_1(
+          &client_resources.handshake, MESSAGE_BUFFER_LENGTH, request_payload,
+          &request_len) != CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -100,18 +100,18 @@ emulation_status_t tfg_run_client(void) {
 
   if (coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
-      client_edhoc_flow_process_message_2(&client_resources.flow,
+      client_edhoc_handshake_process_message_2(&client_resources.handshake,
                                           response_payload, response_len) !=
-          CLIENT_EDHOC_FLOW_SUCCESS) {
+          CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   coap_client_exchange_reset(&client_resources.exchange);
 
-  if (client_edhoc_flow_compose_message_3(
-          &client_resources.flow, MESSAGE_BUFFER_LENGTH, request_payload,
-          &request_len) != CLIENT_EDHOC_FLOW_SUCCESS) {
+  if (client_edhoc_handshake_compose_message_3(
+          &client_resources.handshake, MESSAGE_BUFFER_LENGTH, request_payload,
+          &request_len) != CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -122,9 +122,9 @@ emulation_status_t tfg_run_client(void) {
           COAP_STATUS_SUCCESS ||
       coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
-      client_edhoc_flow_process_message_4(&client_resources.flow,
+      client_edhoc_handshake_process_message_4(&client_resources.handshake,
                                           response_payload, response_len) !=
-          CLIENT_EDHOC_FLOW_SUCCESS) {
+          CLIENT_EDHOC_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }

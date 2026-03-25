@@ -8,11 +8,20 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/bin/client",
+      "program": "${workspaceFolder}/build/tests/coap_server_dispatch_tests",
       "args": [],
-      "stopAtEntry": false,
-      "cwd": "${fileDirname}",
-      "environment": [],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        {
+          "name": "ASAN_OPTIONS",
+          "value": "detect_leaks=0"
+        },
+        {
+          "name": "LSAN_OPTIONS",
+          "value": "verbosity=1:log_threads=1"
+        }
+      ],
       "externalConsole": false,
       "MIMode": "gdb",
       "setupCommands": [
@@ -26,11 +35,7 @@
           "text": "-gdb-set disassembly-flavor intel",
           "ignoreFailures": true
         }
-      ],
+      ]
     }
-  ],
-  "env": {
-    "ASAN_OPTIONS": "detect_leaks=0",
-    "LSAN_OPTIONS": "verbosity=1:log_threads=1"
-  }
+  ]
 }

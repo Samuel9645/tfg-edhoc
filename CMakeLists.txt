@@ -30,6 +30,7 @@ add_executable(server
     src/coap/server/utils.c
     src/coap/server/map_edhoc_error_to_response.c
     src/coap/server/edhoc_dispatch.c
+    src/coap/server/internal/edhoc_dispatch_engine.c
     src/edhoc/server/server_flow.c
     ${BASE_SOURCES}
 )

@@ -4,7 +4,7 @@
 #include <edhoc_values.h>
 #include <stdbool.h>
 
-coap_status_result_t coap_shared_validate_edhoc_request(
+coap_status_result_t coap_shared_extract_payload_if_valid_edhoc_request(
     const coap_pdu_t* request, content_format_edhoc_values_t expected_format,
     const uint8_t** payload, size_t* payload_len) {
   if (!request || !payload || !payload_len) {

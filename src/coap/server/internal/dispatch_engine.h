@@ -45,7 +45,7 @@ typedef struct coap_server_dispatch_deps_t {
                        struct edhoc_extracted_fields* extracted_fields);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  coap_pdu_code_t (*handle_message_1)(
+  edhoc_server_handshake_status_t (*handle_message_1)(
       const edhoc_server_common_request_data_t* request_data,
       common_response_buffer_t* response_data);
 

@@ -16,6 +16,11 @@ typedef struct {
   coap_session_t* session;
 } coap_session_data_t;
 
+static inline bool coap_common_session_data_is_valid(
+    const coap_session_data_t session_data) {
+  return session_data.context != NULL && session_data.session != NULL;
+}
+
 /**
  * @brief Shared endpoint data for CoAP requests.
  */
@@ -26,5 +31,10 @@ typedef struct {
   /** Resolved destination socket address associated with uri. */
   const coap_address_t* destination;
 } coap_endpoint_data_t;
+
+static inline bool coap_common_endpoint_data_is_valid(
+    const coap_endpoint_data_t endpoint_data) {
+  return endpoint_data.uri != NULL && endpoint_data.destination != NULL;
+}
 
 #endif  // COAP_COMMON_DATA_MODELS_H_

@@ -58,20 +58,20 @@ bool is_not_message_1_stub(const uint8_t* payload, size_t payload_len) {
   return false;
 }
 
-coap_pdu_code_t successful_handle_message_1_stub(
+edhoc_server_handshake_status_t successful_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return COAP_RESPONSE_CODE_CHANGED;
+  return CSH_OK;
 }
 
-coap_pdu_code_t failed_handle_message_1_stub(
+edhoc_server_handshake_status_t failed_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  return CSH_ERR_INVALID_ARGS;
 }
 
 bool is_message_3_stub(const uint8_t* request_payload, size_t request_len,

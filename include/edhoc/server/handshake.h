@@ -36,12 +36,19 @@ typedef struct {
   struct edhoc_extracted_fields* message_3_extracted_fields;
 } edhoc_server_message_3_request_data_t;
 
-typedef enum edhoc_server_handshake_error {
+/**
+ * @brief Error codes for EDHOC server handshake operations.
+ */
+typedef enum edhoc_server_handshake_status {
   CSH_OK = 0,
   CSH_ERR_PREFIX_MISSING,
-  CSH_ERR_INVALID_PAYLOAD,
-  CSH_ERR_SESSION_NOT_FOUND,
-} edhoc_server_handshake_error;
+  CSH_ERR_INVALID_ARGS,
+  CSH_ERR_CALLOC_FAILED,
+  CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA,
+  CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED,
+  CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
+  CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED,
+} edhoc_server_handshake_status_t;
 
 /**
  * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
@@ -51,7 +58,7 @@ typedef enum edhoc_server_handshake_error {
  * success.
  * @return CSH_OK if prefix was removed, or a CSH_ERR code if invalid/missing.
  */
-edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
+edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length);
 
 /**
@@ -60,7 +67,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
  * @param[in] request_data Session/request metadata for Message 1
  * processing.
  * @param[out] response_data Response buffer metadata for Message 2.
- * @return CoAP response code for the operation result.
+ * @return edhoc_server_handshake_status_t containing the operation result.
  *
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher from CoAP session app-data. It is used for validation and
@@ -73,7 +80,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
  * use session_resources_t + tfg_common_cleanup_resources() for centralized
  * teardown.
  */
-coap_pdu_code_t edhoc_server_handle_message_1(
+edhoc_server_handshake_status_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data);
 

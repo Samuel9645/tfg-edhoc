@@ -1,6 +1,7 @@
 #include "dispatch_engine.h"
 
 #include "coap/coap_config.h"
+#include "coap/server/map_error_to_response.h"
 #include "edhoc/edhoc_config.h"
 
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
@@ -44,12 +45,11 @@ void coap_server_dispatch_post_with_dependencies(
   }
 
   uint8_t response_payload[EDC_MESSAGE_BUFFER_LENGTH] = {0};
-  size_t response_len = 0;
 
   common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = EDC_MESSAGE_BUFFER_LENGTH,
-      .payload_len = &response_len,
+      .payload_len = 0,
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -74,7 +74,9 @@ void coap_server_dispatch_post_with_dependencies(
             .payload_len = request_len,
         }};
 
-    response_code = deps->handle_message_1(&request_data, &response_data);
+    edhoc_server_handshake_status_t status =
+        deps->handle_message_1(&request_data, &response_data);
+    response_code = coap_server_map_message_1_status_to_response(status);
   } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,
                                 &message_3_extracted_fields)) {
     if (edhoc_ctx == NULL) {
@@ -104,8 +106,9 @@ void coap_server_dispatch_post_with_dependencies(
     return;
   }
 
-  if (response_len > 0 &&
-      deps->add_response_payload(response, response_payload, response_len) !=
+  if (response_data.payload_len > 0 &&
+      deps->add_response_payload(response, response_payload,
+                                 response_data.payload_len) !=
           COAP_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);

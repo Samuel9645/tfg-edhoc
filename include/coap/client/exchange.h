@@ -62,6 +62,11 @@ typedef struct {
   content_format_edhoc_values_t content_format;
 } coap_client_exchange_request_data_t;
 
+static inline bool coap_client_exchange_request_data_is_valid(
+    const coap_client_exchange_request_data_t* request_data) {
+  return common_request_payload_is_valid(&request_data->request_data);
+}
+
 /**
  * @brief Initialize exchange state and register response handler.
  *
@@ -96,8 +101,7 @@ coap_status_result_t coap_client_exchange_send(
  * response_data when present and valid.
  */
 coap_status_result_t coap_client_exchange_wait_and_get(
-    coap_client_exchange_t* exchange,
-    const common_response_buffer_t* response_data);
+    coap_client_exchange_t* exchange, common_response_buffer_t* response_data);
 
 /**
  * @brief Reset response state before next request.

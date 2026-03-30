@@ -82,6 +82,7 @@ coap_status_result_t coap_client_exchange_init(
   if (!exchange || !session_data || !session_data->session_data.context ||
       !session_data->session_data.session || !session_data->endpoint_data.uri ||
       !session_data->endpoint_data.destination) {
+    coap_log_err("invalid arguments to exchange_init\n");
     return COAP_STATUS_ERROR;
   }
 
@@ -107,20 +108,23 @@ coap_status_result_t coap_client_exchange_init(
 coap_status_result_t coap_client_exchange_send(
     coap_client_exchange_t* exchange,
     const coap_client_exchange_request_data_t* request_data) {
-  if (!exchange || !request_data || !request_data->request_data.payload ||
-      request_data->request_data.payload_len == 0) {
+  if (!exchange || !request_data ||
+      !coap_client_exchange_request_data_is_valid(request_data)) {
+    coap_log_err("invalid arguments to exchange_send\n");
     return COAP_STATUS_ERROR;
   }
 
   coap_optlist_t* optlist =
       create_coap_edhoc_optlist(request_data->content_format);
   if (!optlist) {
+    coap_log_err("failed to create CoAP option list\n");
     return COAP_STATUS_ERROR;
   }
 
   coap_pdu_t* request_pdu = coap_client_prepare_post_request(
       &exchange->uri, &exchange->destination, exchange->session, optlist);
   if (!request_pdu) {
+    coap_log_err("failed to prepare CoAP request\n");
     return COAP_STATUS_ERROR;
   }
 
@@ -136,21 +140,22 @@ coap_status_result_t coap_client_exchange_send(
 }
 
 coap_status_result_t coap_client_exchange_wait_and_get(
-    coap_client_exchange_t* exchange,
-    const common_response_buffer_t* response_data) {
-  if (!exchange || !response_data || !response_data->payload ||
-      !response_data->payload_len || response_data->payload_capacity == 0) {
+    coap_client_exchange_t* exchange, common_response_buffer_t* response_data) {
+  if (!exchange || !common_response_buffer_is_writable(response_data)) {
+    coap_log_err("invalid arguments to wait_and_get\n");
     return COAP_STATUS_ERROR;
   }
 
   if (coap_client_wait_for_coap_response(exchange->context, exchange->session,
                                          &exchange->have_response) !=
       COAP_STATUS_SUCCESS) {
+    coap_log_err("error while waiting for CoAP response\n");
     return COAP_STATUS_ERROR;
   }
 
   if (!exchange->have_response || exchange->incoming_message_len == 0 ||
       exchange->incoming_message_len > response_data->payload_capacity) {
+    coap_log_err("invalid response data\n");
     return COAP_STATUS_ERROR;
   }
 
@@ -159,7 +164,7 @@ coap_status_result_t coap_client_exchange_wait_and_get(
 
   memcpy(response_data->payload, exchange->incoming_message,
          exchange->incoming_message_len);
-  *response_data->payload_len = exchange->incoming_message_len;
+  response_data->payload_len = exchange->incoming_message_len;
   exchange->have_response = false;
   exchange->incoming_message_len = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;

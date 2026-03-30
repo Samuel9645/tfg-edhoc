@@ -12,6 +12,7 @@
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/public_data.h"
 #include "edhoc/credentials/server_private_key.h"
+#include "edhoc/server/handle_libedhoc_errors.h"
 
 static int server_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -35,30 +36,28 @@ static const struct edhoc_credentials SERVER_CREDENTIALS = {
     .verify = server_credential_verify,
 };
 
-static inline bool edhoc_server_has_invalid_common_request_data(
+static inline bool has_invalid_common_request_data(
     const edhoc_server_common_request_data_t* base_data) {
   return !base_data || !base_data->session || !base_data->response ||
          !base_data->request_data.payload ||
          base_data->request_data.payload_len == 0;
 }
 
-static inline bool edhoc_server_has_invalid_response_data(
+static inline bool has_invalid_response_data(
     const common_response_buffer_t* response_data) {
-  return !response_data || !response_data->payload ||
-         !response_data->payload_len;
+  return !response_data || !response_data->payload;
 }
 
-static inline bool edhoc_server_params_are_invalid(
+static inline bool params_are_invalid(
     const edhoc_server_common_request_data_t* base_data,
     const common_response_buffer_t* response_data) {
-  return edhoc_server_has_invalid_common_request_data(base_data) ||
-         edhoc_server_has_invalid_response_data(response_data);
+  return has_invalid_common_request_data(base_data) ||
+         has_invalid_response_data(response_data);
 }
 static inline bool edhoc_server_message_1_has_invalid_args(
     const edhoc_server_common_request_data_t* request_data,
     const common_response_buffer_t* response_data) {
-  if (!request_data ||
-      edhoc_server_params_are_invalid(request_data, response_data)) {
+  if (!request_data || params_are_invalid(request_data, response_data)) {
     return true;
   }
 
@@ -71,8 +70,8 @@ static inline bool edhoc_server_message_1_has_invalid_args(
 static inline bool edhoc_server_message_3_has_invalid_args(
     const edhoc_server_message_3_request_data_t* request_data,
     const common_response_buffer_t* response_data) {
-  if (!request_data || edhoc_server_params_are_invalid(&request_data->base_data,
-                                                       response_data)) {
+  if (!request_data ||
+      params_are_invalid(&request_data->base_data, response_data)) {
     return true;
   }
 
@@ -82,11 +81,11 @@ static inline bool edhoc_server_message_3_has_invalid_args(
   return message_3_fields_not_extracted || edhoc_context_is_null;
 }
 
-edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
+edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
-  const bool payload_is_invalid = (!*payload || *length == 0);
+  const bool payload_is_invalid = (!*payload || !length || *length == 0);
   if (payload_is_invalid) {
-    return CSH_ERR_INVALID_PAYLOAD;
+    return CSH_ERR_INVALID_ARGS;
   }
   const bool first_byte_is_not_cbor_true = (*payload)[0] != EDCC_CBOR_TRUE;
   if (first_byte_is_not_cbor_true) {
@@ -98,12 +97,12 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
   return CSH_OK;
 }
 
-coap_pdu_code_t edhoc_server_handle_message_1(
+edhoc_server_handshake_status_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* message_1_request_data,
     common_response_buffer_t* response_data) {
   if (edhoc_server_message_1_has_invalid_args(message_1_request_data,
                                               response_data)) {
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
+    return CSH_ERR_INVALID_ARGS;
   }
   const uint8_t* no_prefix_payload =
       message_1_request_data->request_data.payload;
@@ -114,50 +113,50 @@ coap_pdu_code_t edhoc_server_handle_message_1(
     coap_log_crit(
         "Protocol Violation: Message 1 payload missing expected CBOR "
         "true prefix\n");
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
+    return CSH_ERR_PREFIX_MISSING;
   }
 
-  struct edhoc_context* edhoc_context = calloc(1, sizeof(struct edhoc_context));
-  if (!edhoc_context) {
+  struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
+  if (!edhoc_ctx) {
     coap_log_err("OS Error: Cannot allocate memory for EDHOC context\n");
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    return CSH_ERR_CALLOC_FAILED;
   }
 
   int edhoc_api_result =
-      edhoc_common_setup_context(edhoc_context, &SERVER_CREDENTIALS);
+      edhoc_common_setup_context(edhoc_ctx, &SERVER_CREDENTIALS);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    coap_pdu_code_t response_code = coap_server_map_edhoc_failure_to_response(
-        edhoc_context, "setup EDHOC context", COAP_SERVER_EDHOC_INTERNAL_ERROR,
-        edhoc_api_result, message_1_request_data->response, response_data);
-    free(edhoc_context);
-    return response_code;
+    return CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED;
   }
 
-  if (coap_session_set_app_data2(message_1_request_data->session, edhoc_context,
+  if (coap_session_set_app_data2(message_1_request_data->session, edhoc_ctx,
                                  free) != NULL) {
     coap_log_err("Internal Error: app data for session already set\n");
-    free(edhoc_context);
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    free(edhoc_ctx);
+    return CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA;
   }
 
-  edhoc_api_result = edhoc_message_1_process(edhoc_context, no_prefix_payload,
+  edhoc_api_result = edhoc_message_1_process(edhoc_ctx, no_prefix_payload,
                                              no_prefix_payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_server_map_edhoc_failure_to_response(
-        edhoc_context, "process Message 1", COAP_SERVER_EDHOC_PROTOCOL_ERROR,
-        edhoc_api_result, message_1_request_data->response, response_data);
+    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
+                                             response_data);
+    coap_session_set_app_data2(message_1_request_data->session, NULL, NULL);
+    free(edhoc_ctx);
+    return CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED;
   }
 
-  edhoc_api_result = edhoc_message_2_compose(
-      edhoc_context, response_data->payload, response_data->payload_capacity,
-      response_data->payload_len);
+  edhoc_api_result = edhoc_message_2_compose(edhoc_ctx, response_data->payload,
+                                             response_data->payload_capacity,
+                                             &response_data->payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_server_map_edhoc_failure_to_response(
-        edhoc_context, "compose Message 2", COAP_SERVER_EDHOC_INTERNAL_ERROR,
-        edhoc_api_result, message_1_request_data->response, response_data);
+    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
+                                             response_data);
+    coap_session_set_app_data2(message_1_request_data->session, NULL, NULL);
+    free(edhoc_ctx);
+    return CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED;
   }
 
-  return COAP_RESPONSE_CODE_CHANGED;
+  return CSH_OK;
 }
 
 coap_pdu_code_t edhoc_server_handle_message_3(
@@ -182,7 +181,7 @@ coap_pdu_code_t edhoc_server_handle_message_3(
 
   edhoc_api_result = edhoc_message_4_compose(
       edhoc_context, response_data->payload, response_data->payload_capacity,
-      response_data->payload_len);
+      &response_data->payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     return coap_server_map_edhoc_failure_to_response(
         edhoc_context, "compose Message 4", COAP_SERVER_EDHOC_INTERNAL_ERROR,

@@ -30,6 +30,7 @@ set(SERVER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handle_libedhoc_errors.c
     ${BASE_SOURCES}
 )
 

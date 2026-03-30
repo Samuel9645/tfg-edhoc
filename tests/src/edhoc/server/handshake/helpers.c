@@ -18,11 +18,11 @@ static void setup_valid_message_1_request_data(
 }
 
 static void setup_valid_message_1_response_data(
-    uint8_t* buffer, size_t buffer_capacity, size_t* written_len,
+    uint8_t* buffer, size_t buffer_capacity,
     common_response_buffer_t* response_data) {
   response_data->payload = buffer;
   response_data->payload_capacity = buffer_capacity;
-  response_data->payload_len = written_len;
+  response_data->payload_len = buffer_capacity;
 }
 
 void setup_testing_environment(handshake_test_env_t* env) {
@@ -41,8 +41,7 @@ void setup_testing_environment(handshake_test_env_t* env) {
       (coap_session_t*)&env->session_dummy, (coap_pdu_t*)&env->pdu_dummy,
       env->req_payload, sizeof(env->req_payload), &env->request);
   setup_valid_message_1_response_data(env->res_payload,
-                                      sizeof(env->res_payload),
-                                      &env->res_written_len, &env->response);
+                                      env->res_written_len, &env->response);
 }
 
 void set_valid_message_1_payload(uint8_t* buffer, size_t buffer_capacity,
@@ -63,9 +62,7 @@ void reset_test_response(common_response_buffer_t* response_data) {
                                "Test environment pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(response_data->payload,
                                "Test environment pointer must not be NULL");
-  TEST_ASSERT_NOT_NULL_MESSAGE(response_data->payload_len,
-                               "Test environment pointer must not be NULL");
-  *(response_data->payload_len) = ARBITRARY_NONZERO_VALUE;
+  response_data->payload_len = ARBITRARY_NONZERO_VALUE;
   memset(response_data->payload, 0, response_data->payload_capacity);
 }
 
@@ -73,7 +70,7 @@ void assert_response_untouched(const common_response_buffer_t* response) {
   if (!response || !response->payload || !response->payload_len)
     return;
 
-  TEST_ASSERT_EQUAL_INT_MESSAGE(ARBITRARY_NONZERO_VALUE, *response->payload_len,
+  TEST_ASSERT_EQUAL_INT_MESSAGE(ARBITRARY_NONZERO_VALUE, response->payload_len,
                                 "Side-effect: payload_len was modified");
 
   TEST_ASSERT_EACH_EQUAL_UINT8_MESSAGE(

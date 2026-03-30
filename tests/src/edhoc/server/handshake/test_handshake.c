@@ -25,7 +25,7 @@ void test_remove_prefix_success(void) {
   const uint8_t* payload_ptr = payload_with_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_handshake_error result =
+  edhoc_server_handshake_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_OK, result);
@@ -39,7 +39,7 @@ void test_remove_prefix_fails_on_missing_prefix(void) {
   const uint8_t* payload_ptr = payload_without_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_handshake_error result =
+  edhoc_server_handshake_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result);
@@ -51,10 +51,10 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   const uint8_t* null_payload_ptr = NULL;
   size_t payload_len = 0;
 
-  edhoc_server_handshake_error result =
+  edhoc_server_handshake_status_t result =
       edhoc_server_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_INVALID_PAYLOAD, result);
+  TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
   TEST_ASSERT_NULL(null_payload_ptr);
   TEST_ASSERT_EQUAL(0, payload_len);
 }
@@ -75,10 +75,10 @@ void test_handle_message_1_fails_on_invalid_data(void) {
 
   size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    coap_pdu_code_t result = edhoc_server_handle_message_1(
+    edhoc_server_handshake_status_t result = edhoc_server_handle_message_1(
         test_cases[i].request, test_cases[i].response);
     reset_test_response(&env.response);
-    TEST_ASSERT_EQUAL_MESSAGE(COAP_RESPONSE_CODE_BAD_REQUEST, result,
+    TEST_ASSERT_EQUAL_MESSAGE(CSH_ERR_INVALID_ARGS, result,
                               test_cases[i].description);
     assert_response_untouched(test_cases[i].response);
   }
@@ -91,9 +91,9 @@ void test_handle_message_1_fails_on_too_large_request_data(void) {
   env.request.request_data.payload = large_buffer;
   env.request.request_data.payload_len = sizeof(large_buffer);
 
-  coap_pdu_code_t result =
+  edhoc_server_handshake_status_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST, result);
+  TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
   assert_response_untouched(&env.response);
 }

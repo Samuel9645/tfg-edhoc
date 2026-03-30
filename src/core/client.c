@@ -65,9 +65,7 @@ emulation_status_t tfg_run_client(void) {
   }
 
   uint8_t request_payload[EDC_MESSAGE_BUFFER_LENGTH] = {0};
-  size_t request_len = 0;
   uint8_t response_payload[MAX_PDU_SIZE] = {0};
-  size_t response_len = 0;
 
   coap_client_exchange_request_data_t request_data = {
       .request_data =
@@ -81,17 +79,16 @@ emulation_status_t tfg_run_client(void) {
   common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = MAX_PDU_SIZE,
-      .payload_len = &response_len,
+      .payload_len = 0,
   };
 
   if (edhoc_client_handshake_compose_message_1(
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          request_payload, &request_data.request_data.payload_len) !=
+      EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-
-  request_data.request_data.payload_len = request_len;
 
   if (coap_client_exchange_send(&client_resources.exchange, &request_data) !=
       COAP_STATUS_SUCCESS) {
@@ -102,8 +99,8 @@ emulation_status_t tfg_run_client(void) {
   if (coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
       edhoc_client_handshake_process_message_2(
-          &client_resources.handshake, response_payload, response_len) !=
-          EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          &client_resources.handshake, response_payload,
+          response_data.payload_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -112,20 +109,19 @@ emulation_status_t tfg_run_client(void) {
 
   if (edhoc_client_handshake_compose_message_3(
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          request_payload, &request_data.request_data.payload_len) !=
+      EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
-
-  request_data.request_data.payload_len = request_len;
 
   if (coap_client_exchange_send(&client_resources.exchange, &request_data) !=
           COAP_STATUS_SUCCESS ||
       coap_client_exchange_wait_and_get(
           &client_resources.exchange, &response_data) != COAP_STATUS_SUCCESS ||
       edhoc_client_handshake_process_message_4(
-          &client_resources.handshake, response_payload, response_len) !=
-          EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          &client_resources.handshake, response_payload,
+          response_data.payload_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }

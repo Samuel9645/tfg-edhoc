@@ -30,13 +30,34 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
 
   if (edhoc_message_error_compose(response_data->payload,
                                   response_data->payload_capacity,
-                                  response_data->payload_len, edhoc_error_code,
+                                  &response_data->payload_len, edhoc_error_code,
                                   NULL) != EDHOC_SUCCESS) {
     coap_log_err(
         "cannot compose EDHOC error message for client, using empty payload\n");
-    *response_data->payload_len = 0;
+    response_data->payload_len = 0;
   }
 
   coap_pdu_set_code(response, mapped_response_code);
   return mapped_response_code;
+}
+
+coap_pdu_code_t coap_server_map_message_1_status_to_response(
+    edhoc_server_handshake_status_t status) {
+  switch (status) {
+  case CSH_OK:
+    return COAP_RESPONSE_CODE_CHANGED;
+
+  case CSH_ERR_PREFIX_MISSING:
+  case CSH_ERR_INVALID_ARGS:
+  case CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA:
+  case CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+
+  case CSH_ERR_CALLOC_FAILED:
+  case CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED:
+  case CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  default:
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
 }

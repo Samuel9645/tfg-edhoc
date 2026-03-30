@@ -46,7 +46,7 @@ void coap_server_dispatch_post_with_dependencies(
   uint8_t response_payload[MESSAGE_BUFFER_LENGTH] = {0};
   size_t response_len = 0;
 
-  coap_response_data_t response_data = {
+  common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = MESSAGE_BUFFER_LENGTH,
       .payload_len = &response_len,

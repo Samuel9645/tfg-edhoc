@@ -3,7 +3,7 @@
 coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     struct edhoc_context* edhoc_ctx, const char* operation_label,
     coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
-    coap_pdu_t* response, coap_response_data_t* response_data) {
+    coap_pdu_t* response, common_response_buffer_t* response_data) {
   coap_pdu_code_t mapped_response_code =
       failure_type == COAP_SERVER_EDHOC_PROTOCOL_ERROR
           ? COAP_RESPONSE_CODE_BAD_REQUEST

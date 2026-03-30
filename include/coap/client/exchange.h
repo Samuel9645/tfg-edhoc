@@ -9,6 +9,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/data_models.h"
 #include "coap/common/status.h"
+#include "common/data_models.h"
 
 /**
  * @brief CoAP exchange state for EDHOC client messages.
@@ -55,7 +56,7 @@ typedef struct {
  */
 typedef struct {
   /** Payload pointer and length for this outgoing request. */
-  coap_request_data_t request_data;
+  common_request_payload_t request_data;
 
   /** CoAP content-format option value to attach to the request. */
   content_format_edhoc_values_t content_format;
@@ -96,7 +97,7 @@ coap_status_result_t coap_client_exchange_send(
  */
 coap_status_result_t coap_client_exchange_wait_and_get(
     coap_client_exchange_t* exchange,
-    const coap_response_data_t* response_data);
+    const common_response_buffer_t* response_data);
 
 /**
  * @brief Reset response state before next request.

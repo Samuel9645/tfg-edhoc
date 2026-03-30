@@ -78,7 +78,7 @@ emulation_status_t tfg_run_client(void) {
       .content_format = APPLICATION_CID_EDHOC_CBOR_SEQ,
   };
 
-  coap_response_data_t response_data = {
+  common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = MAX_PDU_SIZE,
       .payload_len = &response_len,

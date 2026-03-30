@@ -24,7 +24,7 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/e
 set(MY_TEST_FILES
     "src/coap/server/dispatch/test_dispatch.c"
     "src/core/test_integration.c"
-    "src/edhoc/server/test_handshake.c"
+    "src/edhoc/server/handshake/test_handshake.c"
 )
 
 # 4. The Loop to automate target creation
@@ -53,6 +53,7 @@ foreach(test_rel_path ${MY_TEST_FILES})
         # Include your test-specific helper implementations
         ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/stubs.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/create_base_dependencies.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
     )
 
     # C. Include Directories

@@ -24,9 +24,9 @@ static bool client_response_has_edhoc_content_format(
 }
 
 static coap_response_t coap_client_response_handler(coap_session_t* session,
-                                                     const coap_pdu_t* sent,
-                                                     const coap_pdu_t* received,
-                                                     const coap_mid_t id) {
+                                                    const coap_pdu_t* sent,
+                                                    const coap_pdu_t* received,
+                                                    const coap_mid_t id) {
   (void)sent;
   (void)id;
 
@@ -137,14 +137,15 @@ coap_status_result_t coap_client_exchange_send(
 
 coap_status_result_t coap_client_exchange_wait_and_get(
     coap_client_exchange_t* exchange,
-    const coap_response_data_t* response_data) {
+    const common_response_buffer_t* response_data) {
   if (!exchange || !response_data || !response_data->payload ||
       !response_data->payload_len || response_data->payload_capacity == 0) {
     return COAP_STATUS_ERROR;
   }
 
   if (coap_client_wait_for_coap_response(exchange->context, exchange->session,
-                             &exchange->have_response) != COAP_STATUS_SUCCESS) {
+                                         &exchange->have_response) !=
+      COAP_STATUS_SUCCESS) {
     return COAP_STATUS_ERROR;
   }
 

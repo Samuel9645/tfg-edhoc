@@ -27,29 +27,4 @@ typedef struct {
   const coap_address_t* destination;
 } coap_endpoint_data_t;
 
-/**
- * @brief Generic request payload descriptor.
- */
-typedef struct {
-  /** Pointer to request bytes to send or process. */
-  const uint8_t* payload;
-
-  /** Length of payload in bytes. */
-  size_t payload_len;
-} coap_request_data_t;
-
-/**
- * @brief Generic response buffer descriptor.
- */
-typedef struct {
-  /** Caller-provided buffer where response bytes are written. */
-  uint8_t* payload;
-
-  /** Capacity of payload buffer in bytes. */
-  size_t payload_capacity;
-
-  /** Output number of bytes written to payload buffer. */
-  size_t* payload_len;
-} coap_response_data_t;
-
 #endif  // COAP_COMMON_DATA_MODELS_H_

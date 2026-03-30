@@ -14,7 +14,8 @@
 #include <unity.h>
 
 #include "edhoc/common/constants.h"
-#include "edhoc/server/handshake.h"
+#include "edhoc/server/handshake/helpers.h"
+#include "edhoc/server/handshake/scenarios.h"
 
 void test_remove_prefix_success(void) {
   enum { FIRST_BYTE = 0x01 };
@@ -56,4 +57,29 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   TEST_ASSERT_EQUAL(CSH_ERR_INVALID_PAYLOAD, result);
   TEST_ASSERT_NULL(null_payload_ptr);
   TEST_ASSERT_EQUAL(0, payload_len);
+}
+
+void test_handle_message_1_fails_on_invalid_data(void) {
+  handshake_test_env_t env = {0};
+  setup_testing_environment(&env);
+  edhoc_server_common_request_data_t empty_request = {0};
+  common_response_buffer_t empty_response = {0};
+
+  handshake_test_case_t test_cases[] = {
+      {"Both arguments NULL", NULL, NULL},
+      {"Request is NULL", NULL, &env.response},
+      {"Response is NULL", &env.request, NULL},
+      {"Empty request data", &empty_request, &env.response},
+      {"Empty response data", &env.request, &empty_response},
+  };
+
+  size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
+  for (size_t i = 0; i < num_cases; i++) {
+    coap_pdu_code_t result = edhoc_server_handle_message_1(
+        test_cases[i].request, test_cases[i].response);
+    reset_test_response(&env.response);
+    TEST_ASSERT_EQUAL_MESSAGE(COAP_RESPONSE_CODE_BAD_REQUEST, result,
+                              test_cases[i].description);
+    assert_response_untouched(test_cases[i].response);
+  }
 }

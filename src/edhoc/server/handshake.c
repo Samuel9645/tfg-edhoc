@@ -43,20 +43,20 @@ static inline bool edhoc_server_has_invalid_common_request_data(
 }
 
 static inline bool edhoc_server_has_invalid_response_data(
-    const coap_response_data_t* response_data) {
+    const common_response_buffer_t* response_data) {
   return !response_data || !response_data->payload ||
          !response_data->payload_len;
 }
 
 static inline bool edhoc_server_params_are_invalid(
     const edhoc_server_common_request_data_t* base_data,
-    const coap_response_data_t* response_data) {
+    const common_response_buffer_t* response_data) {
   return edhoc_server_has_invalid_common_request_data(base_data) ||
          edhoc_server_has_invalid_response_data(response_data);
 }
 static inline bool edhoc_server_message_1_has_invalid_args(
     const edhoc_server_common_request_data_t* request_data,
-    const coap_response_data_t* response_data) {
+    const common_response_buffer_t* response_data) {
   if (!request_data ||
       edhoc_server_params_are_invalid(request_data, response_data)) {
     return true;
@@ -70,7 +70,7 @@ static inline bool edhoc_server_message_1_has_invalid_args(
 
 static inline bool edhoc_server_message_3_has_invalid_args(
     const edhoc_server_message_3_request_data_t* request_data,
-    const coap_response_data_t* response_data) {
+    const common_response_buffer_t* response_data) {
   if (!request_data || edhoc_server_params_are_invalid(&request_data->base_data,
                                                        response_data)) {
     return true;
@@ -100,7 +100,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
 
 coap_pdu_code_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* message_1_request_data,
-    coap_response_data_t* response_data) {
+    common_response_buffer_t* response_data) {
   if (edhoc_server_message_1_has_invalid_args(message_1_request_data,
                                               response_data)) {
     return COAP_RESPONSE_CODE_BAD_REQUEST;
@@ -162,7 +162,7 @@ coap_pdu_code_t edhoc_server_handle_message_1(
 
 coap_pdu_code_t edhoc_server_handle_message_3(
     const edhoc_server_message_3_request_data_t* request_data,
-    coap_response_data_t* response_data) {
+    common_response_buffer_t* response_data) {
   if (edhoc_server_message_3_has_invalid_args(request_data, response_data)) {
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }

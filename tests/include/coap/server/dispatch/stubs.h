@@ -40,11 +40,11 @@ bool is_not_message_1_stub(const uint8_t* payload, size_t payload_len);
 
 coap_pdu_code_t successful_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 coap_pdu_code_t failed_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 bool is_message_3_stub(const uint8_t* request_payload, size_t request_len,
                        const struct edhoc_context* edhoc_ctx,
@@ -56,11 +56,11 @@ bool is_not_message_3_stub(const uint8_t* request_payload, size_t request_len,
 
 coap_pdu_code_t successful_handle_message_3_stub(
     const edhoc_server_message_3_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 coap_pdu_code_t failed_handle_message_3_stub(
     const edhoc_server_message_3_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 coap_status_result_t successful_add_response_payload_stub(
     coap_pdu_t* response, const uint8_t* payload, size_t payload_len);

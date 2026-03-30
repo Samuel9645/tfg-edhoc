@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "coap/common/data_models.h"
+#include "common/data_models.h"
 
 /**
  * @brief Common input data shared by EDHOC Message 1 and Message 3 handlers.
@@ -22,7 +22,7 @@ typedef struct {
   coap_pdu_t* response;
 
   /** Incoming Message payload bytes and size. */
-  coap_request_data_t request_data;
+  common_request_payload_t request_data;
 } edhoc_server_common_request_data_t;
 
 /**
@@ -75,7 +75,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
  */
 coap_pdu_code_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.
@@ -94,6 +94,6 @@ coap_pdu_code_t edhoc_server_handle_message_1(
  */
 coap_pdu_code_t edhoc_server_handle_message_3(
     const edhoc_server_message_3_request_data_t* request_data,
-    coap_response_data_t* response_data);
+    common_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_H_

@@ -94,6 +94,6 @@ void test_handle_message_1_fails_on_too_large_request_data(void) {
   edhoc_server_handshake_status_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
+  TEST_ASSERT_EQUAL(CSH_ERR_PAYLOAD_TOO_LARGE, result);
   assert_response_untouched(&env.response);
 }

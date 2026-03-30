@@ -12,6 +12,7 @@
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/public_data.h"
 #include "edhoc/credentials/server_private_key.h"
+#include "edhoc/edhoc_config.h"
 #include "edhoc/server/handle_libedhoc_errors.h"
 
 static int server_credential_fetch(void* user_context,
@@ -103,6 +104,10 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
   if (edhoc_server_message_1_has_invalid_args(message_1_request_data,
                                               response_data)) {
     return CSH_ERR_INVALID_ARGS;
+  }
+  if (message_1_request_data->request_data.payload_len >
+      EDC_MESSAGE_BUFFER_LENGTH) {
+    return CSH_ERR_PAYLOAD_TOO_LARGE;
   }
   const uint8_t* no_prefix_payload =
       message_1_request_data->request_data.payload;

@@ -1,0 +1,36 @@
+/**
+ * @file payload.h
+ *
+ * @brief Test payload definitions for EDHOC server handshake unit tests.
+ */
+#ifndef EDHOC_SERVER_HANDSHAKE_PAYLOAD_H_
+#define EDHOC_SERVER_HANDSHAKE_PAYLOAD_H_
+
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+enum { BUFFER_SIZE = 8 };
+
+/**
+ * @brief Simple struct to hold test payload data and its length.
+ */
+typedef struct test_edsh_payload {
+  uint8_t data[BUFFER_SIZE];
+  size_t length;
+} test_edsh_payload_t;
+/**
+ * @brief Generates a test payload with the correct CBOR TRUE prefix for
+ * Message 1.
+ * @return A test_edsh_payload_t containing the valid Message 1 payload.
+ */
+test_edsh_payload_t get_invalid_prefix_payload(void);
+
+/**
+ * @brief Generates a valid test payload for Message 1 with the correct CBOR
+ * TRUE prefix.
+ * @return A test_edsh_payload_t containing the valid Message 1 payload.
+ */
+test_edsh_payload_t get_valid_message_1_payload(void);
+
+#endif  // EDHOC_SERVER_HANDSHAKE_PAYLOAD_H_

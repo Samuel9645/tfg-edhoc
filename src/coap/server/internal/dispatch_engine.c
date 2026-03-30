@@ -43,12 +43,12 @@ void coap_server_dispatch_post_with_dependencies(
     return;
   }
 
-  uint8_t response_payload[MESSAGE_BUFFER_LENGTH] = {0};
+  uint8_t response_payload[EDC_MESSAGE_BUFFER_LENGTH] = {0};
   size_t response_len = 0;
 
   common_response_buffer_t response_data = {
       .payload = response_payload,
-      .payload_capacity = MESSAGE_BUFFER_LENGTH,
+      .payload_capacity = EDC_MESSAGE_BUFFER_LENGTH,
       .payload_len = &response_len,
   };
 

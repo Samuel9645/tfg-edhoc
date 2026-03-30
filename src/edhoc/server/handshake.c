@@ -88,7 +88,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
   if (payload_is_invalid) {
     return CSH_ERR_INVALID_PAYLOAD;
   }
-  const bool first_byte_is_not_cbor_true = (*payload)[0] != EDHOC_CC_CBOR_TRUE;
+  const bool first_byte_is_not_cbor_true = (*payload)[0] != EDCC_CBOR_TRUE;
   if (first_byte_is_not_cbor_true) {
     return CSH_ERR_PREFIX_MISSING;
   }

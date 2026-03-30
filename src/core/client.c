@@ -64,7 +64,7 @@ emulation_status_t tfg_run_client(void) {
     return EMULATION_FAILURE;
   }
 
-  uint8_t request_payload[MESSAGE_BUFFER_LENGTH] = {0};
+  uint8_t request_payload[EDC_MESSAGE_BUFFER_LENGTH] = {0};
   size_t request_len = 0;
   uint8_t response_payload[MAX_PDU_SIZE] = {0};
   size_t response_len = 0;
@@ -85,8 +85,8 @@ emulation_status_t tfg_run_client(void) {
   };
 
   if (edhoc_client_handshake_compose_message_1(
-          &client_resources.handshake, MESSAGE_BUFFER_LENGTH, request_payload,
-          &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
+          request_payload, &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -111,8 +111,8 @@ emulation_status_t tfg_run_client(void) {
   coap_client_exchange_reset(&client_resources.exchange);
 
   if (edhoc_client_handshake_compose_message_3(
-          &client_resources.handshake, MESSAGE_BUFFER_LENGTH, request_payload,
-          &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
+          request_payload, &request_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }

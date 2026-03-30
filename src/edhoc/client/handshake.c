@@ -5,29 +5,31 @@
 #include <string.h>
 
 #include "coap/coap_config.h"
-#include "edhoc/edhoc_config.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"
 #include "edhoc/credentials/public_data.h"
+#include "edhoc/edhoc_config.h"
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
   return edhoc_credentials_fetch(user_context, credentials, CLIENT_PUBLIC_KEY,
-                          ARRAY_SIZE(CLIENT_PUBLIC_KEY), CLIENT_PRIVATE_KEY,
-                          ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
+                                 ARRAY_SIZE(CLIENT_PUBLIC_KEY),
+                                 CLIENT_PRIVATE_KEY,
+                                 ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
 
 static int client_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
                                     size_t* public_key_length) {
-  return edhoc_credentials_verify(user_context, credentials, SERVER_KID,
-                           SERVER_PUBLIC_KEY, ARRAY_SIZE(SERVER_PUBLIC_KEY),
-                           public_key_reference, public_key_length);
+  return edhoc_credentials_verify(
+      user_context, credentials, SERVER_KID, SERVER_PUBLIC_KEY,
+      ARRAY_SIZE(SERVER_PUBLIC_KEY), public_key_reference, public_key_length);
 }
 
-edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handshake_t* handshake) {
+edhoc_client_handshake_status_t edhoc_client_handshake_init(
+    edhoc_client_handshake_t* handshake) {
   if (!handshake) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
@@ -39,7 +41,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handsha
       .verify = client_credential_verify,
   };
 
-  if (edhoc_common_setup_context(&handshake->context, &credentials) != EDHOC_SUCCESS) {
+  if (edhoc_common_setup_context(&handshake->context, &credentials) !=
+      EDHOC_SUCCESS) {
     return EDHOC_CLIENT_HANDSHAKE_CONTEXT_SETUP_FAILED;
   }
 
@@ -49,15 +52,16 @@ edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handsha
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
-    size_t* payload_len) {
+    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    uint8_t* payload, size_t* payload_len) {
   if (!handshake || !payload || !payload_len || payload_capacity <= 1) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
-  payload[0] = CBOR_TRUE;
+  payload[0] = EDC_CBOR_TRUE;
   size_t message_len = 0;
-  if (edhoc_message_1_compose(&handshake->context, &payload[1], payload_capacity - 1,
+  if (edhoc_message_1_compose(&handshake->context, &payload[1],
+                              payload_capacity - 1,
                               &message_len) != EDHOC_SUCCESS) {
     return EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_COMPOSE_FAILED;
   }
@@ -67,7 +71,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
-    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len) {
+    edhoc_client_handshake_t* handshake, const uint8_t* payload,
+    size_t payload_len) {
   if (!handshake || !payload || payload_len == 0) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
@@ -81,8 +86,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
-    size_t* payload_len) {
+    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    uint8_t* payload, size_t* payload_len) {
   if (!handshake || !payload || !payload_len || payload_capacity == 0) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
@@ -118,7 +123,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
-    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len) {
+    edhoc_client_handshake_t* handshake, const uint8_t* payload,
+    size_t payload_len) {
   if (!handshake || !payload || payload_len == 0) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }

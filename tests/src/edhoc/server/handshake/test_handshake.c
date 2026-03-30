@@ -14,36 +14,36 @@
 #include <unity.h>
 
 #include "edhoc/common/constants.h"
+#include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/helpers.h"
+#include "edhoc/server/handshake/payload.h"
 #include "edhoc/server/handshake/scenarios.h"
 
 void test_remove_prefix_success(void) {
-  enum { FIRST_BYTE = 0x01 };
-  const uint8_t payload_with_prefix[] = {EDHOC_CC_CBOR_TRUE, FIRST_BYTE};
-  const size_t original_len = sizeof(payload_with_prefix);
-  const uint8_t* payload_ptr = payload_with_prefix;
+  test_edsh_payload_t payload_with_prefix = get_valid_message_1_payload();
+  const size_t original_len = payload_with_prefix.length;
+  const uint8_t* payload_ptr = payload_with_prefix.data;
   size_t payload_len = original_len;
 
   edhoc_server_handshake_error result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_OK, result);
-  TEST_ASSERT_EQUAL(FIRST_BYTE, *payload_ptr);
-  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix[1], payload_ptr);
+  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], payload_ptr);
   TEST_ASSERT_EQUAL(original_len - 1, payload_len);
 }
 
 void test_remove_prefix_fails_on_missing_prefix(void) {
-  const uint8_t payload_without_prefix[] = {0x00, 0x02, 0x03};
-  const size_t original_len = sizeof(payload_without_prefix);
-  const uint8_t* payload_ptr = payload_without_prefix;
+  test_edsh_payload_t payload_without_prefix = get_invalid_prefix_payload();
+  const size_t original_len = payload_without_prefix.length;
+  const uint8_t* payload_ptr = payload_without_prefix.data;
   size_t payload_len = original_len;
 
   edhoc_server_handshake_error result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result);
-  TEST_ASSERT_EQUAL_PTR(payload_without_prefix, payload_ptr);
+  TEST_ASSERT_EQUAL_PTR(payload_without_prefix.data, payload_ptr);
   TEST_ASSERT_EQUAL(original_len, payload_len);
 }
 
@@ -82,4 +82,18 @@ void test_handle_message_1_fails_on_invalid_data(void) {
                               test_cases[i].description);
     assert_response_untouched(test_cases[i].response);
   }
+}
+
+void test_handle_message_1_fails_on_too_large_request_data(void) {
+  handshake_test_env_t env = {0};
+  setup_testing_environment(&env);
+  uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
+  env.request.request_data.payload = large_buffer;
+  env.request.request_data.payload_len = sizeof(large_buffer);
+
+  coap_pdu_code_t result =
+      edhoc_server_handle_message_1(&env.request, &env.response);
+
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST, result);
+  assert_response_untouched(&env.response);
 }

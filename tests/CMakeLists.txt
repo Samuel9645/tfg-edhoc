@@ -54,6 +54,7 @@ foreach(test_rel_path ${MY_TEST_FILES})
         ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/stubs.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/create_base_dependencies.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
     )
 
     # C. Include Directories

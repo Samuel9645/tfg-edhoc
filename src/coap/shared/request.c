@@ -40,7 +40,7 @@ coap_status_result_t coap_shared_extract_payload_if_valid_edhoc_request(
 
 bool coap_shared_is_properly_formatted_message_1(const uint8_t* payload,
                                                  size_t payload_len) {
-  return payload != NULL && payload_len > 0 && payload[0] == EDHOC_CC_CBOR_TRUE;
+  return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
 }
 
 bool coap_shared_is_properly_formatted_message_3(

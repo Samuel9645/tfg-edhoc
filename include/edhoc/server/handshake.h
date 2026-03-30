@@ -23,46 +23,64 @@ typedef struct {
 
   /** Incoming Message payload bytes and size. */
   coap_request_data_t request_data;
-} server_edhoc_common_request_data_t;
+} edhoc_server_common_request_data_t;
 
 /**
  * @brief Input data required to process EDHOC Message 1.
  */
 typedef struct {
   /** Common session/context/response/request metadata. */
-  server_edhoc_common_request_data_t base_data;
-} server_edhoc_message_1_request_data_t;
+  edhoc_server_common_request_data_t base_data;
+} edhoc_server_message_1_request_data_t;
 
 /**
  * @brief Input data required to process EDHOC Message 3.
  */
 typedef struct {
   /** Common session/context/response/request metadata. */
-  server_edhoc_common_request_data_t base_data;
+  edhoc_server_common_request_data_t base_data;
 
   /** Pre-extracted Message 3 fields (including inner EDHOC message). */
   struct edhoc_extracted_fields* message_3_extracted_fields;
-} server_edhoc_message_3_request_data_t;
+} edhoc_server_message_3_request_data_t;
+
+typedef enum edhoc_server_handshake_error {
+  CSH_OK = 0,
+  CSH_ERR_PREFIX_MISSING,
+  CSH_ERR_INVALID_PAYLOAD,
+  CSH_ERR_SESSION_NOT_FOUND,
+} edhoc_server_handshake_error;
+
+/**
+ * @brief Removes the CBOR true prefix from Message 1 payload if present,
+ * adjusting the request_data in-place.
+ * @param[in,out] request_data The Message 1 request data to process.
+ * @return CSH_OK if the prefix was successfully removed, error code otherwise.
+ */
+edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
+    edhoc_server_message_1_request_data_t* request_data);
 
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
- * @param[in] request_data Session/request metadata for Message 1 processing.
+ * @param[in] request_data Session/request metadata for Message 1
+ * processing.
  * @param[out] response_data Response buffer metadata for Message 2.
  * @return CoAP response code for the operation result.
  *
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher from CoAP session app-data. It is used for validation and
- * call-scoped protocol operations only; ownership remains in session app-data.
+ * call-scoped protocol operations only; ownership remains in session
+ * app-data.
  *
  * @warning Allocates EDHOC context with calloc() and registers as session
- * app-data with free() as destructor. Before process exit, caller must clean
- * the CoAP session/context resources associated with this handshake; use
- * session_resources_t + tfg_common_cleanup_resources() for centralized
+ * app-data with free() as destructor. Before process exit, caller must
+ * clean the CoAP session/context resources associated with this handshake;
+ * use session_resources_t + tfg_common_cleanup_resources() for centralized
  * teardown.
  */
-coap_pdu_code_t server_edhoc_handle_message_1(
-    const server_edhoc_message_1_request_data_t* request_data,
+coap_pdu_code_t edhoc_server_handle_message_1(
+    const edhoc_server_message_1_request_data_t* request_data,
     coap_response_data_t* response_data);
 
 /**
@@ -80,8 +98,8 @@ coap_pdu_code_t server_edhoc_handle_message_1(
  * resources associated with this handshake; use session_resources_t +
  * tfg_common_cleanup_resources() for centralized teardown.
  */
-coap_pdu_code_t server_edhoc_handle_message_3(
-    const server_edhoc_message_3_request_data_t* request_data,
+coap_pdu_code_t edhoc_server_handle_message_3(
+    const edhoc_server_message_3_request_data_t* request_data,
     coap_response_data_t* response_data);
 
-#endif // EDHOC_SERVER_HANDSHAKE_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_H_

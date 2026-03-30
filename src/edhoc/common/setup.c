@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int edhoc_setup_context(struct edhoc_context* context,
+int edhoc_common_setup_context(struct edhoc_context* context,
                         const struct edhoc_credentials* credentials) {
   psa_status_t psa_status = psa_crypto_init();
   if (psa_status != PSA_SUCCESS) {
@@ -75,7 +75,7 @@ int edhoc_setup_context(struct edhoc_context* context,
   return ret;
 }
 
-void edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
+void edhoc_common_initialize_credential_key(struct edhoc_auth_creds* credentials,
                                const uint8_t* public_key,
                                size_t public_key_length,
                                int32_t key_id_integer) {

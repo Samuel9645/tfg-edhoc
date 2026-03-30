@@ -14,7 +14,7 @@ typedef struct {
   session_resources_t session_resources;
 
   /** Client EDHOC handshake state owned by the caller. */
-  client_edhoc_handshake_t handshake;
+  edhoc_client_handshake_t handshake;
 
   /** Exchange state owned by the caller. */
   coap_client_exchange_t exchange;
@@ -29,7 +29,7 @@ typedef struct {
  * @note Preferred single cleanup entry point for client handshake/exchange state.
  *
  * @warning When using this function, avoid manual calls to
- * client_edhoc_handshake_deinit() for the same resources in the same control path.
+ * edhoc_client_handshake_deinit() for the same resources in the same control path.
  */
 void coap_client_cleanup_resources(coap_client_session_resources_t* resources);
 

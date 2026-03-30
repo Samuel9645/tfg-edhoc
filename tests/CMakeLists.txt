@@ -12,7 +12,7 @@ set(CORE_SOURCES
 set(COAP_SERVER_SOURCES
     ${CMAKE_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_SOURCE_DIR}/src/coap/server/dispatch.c
-    ${CMAKE_SOURCE_DIR}/src/coap/server/internal/edhoc_dispatch_engine.c
+    ${CMAKE_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_SOURCE_DIR}/src/coap/server/map_error_to_response.c
 )
 
@@ -23,7 +23,7 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/e
 # 3. List only the file paths for your tests (relative to tests/ folder)
 set(MY_TEST_FILES
     "src/coap/server/dispatch/test_dispatch.c"
-    "src/core/test_handshake.c"
+    "src/core/test_integration.c"
 )
 
 # 4. The Loop to automate target creation
@@ -80,7 +80,7 @@ foreach(test_rel_path ${MY_TEST_FILES})
 endforeach()
 
 
-target_compile_definitions(test_handshake PRIVATE 
+target_compile_definitions(test_integration PRIVATE 
     SERVER_PATH="$<TARGET_FILE:server>"
     CLIENT_PATH="$<TARGET_FILE:client>"
 )

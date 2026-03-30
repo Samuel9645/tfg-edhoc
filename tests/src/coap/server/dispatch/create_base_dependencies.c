@@ -1,7 +1,7 @@
 #include "coap/server/dispatch/create_base_dependencies.h"
 
-coap_server_edhoc_dispatch_deps_t create_base_dependencies(void) {
-  return (coap_server_edhoc_dispatch_deps_t){
+coap_server_dispatch_deps_t create_base_dependencies(void) {
+  return (coap_server_dispatch_deps_t){
       .extract_payload_if_valid_edhoc_request = successful_extract_payload_stub,
       .add_edhoc_response_options = successful_add_response_options_stub,
       .is_message_1 = is_message_1_stub,

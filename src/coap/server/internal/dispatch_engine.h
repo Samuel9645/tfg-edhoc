@@ -1,5 +1,5 @@
-#ifndef COAP_SERVER_INTERNAL_EDHOC_DISPATCH_ENGINE_H_
-#define COAP_SERVER_INTERNAL_EDHOC_DISPATCH_ENGINE_H_
+#ifndef COAP_SERVER_INTERNAL_dispatch_engine_H_
+#define COAP_SERVER_INTERNAL_dispatch_engine_H_
 
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
@@ -21,9 +21,9 @@
  * @note Each function pointer may be NULL if not used by a particular test
  * scenario, but all pointers must be non-NULL when passed to the dispatcher.
  *
- * @see coap_server_dispatch_edhoc_post_with_dependencies for usage.
+ * @see coap_server_dispatch_post_with_dependencies for usage.
  */
-typedef struct coap_server_edhoc_dispatch_deps_t {
+typedef struct coap_server_dispatch_deps_t {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
   coap_status_result_t (*extract_payload_if_valid_edhoc_request)(
       const coap_pdu_t* request, content_format_edhoc_values_t expected_format,
@@ -46,12 +46,12 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   coap_pdu_code_t (*handle_message_1)(
-      const server_edhoc_message_1_request_data_t* request_data,
+      const edhoc_server_message_1_request_data_t* request_data,
       coap_response_data_t* response_data);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
   coap_pdu_code_t (*handle_message_3)(
-      const server_edhoc_message_3_request_data_t* request_data,
+      const edhoc_server_message_3_request_data_t* request_data,
       coap_response_data_t* response_data);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
@@ -61,7 +61,7 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);
-} coap_server_edhoc_dispatch_deps_t;
+} coap_server_dispatch_deps_t;
 
 /**
  * @brief Dispatch incoming EDHOC-over-CoAP POST request with injected
@@ -89,8 +89,8 @@ typedef struct coap_server_edhoc_dispatch_deps_t {
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * for protocol details on Message 1 and Message 3 handling.
  */
-void coap_server_dispatch_edhoc_post_with_dependencies(
+void coap_server_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
-    const coap_server_edhoc_dispatch_deps_t* deps);
+    const coap_server_dispatch_deps_t* deps);
 
-#endif  // COAP_SERVER_INTERNAL_EDHOC_DISPATCH_ENGINE_H_
+#endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

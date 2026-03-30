@@ -11,7 +11,7 @@
  * callbacks
  * @return EDHOC_SUCCESS on success, error code otherwise
  */
-int edhoc_setup_context(struct edhoc_context* context,
+int edhoc_common_setup_context(struct edhoc_context* context,
                         const struct edhoc_credentials* credentials);
 
 /**
@@ -21,7 +21,7 @@ int edhoc_setup_context(struct edhoc_context* context,
  * @param[in] public_key_length Length of public key
  * @param[in] key_id_integer Key identifier as integer
  */
-void edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
+void edhoc_common_initialize_credential_key(struct edhoc_auth_creds* credentials,
                                      const uint8_t* public_key,
                                      size_t public_key_length,
                                      int32_t key_id_integer);

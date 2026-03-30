@@ -28,7 +28,7 @@ set(SERVER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/map_error_to_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/edhoc_dispatch_engine.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
     ${BASE_SOURCES}
 )

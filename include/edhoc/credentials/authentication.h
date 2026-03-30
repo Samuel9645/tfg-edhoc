@@ -27,7 +27,7 @@
  * @param[in] own_key_id Own key identifier as integer
  * @return EDHOC_SUCCESS on success, error code otherwise
  */
-int edhoc_credential_fetch(void* user_context, struct edhoc_auth_creds* credentials,
+int edhoc_credentials_fetch(void* user_context, struct edhoc_auth_creds* credentials,
                      const uint8_t* own_public_key,
                      size_t own_public_key_length,
                      const uint8_t* own_private_key,
@@ -45,7 +45,7 @@ int edhoc_credential_fetch(void* user_context, struct edhoc_auth_creds* credenti
  * @return EDHOC_SUCCESS on success, error code otherwise
  *
  */
-int edhoc_credential_verify(void* user_context, struct edhoc_auth_creds* credentials,
+int edhoc_credentials_verify(void* user_context, struct edhoc_auth_creds* credentials,
                       int32_t expected_key_id, const uint8_t* peer_public_key,
                       size_t peer_public_key_length,
                       const uint8_t** public_key_reference,

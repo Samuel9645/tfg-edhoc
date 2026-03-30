@@ -9,40 +9,40 @@
 /**
  * @brief EDHOC client handshake state.
  */
-typedef struct client_edhoc_handshake_t {
+typedef struct edhoc_client_handshake_t {
   /** Internal EDHOC protocol context used across message 1-4 operations. */
   struct edhoc_context context;
 
   /** Tracks whether context setup completed successfully. */
   bool initialized;
-} client_edhoc_handshake_t;
+} edhoc_client_handshake_t;
 
 /**
  * @brief Result codes for EDHOC client handshake operations.
  */
 typedef enum {
-  CLIENT_EDHOC_HANDSHAKE_SUCCESS = 0,
-  CLIENT_EDHOC_HANDSHAKE_INVALID_ARGUMENT,
-  CLIENT_EDHOC_HANDSHAKE_MEMORY_ALLOCATION_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_CONTEXT_SETUP_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_MESSAGE_1_COMPOSE_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_MESSAGE_2_PROCESS_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_CONNECTION_ID_PREPEND_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_MESSAGE_3_COMPOSE_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_PREPEND_RECALCULATION_FAILED,
-  CLIENT_EDHOC_HANDSHAKE_MESSAGE_4_PROCESS_FAILED,
-} client_edhoc_handshake_status_t;
+  EDHOC_CLIENT_HANDSHAKE_SUCCESS = 0,
+  EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT,
+  EDHOC_CLIENT_HANDSHAKE_MEMORY_ALLOCATION_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_CONTEXT_SETUP_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_COMPOSE_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_PROCESS_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_CONNECTION_ID_PREPEND_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_COMPOSE_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_PREPEND_RECALCULATION_FAILED,
+  EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_PROCESS_FAILED,
+} edhoc_client_handshake_status_t;
 
 /**
  * @brief Initialize EDHOC client handshake context.
  *
  * @param[in,out] handshake Caller-owned handshake state.
- * @return CLIENT_EDHOC_HANDSHAKE_SUCCESS on success, error code otherwise.
+ * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  *
  * @note This function does not allocate memory. The caller owns handshake storage
  * and must keep it alive for all handshake operations.
  */
-client_edhoc_handshake_status_t client_edhoc_handshake_init(client_edhoc_handshake_t* handshake);
+edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handshake_t* handshake);
 
 /**
  * @brief Compose EDHOC Message 1 including CBOR marker.
@@ -51,10 +51,10 @@ client_edhoc_handshake_status_t client_edhoc_handshake_init(client_edhoc_handsha
  * @param[in] payload_capacity Capacity of payload buffer.
  * @param[out] payload Output payload buffer.
  * @param[out] payload_len Number of bytes written.
- * @return CLIENT_EDHOC_HANDSHAKE_SUCCESS on success, error code otherwise.
+ * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
-client_edhoc_handshake_status_t client_edhoc_handshake_compose_message_1(
-    client_edhoc_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
+edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
+    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
     size_t* payload_len);
 
 /**
@@ -63,10 +63,10 @@ client_edhoc_handshake_status_t client_edhoc_handshake_compose_message_1(
  * @param[in] handshake Initialized handshake.
  * @param[in] payload Message payload.
  * @param[in] payload_len Payload length.
- * @return CLIENT_EDHOC_HANDSHAKE_SUCCESS on success, error code otherwise.
+ * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
-client_edhoc_handshake_status_t client_edhoc_handshake_process_message_2(
-    client_edhoc_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
+edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
+    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
 
 /**
  * @brief Compose EDHOC Message 3 with prepended connection ID.
@@ -75,10 +75,10 @@ client_edhoc_handshake_status_t client_edhoc_handshake_process_message_2(
  * @param[in] payload_capacity Capacity of payload buffer.
  * @param[out] payload Output payload buffer.
  * @param[out] payload_len Number of bytes written.
- * @return CLIENT_EDHOC_HANDSHAKE_SUCCESS on success, error code otherwise.
+ * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
-client_edhoc_handshake_status_t client_edhoc_handshake_compose_message_3(
-    client_edhoc_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
+edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
+    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
     size_t* payload_len);
 
 /**
@@ -87,10 +87,10 @@ client_edhoc_handshake_status_t client_edhoc_handshake_compose_message_3(
  * @param[in] handshake Initialized handshake.
  * @param[in] payload Message payload.
  * @param[in] payload_len Payload length.
- * @return CLIENT_EDHOC_HANDSHAKE_SUCCESS on success, error code otherwise.
+ * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
-client_edhoc_handshake_status_t client_edhoc_handshake_process_message_4(
-    client_edhoc_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
+edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
+    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
 
 /**
  * @brief Destroy EDHOC client handshake context.
@@ -101,6 +101,6 @@ client_edhoc_handshake_status_t client_edhoc_handshake_process_message_4(
  * calling coap_client_cleanup_resources() instead of invoking this function
  * directly.
  */
-void client_edhoc_handshake_deinit(client_edhoc_handshake_t* handshake);
+void edhoc_client_handshake_deinit(edhoc_client_handshake_t* handshake);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_H_

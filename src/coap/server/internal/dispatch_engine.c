@@ -1,22 +1,11 @@
-#include "edhoc_dispatch_engine.h"
+#include "dispatch_engine.h"
 
 #include "coap/coap_config.h"
 #include "edhoc/edhoc_config.h"
 
-static inline coap_status_result_t remove_cbor_true_prefix(
-    server_edhoc_message_1_request_data_t* request_data) {
-  if (!request_data || !request_data->base_data.request_data.payload ||
-      request_data->base_data.request_data.payload_len == 0) {
-    return COAP_STATUS_ERROR;
-  }
-  request_data->base_data.request_data.payload += 1;
-  request_data->base_data.request_data.payload_len -= 1;
-  return COAP_STATUS_SUCCESS;
-}
-
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
-    const coap_pdu_t* response, const coap_server_edhoc_dispatch_deps_t* deps) {
+    const coap_pdu_t* response, const coap_server_dispatch_deps_t* deps) {
   return !session || !request || !response || !deps ||
          !deps->extract_payload_if_valid_edhoc_request ||
          !deps->add_edhoc_response_options || !deps->is_message_1 ||
@@ -25,9 +14,9 @@ static inline bool coap_server_dispatch_has_invalid_deps_or_args(
          !deps->get_session_app_data;
 }
 
-void coap_server_dispatch_edhoc_post_with_dependencies(
+void coap_server_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
-    const coap_server_edhoc_dispatch_deps_t* deps) {
+    const coap_server_dispatch_deps_t* deps) {
   if (coap_server_dispatch_has_invalid_deps_or_args(session, request, response,
                                                     deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
@@ -76,7 +65,7 @@ void coap_server_dispatch_edhoc_post_with_dependencies(
       return;
     }
 
-    server_edhoc_message_1_request_data_t request_data = {
+    edhoc_server_message_1_request_data_t request_data = {
         .base_data =
             {
                 .session = session,
@@ -90,7 +79,14 @@ void coap_server_dispatch_edhoc_post_with_dependencies(
             },
     };
 
-    remove_cbor_true_prefix(&request_data);
+    // TODO: Add checks for this
+    if (edhoc_server_remove_cbor_true_prefix(&request_data) != CSH_OK) {
+      coap_log_crit(
+          "THIS SHOULD NEVER HAPPEN: Message 1 payload missing expected CBOR "
+          "true prefix\n");
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+      return;
+    }
     response_code = deps->handle_message_1(&request_data, &response_data);
   } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,
                                 &message_3_extracted_fields)) {
@@ -100,7 +96,7 @@ void coap_server_dispatch_edhoc_post_with_dependencies(
       return;
     }
 
-    server_edhoc_message_3_request_data_t request_data = {
+    edhoc_server_message_3_request_data_t request_data = {
         .base_data =
             {
                 .session = session,

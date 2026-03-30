@@ -1,3 +1,15 @@
+/**
+ * @file test_integration.c
+ *
+ * @brief Simple integration test for the standalone EDHOC client and server
+ * binaries.
+ *
+ * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
+ *
+ * @see [Helper Unity
+ * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
+ */
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

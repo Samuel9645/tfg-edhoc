@@ -64,13 +64,14 @@ void test_server_responds_with_internal_error_on_server_side_failure(void) {
                     coap_pdu_get_code(dummy_response));
 }
 
-void test_server_responds_with_internal_error_if_context_already_exists(void) {
+void test_server_responds_with_bad_request_if_context_already_exists_for_message_1(
+    void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
                                               dummy_response, &deps);
-  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
@@ -109,7 +110,7 @@ void test_server_sends_changed_response_for_valid_message_3(void) {
                     coap_pdu_get_code(dummy_response));
 }
 
-void test_server_responds_with_internal_error_for_unrecognized_message_format(
+void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
@@ -118,6 +119,6 @@ void test_server_responds_with_internal_error_for_unrecognized_message_format(
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
                                               dummy_response, &deps);
-  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }

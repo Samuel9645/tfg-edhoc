@@ -108,10 +108,18 @@ coap_pdu_code_t edhoc_server_handle_message_1(
                                               response_data)) {
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }
+  edhoc_server_message_1_request_data_t no_prefix_request =
+      *message_1_request_data;
+  if (edhoc_server_remove_cbor_true_prefix(&no_prefix_request) != CSH_OK) {
+    coap_log_crit(
+        "Protocol Violation: Message 1 payload missing expected CBOR "
+        "true prefix\n");
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  }
 
   struct edhoc_context* edhoc_context = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_context) {
-    coap_log_err("cannot allocate memory for EDHOC context\n");
+    coap_log_err("OS Error: Cannot allocate memory for EDHOC context\n");
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 
@@ -120,27 +128,25 @@ coap_pdu_code_t edhoc_server_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     coap_pdu_code_t response_code = coap_server_map_edhoc_failure_to_response(
         edhoc_context, "setup EDHOC context", COAP_SERVER_EDHOC_INTERNAL_ERROR,
-        edhoc_api_result, message_1_request_data->base_data.response,
-        response_data);
+        edhoc_api_result, no_prefix_request.base_data.response, response_data);
     free(edhoc_context);
     return response_code;
   }
 
-  if (coap_session_set_app_data2(message_1_request_data->base_data.session,
+  if (coap_session_set_app_data2(no_prefix_request.base_data.session,
                                  edhoc_context, free) != NULL) {
-    coap_log_err("app data for session already set\n");
+    coap_log_err("Internal Error: app data for session already set\n");
     free(edhoc_context);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 
   edhoc_api_result = edhoc_message_1_process(
-      edhoc_context, message_1_request_data->base_data.request_data.payload,
-      message_1_request_data->base_data.request_data.payload_len);
+      edhoc_context, no_prefix_request.base_data.request_data.payload,
+      no_prefix_request.base_data.request_data.payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     return coap_server_map_edhoc_failure_to_response(
         edhoc_context, "process Message 1", COAP_SERVER_EDHOC_PROTOCOL_ERROR,
-        edhoc_api_result, message_1_request_data->base_data.response,
-        response_data);
+        edhoc_api_result, no_prefix_request.base_data.response, response_data);
   }
 
   edhoc_api_result = edhoc_message_2_compose(
@@ -149,8 +155,7 @@ coap_pdu_code_t edhoc_server_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     return coap_server_map_edhoc_failure_to_response(
         edhoc_context, "compose Message 2", COAP_SERVER_EDHOC_INTERNAL_ERROR,
-        edhoc_api_result, message_1_request_data->base_data.response,
-        response_data);
+        edhoc_api_result, no_prefix_request.base_data.response, response_data);
   }
 
   return COAP_RESPONSE_CODE_CHANGED;

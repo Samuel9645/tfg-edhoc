@@ -61,7 +61,7 @@ void coap_server_dispatch_post_with_dependencies(
   if (deps->is_message_1(request_payload, request_len)) {
     if (edhoc_ctx != NULL) {
       coap_log_err("EDHOC context already exists for this session\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
       return;
     }
 
@@ -79,14 +79,6 @@ void coap_server_dispatch_post_with_dependencies(
             },
     };
 
-    // TODO: Add checks for this
-    if (edhoc_server_remove_cbor_true_prefix(&request_data) != CSH_OK) {
-      coap_log_crit(
-          "THIS SHOULD NEVER HAPPEN: Message 1 payload missing expected CBOR "
-          "true prefix\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
-      return;
-    }
     response_code = deps->handle_message_1(&request_data, &response_data);
   } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,
                                 &message_3_extracted_fields)) {
@@ -113,7 +105,7 @@ void coap_server_dispatch_post_with_dependencies(
     response_code = deps->handle_message_3(&request_data, &response_data);
   } else {
     coap_log_err("received invalid or unexpected EDHOC message\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
     return;
   }
 

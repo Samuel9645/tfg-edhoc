@@ -65,19 +65,14 @@ void coap_server_dispatch_post_with_dependencies(
       return;
     }
 
-    edhoc_server_message_1_request_data_t request_data = {
-        .base_data =
-            {
-                .session = session,
-                .edhoc_ctx = edhoc_ctx,
-                .response = response,
-                .request_data =
-                    {
-                        .payload = request_payload,
-                        .payload_len = request_len,
-                    },
-            },
-    };
+    edhoc_server_common_request_data_t request_data = {
+        .session = session,
+        .edhoc_ctx = edhoc_ctx,
+        .response = response,
+        .request_data = {
+            .payload = request_payload,
+            .payload_len = request_len,
+        }};
 
     response_code = deps->handle_message_1(&request_data, &response_data);
   } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,

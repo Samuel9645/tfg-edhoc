@@ -14,6 +14,7 @@ typedef enum {
   COAP_SERVER_EDHOC_INTERNAL_ERROR,
 } coap_server_edhoc_failure_type_t;
 
+// TODO: introduce structs to avoid too many parameters in this function
 /**
  * @brief Map EDHOC failure to CoAP response code and compose error message.
  *
@@ -43,4 +44,4 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
     coap_pdu_t* response, coap_response_data_t* response_data);
 
-#endif // COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
+#endif  // COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_

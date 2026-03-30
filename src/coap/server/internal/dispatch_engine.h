@@ -46,7 +46,7 @@ typedef struct coap_server_dispatch_deps_t {
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   coap_pdu_code_t (*handle_message_1)(
-      const edhoc_server_message_1_request_data_t* request_data,
+      const edhoc_server_common_request_data_t* request_data,
       coap_response_data_t* response_data);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */

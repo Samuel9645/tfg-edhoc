@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 enum {
+  CBOR_TRUE = 0xF5,
   // Cryptographic constants
   NONCE_LENGTH_BYTES = 13,
   AES_CCM_TAG_LENGTH = 16,

@@ -24,6 +24,7 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/e
 set(MY_TEST_FILES
     "src/coap/server/dispatch/test_dispatch.c"
     "src/core/test_integration.c"
+    "src/edhoc/server/test_handshake.c"
 )
 
 # 4. The Loop to automate target creation

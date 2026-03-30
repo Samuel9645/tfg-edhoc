@@ -59,7 +59,7 @@ bool is_not_message_1_stub(const uint8_t* payload, size_t payload_len) {
 }
 
 coap_pdu_code_t successful_handle_message_1_stub(
-    const edhoc_server_message_1_request_data_t* request_data,
+    const edhoc_server_common_request_data_t* request_data,
     coap_response_data_t* response_data) {
   (void)request_data;
   (void)response_data;
@@ -67,7 +67,7 @@ coap_pdu_code_t successful_handle_message_1_stub(
 }
 
 coap_pdu_code_t failed_handle_message_1_stub(
-    const edhoc_server_message_1_request_data_t* request_data,
+    const edhoc_server_common_request_data_t* request_data,
     coap_response_data_t* response_data) {
   (void)request_data;
   (void)response_data;

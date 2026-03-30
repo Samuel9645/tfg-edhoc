@@ -26,14 +26,6 @@ typedef struct {
 } edhoc_server_common_request_data_t;
 
 /**
- * @brief Input data required to process EDHOC Message 1.
- */
-typedef struct {
-  /** Common session/context/response/request metadata. */
-  edhoc_server_common_request_data_t base_data;
-} edhoc_server_message_1_request_data_t;
-
-/**
  * @brief Input data required to process EDHOC Message 3.
  */
 typedef struct {
@@ -52,13 +44,15 @@ typedef enum edhoc_server_handshake_error {
 } edhoc_server_handshake_error;
 
 /**
- * @brief Removes the CBOR true prefix from Message 1 payload if present,
- * adjusting the request_data in-place.
- * @param[in,out] request_data The Message 1 request data to process.
- * @return CSH_OK if the prefix was successfully removed, error code otherwise.
+ * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
+ * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
+ * success.
+ * @param[in,out] length Pointer to the buffer length; decremented by 1 on
+ * success.
+ * @return CSH_OK if prefix was removed, or a CSH_ERR code if invalid/missing.
  */
 edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
-    edhoc_server_message_1_request_data_t* request_data);
+    const uint8_t** payload, size_t* length);
 
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
@@ -80,7 +74,7 @@ edhoc_server_handshake_error edhoc_server_remove_cbor_true_prefix(
  * teardown.
  */
 coap_pdu_code_t edhoc_server_handle_message_1(
-    const edhoc_server_message_1_request_data_t* request_data,
+    const edhoc_server_common_request_data_t* request_data,
     coap_response_data_t* response_data);
 
 /**

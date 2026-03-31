@@ -46,7 +46,7 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>.
  */
 coap_status_result_t coap_common_resolve_address(
-    coap_str_const_t* host, uint16_t port, int scheme_hint_bits,
+    const coap_str_const_t* host, uint16_t port, int scheme_hint_bits,
     coap_address_t* destination_address);
 
 /**

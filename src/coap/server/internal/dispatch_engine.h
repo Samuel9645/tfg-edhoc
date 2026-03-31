@@ -70,25 +70,6 @@ typedef struct coap_server_dispatch_deps_t {
 } coap_server_dispatch_deps_t;
 
 /**
- * @brief Validate all required dependency function pointers are non-NULL.
- *
- * @param[in] deps Dispatch dependencies structure.
- * @return true if all function pointers are present, false if any are NULL.
- */
-static inline bool coap_server_dispatch_deps_are_valid(
-    const coap_server_dispatch_deps_t* deps) {
-  return (deps != NULL) &&
-         (deps->extract_payload_if_valid_edhoc_request != NULL) &&
-         (deps->add_edhoc_response_options != NULL) &&
-         (deps->is_message_1 != NULL) &&
-         (deps->process_message_1_result != NULL) &&
-         (deps->extract_fields_if_message_3 != NULL) &&
-         (deps->handle_message_1 != NULL) && (deps->handle_message_3 != NULL) &&
-         (deps->add_response_payload != NULL) &&
-         (deps->get_session_app_data != NULL);
-}
-
-/**
  * @brief Dispatch incoming EDHOC-over-CoAP POST request with injected
  * dependencies.
  *

@@ -18,12 +18,13 @@ static bool client_response_has_edhoc_content_format(
     return false;
   }
 
-  uint16_t content_format =
+  const uint16_t content_format =
       coap_decode_var_bytes(coap_opt_value(content_format_option),
                             coap_opt_length(content_format_option));
   return content_format == APPLICATION_EDHOC_CBOR_SEQ;
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static coap_response_t coap_client_response_handler(coap_session_t* session,
                                                     const coap_pdu_t* sent,
                                                     const coap_pdu_t* received,
@@ -31,8 +32,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   (void)sent;
   (void)id;
 
-  coap_client_exchange_t* exchange =
-      (coap_client_exchange_t*)coap_session_get_app_data(session);
+  coap_client_exchange_t* exchange = coap_session_get_app_data(session);
   if (!exchange) {
     coap_log_err("missing client exchange state in response handler\n");
     return COAP_RESPONSE_FAIL;
@@ -41,7 +41,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   exchange->have_response = true;
   exchange->incoming_message_length = 0;
 
-  coap_pdu_code_t response_code = coap_pdu_get_code(received);
+  const coap_pdu_code_t response_code = coap_pdu_get_code(received);
   exchange->last_response_code = response_code;
   if (response_code == COAP_EMPTY_CODE) {
     coap_log_info("received empty response\n");
@@ -156,7 +156,7 @@ coap_status_result_t coap_client_exchange_wait_and_get(
     return CCOM_ERROR;
   }
 
-  bool is_error_response =
+  const bool is_error_response =
       !coap_response_indicates_success(exchange->last_response_code);
 
   memcpy(response_data->payload, exchange->incoming_message,

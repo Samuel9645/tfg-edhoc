@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/helpers.h"
 #include "coap/common/status.h"
 
 coap_context_t* coap_server_create_context(void) {
@@ -38,10 +37,10 @@ coap_status_result_t coap_server_setup_endpoints(
   coap_addr_info_t* endpoint_info_list = coap_resolve_address_info(
       listen_address, USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA,
       USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA, NO_AI_HINT_FLAGS,
-      scheme_hints_bits, COAP_RESOLVE_TYPE_LOCAL);
+      (int)scheme_hints_bits, COAP_RESOLVE_TYPE_LOCAL);
 
   bool has_endpoint = false;
-  for (coap_addr_info_t* endpoint_info = endpoint_info_list;
+  for (const coap_addr_info_t* endpoint_info = endpoint_info_list;
        endpoint_info != NULL; endpoint_info = endpoint_info->next) {
     coap_endpoint_t* endpoint = coap_new_endpoint(
         coap_context, &endpoint_info->addr, endpoint_info->proto);
@@ -81,7 +80,7 @@ coap_status_result_t coap_server_join_multicast_group(
 
 coap_status_result_t coap_server_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
-    coap_method_handler_t resource_handler) {
+    const coap_method_handler_t resource_handler) {
   if (!coap_context || !resource_path || !resource_handler) {
     return CCOM_ERROR;
   }

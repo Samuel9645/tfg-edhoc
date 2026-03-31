@@ -3,14 +3,12 @@
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 // TODO: remove this include once the refactor is done
 #include "coap/server/edhoc_mapper.h"
 #include "edhoc/common/setup.h"
-#include "edhoc/server/handle_libedhoc_errors.h"
 
-static inline bool edhoc_server_message_3_has_invalid_args(
+static bool edhoc_server_message_3_has_invalid_args(
     const edhoc_server_message_3_request_data_t* request_data,
     const common_response_buffer_t* response_data) {
   if (!request_data ||

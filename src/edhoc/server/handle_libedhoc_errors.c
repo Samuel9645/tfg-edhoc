@@ -36,8 +36,8 @@ static void prepare_generic_error_info(char* error_message,
  * @param[out] error_info The struct to populate
  */
 static void prepare_wrong_cipher_suite_error_info(
-    struct edhoc_context* context, int32_t* own_suites_buf,
-    size_t own_suites_capacity, struct edhoc_error_info* error_info) {
+    const struct edhoc_context* context, int32_t* own_suites_buf,
+    const size_t own_suites_capacity, struct edhoc_error_info* error_info) {
   memset(error_info, 0, sizeof(struct edhoc_error_info));
   // TODO: maybe log the peer suites as well for debugging
   int32_t peer_suites[EDSH_CIPHER_SUITES_ARRAY_SIZE] = {0};
@@ -51,7 +51,7 @@ static void prepare_wrong_cipher_suite_error_info(
 }
 
 void server_edhoc_add_edhoc_error_to_response(
-    int edhoc_api_result, struct edhoc_context* edhoc_ctx,
+    const int edhoc_api_result, struct edhoc_context* edhoc_ctx,
     common_response_buffer_t* response_data) {
   size_t error_payload_len = 0;
   struct edhoc_error_info error_info = {0};

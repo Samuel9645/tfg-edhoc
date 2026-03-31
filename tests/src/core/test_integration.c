@@ -21,7 +21,7 @@
 // TODO: Maybe use another technique to test this instead of cmake
 
 void test_standalone_binaries_handshake(void) {
-  pid_t server_pid = fork();
+  const pid_t server_pid = fork();
 
   if (server_pid == 0) {
     // --- CHILD: Use the absolute path provided by CMake ---
@@ -36,7 +36,7 @@ void test_standalone_binaries_handshake(void) {
     char client_cmd[512];
     snprintf(client_cmd, sizeof(client_cmd), "%s", CLIENT_PATH);
 
-    int client_status = system(client_cmd);
+    const int client_status = system(client_cmd);
 
     kill(server_pid, SIGTERM);
     waitpid(server_pid, NULL, 0);

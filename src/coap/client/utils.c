@@ -31,9 +31,9 @@ coap_status_result_t coap_client_parse_and_resolve_coap_uri(
   }
 
   const uint32_t masked_protocol = 1 << parsed_uri->scheme;
-  coap_status_result_t resolve_status =
+  const coap_status_result_t resolve_status =
       coap_common_resolve_address(&parsed_uri->host, parsed_uri->port,
-                                  masked_protocol, destination_address);
+                                  (int)masked_protocol, destination_address);
   if (resolve_status != CCOM_STATUS_SUCCESS) {
     coap_log_warn("cannot resolve address %*.*s\n",
                   (int)parsed_uri->host.length, (int)parsed_uri->host.length,
@@ -45,7 +45,7 @@ coap_status_result_t coap_client_parse_and_resolve_coap_uri(
 
 coap_status_result_t coap_client_create_coap_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_response_handler_t response_handler,
+    const coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session) {
   *coap_session_context = coap_new_context(NULL);
   if (!*coap_session_context) {
@@ -60,7 +60,7 @@ coap_status_result_t coap_client_create_coap_session(
   const coap_proto_t protocol = client_uri->scheme == COAP_URI_SCHEME_COAP_TCP
                                     ? COAP_PROTO_TCP
                                     : COAP_PROTO_UDP;
-  coap_address_t* local_interface_address = NULL;
+  const coap_address_t* local_interface_address = NULL;
   *coap_session =
       coap_new_client_session(*coap_session_context, local_interface_address,
                               destination_address, protocol);
@@ -136,7 +136,7 @@ static inline int add_uri_into_pdu(const coap_uri_t* client_uri,
 coap_pdu_t* coap_client_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_session_t* coap_session,
-    content_format_edhoc_values_t content_format) {
+    const content_format_edhoc_values_t content_format) {
   coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
   if (!request_pdu) {
     coap_log_err("cannot create PDU\n");

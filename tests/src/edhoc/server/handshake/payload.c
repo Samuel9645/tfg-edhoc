@@ -2,7 +2,7 @@
 
 #include "edhoc/common/constants.h"
 
-static test_edsh_payload_t create_payload(uint8_t prefix) {
+static test_edsh_payload_t create_payload(const uint8_t prefix) {
   test_edsh_payload_t payload;
   memset(payload.data, 0, BUFFER_SIZE);
   payload.data[0] = prefix;

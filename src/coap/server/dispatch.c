@@ -12,7 +12,7 @@
 #include "internal/dispatch_engine.h"
 
 static coap_status_result_t add_edhoc_response_options(
-    coap_pdu_t* response, content_format_edhoc_values_t content_format) {
+    coap_pdu_t* response, const content_format_edhoc_values_t content_format) {
   if (!response) {
     coap_log_err("response pdu is null\n");
     return CCOM_ERROR;

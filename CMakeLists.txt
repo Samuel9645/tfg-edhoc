@@ -86,7 +86,7 @@ set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
-set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" ${MEMORY_CHECK_FLAGS})
+set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" "-Werror" ${MEMORY_CHECK_FLAGS})
 
 target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS}) 
 target_compile_options(client PRIVATE ${CUSTOM_COMPILE_FLAGS})

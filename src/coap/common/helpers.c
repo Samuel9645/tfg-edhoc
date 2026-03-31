@@ -18,12 +18,11 @@
 #include "coap/common/helpers.h"
 
 coap_status_result_t coap_common_resolve_address(
-    coap_str_const_t* host, uint16_t port, int scheme_hint_bits,
-    coap_address_t* destination_address) {
+    const coap_str_const_t* host, const uint16_t port,
+    const int scheme_hint_bits, coap_address_t* destination_address) {
   coap_status_result_t result = CCOM_ERROR;
-  coap_addr_info_t* addr_info;
 
-  addr_info =
+  coap_addr_info_t* addr_info =
       coap_resolve_address_info(host, port, port, port, port, AF_UNSPEC,
                                 scheme_hint_bits, COAP_RESOLVE_TYPE_REMOTE);
   if (addr_info) {
@@ -36,7 +35,7 @@ coap_status_result_t coap_common_resolve_address(
 }
 
 coap_optlist_t* coap_common_create_coap_edhoc_optlist(
-    content_format_edhoc_values_t content_format) {
+    const content_format_edhoc_values_t content_format) {
   enum { CREATE_PORT_HOST_OPTION = 1 };
   coap_optlist_t* optlist = NULL;
   enum { ENCODE_BUFFER_SIZE = 4 };

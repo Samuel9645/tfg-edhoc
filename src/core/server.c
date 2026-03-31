@@ -7,6 +7,7 @@
 #include "common/cleanup.h"
 #include "edhoc/credentials/server_credentials.h"
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void edhoc_post_handler(coap_resource_t* resource,
                                coap_session_t* session,
                                const coap_pdu_t* request,

@@ -32,7 +32,7 @@ int edhoc_common_setup_context(struct edhoc_context* context,
 }
 
 int edhoc_message_1_process(struct edhoc_context* context,
-                            const uint8_t* message, size_t length) {
+                            const uint8_t* message, const size_t length) {
   (void)context;
   (void)message;
   (void)length;
@@ -40,7 +40,7 @@ int edhoc_message_1_process(struct edhoc_context* context,
 }
 
 int edhoc_message_2_compose(struct edhoc_context* context,
-                            uint8_t* response_buffer, size_t capacity,
+                            uint8_t* response_buffer, const size_t capacity,
                             size_t* length) {
   (void)context;
   (void)response_buffer;
@@ -53,7 +53,7 @@ const uint8_t MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE, 0xEF};
 const size_t MOCK_ERROR_LEN = sizeof(MOCK_ERROR_PAYLOAD);
 
 void server_edhoc_add_edhoc_error_to_response(
-    int edhoc_api_result, struct edhoc_context* edhoc_ctx,
+    const int edhoc_api_result, struct edhoc_context* edhoc_ctx,
     common_response_buffer_t* response_data) {
   (void)edhoc_api_result;
   (void)edhoc_ctx;

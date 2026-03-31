@@ -11,12 +11,14 @@
 #include <stdbool.h>
 
 static inline bool coap_server_extract_request_payload_args_are_valid(
-    const coap_pdu_t* request, const uint8_t** payload, size_t* payload_len) {
+    const coap_pdu_t* request, const uint8_t** payload,
+    const size_t* payload_len) {
   return (request != NULL) && (payload != NULL) && (payload_len != NULL);
 }
 
 coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(
-    const coap_pdu_t* request, content_format_edhoc_values_t expected_format,
+    const coap_pdu_t* request,
+    const content_format_edhoc_values_t expected_format,
     const uint8_t** payload, size_t* payload_len) {
   if (!coap_server_extract_request_payload_args_are_valid(request, payload,
                                                           payload_len)) {
@@ -32,7 +34,7 @@ coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(
     return CCOM_ERROR;
   }
 
-  uint16_t content_format =
+  const uint16_t content_format =
       coap_decode_var_bytes(coap_opt_value(content_format_option),
                             coap_opt_length(content_format_option));
   if (content_format != expected_format) {

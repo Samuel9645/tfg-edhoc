@@ -12,6 +12,7 @@ static int server_credential_fetch(void* user_context,
                                  ARRAY_SIZE(SERVER_PRIVATE_KEY), SERVER_KID);
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static int server_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,

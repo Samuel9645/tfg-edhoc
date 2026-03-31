@@ -19,6 +19,7 @@ static int client_credential_fetch(void* user_context,
                                  ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
 
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
 static int client_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
@@ -79,7 +80,7 @@ static inline bool edhoc_client_message_payload_is_valid(const uint8_t* payload,
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    edhoc_client_handshake_t* handshake, const size_t payload_capacity,
     uint8_t* payload, size_t* payload_len) {
   const size_t min_prefix_payload_capacity = 2;
   if (!edhoc_client_handshake_is_initialized(handshake) ||
@@ -105,7 +106,7 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
 
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
     edhoc_client_handshake_t* handshake, const uint8_t* payload,
-    size_t payload_len) {
+    const size_t payload_len) {
   if (!edhoc_client_handshake_is_initialized(handshake) ||
       !edhoc_client_message_payload_is_valid(payload, payload_len)) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
@@ -120,7 +121,7 @@ edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    edhoc_client_handshake_t* handshake, const size_t payload_capacity,
     uint8_t* payload, size_t* payload_len) {
   const size_t min_payload_capacity = 1;
   if (!edhoc_client_handshake_is_initialized(handshake) ||
@@ -164,7 +165,7 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
 
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
     edhoc_client_handshake_t* handshake, const uint8_t* payload,
-    size_t payload_len) {
+    const size_t payload_len) {
   if (!edhoc_client_handshake_is_initialized(handshake) ||
       !edhoc_client_message_payload_is_valid(payload, payload_len)) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;

@@ -12,7 +12,8 @@ static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 
 static void setup_valid_message_1_request_data(
     coap_session_t* session, coap_pdu_t* response, const uint8_t* payload,
-    size_t payload_len, edhoc_server_message_1_request_data_t* request_data) {
+    const size_t payload_len,
+    edhoc_server_message_1_request_data_t* request_data) {
   request_data->base_data.session = session;
   request_data->base_data.edhoc_ctx = NULL;
   request_data->base_data.response = response;
@@ -22,7 +23,7 @@ static void setup_valid_message_1_request_data(
 }
 
 static void setup_valid_message_1_response_data(
-    uint8_t* buffer, size_t buffer_capacity,
+    uint8_t* buffer, const size_t buffer_capacity,
     common_response_buffer_t* response_data) {
   response_data->payload = buffer;
   response_data->payload_capacity = buffer_capacity;
@@ -48,7 +49,7 @@ void setup_testing_environment(handshake_test_env_t* env) {
                                       &env->response);
 }
 
-void set_valid_message_1_payload(uint8_t* buffer, size_t buffer_capacity,
+void set_valid_message_1_payload(uint8_t* buffer, const size_t buffer_capacity,
                                  size_t* written_len) {
   TEST_ASSERT_NOT_NULL_MESSAGE(buffer, "Buffer pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(written_len,

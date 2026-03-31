@@ -34,7 +34,7 @@ void setUp(void) {
 // ============================================================================
 
 void test_handle_message_1_success(void) {
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   TEST_ASSERT_EQUAL(CSH_OK, result.status);
@@ -43,16 +43,17 @@ void test_handle_message_1_success(void) {
 }
 
 static void ensure_context_is_freed_on_failure(
-    edhoc_server_message_1_result_t result) {
+    const edhoc_server_message_1_result_t result) {
   TEST_ASSERT_NULL(result.edhoc_ctx);
 }
 
 void test_handle_message_1_fails_when_prefix_missing(void) {
-  test_edsh_payload_t payload_without_prefix = get_invalid_prefix_payload();
+  const test_edsh_payload_t payload_without_prefix =
+      get_invalid_prefix_payload();
   override_test_request_payload(&env, payload_without_prefix.data,
                                 payload_without_prefix.length);
 
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result.status);
@@ -62,7 +63,7 @@ void test_handle_message_1_fails_when_prefix_missing(void) {
 void test_handle_message_1_fails_when_setup_context_fails(void) {
   stub_edhoc_setup_res = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   TEST_ASSERT_EQUAL(CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
@@ -70,8 +71,8 @@ void test_handle_message_1_fails_when_setup_context_fails(void) {
 }
 
 static void assert_m1_failed_with_edhoc_error(
-    handshake_test_env_t* env, edhoc_server_message_1_result_t result,
-    edhoc_server_message_1_status_t expected_status) {
+    handshake_test_env_t* env, const edhoc_server_message_1_result_t result,
+    const edhoc_server_message_1_status_t expected_status) {
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
@@ -86,7 +87,7 @@ void test_handle_message_1_fails_on_m1_processing(void) {
 
   stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
 
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(&env, result,
@@ -99,7 +100,7 @@ void test_handle_message_1_fails_on_m2_composition(void) {
 
   stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(&env, result,

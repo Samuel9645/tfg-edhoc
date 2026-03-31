@@ -24,7 +24,7 @@
 // ============================================================================
 
 void test_is_properly_formatted_message_1_success(void) {
-  test_edsh_payload_t payload_with_prefix = get_valid_message_1_payload();
+  const test_edsh_payload_t payload_with_prefix = get_valid_message_1_payload();
   const uint8_t* payload_ptr = payload_with_prefix.data;
   TEST_ASSERT_TRUE(edhoc_server_is_properly_formatted_message_1(
       payload_with_prefix.data, payload_with_prefix.length));
@@ -32,7 +32,8 @@ void test_is_properly_formatted_message_1_success(void) {
 }
 
 void test_is_properly_formatted_message_1_fails_on_invalid_payload(void) {
-  test_edsh_payload_t payload_without_prefix = get_invalid_prefix_payload();
+  const test_edsh_payload_t payload_without_prefix =
+      get_invalid_prefix_payload();
   const uint8_t* payload_ptr = payload_without_prefix.data;
 
   TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(NULL, 5));
@@ -49,7 +50,7 @@ void test_remove_prefix_success(void) {
   const uint8_t* payload_ptr = payload_with_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_message_1_status_t result =
+  const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_OK, result);
@@ -58,12 +59,13 @@ void test_remove_prefix_success(void) {
 }
 
 void test_remove_prefix_fails_on_missing_prefix(void) {
-  test_edsh_payload_t payload_without_prefix = get_invalid_prefix_payload();
+  const test_edsh_payload_t payload_without_prefix =
+      get_invalid_prefix_payload();
   const size_t original_len = payload_without_prefix.length;
   const uint8_t* payload_ptr = payload_without_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_message_1_status_t result =
+  const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result);
@@ -75,7 +77,7 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   const uint8_t* null_payload_ptr = NULL;
   size_t payload_len = 0;
 
-  edhoc_server_message_1_status_t result =
+  const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
@@ -89,7 +91,7 @@ void test_handle_message_1_fails_on_invalid_data(void) {
   edhoc_server_message_1_request_data_t empty_request = {0};
   common_response_buffer_t empty_response = {0};
 
-  handshake_test_case_t test_cases[] = {
+  const handshake_test_case_t test_cases[] = {
       {"Both arguments NULL", NULL, NULL},
       {"Request is NULL", NULL, &env.response},
       {"Response is NULL", &env.request, NULL},
@@ -97,9 +99,10 @@ void test_handle_message_1_fails_on_invalid_data(void) {
       {"Empty response data", &env.request, &empty_response},
   };
 
-  size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
+  const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    edhoc_server_message_1_result_t result = edhoc_server_handle_message_1(
+    const edhoc_server_message_1_result_t result =
+        edhoc_server_handle_message_1(
         test_cases[i].request, test_cases[i].response);
     reset_test_response(&env.response);
     TEST_ASSERT_EQUAL_MESSAGE(CSH_ERR_INVALID_ARGS, result.status,
@@ -112,10 +115,10 @@ void test_handle_message_1_fails_on_invalid_data(void) {
 void test_handle_message_1_fails_on_too_large_request_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);
-  uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
+  const uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
   override_test_request_payload(&env, large_buffer, sizeof(large_buffer));
 
-  edhoc_server_message_1_result_t result =
+  const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PAYLOAD_TOO_LARGE, result.status);

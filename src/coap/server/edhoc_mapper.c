@@ -4,9 +4,9 @@
 
 coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     struct edhoc_context* edhoc_ctx, const char* operation_label,
-    coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
-    coap_pdu_t* response, common_response_buffer_t* response_data) {
-  coap_pdu_code_t mapped_response_code =
+    const coap_server_edhoc_failure_type_t failure_type,
+    const int edhoc_api_result, coap_pdu_t* response, common_response_buffer_t* response_data) {
+  const coap_pdu_code_t mapped_response_code =
       failure_type == COAP_SERVER_EDHOC_PROTOCOL_ERROR
           ? COAP_RESPONSE_CODE_BAD_REQUEST
           : COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -48,8 +48,8 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
  * @param status EDHOC server handshake status.
  * @return CoAP response code
  */
-static inline coap_pdu_code_t map_message_1_status_to_response(
-    edhoc_server_message_1_status_t status) {
+static coap_pdu_code_t map_message_1_status_to_response(
+    const edhoc_server_message_1_status_t status) {
   switch (status) {
   case CSH_OK:
     return COAP_RESPONSE_CODE_CHANGED;
@@ -63,14 +63,13 @@ static inline coap_pdu_code_t map_message_1_status_to_response(
   case CSH_ERR_CALLOC_FAILED:
   case CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED:
   case CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 }
 
 static inline void log_message_1_failure(
-    edhoc_server_message_1_status_t status) {
+    const edhoc_server_message_1_status_t status) {
   static const char ERROR_PREFIX[] = "Message 1 processing failed: ";
   switch (status) {
   case CSH_ERR_INVALID_ARGS:
@@ -108,7 +107,8 @@ static inline void log_message_1_failure(
 }
 
 coap_pdu_code_t coap_server_process_message_1_result(
-    edhoc_server_message_1_result_t message_1_result, coap_session_t* session) {
+    const edhoc_server_message_1_result_t message_1_result,
+    coap_session_t* session) {
   if (message_1_result.status != CSH_OK) {
     log_message_1_failure(message_1_result.status);
     return map_message_1_status_to_response(message_1_result.status);

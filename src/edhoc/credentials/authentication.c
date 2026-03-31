@@ -7,9 +7,10 @@
 
 int edhoc_credentials_fetch(void* user_context, struct edhoc_auth_creds* credentials,
                      const uint8_t* own_public_key,
-                     size_t own_public_key_length,
-                     const uint8_t* own_private_key,
-                     size_t own_private_key_length, int32_t own_key_id) {
+                            const size_t own_public_key_length,
+                            const uint8_t* own_private_key,
+                            const size_t own_private_key_length,
+                            const int32_t own_key_id) {
   if (credentials == NULL) {
     return EDHOC_ERROR_INVALID_ARGUMENT;
   }
@@ -26,10 +27,12 @@ int edhoc_credentials_fetch(void* user_context, struct edhoc_auth_creds* credent
   return EDHOC_SUCCESS;
 }
 
-int edhoc_credentials_verify(void* user_context, struct edhoc_auth_creds* credentials,
-                      int32_t expected_key_id, const uint8_t* peer_public_key,
-                      size_t peer_public_key_length,
-                      const uint8_t** public_key_reference,
+int edhoc_credentials_verify(const void* user_context,
+                             struct edhoc_auth_creds* credentials,
+                             const int32_t expected_key_id,
+                             const uint8_t* peer_public_key,
+                             const size_t peer_public_key_length,
+                             const uint8_t** public_key_reference,
                       size_t* public_key_length) {
   (void)user_context;
   if (credentials == NULL) {

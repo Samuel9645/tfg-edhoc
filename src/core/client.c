@@ -1,7 +1,6 @@
 #include "core/client.h"
 
 #include <coap3/coap.h>
-#include <stdio.h>
 
 #include "coap/client/cleanup.h"
 #include "coap/client/exchange.h"

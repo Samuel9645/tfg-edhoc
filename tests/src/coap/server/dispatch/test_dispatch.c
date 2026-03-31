@@ -44,6 +44,16 @@ void tearDown(void) {
   coap_cleanup();
 }
 
+void test_server_sends_changed_response_for_valid_message_1(void) {
+  coap_server_dispatch_deps_t deps = create_base_dependencies();
+  deps.get_session_app_data = get_null_session_app_data_stub;
+
+  coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
+                                              dummy_response, &deps);
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
+                    coap_pdu_get_code(dummy_response));
+}
+
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.extract_payload_if_valid_edhoc_request = failed_extract_payload_stub;
@@ -75,13 +85,29 @@ void test_server_responds_with_bad_request_if_context_already_exists_for_message
                     coap_pdu_get_code(dummy_response));
 }
 
-void test_server_sends_changed_response_for_valid_message_1(void) {
+void test_server_responds_with_error_when_message_1_processing_fails(void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.get_session_app_data = get_null_session_app_data_stub;
+  deps.process_message_1_result = failed_process_message_1_stub;
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
                                               dummy_response, &deps);
-  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
+
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
+                    coap_pdu_get_code(dummy_response));
+}
+
+void test_server_responds_with_internal_error_if_adding_response_payload_fails(
+    void) {
+  coap_server_dispatch_deps_t deps = create_base_dependencies();
+  deps.get_session_app_data = get_null_session_app_data_stub;
+  deps.handle_message_1 =
+      successful_handle_message_1_with_valid_payload_length_stub;
+  deps.add_response_payload = failed_add_response_payload_stub;
+
+  coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
+                                              dummy_response, &deps);
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
 
@@ -89,7 +115,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
-  deps.is_message_3 = is_message_3_stub;
+  deps.extract_fields_if_message_3 = is_message_3_stub;
   deps.get_session_app_data = get_null_session_app_data_stub;
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
@@ -101,7 +127,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
 void test_server_sends_changed_response_for_valid_message_3(void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
-  deps.is_message_3 = is_message_3_stub;
+  deps.extract_fields_if_message_3 = is_message_3_stub;
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,
@@ -114,7 +140,7 @@ void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
   coap_server_dispatch_deps_t deps = create_base_dependencies();
   deps.is_message_1 = is_not_message_1_stub;
-  deps.is_message_3 = is_not_message_3_stub;
+  deps.extract_fields_if_message_3 = is_not_message_3_stub;
   deps.get_session_app_data = get_non_null_session_app_data_stub;
 
   coap_server_dispatch_post_with_dependencies(dummy_session, dummy_request,

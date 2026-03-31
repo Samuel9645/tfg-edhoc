@@ -39,14 +39,20 @@ typedef struct coap_server_dispatch_deps_t {
    * Checks if payload conforms to EDHOC Message 3 format (with prepended
    * connection ID). Also extracts Message 3 fields for handler processing.
    */
-  bool (*is_message_3)(const uint8_t* request_payload, size_t request_len,
-                       const struct edhoc_context* edhoc_ctx,
-                       struct edhoc_extracted_fields* extracted_fields);
+  bool (*extract_fields_if_message_3)(
+      const uint8_t* request_payload, size_t request_len,
+      const struct edhoc_context* edhoc_ctx,
+      struct edhoc_extracted_fields* extracted_fields);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  edhoc_server_handshake_status_t (*handle_message_1)(
+  edhoc_server_message_1_result_t (*handle_message_1)(
       const edhoc_server_common_request_data_t* request_data,
       common_response_buffer_t* response_data);
+  /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
+   * logic with the CoAP transport layer and returning the response code. */
+  coap_pdu_code_t (*process_message_1_result)(
+      edhoc_server_message_1_result_t message_1_result,
+      coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
   coap_pdu_code_t (*handle_message_3)(
@@ -73,7 +79,9 @@ static inline bool coap_server_dispatch_deps_are_valid(
   return (deps != NULL) &&
          (deps->extract_payload_if_valid_edhoc_request != NULL) &&
          (deps->add_edhoc_response_options != NULL) &&
-         (deps->is_message_1 != NULL) && (deps->is_message_3 != NULL) &&
+         (deps->is_message_1 != NULL) &&
+         (deps->process_message_1_result != NULL) &&
+         (deps->extract_fields_if_message_3 != NULL) &&
          (deps->handle_message_1 != NULL) && (deps->handle_message_3 != NULL) &&
          (deps->add_response_payload != NULL) &&
          (deps->get_session_app_data != NULL);

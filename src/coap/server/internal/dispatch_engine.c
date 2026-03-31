@@ -1,7 +1,7 @@
 #include "dispatch_engine.h"
 
 #include "coap/coap_config.h"
-#include "coap/server/map_error_to_response.h"
+#include "coap/server/edhoc_mapper.h"
 #include "edhoc/edhoc_config.h"
 
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
@@ -70,11 +70,12 @@ void coap_server_dispatch_post_with_dependencies(
             .payload_length = request_len,
         }};
 
-    edhoc_server_handshake_status_t status =
+    edhoc_server_message_1_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
-    response_code = coap_server_map_message_1_status_to_response(status);
-  } else if (deps->is_message_3(request_payload, request_len, edhoc_ctx,
-                                &message_3_extracted_fields)) {
+    response_code = deps->process_message_1_result(message_1_result, session);
+  } else if (deps->extract_fields_if_message_3(request_payload, request_len,
+                                               edhoc_ctx,
+                                               &message_3_extracted_fields)) {
     if (edhoc_ctx == NULL) {
       coap_log_err("received Message 3 without EDHOC context\n");
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);

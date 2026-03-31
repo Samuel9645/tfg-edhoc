@@ -1,3 +1,11 @@
+/**
+ * @file handshake.h
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since Tue 31 Mar
+ * @brief Holds the core logic for the EDHOC hanshake
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
 #ifndef EDHOC_SERVER_HANDSHAKE_H_
 #define EDHOC_SERVER_HANDSHAKE_H_
 
@@ -7,6 +15,7 @@
 #include <stdint.h>
 
 #include "common/data_models.h"
+#include "edhoc/server/handshake_result.h"
 
 /**
  * @brief Common input data shared by EDHOC Message 1 and Message 3 handlers.
@@ -55,21 +64,6 @@ typedef struct {
 } edhoc_server_message_3_request_data_t;
 
 /**
- * @brief Error codes for EDHOC server handshake operations.
- */
-typedef enum edhoc_server_handshake_status {
-  CSH_OK = 0,
-  CSH_ERR_INVALID_ARGS,
-  CSH_ERR_PAYLOAD_TOO_LARGE,
-  CSH_ERR_PREFIX_MISSING,
-  CSH_ERR_CALLOC_FAILED,
-  CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA,
-  CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED,
-  CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
-  CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED,
-} edhoc_server_handshake_status_t;
-
-/**
  * @brief Check whether payload is properly formatted as EDHOC Message 1.
  *
  * @param[in] payload Request payload.
@@ -96,7 +90,8 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
  * @param[in] request_data Session/request metadata for Message 1
  * processing.
  * @param[out] response_data Response buffer metadata for Message 2.
- * @return edhoc_server_handshake_status_t containing the operation result.
+ * @return Struct containing status code and allocated EDHOC context on success,
+ * or error code and NULL context on failure.
  *
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher from CoAP session app-data. It is used for validation and
@@ -109,7 +104,7 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
  * use session_resources_t + tfg_common_cleanup_resources() for centralized
  * teardown.
  */
-edhoc_server_handshake_status_t edhoc_server_handle_message_1(
+edhoc_server_message_1_result_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data);
 

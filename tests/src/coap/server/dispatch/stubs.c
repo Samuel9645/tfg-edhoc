@@ -58,20 +58,43 @@ bool is_not_message_1_stub(const uint8_t* payload, size_t payload_len) {
   return false;
 }
 
-edhoc_server_handshake_status_t successful_handle_message_1_stub(
+edhoc_server_message_1_result_t failed_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return CSH_OK;
+  return edhoc_server_message_1_failure(CSH_ERR_INVALID_ARGS);
 }
 
-edhoc_server_handshake_status_t failed_handle_message_1_stub(
+edhoc_server_message_1_result_t successful_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return CSH_ERR_INVALID_ARGS;
+  return edhoc_server_message_1_ok(&dummy_edhoc_context_for_stub);
+}
+
+edhoc_server_message_1_result_t
+successful_handle_message_1_with_valid_payload_length_stub(
+    const edhoc_server_common_request_data_t* request_data,
+    common_response_buffer_t* response_data) {
+  (void)request_data;
+  response_data->payload_length = 10;
+  return edhoc_server_message_1_ok(&dummy_edhoc_context_for_stub);
+}
+
+coap_pdu_code_t successful_process_message_1_stub(
+    edhoc_server_message_1_result_t message_1_result, coap_session_t* session) {
+  (void)message_1_result;
+  (void)session;
+  return COAP_RESPONSE_CODE_CHANGED;
+}
+
+coap_pdu_code_t failed_process_message_1_stub(
+    edhoc_server_message_1_result_t message_1_result, coap_session_t* session) {
+  (void)message_1_result;
+  (void)session;
+  return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
 bool is_message_3_stub(const uint8_t* request_payload, size_t request_len,

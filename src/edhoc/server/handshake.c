@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 // TODO: remove this include once the refactor is done
-#include "coap/server/map_error_to_response.h"
+#include "coap/server/edhoc_mapper.h"
 #include "edhoc/common/constants.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
@@ -92,16 +92,16 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
   return CSH_OK;
 }
 
-edhoc_server_handshake_status_t edhoc_server_handle_message_1(
+edhoc_server_message_1_result_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* message_1_request_data,
     common_response_buffer_t* response_data) {
   if (edhoc_server_message_1_has_invalid_args(message_1_request_data,
                                               response_data)) {
-    return CSH_ERR_INVALID_ARGS;
+    return edhoc_server_message_1_failure(CSH_ERR_INVALID_ARGS);
   }
   if (message_1_request_data->request_data.payload_length >
       EDC_MESSAGE_BUFFER_LENGTH) {
-    return CSH_ERR_PAYLOAD_TOO_LARGE;
+    return edhoc_server_message_1_failure(CSH_ERR_PAYLOAD_TOO_LARGE);
   }
   const uint8_t* no_prefix_payload =
       message_1_request_data->request_data.payload;
@@ -109,29 +109,19 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
       message_1_request_data->request_data.payload_length;
   if (edhoc_server_remove_cbor_true_prefix(&no_prefix_payload,
                                            &no_prefix_payload_len) != CSH_OK) {
-    coap_log_crit(
-        "Protocol Violation: Message 1 payload missing expected CBOR "
-        "true prefix\n");
-    return CSH_ERR_PREFIX_MISSING;
+    return edhoc_server_message_1_failure(CSH_ERR_PREFIX_MISSING);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    coap_log_err("OS Error: Cannot allocate memory for EDHOC context\n");
-    return CSH_ERR_CALLOC_FAILED;
+    return edhoc_server_message_1_failure(CSH_ERR_CALLOC_FAILED);
   }
 
   int edhoc_api_result =
       edhoc_common_setup_context(edhoc_ctx, &SERVER_CREDENTIALS);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED;
-  }
-
-  if (coap_session_set_app_data2(message_1_request_data->session, edhoc_ctx,
-                                 free) != NULL) {
-    coap_log_err("Internal Error: app data for session already set\n");
     free(edhoc_ctx);
-    return CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA;
+    return edhoc_server_message_1_failure(CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED);
   }
 
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, no_prefix_payload,
@@ -139,9 +129,9 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
                                              response_data);
-    coap_session_set_app_data2(message_1_request_data->session, NULL, NULL);
     free(edhoc_ctx);
-    return CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED;
+    return edhoc_server_message_1_failure(
+        CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
   }
 
   edhoc_api_result = edhoc_message_2_compose(edhoc_ctx, response_data->payload,
@@ -150,12 +140,12 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
                                              response_data);
-    coap_session_set_app_data2(message_1_request_data->session, NULL, NULL);
     free(edhoc_ctx);
-    return CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED;
+    return edhoc_server_message_1_failure(
+        CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
 
-  return CSH_OK;
+  return edhoc_server_message_1_ok(edhoc_ctx);
 }
 
 bool edhoc_server_extract_if_properly_formatted_message_3(

@@ -99,11 +99,12 @@ void test_handle_message_1_fails_on_invalid_data(void) {
 
   size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    edhoc_server_handshake_status_t result = edhoc_server_handle_message_1(
+    edhoc_server_message_1_result_t result = edhoc_server_handle_message_1(
         test_cases[i].request, test_cases[i].response);
     reset_test_response(&env.response);
-    TEST_ASSERT_EQUAL_MESSAGE(CSH_ERR_INVALID_ARGS, result,
+    TEST_ASSERT_EQUAL_MESSAGE(CSH_ERR_INVALID_ARGS, result.status,
                               test_cases[i].description);
+    TEST_ASSERT_NULL(result.edhoc_ctx);
     assert_response_untouched(test_cases[i].response);
   }
 }
@@ -115,9 +116,10 @@ void test_handle_message_1_fails_on_too_large_request_data(void) {
   env.request.request_data.payload = large_buffer;
   env.request.request_data.payload_length = sizeof(large_buffer);
 
-  edhoc_server_handshake_status_t result =
+  edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_PAYLOAD_TOO_LARGE, result);
+  TEST_ASSERT_EQUAL(CSH_ERR_PAYLOAD_TOO_LARGE, result.status);
+  TEST_ASSERT_NULL(result.edhoc_ctx);
   assert_response_untouched(&env.response);
 }

@@ -1,13 +1,11 @@
-#ifndef COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
-#define COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
+#ifndef COAP_SERVER_EDHOC_MAPPER_H_
+#define COAP_SERVER_EDHOC_MAPPER_H_
 
 #include <coap3/coap.h>
 #include <edhoc.h>
 
 #include "common/data_models.h"
-// TODO: SPLIT THIS HEADER INTO TWO
-#include "edhoc/server/handshake.h"
-
+#include "edhoc/server/handshake_result.h"
 // TODO: DELETE THIS ENUM AND THE BELLOW FUNCTION
 /**
  * @brief Classifies EDHOC failure source for CoAP response mapping.
@@ -47,7 +45,16 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
     coap_server_edhoc_failure_type_t failure_type, int edhoc_api_result,
     coap_pdu_t* response, common_response_buffer_t* response_data);
 
-coap_pdu_code_t coap_server_map_message_1_status_to_response(
-    edhoc_server_handshake_status_t status);
+/**
+ * @brief Map EDHOC server handshake result to CoAP response code and set
+ * session app-data on success.
+ * @param message_1_result Result of Message 1 processing, including status and
+ * allocated EDHOC context.
+ * @param session CoAP session to set app-data on success.
+ * @return Mapped CoAP response code: 2.04 (Changed) on success, 4.00 (Bad
+ * Request) or 5.00 (Internal Server Error) on failure.
+ */
+coap_pdu_code_t coap_server_process_message_1_result(
+    edhoc_server_message_1_result_t message_1_result, coap_session_t* session);
 
-#endif  // COAP_SERVER_MAP_ERROR_TO_RESPONSE_H_
+#endif  // COAP_SERVER_EDHOC_MAPPER_H_

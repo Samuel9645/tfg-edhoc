@@ -13,7 +13,7 @@ set(COAP_SERVER_SOURCES
     ${CMAKE_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
-    ${CMAKE_SOURCE_DIR}/src/coap/server/map_error_to_response.c
+    ${CMAKE_SOURCE_DIR}/src/coap/server/edhoc_mapper.c
 )
 
 # Suppress warnings from helpers

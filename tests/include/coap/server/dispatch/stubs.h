@@ -38,13 +38,24 @@ bool is_message_1_stub(const uint8_t* payload, size_t payload_len);
 
 bool is_not_message_1_stub(const uint8_t* payload, size_t payload_len);
 
-edhoc_server_handshake_status_t successful_handle_message_1_stub(
+edhoc_server_message_1_result_t failed_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data);
 
-edhoc_server_handshake_status_t failed_handle_message_1_stub(
+edhoc_server_message_1_result_t successful_handle_message_1_stub(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data);
+
+edhoc_server_message_1_result_t
+successful_handle_message_1_with_valid_payload_length_stub(
+    const edhoc_server_common_request_data_t* request_data,
+    common_response_buffer_t* response_data);
+
+coap_pdu_code_t successful_process_message_1_stub(
+    edhoc_server_message_1_result_t message_1_result, coap_session_t* session);
+
+coap_pdu_code_t failed_process_message_1_stub(
+    edhoc_server_message_1_result_t message_1_result, coap_session_t* session);
 
 bool is_message_3_stub(const uint8_t* request_payload, size_t request_len,
                        const struct edhoc_context* edhoc_ctx,

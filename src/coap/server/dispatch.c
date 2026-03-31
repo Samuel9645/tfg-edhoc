@@ -5,6 +5,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/helpers.h"
 #include "coap/common/response.h"
+#include "coap/server/edhoc_mapper.h"
 #include "coap/server/request.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake.h"
@@ -39,8 +40,10 @@ static const coap_server_dispatch_deps_t
             coap_server_extract_payload_if_valid_edhoc_request,
         .add_edhoc_response_options = add_edhoc_response_options,
         .is_message_1 = edhoc_server_is_properly_formatted_message_1,
-        .is_message_3 = edhoc_server_extract_if_properly_formatted_message_3,
+        .extract_fields_if_message_3 =
+            edhoc_server_extract_if_properly_formatted_message_3,
         .handle_message_1 = edhoc_server_handle_message_1,
+        .process_message_1_result = coap_server_process_message_1_result,
         .handle_message_3 = edhoc_server_handle_message_3,
         .add_response_payload = coap_common_add_response_payload,
         .get_session_app_data = coap_session_get_app_data,

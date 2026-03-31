@@ -29,7 +29,8 @@ void setup_testing_environment(handshake_test_env_t* env);
 
 /**
  * @brief Resets the response buffer in the test environment to a known state.
- * @param[in,out] response_data Pointer to the common_response_buffer_t to reset.
+ * @param[in,out] response_data Pointer to the common_response_buffer_t to
+ * reset.
  */
 void reset_test_response(common_response_buffer_t* response_data);
 
@@ -44,8 +45,8 @@ void assert_response_untouched(const common_response_buffer_t* response);
  * @brief Sets the payload for a valid Message 1 in the test environment.
  * @param[out] buffer Pointer to the buffer where the payload will be stored.
  * @param[in] buffer_capacity The maximum capacity of the buffer.
- * @param[out] written_len Pointer to the variable that will store the length of the
- * written payload.
+ * @param[out] written_len Pointer to the variable that will store the length of
+ * the written payload.
  */
 void set_valid_message_1_payload(uint8_t* buffer, size_t buffer_capacity,
                                  size_t* written_len);

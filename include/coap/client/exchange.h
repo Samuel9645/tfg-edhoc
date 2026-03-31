@@ -7,14 +7,14 @@
 #include <stdint.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/data_models.h"
 #include "coap/common/status.h"
 #include "common/data_models.h"
 
 /**
- * @brief CoAP exchange state for EDHOC client messages.
+ * @brief Input data used to initialize client exchange state.
+ * Also embedded in coap_client_exchange_t as session data.
  */
-typedef struct coap_client_exchange_t {
+typedef struct {
   /** Context used by wait loop and response callback registration. */
   coap_context_t* context;
 
@@ -26,6 +26,26 @@ typedef struct coap_client_exchange_t {
 
   /** Cached destination address associated with uri. */
   coap_address_t destination;
+} coap_client_exchange_session_data_t;
+
+/**
+ * @brief Validate session data has required pointer fields.
+ *
+ * @param[in] session_data Session and endpoint data.
+ * @return true if context and session are non-NULL, false otherwise.
+ */
+static inline bool coap_client_exchange_session_data_is_valid(
+    const coap_client_exchange_session_data_t* session_data) {
+  return (session_data != NULL) && (session_data->context != NULL) &&
+         (session_data->session != NULL);
+}
+
+/**
+ * @brief CoAP exchange state for EDHOC client messages.
+ */
+typedef struct coap_client_exchange_t {
+  /** Shared session data (transport and endpoint info). */
+  coap_client_exchange_session_data_t session_data;
 
   /** Response-ready flag set by response callback. */
   bool have_response;
@@ -34,22 +54,11 @@ typedef struct coap_client_exchange_t {
   uint8_t incoming_message[MAX_PDU_SIZE];
 
   /** Number of valid bytes currently stored in incoming_message. */
-  size_t incoming_message_len;
+  size_t incoming_message_length;
 
   /** Last non-empty response code received for this exchange. */
   coap_pdu_code_t last_response_code;
 } coap_client_exchange_t;
-
-/**
- * @brief Input data used to initialize client exchange state.
- */
-typedef struct {
-  /** CoAP context/session required for message exchange lifecycle. */
-  coap_session_data_t session_data;
-
-  /** Destination URI/address pair for outgoing EDHOC requests. */
-  coap_endpoint_data_t endpoint_data;
-} coap_client_exchange_session_data_t;
 
 /**
  * @brief Input data used to send one EDHOC request message.
@@ -64,7 +73,20 @@ typedef struct {
 
 static inline bool coap_client_exchange_request_data_is_valid(
     const coap_client_exchange_request_data_t* request_data) {
-  return common_request_payload_is_valid(&request_data->request_data);
+  return (request_data != NULL) &&
+         common_request_payload_is_valid(&request_data->request_data);
+}
+
+/**
+ * @brief Check if response message size fits in buffer capacity.
+ *
+ * @param[in] message_length Size of incoming message.
+ * @param[in] capacity Available buffer capacity.
+ * @return true if message fits, false otherwise.
+ */
+static inline bool coap_client_exchange_response_size_fits(
+    size_t message_length, size_t capacity) {
+  return message_length > 0 && message_length <= capacity;
 }
 
 /**

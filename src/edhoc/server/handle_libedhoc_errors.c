@@ -60,11 +60,10 @@ void server_edhoc_add_edhoc_error_to_response(
     prepare_wrong_cipher_suite_error_info(
         edhoc_ctx, own_suites, EDSH_CIPHER_SUITES_ARRAY_SIZE, &error_info);
   } else {
-    prepare_generic_error_info("Message 1 processing failed",
-                               &error_info);
+    prepare_generic_error_info("Message 1 processing failed", &error_info);
   }
   edhoc_message_error_compose(
       response_data->payload, response_data->payload_capacity,
       &error_payload_len, EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, &error_info);
-  response_data->payload_len = error_payload_len;
+  response_data->payload_length = error_payload_len;
 }

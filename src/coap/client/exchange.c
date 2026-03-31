@@ -39,7 +39,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   }
 
   exchange->have_response = true;
-  exchange->incoming_message_len = 0;
+  exchange->incoming_message_length = 0;
 
   coap_pdu_code_t response_code = coap_pdu_get_code(received);
   exchange->last_response_code = response_code;
@@ -53,24 +53,25 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
     return COAP_RESPONSE_OK;
   }
 
-  size_t payload_len = 0;
+  size_t payload_length = 0;
   const uint8_t* payload = NULL;
-  if (!coap_get_data(received, &payload_len, &payload) || payload_len == 0) {
+  if (!coap_get_data(received, &payload_length, &payload) ||
+      payload_length == 0) {
     coap_log_err("cannot get response pdu data\n");
     return COAP_RESPONSE_OK;
   }
 
-  if (payload_len > sizeof(exchange->incoming_message)) {
+  if (payload_length > sizeof(exchange->incoming_message)) {
     coap_log_err("response payload too large\n");
     return COAP_RESPONSE_OK;
   }
 
-  memcpy(exchange->incoming_message, payload, payload_len);
-  exchange->incoming_message_len = payload_len;
+  memcpy(exchange->incoming_message, payload, payload_length);
+  exchange->incoming_message_length = payload_length;
 
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
     coap_client_log_received_edhoc_error_response(response_code, payload,
-                                                  payload_len);
+                                                  payload_length);
     return COAP_RESPONSE_OK;
   }
 
@@ -80,27 +81,25 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
 coap_status_result_t coap_client_exchange_init(
     const coap_client_exchange_session_data_t* session_data,
     coap_client_exchange_t* exchange) {
-  if (!exchange || !session_data || !session_data->session_data.context ||
-      !session_data->session_data.session || !session_data->endpoint_data.uri ||
-      !session_data->endpoint_data.destination) {
+  if (!exchange || !coap_client_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
     return CCOM_ERROR;
   }
 
   memset(exchange, 0, sizeof(*exchange));
 
-  exchange->context = session_data->session_data.context;
-  exchange->session = session_data->session_data.session;
-  exchange->uri = *session_data->endpoint_data.uri;
-  exchange->destination = *session_data->endpoint_data.destination;
+  exchange->session_data.context = session_data->context;
+  exchange->session_data.session = session_data->session;
+  exchange->session_data.uri = session_data->uri;
+  exchange->session_data.destination = session_data->destination;
 
-  if (coap_session_set_app_data2(session_data->session_data.session, exchange,
-                                 NULL) != NULL) {
+  if (coap_session_set_app_data2(session_data->session, exchange, NULL) !=
+      NULL) {
     coap_log_err("unexpected existing session app-data in client\n");
     return CCOM_ERROR;
   }
 
-  coap_register_response_handler(session_data->session_data.context,
+  coap_register_response_handler(session_data->context,
                                  coap_client_response_handler);
 
   return CCOM_STATUS_SUCCESS;
@@ -116,8 +115,8 @@ coap_status_result_t coap_client_exchange_send(
   }
 
   coap_pdu_t* request_pdu = coap_client_prepare_post_request(
-      &exchange->uri, &exchange->destination, exchange->session,
-      request_data->content_format);
+      &exchange->session_data.uri, &exchange->session_data.destination,
+      exchange->session_data.session, request_data->content_format);
   if (!request_pdu) {
     coap_log_err("failed to prepare CoAP request\n");
     return CCOM_ERROR;
@@ -125,14 +124,15 @@ coap_status_result_t coap_client_exchange_send(
 
   if (coap_common_add_response_payload(
           request_pdu, request_data->request_data.payload,
-          request_data->request_data.payload_len) == CCOM_ERROR) {
+          request_data->request_data.payload_length) == CCOM_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
     return CCOM_ERROR;
   }
 
   coap_show_pdu(COAP_LOG_WARN, request_pdu);
-  return coap_client_send_coap_request(exchange->session, request_pdu);
+  return coap_client_send_coap_request(exchange->session_data.session,
+                                       request_pdu);
 }
 
 coap_status_result_t coap_client_exchange_wait_and_get(
@@ -142,27 +142,28 @@ coap_status_result_t coap_client_exchange_wait_and_get(
     return CCOM_ERROR;
   }
 
-  if (coap_client_wait_for_coap_response(exchange->context, exchange->session,
-                                         &exchange->have_response) !=
-      CCOM_STATUS_SUCCESS) {
+  if (coap_client_wait_for_coap_response(
+          exchange->session_data.context, exchange->session_data.session,
+          &exchange->have_response) != CCOM_STATUS_SUCCESS) {
     coap_log_err("error while waiting for CoAP response\n");
     return CCOM_ERROR;
   }
 
-  if (!exchange->have_response || exchange->incoming_message_len == 0 ||
-      exchange->incoming_message_len > response_data->payload_capacity) {
+  if (!exchange->have_response ||
+      !coap_client_exchange_response_size_fits(
+          exchange->incoming_message_length, response_data->payload_capacity)) {
     coap_log_err("invalid response data\n");
     return CCOM_ERROR;
   }
 
   bool is_error_response =
-      exchange->last_response_code != COAP_RESPONSE_CODE_CHANGED;
+      !coap_response_indicates_success(exchange->last_response_code);
 
   memcpy(response_data->payload, exchange->incoming_message,
-         exchange->incoming_message_len);
-  response_data->payload_len = exchange->incoming_message_len;
+         exchange->incoming_message_length);
+  response_data->payload_length = exchange->incoming_message_length;
   exchange->have_response = false;
-  exchange->incoming_message_len = 0;
+  exchange->incoming_message_length = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;
 
   return is_error_response ? CCOM_ERROR : CCOM_STATUS_SUCCESS;
@@ -174,6 +175,6 @@ void coap_client_exchange_reset(coap_client_exchange_t* exchange) {
   }
 
   exchange->have_response = false;
-  exchange->incoming_message_len = 0;
+  exchange->incoming_message_length = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;
 }

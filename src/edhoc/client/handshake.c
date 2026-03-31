@@ -51,10 +51,43 @@ edhoc_client_handshake_status_t edhoc_client_handshake_init(
   return EDHOC_CLIENT_HANDSHAKE_SUCCESS;
 }
 
+/**
+ * @brief Validate output buffer parameters for message composition.
+ *
+ * Checks that payload buffer, size output pointer, and capacity are all valid.
+ *
+ * @param[in] payload Output payload buffer.
+ * @param[in] payload_len Output size pointer.
+ * @param[in] min_capacity Minimum required buffer capacity.
+ * @return true if parameters are valid and capacity >= min_capacity.
+ */
+static inline bool edhoc_client_composition_output_is_valid(
+    const uint8_t* payload, const size_t* payload_len, size_t min_capacity) {
+  return (payload != NULL) && (payload_len != NULL) && (min_capacity > 0);
+}
+
+/**
+ * @brief Validate input payload parameters for message processing.
+ *
+ * @param[in] payload Input payload buffer.
+ * @param[in] payload_len Payload length.
+ * @return true if parameters are valid, false otherwise.
+ */
+static inline bool edhoc_client_message_payload_is_valid(const uint8_t* payload,
+                                                         size_t payload_len) {
+  return (payload != NULL) && (payload_len > 0);
+}
+
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
     edhoc_client_handshake_t* handshake, size_t payload_capacity,
     uint8_t* payload, size_t* payload_len) {
-  if (!handshake || !payload || !payload_len || payload_capacity <= 1) {
+  const size_t min_prefix_payload_capacity = 2;
+  if (!edhoc_client_handshake_is_initialized(handshake) ||
+      !edhoc_client_composition_output_is_valid(payload, payload_len,
+                                                min_prefix_payload_capacity)) {
+    return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
+  }
+  if (payload_capacity <= 1) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
@@ -73,7 +106,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
     edhoc_client_handshake_t* handshake, const uint8_t* payload,
     size_t payload_len) {
-  if (!handshake || !payload || payload_len == 0) {
+  if (!edhoc_client_handshake_is_initialized(handshake) ||
+      !edhoc_client_message_payload_is_valid(payload, payload_len)) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
@@ -88,7 +122,13 @@ edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
     edhoc_client_handshake_t* handshake, size_t payload_capacity,
     uint8_t* payload, size_t* payload_len) {
-  if (!handshake || !payload || !payload_len || payload_capacity == 0) {
+  const size_t min_payload_capacity = 1;
+  if (!edhoc_client_handshake_is_initialized(handshake) ||
+      !edhoc_client_composition_output_is_valid(payload, payload_len,
+                                                min_payload_capacity)) {
+    return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
+  }
+  if (payload_capacity == 0) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
@@ -125,7 +165,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
     edhoc_client_handshake_t* handshake, const uint8_t* payload,
     size_t payload_len) {
-  if (!handshake || !payload || payload_len == 0) {
+  if (!edhoc_client_handshake_is_initialized(handshake) ||
+      !edhoc_client_message_payload_is_valid(payload, payload_len)) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
@@ -138,7 +179,7 @@ edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
 }
 
 void edhoc_client_handshake_deinit(edhoc_client_handshake_t* handshake) {
-  if (!handshake || !handshake->initialized) {
+  if (!edhoc_client_handshake_is_initialized(handshake)) {
     return;
   }
 

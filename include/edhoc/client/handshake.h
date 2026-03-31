@@ -18,6 +18,17 @@ typedef struct edhoc_client_handshake_t {
 } edhoc_client_handshake_t;
 
 /**
+ * @brief Validate EDHOC client handshake is initialized.
+ *
+ * @param[in] handshake Handshake state.
+ * @return true if handshake is non-NULL and initialized, false otherwise.
+ */
+static inline bool edhoc_client_handshake_is_initialized(
+    const edhoc_client_handshake_t* handshake) {
+  return (handshake != NULL) && (handshake->initialized);
+}
+
+/**
  * @brief Result codes for EDHOC client handshake operations.
  */
 typedef enum {
@@ -39,10 +50,11 @@ typedef enum {
  * @param[in,out] handshake Caller-owned handshake state.
  * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  *
- * @note This function does not allocate memory. The caller owns handshake storage
- * and must keep it alive for all handshake operations.
+ * @note This function does not allocate memory. The caller owns handshake
+ * storage and must keep it alive for all handshake operations.
  */
-edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handshake_t* handshake);
+edhoc_client_handshake_status_t edhoc_client_handshake_init(
+    edhoc_client_handshake_t* handshake);
 
 /**
  * @brief Compose EDHOC Message 1 including CBOR marker.
@@ -54,8 +66,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_init(edhoc_client_handsha
  * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
-    size_t* payload_len);
+    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    uint8_t* payload, size_t* payload_len);
 
 /**
  * @brief Process EDHOC Message 2.
@@ -66,7 +78,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
  * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
-    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
+    edhoc_client_handshake_t* handshake, const uint8_t* payload,
+    size_t payload_len);
 
 /**
  * @brief Compose EDHOC Message 3 with prepended connection ID.
@@ -78,8 +91,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_process_message_2(
  * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
-    edhoc_client_handshake_t* handshake, size_t payload_capacity, uint8_t* payload,
-    size_t* payload_len);
+    edhoc_client_handshake_t* handshake, size_t payload_capacity,
+    uint8_t* payload, size_t* payload_len);
 
 /**
  * @brief Process EDHOC Message 4.
@@ -90,7 +103,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
  * @return EDHOC_CLIENT_HANDSHAKE_SUCCESS on success, error code otherwise.
  */
 edhoc_client_handshake_status_t edhoc_client_handshake_process_message_4(
-    edhoc_client_handshake_t* handshake, const uint8_t* payload, size_t payload_len);
+    edhoc_client_handshake_t* handshake, const uint8_t* payload,
+    size_t payload_len);
 
 /**
  * @brief Destroy EDHOC client handshake context.

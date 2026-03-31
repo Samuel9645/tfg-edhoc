@@ -39,16 +39,10 @@ emulation_status_t tfg_run_client(void) {
   }
 
   coap_client_exchange_session_data_t exchange_session_data = {
-      .session_data =
-          {
-              .context = client_resources.session_resources.coap_context,
-              .session = client_resources.session_resources.coap_session,
-          },
-      .endpoint_data =
-          {
-              .uri = &client_uri,
-              .destination = &destination_address,
-          },
+      .context = client_resources.session_resources.coap_context,
+      .session = client_resources.session_resources.coap_session,
+      .uri = client_uri,
+      .destination = destination_address,
   };
 
   if (coap_client_exchange_init(&exchange_session_data,
@@ -71,7 +65,7 @@ emulation_status_t tfg_run_client(void) {
       .request_data =
           {
               .payload = request_payload,
-              .payload_len = 0,
+              .payload_length = 0,
           },
       .content_format = APPLICATION_CID_EDHOC_CBOR_SEQ,
   };
@@ -79,12 +73,12 @@ emulation_status_t tfg_run_client(void) {
   common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = MAX_PDU_SIZE,
-      .payload_len = 0,
+      .payload_length = 0,
   };
 
   if (edhoc_client_handshake_compose_message_1(
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.payload_len) !=
+          request_payload, &request_data.request_data.payload_length) !=
       EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
@@ -100,7 +94,7 @@ emulation_status_t tfg_run_client(void) {
           &client_resources.exchange, &response_data) != CCOM_STATUS_SUCCESS ||
       edhoc_client_handshake_process_message_2(
           &client_resources.handshake, response_payload,
-          response_data.payload_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          response_data.payload_length) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -109,7 +103,7 @@ emulation_status_t tfg_run_client(void) {
 
   if (edhoc_client_handshake_compose_message_3(
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.payload_len) !=
+          request_payload, &request_data.request_data.payload_length) !=
       EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
@@ -121,7 +115,7 @@ emulation_status_t tfg_run_client(void) {
           &client_resources.exchange, &response_data) != CCOM_STATUS_SUCCESS ||
       edhoc_client_handshake_process_message_4(
           &client_resources.handshake, response_payload,
-          response_data.payload_len) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+          response_data.payload_length) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }

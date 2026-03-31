@@ -7,12 +7,8 @@
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
     const coap_pdu_t* response, const coap_server_dispatch_deps_t* deps) {
-  return !session || !request || !response || !deps ||
-         !deps->extract_payload_if_valid_edhoc_request ||
-         !deps->add_edhoc_response_options || !deps->is_message_1 ||
-         !deps->is_message_3 || !deps->handle_message_1 ||
-         !deps->handle_message_3 || !deps->add_response_payload ||
-         !deps->get_session_app_data;
+  return !session || !request || !response ||
+         !coap_server_dispatch_deps_are_valid(deps);
 }
 
 void coap_server_dispatch_post_with_dependencies(
@@ -49,7 +45,7 @@ void coap_server_dispatch_post_with_dependencies(
   common_response_buffer_t response_data = {
       .payload = response_payload,
       .payload_capacity = EDC_MESSAGE_BUFFER_LENGTH,
-      .payload_len = 0,
+      .payload_length = 0,
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -71,7 +67,7 @@ void coap_server_dispatch_post_with_dependencies(
         .response = response,
         .request_data = {
             .payload = request_payload,
-            .payload_len = request_len,
+            .payload_length = request_len,
         }};
 
     edhoc_server_handshake_status_t status =
@@ -94,7 +90,7 @@ void coap_server_dispatch_post_with_dependencies(
                 .request_data =
                     {
                         .payload = request_payload,
-                        .payload_len = request_len,
+                        .payload_length = request_len,
                     },
             },
         .message_3_extracted_fields = &message_3_extracted_fields,
@@ -106,9 +102,9 @@ void coap_server_dispatch_post_with_dependencies(
     return;
   }
 
-  if (response_data.payload_len > 0 &&
+  if (response_data.payload_length > 0 &&
       deps->add_response_payload(response, response_payload,
-                                 response_data.payload_len) !=
+                                 response_data.payload_length) !=
           CCOM_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);

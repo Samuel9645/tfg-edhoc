@@ -30,11 +30,11 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
 
   if (edhoc_message_error_compose(response_data->payload,
                                   response_data->payload_capacity,
-                                  &response_data->payload_len, edhoc_error_code,
-                                  NULL) != EDHOC_SUCCESS) {
+                                  &response_data->payload_length,
+                                  edhoc_error_code, NULL) != EDHOC_SUCCESS) {
     coap_log_err(
         "cannot compose EDHOC error message for client, using empty payload\n");
-    response_data->payload_len = 0;
+    response_data->payload_length = 0;
   }
 
   coap_pdu_set_code(response, mapped_response_code);

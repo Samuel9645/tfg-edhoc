@@ -19,6 +19,7 @@
 #define COAP_COMMON_HELPERS_H_
 
 #include <coap3/coap.h>
+#include <stdbool.h>
 
 #include "coap/coap_config.h"
 #include "coap/common/status.h"
@@ -67,5 +68,16 @@ coap_status_result_t coap_common_resolve_address(
  */
 coap_optlist_t* coap_common_create_coap_edhoc_optlist(
     content_format_edhoc_values_t content_format);
+
+/**
+ * @brief Check if CoAP response code indicates success.
+ *
+ * @param[in] response_code The CoAP response code to check.
+ * @return true if response indicates success (2.04 Changed), false otherwise.
+ */
+static inline bool coap_response_indicates_success(
+    coap_pdu_code_t response_code) {
+  return response_code == COAP_RESPONSE_CODE_CHANGED;
+}
 
 #endif  // COAP_COMMON_HELPERS_H_

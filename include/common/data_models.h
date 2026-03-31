@@ -7,6 +7,7 @@
 #ifndef COMMON_DATA_MODELS_H_
 #define COMMON_DATA_MODELS_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -18,13 +19,13 @@ typedef struct {
   const uint8_t* payload;
 
   /** Length of payload in bytes. */
-  size_t payload_len;
+  size_t payload_length;
 } common_request_payload_t;
 
 static inline bool common_request_payload_is_valid(
     const common_request_payload_t* payload) {
   return (payload != NULL) && (payload->payload != NULL) &&
-         (payload->payload_len > 0);
+         (payload->payload_length > 0);
 }
 
 /**
@@ -38,17 +39,23 @@ typedef struct {
   size_t payload_capacity;
 
   /** Output number of bytes written to payload buffer. */
-  size_t payload_len;
+  size_t payload_length;
 } common_response_buffer_t;
 
+static inline bool common_response_buffer_is_valid(
+    const common_response_buffer_t* buffer) {
+  return (buffer != NULL) && (buffer->payload != NULL);
+}
 static inline bool common_response_buffer_is_writable(
-    const common_response_buffer_t* buf) {
-  return (buf != NULL) && (buf->payload != NULL) && (buf->payload_capacity > 0);
+    const common_response_buffer_t* buffer) {
+  return common_response_buffer_is_valid(buffer) &&
+         (buffer->payload_capacity > 0);
 }
 
 static inline bool common_response_buffer_has_content(
-    const common_response_buffer_t* buf) {
-  return common_response_buffer_is_writable(buf) && (buf->payload_len > 0);
+    const common_response_buffer_t* buffer) {
+  return common_response_buffer_is_writable(buffer) &&
+         (buffer->payload_length > 0);
 }
 
 #endif  // COMMON_DATA_MODELS_H_

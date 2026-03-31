@@ -89,7 +89,7 @@ void test_handle_message_1_fails_on_too_large_request_data(void) {
   setup_testing_environment(&env);
   uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
   env.request.request_data.payload = large_buffer;
-  env.request.request_data.payload_len = sizeof(large_buffer);
+  env.request.request_data.payload_length = sizeof(large_buffer);
 
   edhoc_server_handshake_status_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);

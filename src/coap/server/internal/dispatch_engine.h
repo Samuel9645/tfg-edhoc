@@ -5,7 +5,6 @@
 #include <edhoc_helpers.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/data_models.h"
 #include "coap/common/status.h"
 #include "coap/server/dispatch.h"
 #include "edhoc/server/handshake.h"
@@ -62,6 +61,23 @@ typedef struct coap_server_dispatch_deps_t {
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);
 } coap_server_dispatch_deps_t;
+
+/**
+ * @brief Validate all required dependency function pointers are non-NULL.
+ *
+ * @param[in] deps Dispatch dependencies structure.
+ * @return true if all function pointers are present, false if any are NULL.
+ */
+static inline bool coap_server_dispatch_deps_are_valid(
+    const coap_server_dispatch_deps_t* deps) {
+  return (deps != NULL) &&
+         (deps->extract_payload_if_valid_edhoc_request != NULL) &&
+         (deps->add_edhoc_response_options != NULL) &&
+         (deps->is_message_1 != NULL) && (deps->is_message_3 != NULL) &&
+         (deps->handle_message_1 != NULL) && (deps->handle_message_3 != NULL) &&
+         (deps->add_response_payload != NULL) &&
+         (deps->get_session_app_data != NULL);
+}
 
 /**
  * @brief Dispatch incoming EDHOC-over-CoAP POST request with injected

@@ -37,34 +37,23 @@ static const struct edhoc_credentials SERVER_CREDENTIALS = {
     .verify = server_credential_verify,
 };
 
-static inline bool has_invalid_common_request_data(
-    const edhoc_server_common_request_data_t* base_data) {
-  return !base_data || !base_data->session || !base_data->response ||
-         !base_data->request_data.payload ||
-         base_data->request_data.payload_len == 0;
-}
-
-static inline bool has_invalid_response_data(
-    const common_response_buffer_t* response_data) {
-  return !response_data || !response_data->payload;
-}
-
 static inline bool params_are_invalid(
     const edhoc_server_common_request_data_t* base_data,
     const common_response_buffer_t* response_data) {
-  return has_invalid_common_request_data(base_data) ||
-         has_invalid_response_data(response_data);
+  return !edhoc_server_common_request_data_is_valid(base_data) ||
+         !common_response_buffer_is_valid(response_data);
 }
 static inline bool edhoc_server_message_1_has_invalid_args(
     const edhoc_server_common_request_data_t* request_data,
     const common_response_buffer_t* response_data) {
-  if (!request_data || params_are_invalid(request_data, response_data)) {
+  if (!edhoc_server_common_request_data_is_valid(request_data) ||
+      !common_response_buffer_is_valid(response_data)) {
     return true;
   }
 
   const bool session_already_exists = (request_data->edhoc_ctx != NULL);
   const bool payload_is_too_short =
-      (request_data->request_data.payload_len <= 1);
+      (request_data->request_data.payload_length <= 1);
   return session_already_exists || payload_is_too_short;
 }
 
@@ -133,14 +122,14 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
                                               response_data)) {
     return CSH_ERR_INVALID_ARGS;
   }
-  if (message_1_request_data->request_data.payload_len >
+  if (message_1_request_data->request_data.payload_length >
       EDC_MESSAGE_BUFFER_LENGTH) {
     return CSH_ERR_PAYLOAD_TOO_LARGE;
   }
   const uint8_t* no_prefix_payload =
       message_1_request_data->request_data.payload;
   size_t no_prefix_payload_len =
-      message_1_request_data->request_data.payload_len;
+      message_1_request_data->request_data.payload_length;
   if (edhoc_server_remove_cbor_true_prefix(&no_prefix_payload,
                                            &no_prefix_payload_len) != CSH_OK) {
     coap_log_crit(
@@ -180,7 +169,7 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
 
   edhoc_api_result = edhoc_message_2_compose(edhoc_ctx, response_data->payload,
                                              response_data->payload_capacity,
-                                             &response_data->payload_len);
+                                             &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
                                              response_data);
@@ -214,7 +203,7 @@ coap_pdu_code_t edhoc_server_handle_message_3(
 
   edhoc_api_result = edhoc_message_4_compose(
       edhoc_context, response_data->payload, response_data->payload_capacity,
-      &response_data->payload_len);
+      &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     return coap_server_map_edhoc_failure_to_response(
         edhoc_context, "compose Message 4", COAP_SERVER_EDHOC_INTERNAL_ERROR,

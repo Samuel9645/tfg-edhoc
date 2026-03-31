@@ -14,7 +14,7 @@
 #include <unity.h>
 
 #include "edhoc/common/constants.h"
-#include "edhoc/edhoc_config.h"
+#include "edhoc/config.h"
 #include "edhoc/server/handshake/helpers.h"
 #include "edhoc/server/handshake/payload.h"
 #include "edhoc/server/handshake/scenarios.h"
@@ -49,7 +49,7 @@ void test_remove_prefix_success(void) {
   const uint8_t* payload_ptr = payload_with_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_handshake_status_t result =
+  edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_OK, result);
@@ -63,7 +63,7 @@ void test_remove_prefix_fails_on_missing_prefix(void) {
   const uint8_t* payload_ptr = payload_without_prefix.data;
   size_t payload_len = original_len;
 
-  edhoc_server_handshake_status_t result =
+  edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result);
@@ -75,7 +75,7 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   const uint8_t* null_payload_ptr = NULL;
   size_t payload_len = 0;
 
-  edhoc_server_handshake_status_t result =
+  edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
 
   TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
@@ -107,13 +107,6 @@ void test_handle_message_1_fails_on_invalid_data(void) {
     TEST_ASSERT_NULL(result.edhoc_ctx);
     assert_response_untouched(test_cases[i].response);
   }
-}
-
-static inline void override_test_request_payload(handshake_test_env_t* env,
-                                                 const uint8_t* new_payload,
-                                                 size_t new_len) {
-  env->request.base_data.request_data.payload = new_payload;
-  env->request.base_data.request_data.payload_length = new_len;
 }
 
 void test_handle_message_1_fails_on_too_large_request_data(void) {

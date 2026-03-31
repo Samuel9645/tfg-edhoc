@@ -6,10 +6,10 @@
 
 #include "coap/coap_config.h"
 #include "edhoc/common/setup.h"
+#include "edhoc/config.h"
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"
 #include "edhoc/credentials/public_data.h"
-#include "edhoc/edhoc_config.h"
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {

@@ -2,7 +2,7 @@
 
 #include "coap/coap_config.h"
 #include "coap/server/edhoc_mapper.h"
-#include "edhoc/edhoc_config.h"
+#include "edhoc/config.h"
 
 static inline bool coap_server_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,

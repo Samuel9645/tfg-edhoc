@@ -7,7 +7,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_HELPERS_H_
 #define EDHOC_SERVER_HANDSHAKE_HELPERS_H_
 
-#include "edhoc/server/handshake.h"
+#include "edhoc/server/handshake/message_1_handler.h"
 
 enum { TEDSH_MESSAGE_BUFFER_LENGTH = 256 };
 typedef struct {
@@ -19,6 +19,13 @@ typedef struct {
   edhoc_server_message_1_request_data_t request;
   common_response_buffer_t response;
 } handshake_test_env_t;
+
+static inline void override_test_request_payload(handshake_test_env_t* env,
+                                                 const uint8_t* new_payload,
+                                                 size_t new_len) {
+  env->request.base_data.request_data.payload = new_payload;
+  env->request.base_data.request_data.payload_length = new_len;
+}
 
 /**
  * @brief Creates a testing environment for EDHOC server handshake tests.

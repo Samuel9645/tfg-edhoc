@@ -30,6 +30,7 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handle_libedhoc_errors.c
 )
@@ -84,7 +85,7 @@ set_target_properties(server PROPERTIES
 set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
-set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined")
+set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
 set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" ${MEMORY_CHECK_FLAGS})
 
 target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS}) 

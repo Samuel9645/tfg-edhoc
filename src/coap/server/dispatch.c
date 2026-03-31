@@ -7,7 +7,7 @@
 #include "coap/common/response.h"
 #include "coap/server/edhoc_mapper.h"
 #include "coap/server/request.h"
-#include "edhoc/edhoc_config.h"
+#include "edhoc/config.h"
 #include "edhoc/server/handshake.h"
 #include "internal/dispatch_engine.h"
 

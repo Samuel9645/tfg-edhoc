@@ -58,6 +58,9 @@ function(add_unity_test TARGET_NAME TEST_FILE)
 
     # E. Register with CTest
     add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
+
+    set_property(TEST ${TARGET_NAME} APPEND PROPERTY ENVIRONMENT "ASAN_OPTIONS=halt_on_error=1:abort_on_error=1")
+    set_property(TEST ${TARGET_NAME} APPEND PROPERTY ENVIRONMENT "UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_stacktrace=1")
 endfunction()
 
 
@@ -65,7 +68,6 @@ endfunction()
 # 4. REGISTER TESTS WITH GRANULAR CONTROL
 # ==============================================================================
 
-# Test 1: Dispatcher (Needs the CoAP sources and its specific stubs)
 add_unity_test(test_dispatch 
     src/coap/server/dispatch/test_dispatch.c
     ${SERVER_SOURCES}
@@ -73,7 +75,6 @@ add_unity_test(test_dispatch
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/create_base_dependencies.c
 )
 
-# Test 2: Handshake Logic (Needs pure logic files and pure logic stubs)
 add_unity_test(test_handshake 
     src/edhoc/server/handshake/test_handshake.c
     ${SERVER_SOURCES}
@@ -81,7 +82,14 @@ add_unity_test(test_handshake
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
 )
 
-# Test 3: Integration (Needs the whole core engine)
+add_unity_test(test_handshake_mocked_libedhoc 
+    src/edhoc/server/handshake/test_handshake_mocked_libedhoc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/stubs.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler.c
+)
+
 add_unity_test(test_integration 
     src/core/test_integration.c
     ${CORE_SOURCES}

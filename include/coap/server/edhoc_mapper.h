@@ -5,7 +5,7 @@
 #include <edhoc.h>
 
 #include "common/data_models.h"
-#include "edhoc/server/handshake_result.h"
+#include "edhoc/server/handshake/message_1_result.h"
 // TODO: DELETE THIS ENUM AND THE BELLOW FUNCTION
 /**
  * @brief Classifies EDHOC failure source for CoAP response mapping.

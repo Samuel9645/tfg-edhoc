@@ -8,7 +8,7 @@
 #include "coap/client/utils.h"
 #include "coap/coap_config.h"
 #include "edhoc/client/handshake.h"
-#include "edhoc/edhoc_config.h"
+#include "edhoc/config.h"
 
 // TODO: SEND ERROR RESPONSES TO SERVER IN CASE OF FAILURE INSTEAD OF JUST
 // FAILING SILENTLY

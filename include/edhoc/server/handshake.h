@@ -15,53 +15,7 @@
 #include <stdint.h>
 
 #include "common/data_models.h"
-#include "edhoc/server/handshake_result.h"
-
-/**
- * @brief Common input data shared by EDHOC Message 1 and Message 3 handlers.
- */
-typedef struct {
-  /** Session that owns EDHOC app-data for this exchange. */
-  coap_session_t* session;
-
-  /** EDHOC context associated with the session before Message 1 handling. */
-  struct edhoc_context* edhoc_ctx;
-
-  /** Response PDU used to set response codes on failure paths. */
-  coap_pdu_t* response;
-
-  /** Incoming Message payload bytes and size. */
-  common_request_payload_t request_data;
-} edhoc_server_common_request_data_t;
-
-/**
- * @brief Input data required to process EDHOC Message 1.
- */
-typedef struct edhoc_server_message_1_request_data {
-  /** Common session/context/response/request metadata. */
-  edhoc_server_common_request_data_t base_data;
-
-  /** Server credentials for setting up the EDHOC context. */
-  const struct edhoc_credentials* credentials;
-} edhoc_server_message_1_request_data_t;
-
-/**
- * @brief Validate that common EDHOC server request data is properly
- * initialized.
- *
- * Checks that all required pointers and fields are non-NULL and payload has
- * non-zero length.
- *
- * @param[in] request_data Common request data structure.
- * @return true if valid, false if any required field is missing or invalid.
- */
-static inline bool edhoc_server_common_request_data_is_valid(
-    const edhoc_server_common_request_data_t* request_data) {
-  return (request_data != NULL) && (request_data->session != NULL) &&
-         (request_data->response != NULL) &&
-         (request_data->request_data.payload != NULL) &&
-         (request_data->request_data.payload_length > 0);
-}
+#include "edhoc/server/handshake/common/request_data.h"
 
 /**
  * @brief Input data required to process EDHOC Message 3.
@@ -83,34 +37,6 @@ typedef struct {
  */
 bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
                                                   const size_t payload_len);
-
-/**
- * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
- * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
- * success.
- * @param[in,out] length Pointer to the buffer length; decremented by 1 on
- * success.
- * @return CSH_OK if prefix was removed, or a CSH_ERR code if invalid/missing.
- */
-edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
-    const uint8_t** payload, size_t* length);
-
-/**
- * @brief Handle EDHOC Message 1 and compose Message 2.
- *
- * @param[in] message_1_request_data Session/request metadata for Message 1
- * processing, including credentials.
- * @param[out] response_data Response buffer metadata for Message 2.
- * @return Struct containing status code and allocated EDHOC context on success,
- * or error code and NULL context on failure.
- * @warning This function dynamically allocates the EDHOC context using
- * calloc(). On success, the caller assumes ownership of this memory and is
- * responsible for freeing it. On failure, the function safely cleans up after
- * itself and returns a NULL pointer.
- */
-edhoc_server_message_1_result_t edhoc_server_handle_message_1(
-    const edhoc_server_message_1_request_data_t* message_1_request_data,
-    common_response_buffer_t* response_data);
 
 /**
  * @brief Check whether payload is properly formatted as EDHOC Message 3 and

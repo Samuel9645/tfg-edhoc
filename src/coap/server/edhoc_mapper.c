@@ -49,7 +49,7 @@ coap_pdu_code_t coap_server_map_edhoc_failure_to_response(
  * @return CoAP response code
  */
 static inline coap_pdu_code_t map_message_1_status_to_response(
-    edhoc_server_handshake_status_t status) {
+    edhoc_server_message_1_status_t status) {
   switch (status) {
   case CSH_OK:
     return COAP_RESPONSE_CODE_CHANGED;
@@ -70,7 +70,7 @@ static inline coap_pdu_code_t map_message_1_status_to_response(
 }
 
 static inline void log_message_1_failure(
-    edhoc_server_handshake_status_t status) {
+    edhoc_server_message_1_status_t status) {
   static const char ERROR_PREFIX[] = "Message 1 processing failed: ";
   switch (status) {
   case CSH_ERR_INVALID_ARGS:

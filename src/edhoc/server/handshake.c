@@ -72,12 +72,12 @@ static inline bool edhoc_server_message_3_has_invalid_args(
 }
 
 bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
-                                                  size_t payload_len) {
+                                                  const size_t payload_len) {
   return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
 }
 
 bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, size_t request_len,
+    const uint8_t* request_payload, const size_t request_len,
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields) {
   if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {

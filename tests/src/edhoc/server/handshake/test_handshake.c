@@ -59,6 +59,30 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   TEST_ASSERT_EQUAL(0, payload_len);
 }
 
+// ============================================================================
+// Message 1 Handler & Formatting Tests
+// ============================================================================
+
+void test_is_properly_formatted_message_1_success(void) {
+  test_edsh_payload_t payload_with_prefix = get_valid_message_1_payload();
+  const uint8_t* payload_ptr = payload_with_prefix.data;
+  TEST_ASSERT_TRUE(edhoc_server_is_properly_formatted_message_1(
+      payload_with_prefix.data, payload_with_prefix.length));
+  TEST_ASSERT_EQUAL_PTR(payload_ptr, payload_with_prefix.data);
+}
+
+void test_is_properly_formatted_message_1_fails_on_invalid_payload(void) {
+  test_edsh_payload_t payload_without_prefix = get_invalid_prefix_payload();
+  const uint8_t* payload_ptr = payload_without_prefix.data;
+
+  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(NULL, 5));
+  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(
+      payload_without_prefix.data, 0));
+  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(
+      payload_without_prefix.data, payload_without_prefix.length));
+  TEST_ASSERT_EQUAL_PTR(payload_ptr, payload_without_prefix.data);
+}
+
 void test_handle_message_1_fails_on_invalid_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);

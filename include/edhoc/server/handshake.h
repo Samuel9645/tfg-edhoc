@@ -77,7 +77,7 @@ typedef enum edhoc_server_handshake_status {
  * @return true if payload matches Message 1 framing, false otherwise.
  */
 bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
-                                                  size_t payload_len);
+                                                  const size_t payload_len);
 
 /**
  * @brief Check whether payload is properly formatted as EDHOC Message 3 and
@@ -90,7 +90,7 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
  * @return true if payload is valid Message 3, false otherwise.
  */
 bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, size_t request_len,
+    const uint8_t* request_payload, const size_t request_len,
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields);
 

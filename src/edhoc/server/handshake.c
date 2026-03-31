@@ -9,53 +9,15 @@
 #include "coap/server/edhoc_mapper.h"
 #include "edhoc/common/constants.h"
 #include "edhoc/common/setup.h"
-#include "edhoc/credentials/authentication.h"
-#include "edhoc/credentials/public_data.h"
-#include "edhoc/credentials/server_private_key.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handle_libedhoc_errors.h"
 #include "edhoc/server/handshake_result.h"
-
-static int server_credential_fetch(void* user_context,
-                                   struct edhoc_auth_creds* credentials) {
-  return edhoc_credentials_fetch(user_context, credentials, SERVER_PUBLIC_KEY,
-                                 ARRAY_SIZE(SERVER_PUBLIC_KEY),
-                                 SERVER_PRIVATE_KEY,
-                                 ARRAY_SIZE(SERVER_PRIVATE_KEY), SERVER_KID);
-}
-
-static int server_credential_verify(void* user_context,
-                                    struct edhoc_auth_creds* credentials,
-                                    const uint8_t** public_key_reference,
-                                    size_t* public_key_length) {
-  return edhoc_credentials_verify(
-      user_context, credentials, CLIENT_KID, CLIENT_PUBLIC_KEY,
-      ARRAY_SIZE(CLIENT_PUBLIC_KEY), public_key_reference, public_key_length);
-}
-
-static const struct edhoc_credentials SERVER_CREDENTIALS = {
-    .fetch = server_credential_fetch,
-    .verify = server_credential_verify,
-};
 
 static inline bool params_are_invalid(
     const edhoc_server_common_request_data_t* base_data,
     const common_response_buffer_t* response_data) {
   return !edhoc_server_common_request_data_is_valid(base_data) ||
          !common_response_buffer_is_valid(response_data);
-}
-static inline bool edhoc_server_message_1_has_invalid_args(
-    const edhoc_server_common_request_data_t* request_data,
-    const common_response_buffer_t* response_data) {
-  if (!edhoc_server_common_request_data_is_valid(request_data) ||
-      !common_response_buffer_is_valid(response_data)) {
-    return true;
-  }
-
-  const bool session_already_exists = (request_data->edhoc_ctx != NULL);
-  const bool payload_is_too_short =
-      (request_data->request_data.payload_length <= 1);
-  return session_already_exists || payload_is_too_short;
 }
 
 static inline bool edhoc_server_message_3_has_invalid_args(
@@ -93,21 +55,33 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
   return CSH_OK;
 }
 
+static inline bool edhoc_server_message_1_has_invalid_args(
+    const edhoc_server_common_request_data_t* request_data,
+    const common_response_buffer_t* response_data) {
+  if (params_are_invalid(request_data, response_data)) {
+    return true;
+  }
+
+  const bool session_already_exists = (request_data->edhoc_ctx != NULL);
+  const bool payload_is_too_short =
+      (request_data->request_data.payload_length <= 1);
+  return session_already_exists || payload_is_too_short;
+}
+
 edhoc_server_message_1_result_t edhoc_server_handle_message_1(
-    const edhoc_server_common_request_data_t* message_1_request_data,
+    const edhoc_server_message_1_request_data_t* message_1_request_data,
     common_response_buffer_t* response_data) {
-  if (edhoc_server_message_1_has_invalid_args(message_1_request_data,
-                                              response_data)) {
+  const edhoc_server_common_request_data_t* base_data =
+      &message_1_request_data->base_data;
+  if (edhoc_server_message_1_has_invalid_args(base_data, response_data)) {
     return edhoc_server_message_1_failure(CSH_ERR_INVALID_ARGS);
   }
-  if (message_1_request_data->request_data.payload_length >
-      EDC_MESSAGE_BUFFER_LENGTH) {
+
+  if (base_data->request_data.payload_length > EDC_MESSAGE_BUFFER_LENGTH) {
     return edhoc_server_message_1_failure(CSH_ERR_PAYLOAD_TOO_LARGE);
   }
-  const uint8_t* no_prefix_payload =
-      message_1_request_data->request_data.payload;
-  size_t no_prefix_payload_len =
-      message_1_request_data->request_data.payload_length;
+  const uint8_t* no_prefix_payload = base_data->request_data.payload;
+  size_t no_prefix_payload_len = base_data->request_data.payload_length;
   if (edhoc_server_remove_cbor_true_prefix(&no_prefix_payload,
                                            &no_prefix_payload_len) != CSH_OK) {
     return edhoc_server_message_1_failure(CSH_ERR_PREFIX_MISSING);
@@ -118,8 +92,8 @@ edhoc_server_message_1_result_t edhoc_server_handle_message_1(
     return edhoc_server_message_1_failure(CSH_ERR_CALLOC_FAILED);
   }
 
-  int edhoc_api_result =
-      edhoc_common_setup_context(edhoc_ctx, &SERVER_CREDENTIALS);
+  int edhoc_api_result = edhoc_common_setup_context(
+      edhoc_ctx, message_1_request_data->credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     free(edhoc_ctx);
     return edhoc_server_message_1_failure(CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED);

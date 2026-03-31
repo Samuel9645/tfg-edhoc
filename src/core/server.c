@@ -5,6 +5,7 @@
 #include "coap/server/dispatch.h"
 #include "coap/server/utils.h"
 #include "common/cleanup.h"
+#include "edhoc/credentials/server_credentials.h"
 
 static void edhoc_post_handler(coap_resource_t* resource,
                                coap_session_t* session,
@@ -13,7 +14,8 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                coap_pdu_t* response) {
   (void)resource;
   (void)query;
-  coap_server_dispatch_edhoc_post(session, request, response);
+  coap_server_dispatch_edhoc_post(session, request, &SERVER_CREDENTIALS,
+                                  response);
 }
 
 emulation_status_t tfg_run_server(void) {

@@ -12,7 +12,8 @@ static inline bool coap_server_dispatch_has_invalid_deps_or_args(
 }
 
 void coap_server_dispatch_post_with_dependencies(
-    coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
+    coap_session_t* session, const coap_pdu_t* request,
+    const struct edhoc_credentials* credentials, coap_pdu_t* response,
     const coap_server_dispatch_deps_t* deps) {
   if (coap_server_dispatch_has_invalid_deps_or_args(session, request, response,
                                                     deps)) {
@@ -61,14 +62,16 @@ void coap_server_dispatch_post_with_dependencies(
       return;
     }
 
-    edhoc_server_common_request_data_t request_data = {
-        .session = session,
-        .edhoc_ctx = edhoc_ctx,
-        .response = response,
-        .request_data = {
-            .payload = request_payload,
-            .payload_length = request_len,
-        }};
+    edhoc_server_message_1_request_data_t request_data = {
+        .base_data = {.session = session,
+                      .edhoc_ctx = edhoc_ctx,
+                      .response = response,
+                      .request_data =
+                          {
+                              .payload = request_payload,
+                              .payload_length = request_len,
+                          }},
+        .credentials = credentials};
 
     edhoc_server_message_1_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);

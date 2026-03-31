@@ -46,7 +46,7 @@ typedef struct coap_server_dispatch_deps_t {
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   edhoc_server_message_1_result_t (*handle_message_1)(
-      const edhoc_server_common_request_data_t* request_data,
+      const edhoc_server_message_1_request_data_t* request_data,
       common_response_buffer_t* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
@@ -98,7 +98,9 @@ static inline bool coap_server_dispatch_deps_are_valid(
  *
  * @param[in] session Active CoAP session bound to the remote client.
  * @param[in] request Incoming CoAP PDU with EDHOC message payload.
+ * @param[in] credentials EDHOC credentials for the session.
  * @param[in,out] response CoAP response PDU where code and payload are set.
+
  * @param[in] deps Dependency injection structure with custom implementations
  * for all dispatch operations. All function pointers must be non-NULL.
  *
@@ -114,7 +116,8 @@ static inline bool coap_server_dispatch_deps_are_valid(
  * for protocol details on Message 1 and Message 3 handling.
  */
 void coap_server_dispatch_post_with_dependencies(
-    coap_session_t* session, const coap_pdu_t* request, coap_pdu_t* response,
+    coap_session_t* session, const coap_pdu_t* request,
+    const struct edhoc_credentials* credentials, coap_pdu_t* response,
     const coap_server_dispatch_deps_t* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

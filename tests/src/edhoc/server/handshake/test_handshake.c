@@ -86,7 +86,7 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
 void test_handle_message_1_fails_on_invalid_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);
-  edhoc_server_common_request_data_t empty_request = {0};
+  edhoc_server_message_1_request_data_t empty_request = {0};
   common_response_buffer_t empty_response = {0};
 
   handshake_test_case_t test_cases[] = {
@@ -109,12 +109,18 @@ void test_handle_message_1_fails_on_invalid_data(void) {
   }
 }
 
+static inline void override_test_request_payload(handshake_test_env_t* env,
+                                                 const uint8_t* new_payload,
+                                                 size_t new_len) {
+  env->request.base_data.request_data.payload = new_payload;
+  env->request.base_data.request_data.payload_length = new_len;
+}
+
 void test_handle_message_1_fails_on_too_large_request_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);
   uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
-  env.request.request_data.payload = large_buffer;
-  env.request.request_data.payload_length = sizeof(large_buffer);
+  override_test_request_payload(&env, large_buffer, sizeof(large_buffer));
 
   edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);

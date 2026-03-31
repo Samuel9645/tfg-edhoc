@@ -22,7 +22,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
 )
 
-set(SERVER_SOURCES
+set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/request.c
@@ -30,18 +30,27 @@ set(SERVER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handle_libedhoc_errors.c
-    ${BASE_SOURCES}
 )
 
-set(CLIENT_SOURCES
+set(SERVER_SOURCES
+    ${BASE_SOURCES}
+    ${SERVER_SPECIFIC_SOURCES}
+)
+
+set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/client.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cleanup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
+)
+
+set(CLIENT_SOURCES
     ${BASE_SOURCES}
+    ${CLIENT_SPECIFIC_SOURCES}
 )
 
 # Define main executable

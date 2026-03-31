@@ -1,5 +1,6 @@
 #include "edhoc/server/handshake/helpers.h"
 
+#include <edhoc.h>
 #include <string.h>
 #include <unity.h>
 
@@ -7,14 +8,17 @@
 
 enum { ARBITRARY_NONZERO_VALUE = 0xFF };
 
+static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
+
 static void setup_valid_message_1_request_data(
     coap_session_t* session, coap_pdu_t* response, const uint8_t* payload,
-    size_t payload_len, edhoc_server_common_request_data_t* request_data) {
-  request_data->session = session;
-  request_data->edhoc_ctx = NULL;
-  request_data->response = response;
-  request_data->request_data.payload = payload;
-  request_data->request_data.payload_length = payload_len;
+    size_t payload_len, edhoc_server_message_1_request_data_t* request_data) {
+  request_data->base_data.session = session;
+  request_data->base_data.edhoc_ctx = NULL;
+  request_data->base_data.response = response;
+  request_data->base_data.request_data.payload = payload;
+  request_data->base_data.request_data.payload_length = payload_len;
+  request_data->credentials = &DUMMY_TEST_CREDS;
 }
 
 static void setup_valid_message_1_response_data(

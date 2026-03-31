@@ -35,6 +35,17 @@ typedef struct {
 } edhoc_server_common_request_data_t;
 
 /**
+ * @brief Input data required to process EDHOC Message 1.
+ */
+typedef struct edhoc_server_message_1_request_data {
+  /** Common session/context/response/request metadata. */
+  edhoc_server_common_request_data_t base_data;
+
+  /** Server credentials for setting up the EDHOC context. */
+  const struct edhoc_credentials* credentials;
+} edhoc_server_message_1_request_data_t;
+
+/**
  * @brief Validate that common EDHOC server request data is properly
  * initialized.
  *
@@ -87,25 +98,18 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
- * @param[in] request_data Session/request metadata for Message 1
- * processing.
+ * @param[in] message_1_request_data Session/request metadata for Message 1
+ * processing, including credentials.
  * @param[out] response_data Response buffer metadata for Message 2.
  * @return Struct containing status code and allocated EDHOC context on success,
  * or error code and NULL context on failure.
- *
- * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
- * the dispatcher from CoAP session app-data. It is used for validation and
- * call-scoped protocol operations only; ownership remains in session
- * app-data.
- *
- * @warning Allocates EDHOC context with calloc() and registers as session
- * app-data with free() as destructor. Before process exit, caller must
- * clean the CoAP session/context resources associated with this handshake;
- * use session_resources_t + tfg_common_cleanup_resources() for centralized
- * teardown.
+ * @warning This function dynamically allocates the EDHOC context using
+ * calloc(). On success, the caller assumes ownership of this memory and is
+ * responsible for freeing it. On failure, the function safely cleans up after
+ * itself and returns a NULL pointer.
  */
 edhoc_server_message_1_result_t edhoc_server_handle_message_1(
-    const edhoc_server_common_request_data_t* request_data,
+    const edhoc_server_message_1_request_data_t* message_1_request_data,
     common_response_buffer_t* response_data);
 
 /**

@@ -49,9 +49,10 @@ static const coap_server_dispatch_deps_t
         .get_session_app_data = coap_session_get_app_data,
 };
 
-void coap_server_dispatch_edhoc_post(coap_session_t* session,
-                                     const coap_pdu_t* request,
-                                     coap_pdu_t* response) {
+void coap_server_dispatch_edhoc_post(
+    coap_session_t* session, const coap_pdu_t* request,
+    const struct edhoc_credentials* credentials, coap_pdu_t* response) {
   coap_server_dispatch_post_with_dependencies(
-      session, request, response, &coap_server_edhoc_dispatch_default_deps);
+      session, request, credentials, response,
+      &coap_server_edhoc_dispatch_default_deps);
 }

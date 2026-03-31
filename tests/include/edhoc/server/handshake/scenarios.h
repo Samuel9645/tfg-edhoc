@@ -16,7 +16,7 @@ typedef struct handshake_test_case {
   /* Description of the test case for debugging purposes. */
   const char* description;
   /* Input request data for Message 1 handler. */
-  const edhoc_server_common_request_data_t* request;
+  const edhoc_server_message_1_request_data_t* request;
   /* Response buffer to check for side-effects after handler execution. */
   common_response_buffer_t* response;
 } handshake_test_case_t;

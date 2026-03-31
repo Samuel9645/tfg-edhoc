@@ -2,6 +2,7 @@
 #define COAP_SERVER_DISPATCH_H_
 
 #include <coap3/coap.h>
+#include <edhoc.h>
 
 /**
  * @brief Dispatch CoAP EDHOC POST requests to the right message handler.
@@ -14,8 +15,8 @@
  * error responses (4.00 Bad Request, 5.00 Internal Server Error) per RFC 9528
  * A.2.3. For errors, the payload contains the EDHOC error message.
  */
-void coap_server_dispatch_edhoc_post(coap_session_t* session,
-                                     const coap_pdu_t* request,
-                                     coap_pdu_t* response);
+void coap_server_dispatch_edhoc_post(
+    coap_session_t* session, const coap_pdu_t* request,
+    const struct edhoc_credentials* credentials, coap_pdu_t* response);
 
-#endif // COAP_SERVER_DISPATCH_H_
+#endif  // COAP_SERVER_DISPATCH_H_

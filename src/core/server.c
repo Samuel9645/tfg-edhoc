@@ -28,20 +28,20 @@ emulation_status_t tfg_run_server(void) {
   static const char COAP_LISTEN_UCAST_IP[] = "::";
   if (coap_server_setup_endpoints(server_resources.coap_context,
                                   COAP_LISTEN_UCAST_IP) !=
-      COAP_STATUS_SUCCESS) {
+      CCOM_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }
 
   if (coap_server_add_post_resource(server_resources.coap_context,
                                     ".well-known/edhoc", edhoc_post_handler) !=
-      COAP_STATUS_SUCCESS) {
+      CCOM_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }
 
   if (coap_server_run_input_output_loop(server_resources.coap_context) !=
-      COAP_STATUS_SUCCESS) {
+      CCOM_STATUS_SUCCESS) {
     tfg_common_cleanup_resources(&server_resources);
     return EMULATION_FAILURE;
   }

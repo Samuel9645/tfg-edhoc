@@ -27,20 +27,20 @@ coap_status_result_t coap_client_parse_and_resolve_coap_uri(
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
                      parsed_uri) != 0) {
     coap_log_warn("cannot parse uri %s\n", uri_string);
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   const uint32_t masked_protocol = 1 << parsed_uri->scheme;
   coap_status_result_t resolve_status =
-      resolve_address(&parsed_uri->host, parsed_uri->port, masked_protocol,
-                      destination_address);
-  if (resolve_status != COAP_STATUS_SUCCESS) {
+      coap_common_resolve_address(&parsed_uri->host, parsed_uri->port,
+                                  masked_protocol, destination_address);
+  if (resolve_status != CCOM_STATUS_SUCCESS) {
     coap_log_warn("cannot resolve address %*.*s\n",
                   (int)parsed_uri->host.length, (int)parsed_uri->host.length,
                   (const char*)parsed_uri->host.s);
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t coap_client_create_coap_session(
@@ -50,7 +50,7 @@ coap_status_result_t coap_client_create_coap_session(
   *coap_session_context = coap_new_context(NULL);
   if (!*coap_session_context) {
     coap_log_err("cannot create libcoap context\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   coap_context_set_block_mode(
@@ -66,44 +66,93 @@ coap_status_result_t coap_client_create_coap_session(
                               destination_address, protocol);
   if (!*coap_session) {
     coap_log_err("cannot create client session\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   if (response_handler != NULL) {
     coap_register_response_handler(*coap_session_context, response_handler);
   }
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
+}
+
+/**
+ * @brief Create a CoAP POST request PDU with the given URI options.
+ * @param[in] coap_session Active CoAP session used to create the PDU.
+ * @return Pointer to the created PDU, or NULL on error.
+ */
+static inline coap_pdu_t* create_post_request_pdu(
+    coap_session_t* coap_session) {
+  return coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
+                       coap_new_message_id(coap_session),
+                       coap_session_max_pdu_size(coap_session));
+}
+
+/**
+ * @brief Adds URI options to the given optlist based on the provided client URI
+ * and destination address.
+ * @param[in] client_uri Parsed URI containing the options to add.
+ * @param[in] destination_address Destination address associated with the URI,
+ * used for port option.
+ * @param[out] optlist Pointer to the optlist to add options to.
+ * @return 1 on success, 0 if error.
+ */
+static inline int add_uri_into_optlist(
+    const coap_uri_t* client_uri, const coap_address_t* destination_address,
+    coap_optlist_t** optlist) {
+  enum { CCU_ADD_PORT_OPTION = 1 };
+  return coap_uri_into_optlist(client_uri, destination_address, optlist,
+                               CCU_ADD_PORT_OPTION);
+}
+
+/**
+ * @brief Adds URI options to the given CoAP request PDU based on the provided
+ * client URI and destination address.
+ * @param[in] client_uri Parsed URI containing the options to add.
+ * @param[in] destination_address Destination address associated with the URI,
+ * used for port option.
+ * @param[in] options_list CoAP optlist containing the URI options to add.
+ * @param[out] request_pdu CoAP request PDU to add options to.
+ * @return 1 on success, 0 if error.
+ */
+static inline int add_uri_into_pdu(const coap_uri_t* client_uri,
+                                   const coap_address_t* destination_address,
+                                   coap_optlist_t** options_list,
+                                   coap_pdu_t* request_pdu) {
+  enum { CCU_COAP_ERROR_INDICATOR = 0 };
+  int result =
+      add_uri_into_optlist(client_uri, destination_address, options_list);
+  if (result == CCU_COAP_ERROR_INDICATOR) {
+    coap_log_err("cannot add URI into options list\n");
+    return result;
+  }
+  result = coap_add_optlist_pdu(request_pdu, options_list);
+  if (result == CCU_COAP_ERROR_INDICATOR) {
+    coap_log_err("cannot add options to PDU\n");
+    return result;
+  }
+  return result;
 }
 
 coap_pdu_t* coap_client_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_session_t* coap_session, coap_optlist_t* optlist) {
-  if (!optlist) {
-    coap_log_err("options list is null\n");
-    return NULL;
-  }
-
-  coap_pdu_t* request_pdu =
-      coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
-                    coap_new_message_id(coap_session),
-                    coap_session_max_pdu_size(coap_session));
+    coap_session_t* coap_session,
+    content_format_edhoc_values_t content_format) {
+  coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
   if (!request_pdu) {
     coap_log_err("cannot create PDU\n");
-    coap_delete_optlist(optlist);
     return NULL;
   }
-
-  enum { ADD_PORT_OPTION = 1 };
-  if (coap_uri_into_optlist(client_uri, destination_address, &optlist,
-                            ADD_PORT_OPTION) == LIBCOAP_ERROR) {
-    coap_log_err("cannot create options from URI\n");
+  coap_optlist_t* optlist =
+      coap_common_create_coap_edhoc_optlist(content_format);
+  if (!optlist) {
+    coap_log_err("cannot create options list\n");
     coap_delete_pdu(request_pdu);
-    coap_delete_optlist(optlist);
     return NULL;
   }
-
-  if (coap_add_optlist_pdu(request_pdu, &optlist) == LIBCOAP_ERROR) {
-    coap_log_err("cannot add options to PDU\n");
+  enum { CCU_ERROR_INDICATOR = 0 };
+  if (add_uri_into_pdu(client_uri, destination_address, &optlist,
+                       request_pdu) == CCU_ERROR_INDICATOR) {
+    coap_log_err("cannot add URI options to PDU\n");
     coap_delete_pdu(request_pdu);
     coap_delete_optlist(optlist);
     return NULL;
@@ -116,10 +165,10 @@ coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
                                                    coap_pdu_t* request_pdu) {
   if (coap_send(coap_session, request_pdu) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t coap_client_wait_for_coap_response(
@@ -137,7 +186,7 @@ coap_status_result_t coap_client_wait_for_coap_response(
         coap_io_process(coap_session_context, max_wait_milliseconds);
     if (elapsed_milliseconds < 0) {
       coap_log_err("CoAP I/O process failed\n");
-      return COAP_STATUS_ERROR;
+      return CCOM_ERROR;
     }
     if (remaining_wait_milliseconds > 0 &&
         elapsed_milliseconds >= remaining_wait_milliseconds) {
@@ -147,5 +196,5 @@ coap_status_result_t coap_client_wait_for_coap_response(
     remaining_wait_milliseconds -= elapsed_milliseconds;
   }
 
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }

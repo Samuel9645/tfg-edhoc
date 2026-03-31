@@ -52,6 +52,34 @@ typedef enum edhoc_server_handshake_status {
 } edhoc_server_handshake_status_t;
 
 /**
+ * @brief Check whether payload is properly formatted as EDHOC Message 1.
+ *
+ * @param[in] payload Request payload.
+ * @param[in] payload_len Request payload length.
+ * @return true if payload matches Message 1 framing, false otherwise.
+ */
+bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
+                                                  size_t payload_len);
+
+/**
+ * @brief Check whether payload is properly formatted as EDHOC Message 3.
+ *
+ * Validates that the payload contains a properly formatted Message 3 with
+ * correct connection ID. Extracts connection ID fields for further processing.
+ *
+ * @param[in] request_payload Request payload.
+ * @param[in] request_len Request payload length.
+ * @param[in] edhoc_ctx EDHOC context with private connection ID.
+ * @param[out] extracted_fields Populated with extracted message fields on
+ * success.
+ * @return true if payload is valid Message 3, false otherwise.
+ */
+bool edhoc_server_is_properly_formatted_message_3(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields);
+
+/**
  * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
  * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
  * success.

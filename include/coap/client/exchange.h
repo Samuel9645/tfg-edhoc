@@ -72,7 +72,8 @@ static inline bool coap_client_exchange_request_data_is_valid(
  *
  * @param[in] session_data Session and endpoint data required for init.
  * @param[out] exchange Exchange state storage provided by caller.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  */
 coap_status_result_t coap_client_exchange_init(
     const coap_client_exchange_session_data_t* session_data,
@@ -83,7 +84,8 @@ coap_status_result_t coap_client_exchange_init(
  *
  * @param[in] exchange Initialized exchange state.
  * @param[in] request_data EDHOC request payload and content format.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  */
 coap_status_result_t coap_client_exchange_send(
     coap_client_exchange_t* exchange,
@@ -94,8 +96,8 @@ coap_status_result_t coap_client_exchange_send(
  *
  * @param[in,out] exchange Initialized exchange state.
  * @param[out] response_data Response output buffer metadata.
- * @return COAP_STATUS_SUCCESS on 2.04 Changed responses,
- * COAP_STATUS_ERROR on transport failures or CoAP error responses.
+ * @return CCOM_STATUS_SUCCESS on 2.04 Changed responses,
+ * CCOM_ERROR on transport failures or CoAP error responses.
  *
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.

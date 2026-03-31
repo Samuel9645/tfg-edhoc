@@ -31,7 +31,8 @@
  * @param[in] port Port number to resolve.
  * @param[in] scheme_hint_bits Scheme hint bits for protocol selection.
  * @param[out] destination_address Output resolved socket address.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  *
  * @note On failure, the output destination_address is not modified.
  *
@@ -43,9 +44,9 @@
  * @note Inspired by libcoap-minimal common.cc and common.hh files:
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>.
  */
-coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
-                                     int scheme_hint_bits,
-                                     coap_address_t* destination_address);
+coap_status_result_t coap_common_resolve_address(
+    coap_str_const_t* host, uint16_t port, int scheme_hint_bits,
+    coap_address_t* destination_address);
 
 /**
  * @brief Create a CoAP options list with EDHOC-specific options.
@@ -64,7 +65,7 @@ coap_status_result_t resolve_address(coap_str_const_t* host, uint16_t port,
  *
  * @note On failure, any allocated resources are freed.
  */
-coap_optlist_t* create_coap_edhoc_optlist(
+coap_optlist_t* coap_common_create_coap_edhoc_optlist(
     content_format_edhoc_values_t content_format);
 
 #endif  // COAP_COMMON_HELPERS_H_

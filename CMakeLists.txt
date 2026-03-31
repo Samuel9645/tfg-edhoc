@@ -17,8 +17,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/shared/request.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/shared/response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
 )
@@ -26,6 +25,7 @@ set(BASE_SOURCES
 set(SERVER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/request.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/map_error_to_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c

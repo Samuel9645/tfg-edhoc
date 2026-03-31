@@ -7,7 +7,7 @@ coap_status_result_t successful_extract_payload_stub(
   (void)expected_format;
   (void)payload;
   (void)payload_len;
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t failed_extract_payload_stub(
@@ -17,7 +17,7 @@ coap_status_result_t failed_extract_payload_stub(
   (void)expected_format;
   (void)payload;
   (void)payload_len;
-  return COAP_STATUS_ERROR;
+  return CCOM_ERROR;
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};
@@ -26,14 +26,14 @@ coap_status_result_t successful_add_response_options_stub(
     coap_pdu_t* response, content_format_edhoc_values_t content_format) {
   (void)response;
   (void)content_format;
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t failed_add_response_options_stub(
     coap_pdu_t* response, content_format_edhoc_values_t content_format) {
   (void)response;
   (void)content_format;
-  return COAP_STATUS_ERROR;
+  return CCOM_ERROR;
 }
 
 void* get_null_session_app_data_stub(const coap_session_t* session) {
@@ -115,7 +115,7 @@ coap_status_result_t successful_add_response_payload_stub(
   (void)response;
   (void)payload;
   (void)payload_len;
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t failed_add_response_payload_stub(coap_pdu_t* response,
@@ -124,5 +124,5 @@ coap_status_result_t failed_add_response_payload_stub(coap_pdu_t* response,
   (void)response;
   (void)payload;
   (void)payload_len;
-  return COAP_STATUS_ERROR;
+  return CCOM_ERROR;
 }

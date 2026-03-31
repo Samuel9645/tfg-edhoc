@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// TODO: remove this include once the refactor is done
 #include "coap/server/map_error_to_response.h"
-#include "coap/shared/request.h"
 #include "edhoc/common/constants.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/credentials/authentication.h"
@@ -80,6 +80,34 @@ static inline bool edhoc_server_message_3_has_invalid_args(
       !request_data->message_3_extracted_fields;
   const bool edhoc_context_is_null = !request_data->base_data.edhoc_ctx;
   return message_3_fields_not_extracted || edhoc_context_is_null;
+}
+
+bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
+                                                  size_t payload_len) {
+  return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
+}
+
+bool edhoc_server_is_properly_formatted_message_3(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields) {
+  if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {
+    return false;
+  }
+
+  *extracted_fields = (struct edhoc_extracted_fields){
+      .buffer = request_payload,
+      .buffer_size = request_len,
+      .edhoc_message_ptr = request_payload,
+      .edhoc_message_size = request_len,
+  };
+
+  if (edhoc_extract_connection_id(extracted_fields) != EDHOC_SUCCESS) {
+    return false;
+  }
+
+  return edhoc_connection_id_equal(&extracted_fields->extracted_conn_id,
+                                   &edhoc_ctx->private_cid);
 }
 
 edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(

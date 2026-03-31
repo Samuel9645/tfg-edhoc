@@ -32,7 +32,8 @@
  * coap://localhost:5683/hello).
  * @param[out] parsed_uri Output parsed URI structure.
  * @param[out] destination_address Output resolved socket address.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  */
 coap_status_result_t coap_client_parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
@@ -46,7 +47,8 @@ coap_status_result_t coap_client_parse_and_resolve_coap_uri(
  * @param[in] response_handler Optional response callback used by libcoap.
  * @param[out] coap_session_context Output created CoAP context.
  * @param[out] coap_session Output created CoAP session.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  *
  * @note If response_handler is NULL, no callback is registered.
  *
@@ -64,7 +66,7 @@ coap_status_result_t coap_client_create_coap_session(
  * @param[in] client_uri Parsed URI.
  * @param[in] destination_address Destination address.
  * @param[in] coap_session Active CoAP session.
- * @param[in] optlist Pointer to options list used for PDU.
+ * @param[in] content_format Content format for the EDHOC message.
  *
  * @see [RFC 9528: The Forward Message
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
@@ -78,14 +80,15 @@ coap_status_result_t coap_client_create_coap_session(
  */
 coap_pdu_t* coap_client_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_session_t* coap_session, coap_optlist_t* optlist);
+    coap_session_t* coap_session, content_format_edhoc_values_t content_format);
 
 /**
  * @brief Send a prepared CoAP request.
  *
  * @param[in] coap_session Active CoAP session.
  * @param[in] request_pdu Prepared request PDU.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  */
 coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
                                                    coap_pdu_t* request_pdu);
@@ -96,7 +99,8 @@ coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
  * @param[in] coap_session_context Active CoAP context.
  * @param[in] coap_session Active CoAP session.
  * @param[in] have_response Pointer to response flag updated by callback.
- * @return COAP_STATUS_SUCCESS on success, COAP_STATUS_ERROR on failure.
+ * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * failure.
  */
 coap_status_result_t coap_client_wait_for_coap_response(
     coap_context_t* coap_session_context, coap_session_t* coap_session,

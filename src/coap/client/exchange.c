@@ -7,6 +7,7 @@
 #include "coap/client/log_error_response.h"
 #include "coap/client/utils.h"
 #include "coap/common/helpers.h"
+#include "coap/common/response.h"
 
 static bool client_response_has_edhoc_content_format(
     const coap_pdu_t* response) {
@@ -83,7 +84,7 @@ coap_status_result_t coap_client_exchange_init(
       !session_data->session_data.session || !session_data->endpoint_data.uri ||
       !session_data->endpoint_data.destination) {
     coap_log_err("invalid arguments to exchange_init\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   memset(exchange, 0, sizeof(*exchange));
@@ -96,13 +97,13 @@ coap_status_result_t coap_client_exchange_init(
   if (coap_session_set_app_data2(session_data->session_data.session, exchange,
                                  NULL) != NULL) {
     coap_log_err("unexpected existing session app-data in client\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   coap_register_response_handler(session_data->session_data.context,
                                  coap_client_response_handler);
 
-  return COAP_STATUS_SUCCESS;
+  return CCOM_STATUS_SUCCESS;
 }
 
 coap_status_result_t coap_client_exchange_send(
@@ -111,28 +112,23 @@ coap_status_result_t coap_client_exchange_send(
   if (!exchange || !request_data ||
       !coap_client_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
-    return COAP_STATUS_ERROR;
-  }
-
-  coap_optlist_t* optlist =
-      create_coap_edhoc_optlist(request_data->content_format);
-  if (!optlist) {
-    coap_log_err("failed to create CoAP option list\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   coap_pdu_t* request_pdu = coap_client_prepare_post_request(
-      &exchange->uri, &exchange->destination, exchange->session, optlist);
+      &exchange->uri, &exchange->destination, exchange->session,
+      request_data->content_format);
   if (!request_pdu) {
     coap_log_err("failed to prepare CoAP request\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
-  if (coap_add_data(request_pdu, request_data->request_data.payload_len,
-                    request_data->request_data.payload) == LIBCOAP_ERROR) {
+  if (coap_common_add_response_payload(
+          request_pdu, request_data->request_data.payload,
+          request_data->request_data.payload_len) == CCOM_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   coap_show_pdu(COAP_LOG_WARN, request_pdu);
@@ -143,20 +139,20 @@ coap_status_result_t coap_client_exchange_wait_and_get(
     coap_client_exchange_t* exchange, common_response_buffer_t* response_data) {
   if (!exchange || !common_response_buffer_is_writable(response_data)) {
     coap_log_err("invalid arguments to wait_and_get\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   if (coap_client_wait_for_coap_response(exchange->context, exchange->session,
                                          &exchange->have_response) !=
-      COAP_STATUS_SUCCESS) {
+      CCOM_STATUS_SUCCESS) {
     coap_log_err("error while waiting for CoAP response\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   if (!exchange->have_response || exchange->incoming_message_len == 0 ||
       exchange->incoming_message_len > response_data->payload_capacity) {
     coap_log_err("invalid response data\n");
-    return COAP_STATUS_ERROR;
+    return CCOM_ERROR;
   }
 
   bool is_error_response =
@@ -169,7 +165,7 @@ coap_status_result_t coap_client_exchange_wait_and_get(
   exchange->incoming_message_len = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;
 
-  return is_error_response ? COAP_STATUS_ERROR : COAP_STATUS_SUCCESS;
+  return is_error_response ? CCOM_ERROR : CCOM_STATUS_SUCCESS;
 }
 
 void coap_client_exchange_reset(coap_client_exchange_t* exchange) {

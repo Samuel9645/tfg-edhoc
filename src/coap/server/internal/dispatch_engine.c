@@ -31,14 +31,14 @@ void coap_server_dispatch_post_with_dependencies(
   size_t request_len = 0;
   if (deps->extract_payload_if_valid_edhoc_request(
           request, APPLICATION_CID_EDHOC_CBOR_SEQ, &request_payload,
-          &request_len) != COAP_STATUS_SUCCESS) {
+          &request_len) != CCOM_STATUS_SUCCESS) {
     coap_log_err("failed to validate EDHOC request\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
     return;
   }
 
   if (deps->add_edhoc_response_options(response, APPLICATION_EDHOC_CBOR_SEQ) !=
-      COAP_STATUS_SUCCESS) {
+      CCOM_STATUS_SUCCESS) {
     coap_log_err("failed to add EDHOC response options\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
@@ -109,7 +109,7 @@ void coap_server_dispatch_post_with_dependencies(
   if (response_data.payload_len > 0 &&
       deps->add_response_payload(response, response_payload,
                                  response_data.payload_len) !=
-          COAP_STATUS_SUCCESS) {
+          CCOM_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;

@@ -14,6 +14,7 @@
 #include "edhoc/credentials/server_private_key.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handle_libedhoc_errors.h"
+#include "edhoc/server/handshake_result.h"
 
 static int server_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {

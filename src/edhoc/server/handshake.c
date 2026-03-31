@@ -76,29 +76,6 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
   return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
 }
 
-bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, const size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields) {
-  if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {
-    return false;
-  }
-
-  *extracted_fields = (struct edhoc_extracted_fields){
-      .buffer = request_payload,
-      .buffer_size = request_len,
-      .edhoc_message_ptr = request_payload,
-      .edhoc_message_size = request_len,
-  };
-
-  if (edhoc_extract_connection_id(extracted_fields) != EDHOC_SUCCESS) {
-    return false;
-  }
-
-  return edhoc_connection_id_equal(&extracted_fields->extracted_conn_id,
-                                   &edhoc_ctx->private_cid);
-}
-
 edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
   const bool payload_is_invalid = (!*payload || !length || *length == 0);
@@ -179,6 +156,29 @@ edhoc_server_handshake_status_t edhoc_server_handle_message_1(
   }
 
   return CSH_OK;
+}
+
+bool edhoc_server_extract_if_properly_formatted_message_3(
+    const uint8_t* request_payload, const size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields) {
+  if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {
+    return false;
+  }
+
+  *extracted_fields = (struct edhoc_extracted_fields){
+      .buffer = request_payload,
+      .buffer_size = request_len,
+      .edhoc_message_ptr = request_payload,
+      .edhoc_message_size = request_len,
+  };
+
+  if (edhoc_extract_connection_id(extracted_fields) != EDHOC_SUCCESS) {
+    return false;
+  }
+
+  return edhoc_connection_id_equal(&extracted_fields->extracted_conn_id,
+                                   &edhoc_ctx->private_cid);
 }
 
 coap_pdu_code_t edhoc_server_handle_message_3(

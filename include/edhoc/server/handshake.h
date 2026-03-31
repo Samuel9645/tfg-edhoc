@@ -80,21 +80,6 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
                                                   const size_t payload_len);
 
 /**
- * @brief Check whether payload is properly formatted as EDHOC Message 3 and
- * then extract the fields if so.
- * @param[in] request_payload Request payload.
- * @param[in] request_len Request payload length.
- * @param[in] edhoc_ctx EDHOC context with private connection ID.
- * @param[out] extracted_fields Populated with extracted message fields on
- * success.
- * @return true if payload is valid Message 3, false otherwise.
- */
-bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, const size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields);
-
-/**
  * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
  * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
  * success.
@@ -127,6 +112,21 @@ edhoc_server_handshake_status_t edhoc_server_remove_cbor_true_prefix(
 edhoc_server_handshake_status_t edhoc_server_handle_message_1(
     const edhoc_server_common_request_data_t* request_data,
     common_response_buffer_t* response_data);
+
+/**
+ * @brief Check whether payload is properly formatted as EDHOC Message 3 and
+ * then extract the fields if so.
+ * @param[in] request_payload Request payload.
+ * @param[in] request_len Request payload length.
+ * @param[in] edhoc_ctx EDHOC context with private connection ID.
+ * @param[out] extracted_fields Populated with extracted message fields on
+ * success.
+ * @return true if payload is valid Message 3, false otherwise.
+ */
+bool edhoc_server_extract_if_properly_formatted_message_3(
+    const uint8_t* request_payload, const size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields);
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.

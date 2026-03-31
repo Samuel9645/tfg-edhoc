@@ -80,11 +80,8 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
                                                   size_t payload_len);
 
 /**
- * @brief Check whether payload is properly formatted as EDHOC Message 3.
- *
- * Validates that the payload contains a properly formatted Message 3 with
- * correct connection ID. Extracts connection ID fields for further processing.
- *
+ * @brief Check whether payload is properly formatted as EDHOC Message 3 and
+ * then extract the fields if so.
  * @param[in] request_payload Request payload.
  * @param[in] request_len Request payload length.
  * @param[in] edhoc_ctx EDHOC context with private connection ID.
@@ -92,7 +89,7 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
  * success.
  * @return true if payload is valid Message 3, false otherwise.
  */
-bool edhoc_server_is_properly_formatted_message_3(
+bool edhoc_server_extract_if_properly_formatted_message_3(
     const uint8_t* request_payload, size_t request_len,
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields);

@@ -76,7 +76,7 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
   return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
 }
 
-bool edhoc_server_is_properly_formatted_message_3(
+bool edhoc_server_extract_if_properly_formatted_message_3(
     const uint8_t* request_payload, size_t request_len,
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields) {

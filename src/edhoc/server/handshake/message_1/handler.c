@@ -6,14 +6,14 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/server/handshake/message_1_handler.h"
+#include "edhoc/server/handshake/message_1/handler.h"
 
 #include <stdlib.h>
 
 #include "edhoc/common/constants.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/config.h"
-#include "edhoc/server/handle_libedhoc_errors.h"
+#include "edhoc/server/handshake/message_1/errors.h"
 
 bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
                                                   const size_t payload_len) {
@@ -95,8 +95,9 @@ edhoc_server_message_1_result_t edhoc_server_handle_message_1(
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, no_prefix_payload,
                                              no_prefix_payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
-                                             response_data);
+    edhoc_handshake_add_message_1_error_to_response(
+        edhoc_api_result, edhoc_ctx, "Message 1 processing failed",
+        response_data);
     free(edhoc_ctx);
     return edhoc_server_message_1_failure(
         ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
@@ -106,8 +107,9 @@ edhoc_server_message_1_result_t edhoc_server_handle_message_1(
                                              response_data->payload_capacity,
                                              &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_ctx,
-                                             response_data);
+    edhoc_handshake_add_message_1_error_to_response(
+        edhoc_api_result, edhoc_ctx, "Message 2 composing failed",
+        response_data);
     free(edhoc_ctx);
     return edhoc_server_message_1_failure(
         ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);

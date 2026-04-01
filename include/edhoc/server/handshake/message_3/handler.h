@@ -1,5 +1,5 @@
 /**
- * @file message_3_handler.h
+ * @file handler.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Holds the core logic for the EDHOC handshake
@@ -14,7 +14,7 @@
 
 #include "common/data_models.h"
 #include "edhoc/server/handshake/common/request_data.h"
-#include "edhoc/server/handshake/message_3_result.h"
+#include "edhoc/server/handshake/message_3/result.h"
 
 /**
  * @brief Input data required to process EDHOC Message 3.

@@ -101,3 +101,17 @@ void test_handle_message_1_fails_on_m2_composition(void) {
   assert_m1_failed_with_edhoc_error(result,
                                     ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
 }
+
+void test_handle_message_1_propagates_library_error_payload(void) {
+  stub_edhoc_process_res = EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
+  const uint8_t expected_error_pdu[] = {0x01, 0x02, 0x03};
+  set_stub_error_response(expected_error_pdu, sizeof(expected_error_pdu));
+
+  const edhoc_server_message_1_result_t result =
+      edhoc_server_handle_message_1(&env.request, &env.response);
+
+  TEST_ASSERT_EQUAL(ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED, result.status);
+  TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.payload_length);
+  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.payload,
+                           sizeof(expected_error_pdu));
+}

@@ -1,5 +1,5 @@
 /**
- * @file message_3_result.h
+ * @file result.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief EDHOC Message 3 operation result type to decouple EDHOC logic from

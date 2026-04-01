@@ -6,13 +6,13 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/server/handshake/message_3_handler.h"
+#include "edhoc/server/handshake/message_3/handler.h"
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
 
-#include "edhoc/server/handle_libedhoc_errors.h"
+#include "edhoc/server/handshake/message_3/errors.h"
 
 static bool edhoc_server_message_3_has_invalid_args(
     const edhoc_server_message_3_request_data_t* request_data,
@@ -67,8 +67,8 @@ edhoc_server_message_3_result_t edhoc_server_handle_message_3(
       request_data->message_3_extracted_fields->edhoc_message_ptr,
       request_data->message_3_extracted_fields->edhoc_message_size);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_context,
-                                             response_data);
+    add_message_3_error_to_response(
+        edhoc_api_result, "Message 3 processing failed", response_data);
     return ESHM3_ERR_MESSAGE_3_PROCESS_FAILED;
   }
 
@@ -76,8 +76,8 @@ edhoc_server_message_3_result_t edhoc_server_handle_message_3(
       edhoc_context, response_data->payload, response_data->payload_capacity,
       &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_context,
-                                             response_data);
+    add_message_3_error_to_response(
+        edhoc_api_result, "Message 4 composing failed", response_data);
     return ESHM3_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
 

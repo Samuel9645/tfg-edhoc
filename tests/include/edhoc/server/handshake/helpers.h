@@ -9,7 +9,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_HELPERS_H_
 #define EDHOC_SERVER_HANDSHAKE_HELPERS_H_
 
-#include "edhoc/server/handshake/message_1_handler.h"
+#include "edhoc/server/handshake/message_1/handler.h"
 
 enum { TEDSH_MESSAGE_BUFFER_LENGTH = 256 };
 

@@ -14,6 +14,8 @@
 
 void reset_stub_results(void);
 
+void set_stub_error_response(const uint8_t* data, size_t len);
+
 extern int stub_edhoc_setup_res;
 extern int stub_edhoc_process_res;
 extern int stub_edhoc_compose_res;

@@ -5,7 +5,7 @@
  * @brief EDHOC Message 1 result constructors.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
-#include "edhoc/server/handshake/message_1_result.h"
+#include "edhoc/server/handshake/message_1/result.h"
 
 #include <stddef.h>
 

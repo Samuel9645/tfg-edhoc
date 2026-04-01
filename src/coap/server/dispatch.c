@@ -6,7 +6,7 @@
 #include "coap/server/edhoc_mapper/message_1_mapper.h"
 #include "coap/server/edhoc_mapper/message_3_mapper.h"
 #include "coap/server/request.h"
-#include "edhoc/server/handshake/message_3_handler.h"
+#include "edhoc/server/handshake/message_3/handler.h"
 #include "internal/dispatch_engine.h"
 
 static coap_status_result_t add_edhoc_response_options(

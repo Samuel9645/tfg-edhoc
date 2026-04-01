@@ -87,7 +87,9 @@ add_unity_test(test_handshake_mocked_libedhoc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/stubs.c
-    ${MESSAGE_1_HANDLER_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/common/request_data.c
     ${CMAKE_SOURCE_DIR}/src/common/data_models.c
 )
 

@@ -1,5 +1,5 @@
 /**
- * @file message_1_handler.h
+ * @file handler.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Logic for handling EDHOC Message 1 on the server side
@@ -9,7 +9,7 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
 
 #include "edhoc/server/handshake/common/request_data.h"
-#include "edhoc/server/handshake/message_1_result.h"
+#include "edhoc/server/handshake/message_1/result.h"
 
 /**
  * @brief Input data required to process EDHOC Message 1.

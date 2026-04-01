@@ -10,7 +10,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 
 enum { BUFFER_SIZE = 8 };
 

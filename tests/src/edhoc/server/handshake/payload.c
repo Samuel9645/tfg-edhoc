@@ -8,6 +8,8 @@
 
 #include "edhoc/server/handshake/payload.h"
 
+#include <string.h>
+
 #include "edhoc/common/constants.h"
 
 static test_edsh_payload_t create_payload(const uint8_t prefix) {
@@ -23,5 +25,5 @@ test_edsh_payload_t get_invalid_prefix_payload(void) {
 }
 
 test_edsh_payload_t get_valid_message_1_payload(void) {
-  return create_payload(EDCC_CBOR_TRUE);
+  return create_payload(EDH_COM_CONST_CBOR_TRUE);
 }

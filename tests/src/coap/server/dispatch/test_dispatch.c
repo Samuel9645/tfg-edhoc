@@ -1,5 +1,5 @@
 /**
- * @file tests.c
+ * @file test_dispatch.c
  *
  * @brief Unit tests for the CoAP server EDHOC dispatcher with dependency
  * injection.
@@ -14,10 +14,10 @@
  */
 #include <coap3/coap.h>
 #include <edhoc.h>
-#include <string.h>
 #include <unity.h>
 
 #include "coap/server/dispatch/create_base_dependencies.h"
+#include "coap/server/dispatch/stubs.h"
 
 static coap_session_t* dummy_session = NULL;
 static coap_pdu_t* dummy_request = NULL;

@@ -1,11 +1,14 @@
 /**
- * @file libedhoc_stubs.c
+ * @file stubs.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 31/03/2026
  * @brief Stubs to link to when testing
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
-
+// ReSharper disable CppParameterMayBeConstPtrOrRef
+// ReSharper disable CppParameterMayBeConst
+// since the real implementations expects non-const pointers to allow output
+// parameters
 #include "edhoc/server/handshake/stubs.h"
 
 #include <edhoc.h>
@@ -29,24 +32,27 @@ static size_t stub_error_len = 0;
 const uint8_t MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE, 0xEF};
 const size_t MOCK_ERROR_LEN = sizeof(MOCK_ERROR_PAYLOAD);
 
-int edhoc_common_setup_context(struct edhoc_context* context,
-                               const struct edhoc_credentials* credentials) {
+int edh_com_setup_context(struct edhoc_context* context,
+                          const struct edhoc_credentials* credentials) {
   (void)context;
   (void)credentials;
   return stub_edhoc_setup_res;
 }
 
 int edhoc_message_1_process(struct edhoc_context* edhoc_context,
-                            const uint8_t* message, const size_t length) {
+                            const uint8_t* message_1,
+                            const size_t message_1_length) {
   (void)edhoc_context;
-  (void)message;
-  (void)length;
+  (void)message_1;
+  (void)message_1_length;
   return stub_edhoc_process_res;
 }
 
-int edhoc_message_2_compose(struct edhoc_context* edhoc_context,
-                            uint8_t* message_2, const size_t message_2_size,
-                            size_t* message_2_length) {
+int edhoc_message_2_compose(
+    struct edhoc_context* edhoc_context,
+    uint8_t* message_2,  // NOLINT(*-non-const-parameter)
+    const size_t message_2_size,
+    size_t* message_2_length) {  // NOLINT(*-non-const-parameter)
   (void)edhoc_context;
   (void)message_2;
   (void)message_2_size;
@@ -61,10 +67,9 @@ void set_stub_error_response(const uint8_t* data, size_t len) {
   }
 }
 
-void edhoc_handshake_add_message_1_error_to_response(
+void edh_srv_hnd_m1_add_error_to_response(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message,
-    common_response_buffer_t* response_data) {
+    const char* generic_error_message, com_response_buffer_t* response_data) {
   (void)edhoc_api_result;
   (void)edhoc_context;
   (void)generic_error_message;
@@ -72,9 +77,9 @@ void edhoc_handshake_add_message_1_error_to_response(
   if (!response_data || !response_data->payload)
     return;
 
-  size_t len = (stub_error_len > 0) ? stub_error_len : MOCK_ERROR_LEN;
+  const size_t len = stub_error_len > 0 ? stub_error_len : MOCK_ERROR_LEN;
   const uint8_t* src =
-      (stub_error_len > 0) ? stub_error_payload : MOCK_ERROR_PAYLOAD;
+      stub_error_len > 0 ? stub_error_payload : MOCK_ERROR_PAYLOAD;
 
   if (response_data->payload_capacity >= len) {
     memcpy(response_data->payload, src, len);

@@ -6,10 +6,10 @@
 
 static int server_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
-  return edhoc_credentials_fetch(user_context, credentials, SERVER_PUBLIC_KEY,
-                                 ARRAY_SIZE(SERVER_PUBLIC_KEY),
-                                 SERVER_PRIVATE_KEY,
-                                 ARRAY_SIZE(SERVER_PRIVATE_KEY), SERVER_KID);
+  return edh_cred_auth_fetch(
+      user_context, credentials, EDH_CRED_PUB_SRV_PK,
+      ARRAY_SIZE(EDH_CRED_PUB_SRV_PK), EDH_CRED_SRV_PRIVATE_KEY,
+      ARRAY_SIZE(EDH_CRED_SRV_PRIVATE_KEY), EDH_CRED_PUB_SRV_KID);
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -17,12 +17,12 @@ static int server_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
                                     size_t* public_key_length) {
-  return edhoc_credentials_verify(
-      user_context, credentials, CLIENT_KID, CLIENT_PUBLIC_KEY,
-      ARRAY_SIZE(CLIENT_PUBLIC_KEY), public_key_reference, public_key_length);
+  return edh_cred_auth_verify(
+      user_context, credentials, EDH_CRED_PUB_CLI_KID, EDH_CRED_PUB_CLI_PK,
+      ARRAY_SIZE(EDH_CRED_PUB_CLI_PK), public_key_reference, public_key_length);
 }
 
-const struct edhoc_credentials SERVER_CREDENTIALS = {
+const struct edhoc_credentials EDH_CRED_SRV_CRED = {
     .fetch = server_credential_fetch,
     .verify = server_credential_verify,
 };

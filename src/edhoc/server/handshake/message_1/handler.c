@@ -1,5 +1,5 @@
 /**
- * @file message_1_handler.c
+ * @file handler.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Definition for the Message 1 handler
@@ -15,9 +15,10 @@
 #include "edhoc/config.h"
 #include "edhoc/server/handshake/message_1/errors.h"
 
-bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
-                                                  const size_t payload_len) {
-  return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
+bool edh_srv_hnd_m1_is_properly_formatted(const uint8_t* payload,
+                                          const size_t payload_len) {
+  return payload != NULL && payload_len > 0 &&
+         payload[0] == EDH_COM_CONST_CBOR_TRUE;
 }
 
 static bool arguments_are_invalid(const uint8_t** payload,
@@ -26,29 +27,28 @@ static bool arguments_are_invalid(const uint8_t** payload,
 }
 
 static bool first_byte_is_not_cbor_true(const uint8_t** payload) {
-  return (*payload)[0] != EDCC_CBOR_TRUE;
+  return (*payload)[0] != EDH_COM_CONST_CBOR_TRUE;
 }
 
-edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
+edh_srv_hnd_m1_status_t edh_srv_hnd_m1_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
   if (arguments_are_invalid(payload, length)) {
-    return ESHM1_ERR_INVALID_ARGS;
+    return EDH_SERV_HND_M1_ERR_INVALID_ARGS;
   }
   if (first_byte_is_not_cbor_true(payload)) {
-    return ESHM1_ERR_PREFIX_MISSING;
+    return EDH_SERV_HND_M1_ERR_PREFIX_MISSING;
   }
 
   *payload += 1;
   *length -= 1;
-  return ESHM1_OK;
+  return EDH_SERV_HND_M1_OK;
 }
 
 static bool edhoc_server_message_1_has_invalid_args(
-    const edhoc_server_common_request_data_t* request_data,
-    const common_response_buffer_t* response_data) {
-  if (!request_data ||
-      !edhoc_server_common_request_data_is_valid(request_data) ||
-      !common_response_buffer_is_valid(response_data)) {
+    const edh_srv_hnd_com_request_data_t* request_data,
+    const com_response_buffer_t* response_data) {
+  if (!request_data || !edh_srv_hnd_com_request_data_is_valid(request_data) ||
+      !com_response_buffer_is_valid(response_data)) {
     return true;
   }
 
@@ -58,62 +58,63 @@ static bool edhoc_server_message_1_has_invalid_args(
   return session_already_exists || payload_is_too_short;
 }
 
-edhoc_server_message_1_result_t edhoc_server_handle_message_1(
-    const edhoc_server_message_1_request_data_t* message_1_request_data,
-    common_response_buffer_t* response_data) {
+edh_srv_hnd_m1_result_t edh_srv_hnd_m1_handle(
+    const edh_srv_hnd_m1_request_data_t* message_1_request_data,
+    com_response_buffer_t* response_data) {
   if (!message_1_request_data) {
-    return edhoc_server_message_1_failure(ESHM1_ERR_INVALID_ARGS);
+    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);
   }
-  const edhoc_server_common_request_data_t* base_data =
+  const edh_srv_hnd_com_request_data_t* base_data =
       &message_1_request_data->base_data;
   if (edhoc_server_message_1_has_invalid_args(base_data, response_data)) {
-    return edhoc_server_message_1_failure(ESHM1_ERR_INVALID_ARGS);
+    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);
   }
 
-  if (base_data->request_data.payload_length > EDC_MESSAGE_BUFFER_LENGTH) {
-    return edhoc_server_message_1_failure(ESHM1_ERR_PAYLOAD_TOO_LARGE);
+  if (base_data->request_data.payload_length > EDH_CFG_MESSAGE_BUFFER_LENGTH) {
+    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_PAYLOAD_TOO_LARGE);
   }
   const uint8_t* no_prefix_payload = base_data->request_data.payload;
   size_t no_prefix_payload_len = base_data->request_data.payload_length;
-  if (edhoc_server_remove_cbor_true_prefix(
-          &no_prefix_payload, &no_prefix_payload_len) != ESHM1_OK) {
-    return edhoc_server_message_1_failure(ESHM1_ERR_PREFIX_MISSING);
+  if (edh_srv_hnd_m1_remove_cbor_true_prefix(
+          &no_prefix_payload, &no_prefix_payload_len) != EDH_SERV_HND_M1_OK) {
+    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_PREFIX_MISSING);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    return edhoc_server_message_1_failure(ESHM1_ERR_CALLOC_FAILED);
+    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_CALLOC_FAILED);
   }
 
-  int edhoc_api_result = edhoc_common_setup_context(
-      edhoc_ctx, message_1_request_data->credentials);
+  int edhoc_api_result =
+      edh_com_setup_context(edhoc_ctx, message_1_request_data->credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     free(edhoc_ctx);
-    return edhoc_server_message_1_failure(ESHM1_ERR_EDHOC_CONTEXT_SETUP_FAILED);
+    return edh_srv_hnd_m1_failure(
+        EDH_SERV_HND_M1_ERR_EDHOC_CONTEXT_SETUP_FAILED);
   }
 
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, no_prefix_payload,
                                              no_prefix_payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edhoc_handshake_add_message_1_error_to_response(
-        edhoc_api_result, edhoc_ctx, "Message 1 processing failed",
-        response_data);
+    edh_srv_hnd_m1_add_error_to_response(edhoc_api_result, edhoc_ctx,
+                                         "Message 1 processing failed",
+                                         response_data);
     free(edhoc_ctx);
-    return edhoc_server_message_1_failure(
-        ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+    return edh_srv_hnd_m1_failure(
+        EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
   }
 
   edhoc_api_result = edhoc_message_2_compose(edhoc_ctx, response_data->payload,
                                              response_data->payload_capacity,
                                              &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edhoc_handshake_add_message_1_error_to_response(
-        edhoc_api_result, edhoc_ctx, "Message 2 composing failed",
-        response_data);
+    edh_srv_hnd_m1_add_error_to_response(edhoc_api_result, edhoc_ctx,
+                                         "Message 2 composing failed",
+                                         response_data);
     free(edhoc_ctx);
-    return edhoc_server_message_1_failure(
-        ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+    return edh_srv_hnd_m1_failure(
+        EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
 
-  return edhoc_server_message_1_ok(edhoc_ctx);
+  return edh_srv_hnd_m1_ok(edhoc_ctx);
 }

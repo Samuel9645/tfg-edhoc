@@ -11,14 +11,14 @@
  */
 typedef struct {
   /** Generic CoAP/EDHOC session resources. */
-  session_resources_t session_resources;
+  com_session_resources_t session_resources;
 
   /** Client EDHOC handshake state owned by the caller. */
-  edhoc_client_handshake_t handshake;
+  edh_cli_handshake_t handshake;
 
   /** Exchange state owned by the caller. */
-  coap_client_exchange_t exchange;
-} coap_client_session_resources_t;
+  cp_cli_exchange_t exchange;
+} cp_cli_session_resources_t;
 
 /**
  * @brief Cleanup all resources allocated for the CoAP EDHOC client path.
@@ -26,11 +26,13 @@ typedef struct {
  * @param resources Pointer to coap_client_session_resources_t containing
  * generic and client-specific resources.
  *
- * @note Preferred single cleanup entry point for client handshake/exchange state.
+ * @note Preferred single cleanup entry point for client handshake/exchange
+ * state.
  *
  * @warning When using this function, avoid manual calls to
- * edhoc_client_handshake_deinit() for the same resources in the same control path.
+ * edh_cli_handshake_deinit() for the same resources in the same control
+ * path.
  */
-void coap_client_cleanup_resources(coap_client_session_resources_t* resources);
+void cp_cli_cleanup_resources(cp_cli_session_resources_t* resources);
 
 #endif  // COAP_CLIENT_CLEANUP_H_

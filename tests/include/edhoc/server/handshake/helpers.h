@@ -19,8 +19,8 @@ typedef struct {
   uint8_t req_payload[TEDSH_MESSAGE_BUFFER_LENGTH];
   uint8_t res_payload[TEDSH_MESSAGE_BUFFER_LENGTH];
   size_t res_written_len;
-  edhoc_server_message_1_request_data_t request;
-  common_response_buffer_t response;
+  struct edh_srv_hnd_m1_request_data request;
+  com_response_buffer_t response;
 } handshake_test_env_t;
 
 /**
@@ -43,17 +43,17 @@ void setup_testing_environment(handshake_test_env_t* env);
 
 /**
  * @brief Resets the response buffer in the test environment to a known state.
- * @param[in,out] response_data Pointer to the common_response_buffer_t to
+ * @param[in,out] response_data Pointer to the com_response_buffer_t to
  * reset.
  */
-void reset_test_response(common_response_buffer_t* response_data);
+void reset_test_response(com_response_buffer_t* response_data);
 
 /**
  * @brief Asserts that the response buffer has not been modified (i.e., no
  * side-effects) after a handler call.
- * @param[in] response Pointer to the common_response_buffer_t to check.
+ * @param[in] response Pointer to the com_response_buffer_t to check.
  */
-void assert_response_untouched(const common_response_buffer_t* response);
+void assert_response_untouched(const com_response_buffer_t* response);
 
 /**
  * @brief Sets the payload for a valid Message 1 in the test environment.

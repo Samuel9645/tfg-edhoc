@@ -2,7 +2,7 @@
 
 #include <edhoc.h>
 
-void coap_client_log_received_edhoc_error_response(
+void cp_cli_log_received_edhoc_error_response(
     const coap_pdu_code_t response_code, const uint8_t* payload,
     const size_t payload_len) {
   enum edhoc_error_code edhoc_error_code = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;

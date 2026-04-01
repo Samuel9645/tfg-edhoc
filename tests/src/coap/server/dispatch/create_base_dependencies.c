@@ -1,5 +1,7 @@
 #include "coap/server/dispatch/create_base_dependencies.h"
 
+#include "coap/server/dispatch/stubs.h"
+
 coap_server_dispatch_deps_t create_base_dependencies(void) {
   return (coap_server_dispatch_deps_t){
       .extract_payload_if_valid_edhoc_request = successful_extract_payload_stub,

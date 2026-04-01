@@ -25,8 +25,8 @@
  * @param[in] generic_error_message Generic error text for non-cipher errors.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void edhoc_handshake_add_message_1_error_to_response(
+void edh_srv_hnd_m1_add_error_to_response(
     int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message, common_response_buffer_t* response_data);
+    const char* generic_error_message, com_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_

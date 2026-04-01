@@ -24,18 +24,18 @@ typedef struct {
 
   /** Current EDHOC context associated with this session (if any). */
   struct edhoc_context* edhoc_current_context;
-} session_resources_t;
+} com_session_resources_t;
 
 /**
  * @brief Cleanup all resources allocated during a CoAP session, including the
  * EDHOC context.
  *
- * @param resources Pointer to the session_resources_t structure containing all
- * resources to be cleaned up.
+ * @param resources Pointer to the com_session_resources_t structure containing
+ * all resources to be cleaned up.
  *
  * @note The function will check each resource for NULL before attempting to
  * free it, and will set each pointer to NULL after freeing.
  */
-void tfg_common_cleanup_resources(session_resources_t* resources);
+void com_cleanup_resources(com_session_resources_t* resources);
 
 #endif  // COMMON_CLEANUP_H_

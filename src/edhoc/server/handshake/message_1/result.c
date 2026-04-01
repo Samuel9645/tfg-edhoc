@@ -1,5 +1,5 @@
 /**
- * @file message_1_result.c
+ * @file result.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief EDHOC Message 1 result constructors.
@@ -9,13 +9,12 @@
 
 #include <stddef.h>
 
-edhoc_server_message_1_result_t edhoc_server_message_1_ok(
-    struct edhoc_context* edhoc_ctx) {
-  return (edhoc_server_message_1_result_t){.status = ESHM1_OK,
-                                           .edhoc_ctx = edhoc_ctx};
+edh_srv_hnd_m1_result_t edh_srv_hnd_m1_ok(struct edhoc_context* edhoc_ctx) {
+  return (edh_srv_hnd_m1_result_t){.status = EDH_SERV_HND_M1_OK,
+                                   .edhoc_ctx = edhoc_ctx};
 }
 
-edhoc_server_message_1_result_t edhoc_server_message_1_failure(
-    const edhoc_server_message_1_status_t status) {
-  return (edhoc_server_message_1_result_t){.status = status, .edhoc_ctx = NULL};
+edh_srv_hnd_m1_result_t edh_srv_hnd_m1_failure(
+    const edh_srv_hnd_m1_status_t status) {
+  return (edh_srv_hnd_m1_result_t){.status = status, .edhoc_ctx = NULL};
 }

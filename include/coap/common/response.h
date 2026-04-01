@@ -15,8 +15,8 @@
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-coap_status_result_t coap_common_add_response_payload(coap_pdu_t* response,
-                                                      const uint8_t* payload,
-                                                      size_t payload_len);
+cp_status_result_t cp_com_add_response_payload(coap_pdu_t* response,
+                                               const uint8_t* payload,
+                                               size_t payload_len);
 
 #endif  // COAP_COMMON_RESPONSE_H_

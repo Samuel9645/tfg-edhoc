@@ -2,8 +2,8 @@
 #define COMMON_EMULATION_STATUS_H_
 
 typedef enum {
-  EMULATION_SUCCESS = 0,
-  EMULATION_FAILURE = -1,
-} emulation_status_t;
+  COM_EMULATION_SUCCESS = 0,
+  COM_EMULATION_FAILURE = -1,
+} com_emulation_status_t;
 
 #endif  // COMMON_EMULATION_STATUS_H_

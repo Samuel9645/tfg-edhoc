@@ -4,8 +4,8 @@
 #include <coap3/coap.h>
 #include <edhoc_helpers.h>
 
-#include "coap/coap_config.h"
 #include "coap/common/status.h"
+#include "coap/config.h"
 #include "edhoc/server/handshake/message_1/handler.h"
 #include "edhoc/server/handshake/message_3/handler.h"
 
@@ -24,13 +24,15 @@
  */
 typedef struct coap_server_dispatch_deps_t {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
-  coap_status_result_t (*extract_payload_if_valid_edhoc_request)(
-      const coap_pdu_t* request, content_format_edhoc_values_t expected_format,
+  cp_status_result_t (*extract_payload_if_valid_edhoc_request)(
+      const coap_pdu_t* request,
+      cp_cfg_content_format_edhoc_values_t expected_format,
       const uint8_t** payload, size_t* payload_len);
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
-  coap_status_result_t (*add_edhoc_response_options)(
-      coap_pdu_t* response, content_format_edhoc_values_t content_format);
+  cp_status_result_t (*add_edhoc_response_options)(
+      coap_pdu_t* response,
+      cp_cfg_content_format_edhoc_values_t content_format);
 
   /** Checks if payload conforms to EDHOC Message 1 format. */
   bool (*is_message_1)(const uint8_t* payload, size_t payload_len);
@@ -45,29 +47,27 @@ typedef struct coap_server_dispatch_deps_t {
       struct edhoc_extracted_fields* extracted_fields);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  edhoc_server_message_1_result_t (*handle_message_1)(
-      const edhoc_server_message_1_request_data_t* request_data,
-      common_response_buffer_t* response_data);
+  edh_srv_hnd_m1_result_t (*handle_message_1)(
+      const edh_srv_hnd_m1_request_data_t* request_data,
+      com_response_buffer_t* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      edhoc_server_message_1_result_t message_1_result,
-      coap_session_t* session);
+      edh_srv_hnd_m1_result_t message_1_result, coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  edhoc_server_message_3_result_t (*handle_message_3)(
-      const edhoc_server_message_3_request_data_t* request_data,
-      common_response_buffer_t* response_data);
+  edh_srv_hnd_m3_result_t (*handle_message_3)(
+      const edh_srv_hnd_m3_request_data_t* request_data,
+      com_response_buffer_t* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
   coap_pdu_code_t (*process_message_3_result)(
-      edhoc_server_message_3_result_t message_3_result,
-      coap_session_t* session);
+      edh_srv_hnd_m3_result_t message_3_result);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
-  coap_status_result_t (*add_response_payload)(coap_pdu_t* response,
-                                               const uint8_t* payload,
-                                               size_t payload_len);
+  cp_status_result_t (*add_response_payload)(coap_pdu_t* response,
+                                             const uint8_t* payload,
+                                             size_t payload_len);
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);

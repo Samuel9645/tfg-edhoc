@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int edhoc_common_setup_context(struct edhoc_context* context,
-                        const struct edhoc_credentials* credentials) {
+int edh_com_setup_context(struct edhoc_context* context,
+                          const struct edhoc_credentials* credentials) {
   const psa_status_t psa_status = psa_crypto_init();
   if (psa_status != PSA_SUCCESS) {
     fprintf(stderr, "cannot initialize PSA crypto: %d\n", psa_status);
@@ -75,9 +75,10 @@ int edhoc_common_setup_context(struct edhoc_context* context,
   return ret;
 }
 
-void edhoc_common_initialize_credential_key(struct edhoc_auth_creds* credentials,
-                               const uint8_t* public_key,
-    const size_t public_key_length, const int32_t key_id_integer) {
+void edh_com_initialize_credential_key(struct edhoc_auth_creds* credentials,
+                                       const uint8_t* public_key,
+                                       const size_t public_key_length,
+                                       const int32_t key_id_integer) {
   credentials->label = EDHOC_COSE_HEADER_KID;
   credentials->key_id.cred = public_key;
   credentials->key_id.cred_len = public_key_length;

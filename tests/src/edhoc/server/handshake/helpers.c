@@ -20,8 +20,7 @@ static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 
 static void setup_valid_message_1_request_data(
     coap_session_t* session, coap_pdu_t* response, const uint8_t* payload,
-    const size_t payload_len,
-    edhoc_server_message_1_request_data_t* request_data) {
+    const size_t payload_len, edh_srv_hnd_m1_request_data_t* request_data) {
   request_data->base_data.session = session;
   request_data->base_data.edhoc_ctx = NULL;
   request_data->base_data.response = response;
@@ -32,7 +31,7 @@ static void setup_valid_message_1_request_data(
 
 static void setup_valid_message_1_response_data(
     uint8_t* buffer, const size_t buffer_capacity,
-    common_response_buffer_t* response_data) {
+    com_response_buffer_t* response_data) {
   response_data->payload = buffer;
   response_data->payload_capacity = buffer_capacity;
   response_data->payload_length = buffer_capacity;
@@ -52,7 +51,7 @@ void setup_testing_environment(handshake_test_env_t* env) {
   env->session_dummy = 0;
   env->pdu_dummy = 0;
   memset(env->req_payload, 0, sizeof(env->req_payload));
-  const uint8_t payload_with_prefix[] = {EDCC_CBOR_TRUE, 0x01, 0x02};
+  const uint8_t payload_with_prefix[] = {EDH_COM_CONST_CBOR_TRUE, 0x01, 0x02};
   memcpy(env->req_payload, payload_with_prefix, sizeof(payload_with_prefix));
   memset(env->res_payload, 0, sizeof(env->res_payload));
   env->res_written_len = ARBITRARY_NONZERO_VALUE;
@@ -69,7 +68,7 @@ void set_valid_message_1_payload(uint8_t* buffer, const size_t buffer_capacity,
   TEST_ASSERT_NOT_NULL_MESSAGE(buffer, "Buffer pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(written_len,
                                "Written length pointer must not be NULL");
-  const uint8_t payload_with_prefix[] = {EDCC_CBOR_TRUE, 0x01, 0x02};
+  const uint8_t payload_with_prefix[] = {EDH_COM_CONST_CBOR_TRUE, 0x01, 0x02};
   TEST_ASSERT_LESS_OR_EQUAL_size_t_MESSAGE(
       sizeof(payload_with_prefix), buffer_capacity,
       "Buffer capacity is too small for valid Message 1 payload");
@@ -77,7 +76,7 @@ void set_valid_message_1_payload(uint8_t* buffer, const size_t buffer_capacity,
   *written_len = sizeof(payload_with_prefix);
 }
 
-void reset_test_response(common_response_buffer_t* response_data) {
+void reset_test_response(com_response_buffer_t* response_data) {
   TEST_ASSERT_NOT_NULL_MESSAGE(response_data,
                                "Test environment pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(response_data->payload,
@@ -86,7 +85,7 @@ void reset_test_response(common_response_buffer_t* response_data) {
   memset(response_data->payload, 0, response_data->payload_capacity);
 }
 
-void assert_response_untouched(const common_response_buffer_t* response) {
+void assert_response_untouched(const com_response_buffer_t* response) {
   if (!response || !response->payload || !response->payload_length)
     return;
 

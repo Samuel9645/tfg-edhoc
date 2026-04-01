@@ -1,3 +1,3 @@
 #include "core/client.h"
 
-int main(void) { return tfg_run_client(); }
+int main(void) { return core_run_client(); }

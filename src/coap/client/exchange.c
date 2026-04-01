@@ -21,7 +21,7 @@ static bool client_response_has_edhoc_content_format(
   const uint16_t content_format =
       coap_decode_var_bytes(coap_opt_value(content_format_option),
                             coap_opt_length(content_format_option));
-  return content_format == APPLICATION_EDHOC_CBOR_SEQ;
+  return content_format == CP_CFG_CONTENT_EDHOC;
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -32,7 +32,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   (void)sent;
   (void)id;
 
-  coap_client_exchange_t* exchange = coap_session_get_app_data(session);
+  cp_cli_exchange_t* exchange = coap_session_get_app_data(session);
   if (!exchange) {
     coap_log_err("missing client exchange state in response handler\n");
     return COAP_RESPONSE_FAIL;
@@ -70,37 +70,37 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   exchange->incoming_message_length = payload_length;
 
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
-    coap_client_log_received_edhoc_error_response(response_code, payload,
-                                                  payload_length);
+    cp_cli_log_received_edhoc_error_response(response_code, payload,
+                                             payload_length);
     return COAP_RESPONSE_OK;
   }
 
   return COAP_RESPONSE_OK;
 }
 
-bool coap_client_exchange_session_data_is_valid(
-    const coap_client_exchange_session_data_t* session_data) {
+bool cp_cli_exchange_session_data_is_valid(
+    const cp_cli_exchange_session_data_t* session_data) {
   return session_data != NULL && session_data->context != NULL &&
          session_data->session != NULL;
 }
 
-bool coap_client_exchange_request_data_is_valid(
-    const coap_client_exchange_request_data_t* request_data) {
+bool cp_cli_exchange_request_data_is_valid(
+    const cp_cli_exchange_request_data_t* request_data) {
   return request_data != NULL &&
-         common_request_payload_is_valid(&request_data->request_data);
+         com_request_payload_is_valid(&request_data->request_data);
 }
 
-bool coap_client_exchange_response_size_fits(const size_t message_length,
-                                             const size_t capacity) {
+bool cp_cli_exchange_response_size_fits(const size_t message_length,
+                                        const size_t capacity) {
   return message_length > 0 && message_length <= capacity;
 }
 
-coap_status_result_t coap_client_exchange_init(
-    const coap_client_exchange_session_data_t* session_data,
-    coap_client_exchange_t* exchange) {
-  if (!exchange || !coap_client_exchange_session_data_is_valid(session_data)) {
+cp_status_result_t cp_cli_exchange_init(
+    const cp_cli_exchange_session_data_t* session_data,
+    cp_cli_exchange_t* exchange) {
+  if (!exchange || !cp_cli_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   memset(exchange, 0, sizeof(*exchange));
@@ -113,68 +113,67 @@ coap_status_result_t coap_client_exchange_init(
   if (coap_session_set_app_data2(session_data->session, exchange, NULL) !=
       NULL) {
     coap_log_err("unexpected existing session app-data in client\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   coap_register_response_handler(session_data->context,
                                  coap_client_response_handler);
 
-  return CCOM_STATUS_SUCCESS;
+  return CP_STATUS_SUCCESS;
 }
 
-coap_status_result_t coap_client_exchange_send(
-    coap_client_exchange_t* exchange,
-    const coap_client_exchange_request_data_t* request_data) {
+cp_status_result_t cp_cli_exchange_send(
+    cp_cli_exchange_t* exchange,
+    const cp_cli_exchange_request_data_t* request_data) {
   if (!exchange || !request_data ||
-      !coap_client_exchange_request_data_is_valid(request_data)) {
+      !cp_cli_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
-  coap_pdu_t* request_pdu = coap_client_prepare_post_request(
+  coap_pdu_t* request_pdu = cp_cli_prepare_post_request(
       &exchange->session_data.uri, &exchange->session_data.destination,
       exchange->session_data.session, request_data->content_format);
   if (!request_pdu) {
     coap_log_err("failed to prepare CoAP request\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
-  if (coap_common_add_response_payload(
+  if (cp_com_add_response_payload(
           request_pdu, request_data->request_data.payload,
-          request_data->request_data.payload_length) == CCOM_ERROR) {
+          request_data->request_data.payload_length) == CP_STATUS_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   coap_show_pdu(COAP_LOG_WARN, request_pdu);
-  return coap_client_send_coap_request(exchange->session_data.session,
-                                       request_pdu);
+  return cp_cli_send_coap_request(exchange->session_data.session, request_pdu);
 }
 
-coap_status_result_t coap_client_exchange_wait_and_get(
-    coap_client_exchange_t* exchange, common_response_buffer_t* response_data) {
-  if (!exchange || !common_response_buffer_is_writable(response_data)) {
+cp_status_result_t cp_cli_exchange_wait_and_get(
+    cp_cli_exchange_t* exchange, com_response_buffer_t* response_data) {
+  if (!exchange || !com_response_buffer_is_writable(response_data)) {
     coap_log_err("invalid arguments to wait_and_get\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
-  if (coap_client_wait_for_coap_response(
+  if (cp_cli_wait_for_coap_response(
           exchange->session_data.context, exchange->session_data.session,
-          &exchange->have_response) != CCOM_STATUS_SUCCESS) {
+          &exchange->have_response) != CP_STATUS_SUCCESS) {
     coap_log_err("error while waiting for CoAP response\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   if (!exchange->have_response ||
-      !coap_client_exchange_response_size_fits(
-          exchange->incoming_message_length, response_data->payload_capacity)) {
+      !cp_cli_exchange_response_size_fits(exchange->incoming_message_length,
+                                          response_data->payload_capacity)) {
     coap_log_err("invalid response data\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   const bool is_error_response =
-      !coap_response_indicates_success(exchange->last_response_code);
+      !cp_com_coap_response_indicates_success(exchange->last_response_code);
 
   memcpy(response_data->payload, exchange->incoming_message,
          exchange->incoming_message_length);
@@ -183,10 +182,10 @@ coap_status_result_t coap_client_exchange_wait_and_get(
   exchange->incoming_message_length = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;
 
-  return is_error_response ? CCOM_ERROR : CCOM_STATUS_SUCCESS;
+  return is_error_response ? CP_STATUS_ERROR : CP_STATUS_SUCCESS;
 }
 
-void coap_client_exchange_reset(coap_client_exchange_t* exchange) {
+void cp_cli_exchange_reset(cp_cli_exchange_t* exchange) {
   if (!exchange) {
     return;
   }

@@ -15,6 +15,7 @@
 #include <coap3/coap.h>
 #include <edhoc.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unity.h>
 
 #include "edhoc/server/handshake/helpers.h"
@@ -35,16 +36,16 @@ void setUp(void) {
 // ============================================================================
 
 void test_handle_message_1_success(void) {
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(ESHM1_OK, result.status);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.edhoc_ctx);
   free(result.edhoc_ctx);
 }
 
 static void ensure_context_is_freed_on_failure(
-    const edhoc_server_message_1_result_t result) {
+    const edh_srv_hnd_m1_result_t result) {
   TEST_ASSERT_NULL(result.edhoc_ctx);
 }
 
@@ -54,26 +55,27 @@ void test_handle_message_1_fails_when_prefix_missing(void) {
   override_test_request_payload(&env, payload_without_prefix.data,
                                 payload_without_prefix.length);
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_PREFIX_MISSING, result.status);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_PREFIX_MISSING, result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
 void test_handle_message_1_fails_when_setup_context_fails(void) {
   stub_edhoc_setup_res = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_EDHOC_CONTEXT_SETUP_FAILED,
+                    result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
 static void assert_m1_failed_with_edhoc_error(
-    const edhoc_server_message_1_result_t result,
-    const edhoc_server_message_1_status_t expected_status) {
+    const edh_srv_hnd_m1_result_t result,
+    const edh_srv_hnd_m1_status_t expected_status) {
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
@@ -85,21 +87,21 @@ static void assert_m1_failed_with_edhoc_error(
 void test_handle_message_1_fails_on_m1_processing(void) {
   stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  assert_m1_failed_with_edhoc_error(result,
-                                    ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+  assert_m1_failed_with_edhoc_error(
+      result, EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
 }
 
 void test_handle_message_1_fails_on_m2_composition(void) {
   stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  assert_m1_failed_with_edhoc_error(result,
-                                    ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+  assert_m1_failed_with_edhoc_error(
+      result, EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
 }
 
 void test_handle_message_1_propagates_library_error_payload(void) {
@@ -107,10 +109,11 @@ void test_handle_message_1_propagates_library_error_payload(void) {
   const uint8_t expected_error_pdu[] = {0x01, 0x02, 0x03};
   set_stub_error_response(expected_error_pdu, sizeof(expected_error_pdu));
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED, result.status);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
+                    result.status);
   TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.payload_length);
   TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.payload,
                            sizeof(expected_error_pdu));

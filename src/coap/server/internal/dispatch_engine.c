@@ -1,6 +1,6 @@
 #include "dispatch_engine.h"
 
-#include "coap/coap_config.h"
+#include "coap/config.h"
 #include "edhoc/config.h"
 
 /**
@@ -44,25 +44,25 @@ void coap_server_dispatch_post_with_dependencies(
   const uint8_t* request_payload = NULL;
   size_t request_len = 0;
   if (deps->extract_payload_if_valid_edhoc_request(
-          request, APPLICATION_CID_EDHOC_CBOR_SEQ, &request_payload,
-          &request_len) != CCOM_STATUS_SUCCESS) {
+          request, CP_CFG_CONTENT_CID_EDHOC, &request_payload, &request_len) !=
+      CP_STATUS_SUCCESS) {
     coap_log_err("failed to validate EDHOC request\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
     return;
   }
 
-  if (deps->add_edhoc_response_options(response, APPLICATION_EDHOC_CBOR_SEQ) !=
-      CCOM_STATUS_SUCCESS) {
+  if (deps->add_edhoc_response_options(response, CP_CFG_CONTENT_EDHOC) !=
+      CP_STATUS_SUCCESS) {
     coap_log_err("failed to add EDHOC response options\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
 
-  uint8_t response_payload[EDC_MESSAGE_BUFFER_LENGTH] = {0};
+  uint8_t response_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
 
-  common_response_buffer_t response_data = {
+  com_response_buffer_t response_data = {
       .payload = response_payload,
-      .payload_capacity = EDC_MESSAGE_BUFFER_LENGTH,
+      .payload_capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
       .payload_length = 0,
   };
 
@@ -78,7 +78,7 @@ void coap_server_dispatch_post_with_dependencies(
       return;
     }
 
-    const edhoc_server_message_1_request_data_t request_data = {
+    const edh_srv_hnd_m1_request_data_t request_data = {
         .base_data = {.session = session,
                       .edhoc_ctx = edhoc_ctx,
                       .response = response,
@@ -89,7 +89,7 @@ void coap_server_dispatch_post_with_dependencies(
                           }},
         .credentials = credentials};
 
-    const edhoc_server_message_1_result_t message_1_result =
+    const edh_srv_hnd_m1_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
   } else if (deps->extract_fields_if_message_3(request_payload, request_len,
@@ -101,7 +101,7 @@ void coap_server_dispatch_post_with_dependencies(
       return;
     }
 
-    const edhoc_server_message_3_request_data_t request_data = {
+    const edh_srv_hnd_m3_request_data_t request_data = {
         .base_data =
             {
                 .session = session,
@@ -115,9 +115,9 @@ void coap_server_dispatch_post_with_dependencies(
             },
         .message_3_extracted_fields = &message_3_extracted_fields,
     };
-    const edhoc_server_message_3_result_t message_3_result =
+    const edh_srv_hnd_m3_result_t message_3_result =
         deps->handle_message_3(&request_data, &response_data);
-    response_code = deps->process_message_3_result(message_3_result, session);
+    response_code = deps->process_message_3_result(message_3_result);
   } else {
     coap_log_err("received invalid or unexpected EDHOC message\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
@@ -127,7 +127,7 @@ void coap_server_dispatch_post_with_dependencies(
   if (response_data.payload_length > 0 &&
       deps->add_response_payload(response, response_payload,
                                  response_data.payload_length) !=
-          CCOM_STATUS_SUCCESS) {
+          CP_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;

@@ -14,13 +14,13 @@
 /**
  * @brief Input data required to process EDHOC Message 1.
  */
-typedef struct edhoc_server_message_1_request_data {
+typedef struct edh_srv_hnd_m1_request_data {
   /** Common session/context/response/request metadata. */
-  edhoc_server_common_request_data_t base_data;
+  edh_srv_hnd_com_request_data_t base_data;
 
   /** Server credentials for setting up the EDHOC context. */
   const struct edhoc_credentials* credentials;
-} edhoc_server_message_1_request_data_t;
+} edh_srv_hnd_m1_request_data_t;
 
 /**
  * @brief Check whether payload is properly formatted as EDHOC Message 1.
@@ -29,8 +29,8 @@ typedef struct edhoc_server_message_1_request_data {
  * @param[in] payload_len Request payload length.
  * @return true if payload matches Message 1 framing, false otherwise.
  */
-bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
-                                                  size_t payload_len);
+bool edh_srv_hnd_m1_is_properly_formatted(const uint8_t* payload,
+                                          size_t payload_len);
 
 /**
  * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
@@ -38,10 +38,10 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
  * success.
  * @param[in,out] length Pointer to the buffer length; decremented by 1 on
  * success.
- * @return ESHM1_OK if prefix was removed, or a ESHM1_ERR code if
+ * @return EDHS_M1_OK if prefix was removed, or a EDHS_M1_ERR code if
  * invalid/missing.
  */
-edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
+edh_srv_hnd_m1_status_t edh_srv_hnd_m1_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length);
 
 /**
@@ -57,8 +57,8 @@ edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
  * responsible for freeing it. On failure, the function safely cleans up after
  * itself and returns a NULL pointer.
  */
-edhoc_server_message_1_result_t edhoc_server_handle_message_1(
-    const edhoc_server_message_1_request_data_t* message_1_request_data,
-    common_response_buffer_t* response_data);
+edh_srv_hnd_m1_result_t edh_srv_hnd_m1_handle(
+    const edh_srv_hnd_m1_request_data_t* message_1_request_data,
+    com_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_

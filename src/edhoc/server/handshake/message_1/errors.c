@@ -12,25 +12,24 @@
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
 
-enum { ESHM1_CIPHER_SUITES_ARRAY_SIZE = 8 };
+enum { EDHS_M1_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
 typedef struct {
   struct edhoc_error_info info;
-  int32_t suites_buffer[ESHM1_CIPHER_SUITES_ARRAY_SIZE];
-} edhoc_server_message_1_error_context_t;
+  int32_t suites_buffer[EDHS_M1_CIPHER_SUITES_ARRAY_SIZE];
+} edhs_m1_error_context_t;
 
-static edhoc_server_message_1_error_context_t prepare_message_1_error_context(
+static edhs_m1_error_context_t prepare_message_1_error_context(
     const int edhoc_api_result, const struct edhoc_context* context,
     const char* generic_error_message) {
-  edhoc_server_message_1_error_context_t error_ctx = {0};
+  edhs_m1_error_context_t error_ctx = {0};
 
   if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
-    edhoc_handshake_common_set_error_info(generic_error_message,
-                                          &error_ctx.info);
+    edh_srv_hnd_com_set_error_info(generic_error_message, &error_ctx.info);
     return error_ctx;
   }
 
-  int32_t peer_suites[ESHM1_CIPHER_SUITES_ARRAY_SIZE] = {0};
+  int32_t peer_suites[EDHS_M1_CIPHER_SUITES_ARRAY_SIZE] = {0};
   size_t peer_len = 0;
   size_t own_len = 0;
   /*
@@ -42,21 +41,19 @@ static edhoc_server_message_1_error_context_t prepare_message_1_error_context(
    not utilized.
    */
   edhoc_error_get_cipher_suites(
-      context, error_ctx.suites_buffer, ESHM1_CIPHER_SUITES_ARRAY_SIZE,
+      context, error_ctx.suites_buffer, EDHS_M1_CIPHER_SUITES_ARRAY_SIZE,
       &own_len, peer_suites, ARRAY_SIZE(peer_suites), &peer_len);
 
-  edhoc_handshake_common_set_error_info(generic_error_message, &error_ctx.info);
+  edh_srv_hnd_com_set_error_info(generic_error_message, &error_ctx.info);
   return error_ctx;
 }
 
-void edhoc_handshake_add_message_1_error_to_response(
+void edh_srv_hnd_m1_add_error_to_response(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message,
-    common_response_buffer_t* response_data) {
-  const edhoc_server_message_1_error_context_t error_ctx =
-      prepare_message_1_error_context(edhoc_api_result, edhoc_context,
-                                      generic_error_message);
+    const char* generic_error_message, com_response_buffer_t* response_data) {
+  const edhs_m1_error_context_t error_ctx = prepare_message_1_error_context(
+      edhoc_api_result, edhoc_context, generic_error_message);
 
-  edhoc_handshake_common_add_edhoc_error_to_response(
-      edhoc_api_result, &error_ctx.info, response_data);
+  edh_srv_hnd_com_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
+                                              response_data);
 }

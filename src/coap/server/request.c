@@ -16,14 +16,14 @@ static bool coap_server_extract_request_payload_args_are_valid(
   return request != NULL && payload != NULL && payload_len != NULL;
 }
 
-coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(
+cp_status_result_t cp_srv_request_extract_payload_if_valid_edhoc_request(
     const coap_pdu_t* request,
-    const content_format_edhoc_values_t expected_format,
+    const cp_cfg_content_format_edhoc_values_t expected_format,
     const uint8_t** payload, size_t* payload_len) {
   if (!coap_server_extract_request_payload_args_are_valid(request, payload,
                                                           payload_len)) {
     coap_log_err("invalid input when validating EDHOC request\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   coap_opt_iterator_t option_iterator = {0};
@@ -31,7 +31,7 @@ coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(
       coap_check_option(request, COAP_OPTION_CONTENT_FORMAT, &option_iterator);
   if (!content_format_option) {
     coap_log_err("missing content format option\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   const uint16_t content_format =
@@ -39,13 +39,13 @@ coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(
                             coap_opt_length(content_format_option));
   if (content_format != expected_format) {
     coap_log_err("invalid content format\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
   if (!coap_get_data(request, payload_len, payload)) {
     coap_log_err("cannot get request pdu data\n");
-    return CCOM_ERROR;
+    return CP_STATUS_ERROR;
   }
 
-  return CCOM_STATUS_SUCCESS;
+  return CP_STATUS_SUCCESS;
 }

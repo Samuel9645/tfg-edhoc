@@ -12,21 +12,21 @@
 
 typedef struct {
   struct edhoc_error_info info;
-} edhoc_server_message_3_error_context_t;
+} edhs_m3_error_context_t;
 
-static edhoc_server_message_3_error_context_t prepare_message_3_error_context(
+static edhs_m3_error_context_t prepare_message_3_error_context(
     const char* generic_error_message) {
-  edhoc_server_message_3_error_context_t error_ctx = {0};
-  edhoc_handshake_common_set_error_info(generic_error_message, &error_ctx.info);
+  edhs_m3_error_context_t error_ctx = {0};
+  edh_srv_hnd_com_set_error_info(generic_error_message, &error_ctx.info);
   return error_ctx;
 }
 
-void add_message_3_error_to_response(const int edhoc_api_result,
-                                     const char* generic_error_message,
-                                     common_response_buffer_t* response_data) {
-  const edhoc_server_message_3_error_context_t error_ctx =
+void edh_srv_hnd_m3_add_error_to_response(
+    const int edhoc_api_result, const char* generic_error_message,
+    com_response_buffer_t* response_data) {
+  const edhs_m3_error_context_t error_ctx =
       prepare_message_3_error_context(generic_error_message);
 
-  edhoc_handshake_common_add_edhoc_error_to_response(
-      edhoc_api_result, &error_ctx.info, response_data);
+  edh_srv_hnd_com_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
+                                              response_data);
 }

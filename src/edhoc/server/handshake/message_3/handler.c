@@ -1,5 +1,5 @@
 /**
- * @file message_3_handler.c
+ * @file handler.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Definition for the Message 3 handler.
@@ -8,6 +8,7 @@
 
 #include "edhoc/server/handshake/message_3/handler.h"
 
+#include <edhoc.h>
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
@@ -15,11 +16,11 @@
 #include "edhoc/server/handshake/message_3/errors.h"
 
 static bool edhoc_server_message_3_has_invalid_args(
-    const edhoc_server_message_3_request_data_t* request_data,
-    const common_response_buffer_t* response_data) {
+    const edh_srv_hnd_m3_request_data_t* request_data,
+    const com_response_buffer_t* response_data) {
   if (!request_data ||
-      !edhoc_server_common_request_data_is_valid(&request_data->base_data) ||
-      !common_response_buffer_is_valid(response_data)) {
+      !edh_srv_hnd_com_request_data_is_valid(&request_data->base_data) ||
+      !com_response_buffer_is_valid(response_data)) {
     return true;
   }
 
@@ -29,10 +30,10 @@ static bool edhoc_server_message_3_has_invalid_args(
   return message_3_fields_not_extracted || edhoc_context_is_null;
 }
 
-bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, const size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields) {
+bool edh_srv_hnd_m3_parse(const uint8_t* request_payload,
+                          const size_t request_len,
+                          const struct edhoc_context* edhoc_ctx,
+                          struct edhoc_extracted_fields* extracted_fields) {
   if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {
     return false;
   }
@@ -52,11 +53,11 @@ bool edhoc_server_extract_if_properly_formatted_message_3(
                                    &edhoc_ctx->private_cid);
 }
 
-edhoc_server_message_3_result_t edhoc_server_handle_message_3(
-    const edhoc_server_message_3_request_data_t* request_data,
-    common_response_buffer_t* response_data) {
+edh_srv_hnd_m3_result_t edh_srv_hnd_m3_handle(
+    const edh_srv_hnd_m3_request_data_t* request_data,
+    com_response_buffer_t* response_data) {
   if (edhoc_server_message_3_has_invalid_args(request_data, response_data)) {
-    return ESHM3_ERR_INVALID_ARGS;
+    return EDH_SRV_HND_M3_ERR_INVALID_ARGS;
   }
 
   struct edhoc_context* edhoc_context = request_data->base_data.edhoc_ctx;
@@ -67,19 +68,19 @@ edhoc_server_message_3_result_t edhoc_server_handle_message_3(
       request_data->message_3_extracted_fields->edhoc_message_ptr,
       request_data->message_3_extracted_fields->edhoc_message_size);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    add_message_3_error_to_response(
+    edh_srv_hnd_m3_add_error_to_response(
         edhoc_api_result, "Message 3 processing failed", response_data);
-    return ESHM3_ERR_MESSAGE_3_PROCESS_FAILED;
+    return EDH_SRV_HND_M3_ERR_MESSAGE_3_PROCESS_FAILED;
   }
 
   edhoc_api_result = edhoc_message_4_compose(
       edhoc_context, response_data->payload, response_data->payload_capacity,
       &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    add_message_3_error_to_response(
+    edh_srv_hnd_m3_add_error_to_response(
         edhoc_api_result, "Message 4 composing failed", response_data);
-    return ESHM3_ERR_MESSAGE_4_COMPOSE_FAILED;
+    return EDH_SRV_HND_M3_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
 
-  return ESHM3_OK;
+  return EDH_SRV_HND_M3_OK;
 }

@@ -15,40 +15,38 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                coap_pdu_t* response) {
   (void)resource;
   (void)query;
-  coap_server_dispatch_edhoc_post(session, request, &SERVER_CREDENTIALS,
-                                  response);
+  cp_srv_dispatch_edhoc_post(session, request, &EDH_CRED_SRV_CRED, response);
 }
 
-emulation_status_t tfg_run_server(void) {
-  session_resources_t server_resources = {0};
+com_emulation_status_t core_run_server(void) {
+  com_session_resources_t server_resources = {0};
 
-  server_resources.coap_context = coap_server_create_context();
+  server_resources.coap_context = cp_srv_create_context();
   if (!server_resources.coap_context) {
-    tfg_common_cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
+    com_cleanup_resources(&server_resources);
+    return COM_EMULATION_FAILURE;
   }
 
   static const char COAP_LISTEN_UCAST_IP[] = "::";
-  if (coap_server_setup_endpoints(server_resources.coap_context,
-                                  COAP_LISTEN_UCAST_IP) !=
-      CCOM_STATUS_SUCCESS) {
-    tfg_common_cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
+  if (cp_srv_setup_endpoints(server_resources.coap_context,
+                             COAP_LISTEN_UCAST_IP) != CP_STATUS_SUCCESS) {
+    com_cleanup_resources(&server_resources);
+    return COM_EMULATION_FAILURE;
   }
 
-  if (coap_server_add_post_resource(server_resources.coap_context,
-                                    ".well-known/edhoc", edhoc_post_handler) !=
-      CCOM_STATUS_SUCCESS) {
-    tfg_common_cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
+  if (cp_srv_add_post_resource(server_resources.coap_context,
+                               ".well-known/edhoc",
+                               edhoc_post_handler) != CP_STATUS_SUCCESS) {
+    com_cleanup_resources(&server_resources);
+    return COM_EMULATION_FAILURE;
   }
 
-  if (coap_server_run_input_output_loop(server_resources.coap_context) !=
-      CCOM_STATUS_SUCCESS) {
-    tfg_common_cleanup_resources(&server_resources);
-    return EMULATION_FAILURE;
+  if (cp_srv_run_input_output_loop(server_resources.coap_context) !=
+      CP_STATUS_SUCCESS) {
+    com_cleanup_resources(&server_resources);
+    return COM_EMULATION_FAILURE;
   }
 
-  tfg_common_cleanup_resources(&server_resources);
-  return EMULATION_SUCCESS;
+  com_cleanup_resources(&server_resources);
+  return COM_EMULATION_SUCCESS;
 }

@@ -7,8 +7,8 @@
  * @brief Execute EDHOC server handshake and receive encrypted message from
  * client
  *
- * @return EMULATION_SUCCESS on success, EMULATION_FAILURE on failure
+ * @return COM_EMULATION_SUCCESS on success, COM_EMULATION_FAILURE on failure
  */
-emulation_status_t tfg_run_server(void);
+com_emulation_status_t core_run_server(void);
 
 #endif  // CORE_SERVER_H_

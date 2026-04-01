@@ -24,10 +24,9 @@
  * compose/internal failures.
  *
  * @param[in] message_3_result Message 3 processing result from the EDHOC layer.
- * @param[in] session CoAP session (currently unused, kept for API symmetry).
  * @return Mapped CoAP response code for the operation.
  */
-coap_pdu_code_t coap_server_process_message_3_result(
-    edhoc_server_message_3_result_t message_3_result, coap_session_t* session);
+coap_pdu_code_t cp_srv_m3_map_process_result(
+    edh_srv_hnd_m3_result_t message_3_result);
 
 #endif  // COAP_SERVER_EDHOC_MAPPER_MESSAGE_3_MAPPER_H_

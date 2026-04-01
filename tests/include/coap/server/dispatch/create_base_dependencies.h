@@ -1,5 +1,5 @@
 /**
- * @file /dispatch/create_base_dependencies.h
+ * @file create_base_dependencies.h
  *
  * @brief Dependency-table builder for EDHOC dispatcher seam tests.
  *
@@ -9,7 +9,6 @@
 #ifndef COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_
 #define COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_
 
-#include "coap/server/dispatch/stubs.h"
 #include "coap/server/internal/dispatch_engine.h"
 
 /**

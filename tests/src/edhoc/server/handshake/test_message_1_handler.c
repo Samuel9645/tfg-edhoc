@@ -25,7 +25,7 @@
 void test_is_properly_formatted_message_1_success(void) {
   const test_edsh_payload_t payload_with_prefix = get_valid_message_1_payload();
   const uint8_t* payload_ptr = payload_with_prefix.data;
-  TEST_ASSERT_TRUE(edhoc_server_is_properly_formatted_message_1(
+  TEST_ASSERT_TRUE(edh_srv_hnd_m1_is_properly_formatted(
       payload_with_prefix.data, payload_with_prefix.length));
   TEST_ASSERT_EQUAL_PTR(payload_ptr, payload_with_prefix.data);
 }
@@ -35,10 +35,10 @@ void test_is_properly_formatted_message_1_fails_on_invalid_payload(void) {
       get_invalid_prefix_payload();
   const uint8_t* payload_ptr = payload_without_prefix.data;
 
-  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(NULL, 5));
-  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(
-      payload_without_prefix.data, 0));
-  TEST_ASSERT_FALSE(edhoc_server_is_properly_formatted_message_1(
+  TEST_ASSERT_FALSE(edh_srv_hnd_m1_is_properly_formatted(NULL, 5));
+  TEST_ASSERT_FALSE(
+      edh_srv_hnd_m1_is_properly_formatted(payload_without_prefix.data, 0));
+  TEST_ASSERT_FALSE(edh_srv_hnd_m1_is_properly_formatted(
       payload_without_prefix.data, payload_without_prefix.length));
   TEST_ASSERT_EQUAL_PTR(payload_ptr, payload_without_prefix.data);
 }
@@ -49,10 +49,10 @@ void test_remove_prefix_success(void) {
   const uint8_t* payload_ptr = payload_with_prefix.data;
   size_t payload_len = original_len;
 
-  const edhoc_server_message_1_status_t result =
-      edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
+  const enum edh_srv_hnd_m1_status result =
+      edh_srv_hnd_m1_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(ESHM1_OK, result);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_OK, result);
   TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], payload_ptr);
   TEST_ASSERT_EQUAL(original_len - 1, payload_len);
 }
@@ -64,10 +64,10 @@ void test_remove_prefix_fails_on_missing_prefix(void) {
   const uint8_t* payload_ptr = payload_without_prefix.data;
   size_t payload_len = original_len;
 
-  const edhoc_server_message_1_status_t result =
-      edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
+  const enum edh_srv_hnd_m1_status result =
+      edh_srv_hnd_m1_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_PREFIX_MISSING, result);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_PREFIX_MISSING, result);
   TEST_ASSERT_EQUAL_PTR(payload_without_prefix.data, payload_ptr);
   TEST_ASSERT_EQUAL(original_len, payload_len);
 }
@@ -76,10 +76,10 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   const uint8_t* null_payload_ptr = NULL;
   size_t payload_len = 0;
 
-  const edhoc_server_message_1_status_t result =
-      edhoc_server_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
+  const enum edh_srv_hnd_m1_status result =
+      edh_srv_hnd_m1_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_INVALID_ARGS, result);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_INVALID_ARGS, result);
   TEST_ASSERT_NULL(null_payload_ptr);
   TEST_ASSERT_EQUAL(0, payload_len);
 }
@@ -87,8 +87,8 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
 void test_handle_message_1_fails_on_invalid_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);
-  edhoc_server_message_1_request_data_t empty_request = {0};
-  common_response_buffer_t empty_response = {0};
+  edh_srv_hnd_m1_request_data_t empty_request = {0};
+  com_response_buffer_t empty_response = {0};
 
   const handshake_test_case_t test_cases[] = {
       {"Both arguments NULL", NULL, NULL},
@@ -100,11 +100,10 @@ void test_handle_message_1_fails_on_invalid_data(void) {
 
   const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    const edhoc_server_message_1_result_t result =
-        edhoc_server_handle_message_1(test_cases[i].request,
-                                      test_cases[i].response);
+    const edh_srv_hnd_m1_result_t result =
+        edh_srv_hnd_m1_handle(test_cases[i].request, test_cases[i].response);
     reset_test_response(&env.response);
-    TEST_ASSERT_EQUAL_MESSAGE(ESHM1_ERR_INVALID_ARGS, result.status,
+    TEST_ASSERT_EQUAL_MESSAGE(EDH_SERV_HND_M1_ERR_INVALID_ARGS, result.status,
                               test_cases[i].description);
     TEST_ASSERT_NULL(result.edhoc_ctx);
     assert_response_untouched(test_cases[i].response);
@@ -114,13 +113,13 @@ void test_handle_message_1_fails_on_invalid_data(void) {
 void test_handle_message_1_fails_on_too_large_request_data(void) {
   handshake_test_env_t env = {0};
   setup_testing_environment(&env);
-  const uint8_t large_buffer[EDC_MESSAGE_BUFFER_LENGTH + 1] = {0};
+  const uint8_t large_buffer[EDH_CFG_MESSAGE_BUFFER_LENGTH + 1] = {0};
   override_test_request_payload(&env, large_buffer, sizeof(large_buffer));
 
-  const edhoc_server_message_1_result_t result =
-      edhoc_server_handle_message_1(&env.request, &env.response);
+  const edh_srv_hnd_m1_result_t result =
+      edh_srv_hnd_m1_handle(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(ESHM1_ERR_PAYLOAD_TOO_LARGE, result.status);
+  TEST_ASSERT_EQUAL(EDH_SERV_HND_M1_ERR_PAYLOAD_TOO_LARGE, result.status);
   TEST_ASSERT_NULL(result.edhoc_ctx);
   assert_response_untouched(&env.response);
 }

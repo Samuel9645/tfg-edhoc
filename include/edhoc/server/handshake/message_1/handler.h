@@ -14,13 +14,13 @@
 /**
  * @brief Input data required to process EDHOC Message 1.
  */
-typedef struct edh_srv_hnd_m1_request_data {
+typedef struct edh_srv_hnd_m1_request {
   /** Common session/context/response/request metadata. */
-  edh_srv_hnd_com_request_data_t base_data;
+  edh_srv_hnd_com_request_t base_data;
 
   /** Server credentials for setting up the EDHOC context. */
   const struct edhoc_credentials* credentials;
-} edh_srv_hnd_m1_request_data_t;
+} edh_srv_hnd_m1_request_t;
 
 /**
  * @brief Check whether payload is properly formatted as EDHOC Message 1.
@@ -58,7 +58,7 @@ edh_srv_hnd_m1_status_t edh_srv_hnd_m1_remove_cbor_true_prefix(
  * itself and returns a NULL pointer.
  */
 edh_srv_hnd_m1_result_t edh_srv_hnd_m1_handle(
-    const edh_srv_hnd_m1_request_data_t* message_1_request_data,
+    const edh_srv_hnd_m1_request_t* message_1_request_data,
     com_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_

@@ -12,15 +12,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void reset_stub_results(void);
+void tst_edh_srv_hnd_reset_stub_results(void);
 
-void set_stub_error_response(const uint8_t* data, size_t len);
+void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len);
 
-extern int stub_edhoc_setup_res;
-extern int stub_edhoc_process_res;
-extern int stub_edhoc_compose_res;
+extern int tst_edh_srv_hnd_stub_edhoc_setup_res;
+extern int tst_edh_srv_hnd_stub_edhoc_process_res;
+extern int tst_edh_srv_hnd_stub_edhoc_compose_res;
 
-extern const uint8_t MOCK_ERROR_PAYLOAD[];
-extern const size_t MOCK_ERROR_LEN;
+extern const uint8_t TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD[];
+extern const size_t TST_EDH_SRV_HND_MOCK_ERROR_LEN;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_STUBS_H_

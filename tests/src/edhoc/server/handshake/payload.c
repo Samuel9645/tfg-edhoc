@@ -12,18 +12,18 @@
 
 #include "edhoc/common/constants.h"
 
-static test_edsh_payload_t create_payload(const uint8_t prefix) {
-  test_edsh_payload_t payload;
-  memset(payload.data, 0, BUFFER_SIZE);
+static tst_edh_srv_hnd_payload_t create_payload(const uint8_t prefix) {
+  tst_edh_srv_hnd_payload_t payload;
+  memset(payload.data, 0, EDH_SRV_HND_PAY_LEN);
   payload.data[0] = prefix;
-  payload.length = BUFFER_SIZE;
+  payload.length = EDH_SRV_HND_PAY_LEN;
   return payload;
 }
 
-test_edsh_payload_t get_invalid_prefix_payload(void) {
+tst_edh_srv_hnd_payload_t get_invalid_prefix_payload(void) {
   return create_payload(0xAA);
 }
 
-test_edsh_payload_t get_valid_message_1_payload(void) {
+tst_edh_srv_hnd_payload_t get_valid_message_1_payload(void) {
   return create_payload(EDH_COM_CONST_CBOR_TRUE);
 }

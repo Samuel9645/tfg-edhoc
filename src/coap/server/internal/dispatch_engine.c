@@ -9,8 +9,7 @@
  * @param[in] deps Dispatch dependencies structure.
  * @return true if all function pointers are present, false if any are NULL.
  */
-static bool coap_server_dispatch_deps_are_valid(
-    const coap_server_dispatch_deps_t* deps) {
+static bool dispatch_deps_are_valid(const cp_server_dispatch_deps_t* deps) {
   return deps != NULL && deps->extract_payload_if_valid_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
          deps->is_message_1 != NULL && deps->process_message_1_result != NULL &&
@@ -21,19 +20,17 @@ static bool coap_server_dispatch_deps_are_valid(
          deps->get_session_app_data != NULL;
 }
 
-static bool coap_server_dispatch_has_invalid_deps_or_args(
+static bool dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
-    const coap_pdu_t* response, const coap_server_dispatch_deps_t* deps) {
-  return !session || !request || !response ||
-         !coap_server_dispatch_deps_are_valid(deps);
+    const coap_pdu_t* response, const cp_server_dispatch_deps_t* deps) {
+  return !session || !request || !response || !dispatch_deps_are_valid(deps);
 }
 
-void coap_server_dispatch_post_with_dependencies(
+void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
-    const coap_server_dispatch_deps_t* deps) {
-  if (coap_server_dispatch_has_invalid_deps_or_args(session, request, response,
-                                                    deps)) {
+    const cp_server_dispatch_deps_t* deps) {
+  if (dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
     if (response) {
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
@@ -78,7 +75,7 @@ void coap_server_dispatch_post_with_dependencies(
       return;
     }
 
-    const edh_srv_hnd_m1_request_data_t request_data = {
+    const edh_srv_hnd_m1_request_t request_data = {
         .base_data = {.session = session,
                       .edhoc_ctx = edhoc_ctx,
                       .response = response,

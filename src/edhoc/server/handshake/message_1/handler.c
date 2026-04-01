@@ -45,7 +45,7 @@ edh_srv_hnd_m1_status_t edh_srv_hnd_m1_remove_cbor_true_prefix(
 }
 
 static bool edhoc_server_message_1_has_invalid_args(
-    const edh_srv_hnd_com_request_data_t* request_data,
+    const edh_srv_hnd_com_request_t* request_data,
     const com_response_buffer_t* response_data) {
   if (!request_data || !edh_srv_hnd_com_request_data_is_valid(request_data) ||
       !com_response_buffer_is_valid(response_data)) {
@@ -59,12 +59,12 @@ static bool edhoc_server_message_1_has_invalid_args(
 }
 
 edh_srv_hnd_m1_result_t edh_srv_hnd_m1_handle(
-    const edh_srv_hnd_m1_request_data_t* message_1_request_data,
+    const edh_srv_hnd_m1_request_t* message_1_request_data,
     com_response_buffer_t* response_data) {
   if (!message_1_request_data) {
     return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);
   }
-  const edh_srv_hnd_com_request_data_t* base_data =
+  const edh_srv_hnd_com_request_t* base_data =
       &message_1_request_data->base_data;
   if (edhoc_server_message_1_has_invalid_args(base_data, response_data)) {
     return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);

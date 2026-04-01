@@ -22,21 +22,22 @@
  */
 const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;
 
-int stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
-int stub_edhoc_process_res = SUCCESS_STUB_RESULT;
-int stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
+int tst_edh_srv_hnd_stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
+int tst_edh_srv_hnd_stub_edhoc_process_res = SUCCESS_STUB_RESULT;
+int tst_edh_srv_hnd_stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
 
 static uint8_t stub_error_payload[200] = {0};
 static size_t stub_error_len = 0;
 
-const uint8_t MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE, 0xEF};
-const size_t MOCK_ERROR_LEN = sizeof(MOCK_ERROR_PAYLOAD);
+const uint8_t TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE, 0xEF};
+const size_t TST_EDH_SRV_HND_MOCK_ERROR_LEN =
+    sizeof(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD);
 
 int edh_com_setup_context(struct edhoc_context* context,
                           const struct edhoc_credentials* credentials) {
   (void)context;
   (void)credentials;
-  return stub_edhoc_setup_res;
+  return tst_edh_srv_hnd_stub_edhoc_setup_res;
 }
 
 int edhoc_message_1_process(struct edhoc_context* edhoc_context,
@@ -45,7 +46,7 @@ int edhoc_message_1_process(struct edhoc_context* edhoc_context,
   (void)edhoc_context;
   (void)message_1;
   (void)message_1_length;
-  return stub_edhoc_process_res;
+  return tst_edh_srv_hnd_stub_edhoc_process_res;
 }
 
 int edhoc_message_2_compose(
@@ -57,10 +58,10 @@ int edhoc_message_2_compose(
   (void)message_2;
   (void)message_2_size;
   (void)message_2_length;
-  return stub_edhoc_compose_res;
+  return tst_edh_srv_hnd_stub_edhoc_compose_res;
 }
 
-void set_stub_error_response(const uint8_t* data, size_t len) {
+void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len) {
   if (len <= sizeof(stub_error_payload)) {
     memcpy(stub_error_payload, data, len);
     stub_error_len = len;
@@ -77,9 +78,10 @@ void edh_srv_hnd_m1_add_error_to_response(
   if (!response_data || !response_data->payload)
     return;
 
-  const size_t len = stub_error_len > 0 ? stub_error_len : MOCK_ERROR_LEN;
-  const uint8_t* src =
-      stub_error_len > 0 ? stub_error_payload : MOCK_ERROR_PAYLOAD;
+  const size_t len =
+      stub_error_len > 0 ? stub_error_len : TST_EDH_SRV_HND_MOCK_ERROR_LEN;
+  const uint8_t* src = stub_error_len > 0 ? stub_error_payload
+                                          : TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD;
 
   if (response_data->payload_capacity >= len) {
     memcpy(response_data->payload, src, len);
@@ -87,10 +89,10 @@ void edh_srv_hnd_m1_add_error_to_response(
   }
 }
 
-void reset_stub_results(void) {
-  stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
-  stub_edhoc_process_res = SUCCESS_STUB_RESULT;
-  stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
+void tst_edh_srv_hnd_reset_stub_results(void) {
+  tst_edh_srv_hnd_stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
+  tst_edh_srv_hnd_stub_edhoc_process_res = SUCCESS_STUB_RESULT;
+  tst_edh_srv_hnd_stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
   stub_error_len = 0;
   memset(stub_error_payload, 0, sizeof(stub_error_payload));
 }

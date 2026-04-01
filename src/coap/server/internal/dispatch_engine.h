@@ -48,7 +48,7 @@ typedef struct coap_server_dispatch_deps_t {
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   edh_srv_hnd_m1_result_t (*handle_message_1)(
-      const edh_srv_hnd_m1_request_data_t* request_data,
+      const edh_srv_hnd_m1_request_t* request_data,
       com_response_buffer_t* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
@@ -71,7 +71,7 @@ typedef struct coap_server_dispatch_deps_t {
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);
-} coap_server_dispatch_deps_t;
+} cp_server_dispatch_deps_t;
 
 /**
  * @brief Dispatch incoming EDHOC-over-CoAP POST request with injected
@@ -101,9 +101,9 @@ typedef struct coap_server_dispatch_deps_t {
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * for protocol details on Message 1 and Message 3 handling.
  */
-void coap_server_dispatch_post_with_dependencies(
+void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
-    const coap_server_dispatch_deps_t* deps);
+    const cp_server_dispatch_deps_t* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

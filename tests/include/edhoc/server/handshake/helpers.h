@@ -11,17 +11,17 @@
 
 #include "edhoc/server/handshake/message_1/handler.h"
 
-enum { TEDSH_MESSAGE_BUFFER_LENGTH = 256 };
+enum { TST_EDH_SRV_HND_BUF_LEN = 256 };
 
 typedef struct {
   int session_dummy;
   int pdu_dummy;
-  uint8_t req_payload[TEDSH_MESSAGE_BUFFER_LENGTH];
-  uint8_t res_payload[TEDSH_MESSAGE_BUFFER_LENGTH];
+  uint8_t req_payload[TST_EDH_SRV_HND_BUF_LEN];
+  uint8_t res_payload[TST_EDH_SRV_HND_BUF_LEN];
   size_t res_written_len;
-  struct edh_srv_hnd_m1_request_data request;
+  struct edh_srv_hnd_m1_request request;
   com_response_buffer_t response;
-} handshake_test_env_t;
+} tst_edh_srv_hnd_env_t;
 
 /**
  * @brief Overrides the request payload in the test environment with new data.
@@ -29,31 +29,31 @@ typedef struct {
  * modify.
  * @param new_payload Pointer to the new payload data to set in the request.
  * @param new_len Length of the new payload data in bytes; must not exceed
- * TEDSH_MESSAGE_BUFFER_LENGTH.
+ * EDH_SRV_HND_TST_BUF_LEN.
  */
-void override_test_request_payload(handshake_test_env_t* env,
-                                   const uint8_t* new_payload, size_t new_len);
+void tst_edh_srv_hnd_override_req(tst_edh_srv_hnd_env_t* env,
+                                  const uint8_t* new_payload, size_t new_len);
 
 /**
  * @brief Creates a testing environment for EDHOC server handshake tests.
  * @param[out] env Pointer to uninitialized handshake_test_env_t struct to
  * populate.
  */
-void setup_testing_environment(handshake_test_env_t* env);
+void tst_edh_srv_hnd_setup_env(tst_edh_srv_hnd_env_t* env);
 
 /**
  * @brief Resets the response buffer in the test environment to a known state.
  * @param[in,out] response_data Pointer to the com_response_buffer_t to
  * reset.
  */
-void reset_test_response(com_response_buffer_t* response_data);
+void tst_edh_srv_hnd_reset_res(com_response_buffer_t* response_data);
 
 /**
  * @brief Asserts that the response buffer has not been modified (i.e., no
- * side-effects) after a handler call.
+ * side effects) after a handler call.
  * @param[in] response Pointer to the com_response_buffer_t to check.
  */
-void assert_response_untouched(const com_response_buffer_t* response);
+void tst_edh_srv_hnd_assert_res_clean(const com_response_buffer_t* response);
 
 /**
  * @brief Sets the payload for a valid Message 1 in the test environment.
@@ -62,7 +62,7 @@ void assert_response_untouched(const com_response_buffer_t* response);
  * @param[out] written_len Pointer to the variable that will store the length of
  * the written payload.
  */
-void set_valid_message_1_payload(uint8_t* buffer, size_t buffer_capacity,
-                                 size_t* written_len);
+void tst_edh_srv_hnd_set_m1_valid(uint8_t* buffer, size_t buffer_capacity,
+                                  size_t* written_len);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_HELPERS_H_

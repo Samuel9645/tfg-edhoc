@@ -20,7 +20,7 @@ static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 
 static void setup_valid_message_1_request_data(
     coap_session_t* session, coap_pdu_t* response, const uint8_t* payload,
-    const size_t payload_len, edh_srv_hnd_m1_request_data_t* request_data) {
+    const size_t payload_len, edh_srv_hnd_m1_request_t* request_data) {
   request_data->base_data.session = session;
   request_data->base_data.edhoc_ctx = NULL;
   request_data->base_data.response = response;
@@ -37,14 +37,14 @@ static void setup_valid_message_1_response_data(
   response_data->payload_length = buffer_capacity;
 }
 
-void override_test_request_payload(handshake_test_env_t* env,
-                                   const uint8_t* new_payload,
+void tst_edh_srv_hnd_override_req(tst_edh_srv_hnd_env_t* env,
+                                  const uint8_t* new_payload,
                                    const size_t new_len) {
   env->request.base_data.request_data.payload = new_payload;
   env->request.base_data.request_data.payload_length = new_len;
 }
 
-void setup_testing_environment(handshake_test_env_t* env) {
+void tst_edh_srv_hnd_setup_env(tst_edh_srv_hnd_env_t* env) {
   TEST_ASSERT_NOT_NULL_MESSAGE(env,
                                "Test environment pointer must not be NULL");
 
@@ -63,8 +63,8 @@ void setup_testing_environment(handshake_test_env_t* env) {
                                       &env->response);
 }
 
-void set_valid_message_1_payload(uint8_t* buffer, const size_t buffer_capacity,
-                                 size_t* written_len) {
+void tst_edh_srv_hnd_set_m1_valid(uint8_t* buffer, const size_t buffer_capacity,
+                                  size_t* written_len) {
   TEST_ASSERT_NOT_NULL_MESSAGE(buffer, "Buffer pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(written_len,
                                "Written length pointer must not be NULL");
@@ -76,7 +76,7 @@ void set_valid_message_1_payload(uint8_t* buffer, const size_t buffer_capacity,
   *written_len = sizeof(payload_with_prefix);
 }
 
-void reset_test_response(com_response_buffer_t* response_data) {
+void tst_edh_srv_hnd_reset_res(com_response_buffer_t* response_data) {
   TEST_ASSERT_NOT_NULL_MESSAGE(response_data,
                                "Test environment pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(response_data->payload,
@@ -85,7 +85,7 @@ void reset_test_response(com_response_buffer_t* response_data) {
   memset(response_data->payload, 0, response_data->payload_capacity);
 }
 
-void assert_response_untouched(const com_response_buffer_t* response) {
+void tst_edh_srv_hnd_assert_res_clean(const com_response_buffer_t* response) {
   if (!response || !response->payload || !response->payload_length)
     return;
 

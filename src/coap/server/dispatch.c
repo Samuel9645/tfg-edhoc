@@ -32,8 +32,7 @@ static cp_status_result_t add_edhoc_response_options(
   return CP_STATUS_SUCCESS;
 }
 
-static const coap_server_dispatch_deps_t
-    coap_server_edhoc_dispatch_default_deps = {
+static const cp_server_dispatch_deps_t coap_server_edhoc_dispatch_default_deps = {
         .extract_payload_if_valid_edhoc_request =
             cp_srv_request_extract_payload_if_valid_edhoc_request,
         .add_edhoc_response_options = add_edhoc_response_options,
@@ -51,7 +50,7 @@ void cp_srv_dispatch_edhoc_post(coap_session_t* session,
                                 const coap_pdu_t* request,
                                 const struct edhoc_credentials* credentials,
                                 coap_pdu_t* response) {
-  coap_server_dispatch_post_with_dependencies(
+  cp_srv_dispatch_post_with_dependencies(
       session, request, credentials, response,
       &coap_server_edhoc_dispatch_default_deps);
 }

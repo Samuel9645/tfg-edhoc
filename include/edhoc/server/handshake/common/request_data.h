@@ -16,7 +16,7 @@
 /**
  * @brief Common input data shared by EDHOC Message 1 and Message 3 handlers.
  */
-typedef struct edh_srv_hnd_com_request_data {
+typedef struct edh_srv_hnd_com_request {
   /** Session that owns EDHOC app-data for this exchange. */
   coap_session_t* session;
 
@@ -28,7 +28,7 @@ typedef struct edh_srv_hnd_com_request_data {
 
   /** Incoming Message payload bytes and size. */
   com_request_payload_t request_data;
-} edh_srv_hnd_com_request_data_t;
+} edh_srv_hnd_com_request_t;
 
 /**
  * @brief Validate that common EDHOC server request data is properly
@@ -41,6 +41,6 @@ typedef struct edh_srv_hnd_com_request_data {
  * @return true if valid, false if any required field is missing or invalid.
  */
 bool edh_srv_hnd_com_request_data_is_valid(
-    const edh_srv_hnd_com_request_data_t* request_data);
+    const edh_srv_hnd_com_request_t* request_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_COMMON_REQUEST_DATA_H_

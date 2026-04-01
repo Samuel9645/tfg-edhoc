@@ -21,7 +21,7 @@
  */
 typedef struct edh_srv_hnd_m3_request_data {
   /** Common session/context/response/request metadata. */
-  edh_srv_hnd_com_request_data_t base_data;
+  edh_srv_hnd_com_request_t base_data;
 
   /** Pre-extracted Message 3 fields (including inner EDHOC message). */
   struct edhoc_extracted_fields* message_3_extracted_fields;

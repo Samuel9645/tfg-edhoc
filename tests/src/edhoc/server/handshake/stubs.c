@@ -31,21 +31,21 @@ int edhoc_common_setup_context(struct edhoc_context* context,
   return stub_edhoc_setup_res;
 }
 
-int edhoc_message_1_process(struct edhoc_context* context,
+int edhoc_message_1_process(struct edhoc_context* edhoc_context,
                             const uint8_t* message, const size_t length) {
-  (void)context;
+  (void)edhoc_context;
   (void)message;
   (void)length;
   return stub_edhoc_process_res;
 }
 
-int edhoc_message_2_compose(struct edhoc_context* context,
-                            uint8_t* response_buffer, const size_t capacity,
-                            size_t* length) {
-  (void)context;
-  (void)response_buffer;
-  (void)capacity;
-  (void)length;
+int edhoc_message_2_compose(struct edhoc_context* edhoc_context,
+                            uint8_t* message_2, const size_t message_2_size,
+                            size_t* message_2_length) {
+  (void)edhoc_context;
+  (void)message_2;
+  (void)message_2_size;
+  (void)message_2_length;
   return stub_edhoc_compose_res;
 }
 

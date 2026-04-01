@@ -6,8 +6,8 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_LIBEDHOC_STUBS_H_
-#define EDHOC_SERVER_HANDSHAKE_LIBEDHOC_STUBS_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_STUBS_H_
+#define EDHOC_SERVER_HANDSHAKE_STUBS_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21,4 +21,4 @@ extern int stub_edhoc_compose_res;
 extern const uint8_t MOCK_ERROR_PAYLOAD[];
 extern const size_t MOCK_ERROR_LEN;
 
-#endif  // EDHOC_SERVER_HANDSHAKE_LIBEDHOC_STUBS_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_STUBS_H_

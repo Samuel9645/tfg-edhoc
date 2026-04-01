@@ -3,9 +3,10 @@
 #include "coap/coap_config.h"
 #include "coap/common/helpers.h"
 #include "coap/common/response.h"
-#include "coap/server/edhoc_mapper.h"
+#include "coap/server/edhoc_mapper/message_1_mapper.h"
+#include "coap/server/edhoc_mapper/message_3_mapper.h"
 #include "coap/server/request.h"
-#include "edhoc/server/handshake.h"
+#include "edhoc/server/handshake/message_3_handler.h"
 #include "internal/dispatch_engine.h"
 
 static coap_status_result_t add_edhoc_response_options(
@@ -42,6 +43,7 @@ static const coap_server_dispatch_deps_t
         .handle_message_1 = edhoc_server_handle_message_1,
         .process_message_1_result = coap_server_process_message_1_result,
         .handle_message_3 = edhoc_server_handle_message_3,
+        .process_message_3_result = coap_server_process_message_3_result,
         .add_response_payload = coap_common_add_response_payload,
         .get_session_app_data = coap_session_get_app_data,
 };

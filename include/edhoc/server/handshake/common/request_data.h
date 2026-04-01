@@ -1,7 +1,7 @@
 /**
  * @file request_data.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 01/04/2026
  * @brief Base data models for message 1 and 3 request
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */

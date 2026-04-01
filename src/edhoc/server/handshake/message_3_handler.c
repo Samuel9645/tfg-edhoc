@@ -1,12 +1,18 @@
-#include "edhoc/server/handshake.h"
+/**
+ * @file message_3_handler.c
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 01/04/2026
+ * @brief Definition for the Message 3 handler.
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
+#include "edhoc/server/handshake/message_3_handler.h"
 
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 #include <stdbool.h>
 
-// TODO: remove this include once the refactor is done
-#include "coap/server/edhoc_mapper.h"
-#include "edhoc/common/setup.h"
+#include "edhoc/server/handle_libedhoc_errors.h"
 
 static bool edhoc_server_message_3_has_invalid_args(
     const edhoc_server_message_3_request_data_t* request_data,
@@ -46,11 +52,11 @@ bool edhoc_server_extract_if_properly_formatted_message_3(
                                    &edhoc_ctx->private_cid);
 }
 
-coap_pdu_code_t edhoc_server_handle_message_3(
+edhoc_server_message_3_result_t edhoc_server_handle_message_3(
     const edhoc_server_message_3_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   if (edhoc_server_message_3_has_invalid_args(request_data, response_data)) {
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
+    return ESHM3_ERR_INVALID_ARGS;
   }
 
   struct edhoc_context* edhoc_context = request_data->base_data.edhoc_ctx;
@@ -61,19 +67,19 @@ coap_pdu_code_t edhoc_server_handle_message_3(
       request_data->message_3_extracted_fields->edhoc_message_ptr,
       request_data->message_3_extracted_fields->edhoc_message_size);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_server_map_edhoc_failure_to_response(
-        edhoc_context, "process Message 3", COAP_SERVER_EDHOC_PROTOCOL_ERROR,
-        edhoc_api_result, request_data->base_data.response, response_data);
+    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_context,
+                                             response_data);
+    return ESHM3_ERR_MESSAGE_3_PROCESS_FAILED;
   }
 
   edhoc_api_result = edhoc_message_4_compose(
       edhoc_context, response_data->payload, response_data->payload_capacity,
       &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    return coap_server_map_edhoc_failure_to_response(
-        edhoc_context, "compose Message 4", COAP_SERVER_EDHOC_INTERNAL_ERROR,
-        edhoc_api_result, request_data->base_data.response, response_data);
+    server_edhoc_add_edhoc_error_to_response(edhoc_api_result, edhoc_context,
+                                             response_data);
+    return ESHM3_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
 
-  return COAP_RESPONSE_CODE_CHANGED;
+  return ESHM3_OK;
 }

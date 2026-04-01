@@ -65,7 +65,7 @@ edhoc_server_message_1_result_t failed_handle_message_1_stub(
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return edhoc_server_message_1_failure(CSH_ERR_INVALID_ARGS);
+  return edhoc_server_message_1_failure(ESHM1_ERR_INVALID_ARGS);
 }
 
 edhoc_server_message_1_result_t successful_handle_message_1_stub(
@@ -122,19 +122,35 @@ bool is_not_message_3_stub(const uint8_t* request_payload,
   return false;
 }
 
-coap_pdu_code_t successful_handle_message_3_stub(
+edhoc_server_message_3_result_t successful_handle_message_3_stub(
     const edhoc_server_message_3_request_data_t* request_data,
     common_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
+  return ESHM3_OK;
+}
+
+edhoc_server_message_3_result_t failed_handle_message_3_stub(
+    const edhoc_server_message_3_request_data_t* request_data,
+    common_response_buffer_t* response_data) {
+  (void)request_data;
+  (void)response_data;
+  return ESHM3_ERR_MESSAGE_4_COMPOSE_FAILED;
+}
+
+coap_pdu_code_t successful_process_message_3_stub(
+    const edhoc_server_message_3_result_t message_3_result,
+    coap_session_t* session) {
+  (void)message_3_result;
+  (void)session;
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
-coap_pdu_code_t failed_handle_message_3_stub(
-    const edhoc_server_message_3_request_data_t* request_data,
-    common_response_buffer_t* response_data) {
-  (void)request_data;
-  (void)response_data;
+coap_pdu_code_t failed_process_message_3_stub(
+    const edhoc_server_message_3_result_t message_3_result,
+    coap_session_t* session) {
+  (void)message_3_result;
+  (void)session;
   return COAP_RESPONSE_CODE_INTERNAL_ERROR;
 }
 
@@ -146,7 +162,8 @@ coap_status_result_t successful_add_response_payload_stub(
   return CCOM_STATUS_SUCCESS;
 }
 
-coap_status_result_t failed_add_response_payload_stub(coap_pdu_t* response, const uint8_t* payload, const size_t payload_len) {
+coap_status_result_t failed_add_response_payload_stub(
+    coap_pdu_t* response, const uint8_t* payload, const size_t payload_len) {
   (void)response;
   (void)payload;
   (void)payload_len;

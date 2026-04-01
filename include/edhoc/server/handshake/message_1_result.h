@@ -1,7 +1,7 @@
 /**
  * @file message_1_result.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 01/04/2026
  * @brief EDHOC results type definition to integrate with any layer above the
  * EDHOC library, such as CoAP server handlers.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
@@ -14,15 +14,15 @@
  * @brief Error codes for EDHOC server handshake operations.
  */
 typedef enum edhoc_server_message_1_status {
-  CSH_OK = 0,
-  CSH_ERR_INVALID_ARGS,
-  CSH_ERR_PAYLOAD_TOO_LARGE,
-  CSH_ERR_PREFIX_MISSING,
-  CSH_ERR_CALLOC_FAILED,
-  CSH_ERR_COAP_SESSION_ALREADY_HAS_DATA,
-  CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED,
-  CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
-  CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED,
+  ESHM1_OK = 0,
+  ESHM1_ERR_INVALID_ARGS,
+  ESHM1_ERR_PAYLOAD_TOO_LARGE,
+  ESHM1_ERR_PREFIX_MISSING,
+  ESHM1_ERR_CALLOC_FAILED,
+  ESHM1_ERR_COAP_SESSION_ALREADY_HAS_DATA,
+  ESHM1_ERR_EDHOC_CONTEXT_SETUP_FAILED,
+  ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
+  ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED,
 } edhoc_server_message_1_status_t;
 
 /**

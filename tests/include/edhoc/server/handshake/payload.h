@@ -1,7 +1,9 @@
 /**
  * @file payload.h
- *
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 30/03/2026
  * @brief Test payload definitions for EDHOC server handshake unit tests.
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #ifndef EDHOC_SERVER_HANDSHAKE_PAYLOAD_H_
 #define EDHOC_SERVER_HANDSHAKE_PAYLOAD_H_
@@ -19,6 +21,7 @@ typedef struct test_edsh_payload {
   uint8_t data[BUFFER_SIZE];
   size_t length;
 } test_edsh_payload_t;
+
 /**
  * @brief Generates a test payload with the correct CBOR TRUE prefix for
  * Message 1.

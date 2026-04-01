@@ -9,6 +9,7 @@ coap_server_dispatch_deps_t create_base_dependencies(void) {
       .handle_message_1 = successful_handle_message_1_stub,
       .process_message_1_result = successful_process_message_1_stub,
       .handle_message_3 = successful_handle_message_3_stub,
+      .process_message_3_result = successful_process_message_3_stub,
       .add_response_payload = successful_add_response_payload_stub,
       .get_session_app_data = get_non_null_session_app_data_stub,
   };

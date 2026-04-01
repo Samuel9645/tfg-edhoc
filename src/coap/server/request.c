@@ -1,7 +1,7 @@
 /**
  * @file request.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 31/03/2026
  * @brief Definitions of functions to process requests
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */

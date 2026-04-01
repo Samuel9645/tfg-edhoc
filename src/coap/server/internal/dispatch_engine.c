@@ -1,7 +1,6 @@
 #include "dispatch_engine.h"
 
 #include "coap/coap_config.h"
-#include "coap/server/edhoc_mapper.h"
 #include "edhoc/config.h"
 
 /**
@@ -17,6 +16,7 @@ static bool coap_server_dispatch_deps_are_valid(
          deps->is_message_1 != NULL && deps->process_message_1_result != NULL &&
          deps->extract_fields_if_message_3 != NULL &&
          deps->handle_message_1 != NULL && deps->handle_message_3 != NULL &&
+         deps->process_message_3_result != NULL &&
          deps->add_response_payload != NULL &&
          deps->get_session_app_data != NULL;
 }
@@ -115,7 +115,9 @@ void coap_server_dispatch_post_with_dependencies(
             },
         .message_3_extracted_fields = &message_3_extracted_fields,
     };
-    response_code = deps->handle_message_3(&request_data, &response_data);
+    const edhoc_server_message_3_result_t message_3_result =
+        deps->handle_message_3(&request_data, &response_data);
+    response_code = deps->process_message_3_result(message_3_result, session);
   } else {
     coap_log_err("received invalid or unexpected EDHOC message\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);

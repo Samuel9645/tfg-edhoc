@@ -1,3 +1,11 @@
+/**
+ * @file helpers.c
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 30/03/2026
+ * @brief Helper function implementations for EDHOC server handshake tests.
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
 #include "edhoc/server/handshake/helpers.h"
 
 #include <edhoc.h>

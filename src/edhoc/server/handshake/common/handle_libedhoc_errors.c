@@ -1,7 +1,7 @@
 /**
  * @file handle_libedhoc_errors.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Mon 30 Mar
+ * @since 30/03/2026
  * @brief Functions to write the edhoc rfc codes from the library into the
  * response
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)

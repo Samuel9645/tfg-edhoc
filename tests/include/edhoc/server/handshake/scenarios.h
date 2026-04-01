@@ -1,12 +1,14 @@
 /**
  * @file scenarios.h
- *
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 30/03/2026
  * @brief Scenario table definition
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #ifndef EDHOC_SERVER_HANDSHAKE_SCENARIOS_H_
 #define EDHOC_SERVER_HANDSHAKE_SCENARIOS_H_
 
-#include "edhoc/server/handshake.h"
+#include "edhoc/server/handshake/message_1_handler.h"
 
 /**
  * @brief Represents a single test case for Message 1 handling, including input
@@ -17,7 +19,7 @@ typedef struct handshake_test_case {
   const char* description;
   /* Input request data for Message 1 handler. */
   const edhoc_server_message_1_request_data_t* request;
-  /* Response buffer to check for side-effects after handler execution. */
+  /* Response buffer to check for side effects after handler execution. */
   common_response_buffer_t* response;
 } handshake_test_case_t;
 

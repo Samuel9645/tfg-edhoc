@@ -6,8 +6,8 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/status.h"
-#include "edhoc/server/handshake.h"
 #include "edhoc/server/handshake/message_1_handler.h"
+#include "edhoc/server/handshake/message_3_handler.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.
@@ -55,9 +55,14 @@ typedef struct coap_server_dispatch_deps_t {
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  coap_pdu_code_t (*handle_message_3)(
+  edhoc_server_message_3_result_t (*handle_message_3)(
       const edhoc_server_message_3_request_data_t* request_data,
       common_response_buffer_t* response_data);
+  /** Processes the result of EDHOC Message 3 handling and returns the CoAP
+   * response code. */
+  coap_pdu_code_t (*process_message_3_result)(
+      edhoc_server_message_3_result_t message_3_result,
+      coap_session_t* session);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
   coap_status_result_t (*add_response_payload)(coap_pdu_t* response,

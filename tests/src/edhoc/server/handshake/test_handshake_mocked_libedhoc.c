@@ -1,18 +1,19 @@
 
 /**
  * @file test_handshake_mocked_libedhoc.c
- *
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 31/03/2026
  * @brief Unit tests for EDHOC server handshake message processing logic.
  * This file uses stubs to simulate different outcomes from the underlying EDHOC
  * library functions.
- *
  * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
- *
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  * @see [Helper Unity
  * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
  */
 
 #include <coap3/coap.h>
+#include <edhoc.h>
 #include <stdlib.h>
 #include <unity.h>
 
@@ -37,7 +38,7 @@ void test_handle_message_1_success(void) {
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_OK, result.status);
+  TEST_ASSERT_EQUAL(ESHM1_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.edhoc_ctx);
   free(result.edhoc_ctx);
 }
@@ -56,7 +57,7 @@ void test_handle_message_1_fails_when_prefix_missing(void) {
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result.status);
+  TEST_ASSERT_EQUAL(ESHM1_ERR_PREFIX_MISSING, result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
@@ -66,7 +67,7 @@ void test_handle_message_1_fails_when_setup_context_fails(void) {
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
+  TEST_ASSERT_EQUAL(ESHM1_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
@@ -88,7 +89,7 @@ void test_handle_message_1_fails_on_m1_processing(void) {
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(result,
-                                    CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+                                    ESHM1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
 }
 
 void test_handle_message_1_fails_on_m2_composition(void) {
@@ -98,5 +99,5 @@ void test_handle_message_1_fails_on_m2_composition(void) {
       edhoc_server_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(result,
-                                    CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+                                    ESHM1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
 }

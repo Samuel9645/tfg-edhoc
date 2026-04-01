@@ -1,7 +1,7 @@
 /**
  * @file message_1_handler.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 01/04/2026
  * @brief Logic for handling EDHOC Message 1 on the server side
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
@@ -38,7 +38,8 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
  * success.
  * @param[in,out] length Pointer to the buffer length; decremented by 1 on
  * success.
- * @return CSH_OK if prefix was removed, or a CSH_ERR code if invalid/missing.
+ * @return ESHM1_OK if prefix was removed, or a ESHM1_ERR code if
+ * invalid/missing.
  */
 edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length);

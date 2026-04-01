@@ -1,10 +1,10 @@
 /**
- * @file test_handshake.c
- *
+ * @file test_message_1_handler.c
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 30/03/2026
  * @brief Unit tests for EDHOC server handshake message processing logic.
- *
  * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
- *
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  * @see [Helper Unity
  * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
  */
@@ -52,7 +52,7 @@ void test_remove_prefix_success(void) {
   const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(CSH_OK, result);
+  TEST_ASSERT_EQUAL(ESHM1_OK, result);
   TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], payload_ptr);
   TEST_ASSERT_EQUAL(original_len - 1, payload_len);
 }
@@ -67,7 +67,7 @@ void test_remove_prefix_fails_on_missing_prefix(void) {
   const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_PREFIX_MISSING, result);
+  TEST_ASSERT_EQUAL(ESHM1_ERR_PREFIX_MISSING, result);
   TEST_ASSERT_EQUAL_PTR(payload_without_prefix.data, payload_ptr);
   TEST_ASSERT_EQUAL(original_len, payload_len);
 }
@@ -79,7 +79,7 @@ void test_remove_prefix_fails_on_invalid_payload(void) {
   const edhoc_server_message_1_status_t result =
       edhoc_server_remove_cbor_true_prefix(&null_payload_ptr, &payload_len);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_INVALID_ARGS, result);
+  TEST_ASSERT_EQUAL(ESHM1_ERR_INVALID_ARGS, result);
   TEST_ASSERT_NULL(null_payload_ptr);
   TEST_ASSERT_EQUAL(0, payload_len);
 }
@@ -101,10 +101,10 @@ void test_handle_message_1_fails_on_invalid_data(void) {
   const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
     const edhoc_server_message_1_result_t result =
-        edhoc_server_handle_message_1(
-        test_cases[i].request, test_cases[i].response);
+        edhoc_server_handle_message_1(test_cases[i].request,
+                                      test_cases[i].response);
     reset_test_response(&env.response);
-    TEST_ASSERT_EQUAL_MESSAGE(CSH_ERR_INVALID_ARGS, result.status,
+    TEST_ASSERT_EQUAL_MESSAGE(ESHM1_ERR_INVALID_ARGS, result.status,
                               test_cases[i].description);
     TEST_ASSERT_NULL(result.edhoc_ctx);
     assert_response_untouched(test_cases[i].response);
@@ -120,7 +120,7 @@ void test_handle_message_1_fails_on_too_large_request_data(void) {
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(CSH_ERR_PAYLOAD_TOO_LARGE, result.status);
+  TEST_ASSERT_EQUAL(ESHM1_ERR_PAYLOAD_TOO_LARGE, result.status);
   TEST_ASSERT_NULL(result.edhoc_ctx);
   assert_response_untouched(&env.response);
 }

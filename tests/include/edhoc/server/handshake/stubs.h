@@ -1,7 +1,7 @@
 /**
  * @file stubs.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 31/03/2026
  * @brief Declarations of the variables used in the libedhoc stubs
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */

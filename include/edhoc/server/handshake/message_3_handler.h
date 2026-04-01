@@ -1,21 +1,20 @@
 /**
- * @file handshake.h
+ * @file message_3_handler.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 01/04/2026
  * @brief Holds the core logic for the EDHOC handshake
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_H_
-#define EDHOC_SERVER_HANDSHAKE_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
 
-#include <coap3/coap.h>
 #include <edhoc_helpers.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #include "common/data_models.h"
 #include "edhoc/server/handshake/common/request_data.h"
+#include "edhoc/server/handshake/message_3_result.h"
 
 /**
  * @brief Input data required to process EDHOC Message 3.
@@ -48,7 +47,7 @@ bool edhoc_server_extract_if_properly_formatted_message_3(
  *
  * @param[in] request_data Session/request metadata for Message 3 processing.
  * @param[out] response_data Response buffer metadata for Message 4.
- * @return CoAP response code for the operation result.
+ * @return Struct containing Message 3 operation status.
  *
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher from CoAP session app-data. It is used for validation and
@@ -58,8 +57,8 @@ bool edhoc_server_extract_if_properly_formatted_message_3(
  * resources associated with this handshake; use session_resources_t +
  * tfg_common_cleanup_resources() for centralized teardown.
  */
-coap_pdu_code_t edhoc_server_handle_message_3(
+edhoc_server_message_3_result_t edhoc_server_handle_message_3(
     const edhoc_server_message_3_request_data_t* request_data,
     common_response_buffer_t* response_data);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

@@ -1,7 +1,7 @@
 /**
  * @file handle_libedhoc_errors.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Mon 30 Mar
+ * @since 30/03/2026
  * @brief Definition of the function to add the edhoc code into the response
  * buffer
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)

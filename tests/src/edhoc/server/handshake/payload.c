@@ -1,3 +1,11 @@
+/**
+ * @file payload.c
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 30/03/2026
+ * @brief Test payload factories for EDHOC server handshake tests.
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
 #include "edhoc/server/handshake/payload.h"
 
 #include "edhoc/common/constants.h"

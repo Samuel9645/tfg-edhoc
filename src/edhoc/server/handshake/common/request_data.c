@@ -2,7 +2,7 @@
  * @file request_data.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
- * @brief Declarations for the request_data module.
+ * @brief Validation helpers for shared EDHOC server request data.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #include "edhoc/server/handshake/common/request_data.h"

@@ -1,7 +1,7 @@
 /**
  * @file request.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since Tue 31 Mar
+ * @since 31/03/2026
  * @brief Contains the functions related to CoAP request
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */

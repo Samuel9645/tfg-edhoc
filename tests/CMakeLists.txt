@@ -75,8 +75,8 @@ add_unity_test(test_dispatch
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/create_base_dependencies.c
 )
 
-add_unity_test(test_handshake 
-    src/edhoc/server/handshake/test_handshake.c
+add_unity_test(test_handshake
+        src/edhoc/server/handshake/test_message_1_handler.c
     ${SERVER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c

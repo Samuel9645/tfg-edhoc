@@ -13,7 +13,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/constants.h"
 #include "edhoc/config.h"
 #include "edhoc/server/handshake/helpers.h"
 #include "edhoc/server/handshake/payload.h"

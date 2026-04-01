@@ -1,5 +1,6 @@
+
 /**
- * @file test_handshake.c
+ * @file test_handshake_mocked_libedhoc.c
  *
  * @brief Unit tests for EDHOC server handshake message processing logic.
  * This file uses stubs to simulate different outcomes from the underlying EDHOC
@@ -14,7 +15,6 @@
 #include <coap3/coap.h>
 #include <stdlib.h>
 #include <unity.h>
-
 
 #include "edhoc/server/handshake/helpers.h"
 #include "edhoc/server/handshake/payload.h"
@@ -71,38 +71,32 @@ void test_handle_message_1_fails_when_setup_context_fails(void) {
 }
 
 static void assert_m1_failed_with_edhoc_error(
-    handshake_test_env_t* env, const edhoc_server_message_1_result_t result,
+    const edhoc_server_message_1_result_t result,
     const edhoc_server_message_1_status_t expected_status) {
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
-  TEST_ASSERT_EQUAL(MOCK_ERROR_LEN, env->response.payload_length);
-  TEST_ASSERT_EQUAL_MEMORY(MOCK_ERROR_PAYLOAD, env->response.payload,
+  TEST_ASSERT_EQUAL(MOCK_ERROR_LEN, env.response.payload_length);
+  TEST_ASSERT_EQUAL_MEMORY(MOCK_ERROR_PAYLOAD, env.response.payload,
                            MOCK_ERROR_LEN);
 }
 
 void test_handle_message_1_fails_on_m1_processing(void) {
-  handshake_test_env_t env = {0};
-  setup_testing_environment(&env);
-
   stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
 
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  assert_m1_failed_with_edhoc_error(&env, result,
+  assert_m1_failed_with_edhoc_error(result,
                                     CSH_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
 }
 
 void test_handle_message_1_fails_on_m2_composition(void) {
-  handshake_test_env_t env = {0};
-  setup_testing_environment(&env);
-
   stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
   const edhoc_server_message_1_result_t result =
       edhoc_server_handle_message_1(&env.request, &env.response);
 
-  assert_m1_failed_with_edhoc_error(&env, result,
+  assert_m1_failed_with_edhoc_error(result,
                                     CSH_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
 }

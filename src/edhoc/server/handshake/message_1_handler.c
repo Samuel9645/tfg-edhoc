@@ -36,7 +36,7 @@ edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
   return CSH_OK;
 }
 
-static inline bool edhoc_server_message_1_has_invalid_args(
+static bool edhoc_server_message_1_has_invalid_args(
     const edhoc_server_common_request_data_t* request_data,
     const common_response_buffer_t* response_data) {
   if (!request_data ||

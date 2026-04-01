@@ -17,16 +17,8 @@ typedef struct edhoc_client_handshake_t {
   bool initialized;
 } edhoc_client_handshake_t;
 
-/**
- * @brief Validate EDHOC client handshake is initialized.
- *
- * @param[in] handshake Handshake state.
- * @return true if handshake is non-NULL and initialized, false otherwise.
- */
-static inline bool edhoc_client_handshake_is_initialized(
-    const edhoc_client_handshake_t* handshake) {
-  return (handshake != NULL) && (handshake->initialized);
-}
+bool edhoc_client_handshake_is_not_initialized(
+    const edhoc_client_handshake_t* handshake);
 
 /**
  * @brief Result codes for EDHOC client handshake operations.

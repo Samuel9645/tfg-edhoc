@@ -51,7 +51,7 @@ static void prepare_wrong_cipher_suite_error_info(
 }
 
 void server_edhoc_add_edhoc_error_to_response(
-    const int edhoc_api_result, struct edhoc_context* edhoc_ctx,
+    const int edhoc_api_result, const struct edhoc_context* edhoc_ctx,
     common_response_buffer_t* response_data) {
   size_t error_payload_len = 0;
   struct edhoc_error_info error_info = {0};

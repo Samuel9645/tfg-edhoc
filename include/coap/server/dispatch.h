@@ -9,6 +9,7 @@
  *
  * @param[in] session Active CoAP session.
  * @param[in] request Incoming request PDU.
+ * @param[in] credentials EDHOC credentials implementation for this handshake.
  * @param[in,out] response Outgoing response PDU.
  *
  * @note Response payloads are included for both success (2.04 Changed) and

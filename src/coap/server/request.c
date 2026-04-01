@@ -10,10 +10,10 @@
 
 #include <stdbool.h>
 
-static inline bool coap_server_extract_request_payload_args_are_valid(
+static bool coap_server_extract_request_payload_args_are_valid(
     const coap_pdu_t* request, const uint8_t** payload,
     const size_t* payload_len) {
-  return (request != NULL) && (payload != NULL) && (payload_len != NULL);
+  return request != NULL && payload != NULL && payload_len != NULL;
 }
 
 coap_status_result_t coap_server_extract_payload_if_valid_edhoc_request(

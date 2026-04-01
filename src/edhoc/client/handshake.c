@@ -19,7 +19,8 @@ static int client_credential_fetch(void* user_context,
                                  ARRAY_SIZE(CLIENT_PRIVATE_KEY), CLIENT_KID);
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
+// ReSharper disable once CppParameterMayBeConstPtrOrRef (libedhoc signature
+// forces it)
 static int client_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
@@ -52,31 +53,20 @@ edhoc_client_handshake_status_t edhoc_client_handshake_init(
   return EDHOC_CLIENT_HANDSHAKE_SUCCESS;
 }
 
-/**
- * @brief Validate output buffer parameters for message composition.
- *
- * Checks that payload buffer, size output pointer, and capacity are all valid.
- *
- * @param[in] payload Output payload buffer.
- * @param[in] payload_len Output size pointer.
- * @param[in] min_capacity Minimum required buffer capacity.
- * @return true if parameters are valid and capacity >= min_capacity.
- */
-static inline bool edhoc_client_composition_output_is_valid(
-    const uint8_t* payload, const size_t* payload_len, size_t min_capacity) {
-  return (payload != NULL) && (payload_len != NULL) && (min_capacity > 0);
+bool edhoc_client_handshake_is_initialized(
+    const edhoc_client_handshake_t* handshake) {
+  // ReSharper disable once CppDFANullDereference
+  return handshake != NULL && handshake->initialized;
 }
 
-/**
- * @brief Validate input payload parameters for message processing.
- *
- * @param[in] payload Input payload buffer.
- * @param[in] payload_len Payload length.
- * @return true if parameters are valid, false otherwise.
- */
-static inline bool edhoc_client_message_payload_is_valid(const uint8_t* payload,
-                                                         size_t payload_len) {
-  return (payload != NULL) && (payload_len > 0);
+static bool edhoc_client_composition_output_is_valid(
+    const uint8_t* payload, const size_t* payload_len) {
+  return payload != NULL && payload_len != NULL;
+}
+
+static bool edhoc_client_message_payload_is_valid(const uint8_t* payload,
+                                                  const size_t payload_len) {
+  return payload != NULL && payload_len > 0;
 }
 
 edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
@@ -84,11 +74,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_1(
     uint8_t* payload, size_t* payload_len) {
   const size_t min_prefix_payload_capacity = 2;
   if (!edhoc_client_handshake_is_initialized(handshake) ||
-      !edhoc_client_composition_output_is_valid(payload, payload_len,
-                                                min_prefix_payload_capacity)) {
-    return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
-  }
-  if (payload_capacity <= 1) {
+      !edhoc_client_composition_output_is_valid(payload, payload_len) ||
+      payload_capacity < min_prefix_payload_capacity) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 
@@ -125,11 +112,8 @@ edhoc_client_handshake_status_t edhoc_client_handshake_compose_message_3(
     uint8_t* payload, size_t* payload_len) {
   const size_t min_payload_capacity = 1;
   if (!edhoc_client_handshake_is_initialized(handshake) ||
-      !edhoc_client_composition_output_is_valid(payload, payload_len,
-                                                min_payload_capacity)) {
-    return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
-  }
-  if (payload_capacity == 0) {
+      !edhoc_client_composition_output_is_valid(payload, payload_len) ||
+      payload_capacity < min_payload_capacity) {
     return EDHOC_CLIENT_HANDSHAKE_INVALID_ARGUMENT;
   }
 

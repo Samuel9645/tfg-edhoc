@@ -1,13 +1,10 @@
 #include "coap/server/dispatch.h"
 
-#include <edhoc_helpers.h>
-
 #include "coap/coap_config.h"
 #include "coap/common/helpers.h"
 #include "coap/common/response.h"
 #include "coap/server/edhoc_mapper.h"
 #include "coap/server/request.h"
-#include "edhoc/config.h"
 #include "edhoc/server/handshake.h"
 #include "internal/dispatch_engine.h"
 

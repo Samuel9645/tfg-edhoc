@@ -2,7 +2,6 @@
 #define COAP_CLIENT_LOG_ERROR_RESPONSE_H_
 
 #include <coap3/coap.h>
-#include <stddef.h>
 #include <stdint.h>
 
 /**

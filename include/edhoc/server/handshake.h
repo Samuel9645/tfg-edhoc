@@ -2,7 +2,7 @@
  * @file handshake.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since Tue 31 Mar
- * @brief Holds the core logic for the EDHOC hanshake
+ * @brief Holds the core logic for the EDHOC handshake
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
@@ -29,16 +29,6 @@ typedef struct {
 } edhoc_server_message_3_request_data_t;
 
 /**
- * @brief Check whether payload is properly formatted as EDHOC Message 1.
- *
- * @param[in] payload Request payload.
- * @param[in] payload_len Request payload length.
- * @return true if payload matches Message 1 framing, false otherwise.
- */
-bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
-                                                  const size_t payload_len);
-
-/**
  * @brief Check whether payload is properly formatted as EDHOC Message 3 and
  * then extract the fields if so.
  * @param[in] request_payload Request payload.
@@ -49,7 +39,7 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
  * @return true if payload is valid Message 3, false otherwise.
  */
 bool edhoc_server_extract_if_properly_formatted_message_3(
-    const uint8_t* request_payload, const size_t request_len,
+    const uint8_t* request_payload, size_t request_len,
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields);
 

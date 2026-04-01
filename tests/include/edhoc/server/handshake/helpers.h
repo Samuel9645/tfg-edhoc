@@ -10,6 +10,7 @@
 #include "edhoc/server/handshake/message_1_handler.h"
 
 enum { TEDSH_MESSAGE_BUFFER_LENGTH = 256 };
+
 typedef struct {
   int session_dummy;
   int pdu_dummy;
@@ -20,12 +21,16 @@ typedef struct {
   common_response_buffer_t response;
 } handshake_test_env_t;
 
-static inline void override_test_request_payload(handshake_test_env_t* env,
-                                                 const uint8_t* new_payload,
-                                                 size_t new_len) {
-  env->request.base_data.request_data.payload = new_payload;
-  env->request.base_data.request_data.payload_length = new_len;
-}
+/**
+ * @brief Overrides the request payload in the test environment with new data.
+ * @param env Pointer to the handshake_test_env_t containing the request to
+ * modify.
+ * @param new_payload Pointer to the new payload data to set in the request.
+ * @param new_len Length of the new payload data in bytes; must not exceed
+ * TEDSH_MESSAGE_BUFFER_LENGTH.
+ */
+void override_test_request_payload(handshake_test_env_t* env,
+                                   const uint8_t* new_payload, size_t new_len);
 
 /**
  * @brief Creates a testing environment for EDHOC server handshake tests.

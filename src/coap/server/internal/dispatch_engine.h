@@ -6,7 +6,6 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/status.h"
-#include "coap/server/dispatch.h"
 #include "edhoc/server/handshake.h"
 #include "edhoc/server/handshake/message_1_handler.h"
 

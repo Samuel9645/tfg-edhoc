@@ -14,7 +14,7 @@
 
 emulation_status_t tfg_run_client(void) {
   coap_startup();
-  coap_set_log_level(COAP_LOG_WARN);
+  coap_set_log_level(COAP_LOG_DEBUG);
 
   coap_client_session_resources_t client_resources = {0};
 
@@ -25,6 +25,7 @@ emulation_status_t tfg_run_client(void) {
   if (coap_client_parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
                                              &destination_address) !=
       CCOM_STATUS_SUCCESS) {
+    coap_log_err("Failed to parse or resolve CoAP URI\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -33,6 +34,7 @@ emulation_status_t tfg_run_client(void) {
           &client_resources.session_resources.coap_context,
           &client_resources.session_resources.coap_session) !=
       CCOM_STATUS_SUCCESS) {
+    coap_log_err("Failed to create CoAP session\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -47,12 +49,14 @@ emulation_status_t tfg_run_client(void) {
   if (coap_client_exchange_init(&exchange_session_data,
                                 &client_resources.exchange) !=
       CCOM_STATUS_SUCCESS) {
+    coap_log_err("Failed to initialize CoAP exchange\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   if (edhoc_client_handshake_init(&client_resources.handshake) !=
       EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+    coap_log_err("Failed to initialize EDHOC handshake\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -79,12 +83,14 @@ emulation_status_t tfg_run_client(void) {
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
           request_payload, &request_data.request_data.payload_length) !=
       EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+    coap_log_err("Failed to compose EDHOC message 1\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
 
   if (coap_client_exchange_send(&client_resources.exchange, &request_data) !=
       CCOM_STATUS_SUCCESS) {
+    coap_log_err("Failed to send CoAP request for message 1\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -94,6 +100,7 @@ emulation_status_t tfg_run_client(void) {
       edhoc_client_handshake_process_message_2(
           &client_resources.handshake, response_payload,
           response_data.payload_length) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+    coap_log_err("Failed to receive or process EDHOC message 2\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -104,6 +111,7 @@ emulation_status_t tfg_run_client(void) {
           &client_resources.handshake, EDC_MESSAGE_BUFFER_LENGTH,
           request_payload, &request_data.request_data.payload_length) !=
       EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+    coap_log_err("Failed to compose EDHOC message 3\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }
@@ -115,6 +123,8 @@ emulation_status_t tfg_run_client(void) {
       edhoc_client_handshake_process_message_4(
           &client_resources.handshake, response_payload,
           response_data.payload_length) != EDHOC_CLIENT_HANDSHAKE_SUCCESS) {
+    coap_log_err(
+        "Failed to complete EDHOC message 3 exchange or process message 4\n");
     coap_client_cleanup_resources(&client_resources);
     return EMULATION_FAILURE;
   }

@@ -80,8 +80,7 @@ coap_status_result_t coap_client_create_coap_session(
  * @param[in] coap_session Active CoAP session used to create the PDU.
  * @return Pointer to the created PDU, or NULL on error.
  */
-static inline coap_pdu_t* create_post_request_pdu(
-    coap_session_t* coap_session) {
+static coap_pdu_t* create_post_request_pdu(coap_session_t* coap_session) {
   return coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
                        coap_new_message_id(coap_session),
                        coap_session_max_pdu_size(coap_session));
@@ -96,9 +95,9 @@ static inline coap_pdu_t* create_post_request_pdu(
  * @param[out] optlist Pointer to the optlist to add options to.
  * @return 1 on success, 0 if error.
  */
-static inline int add_uri_into_optlist(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_optlist_t** optlist) {
+static int add_uri_into_optlist(const coap_uri_t* client_uri,
+                                const coap_address_t* destination_address,
+                                coap_optlist_t** optlist) {
   enum { CCU_ADD_PORT_OPTION = 1 };
   return coap_uri_into_optlist(client_uri, destination_address, optlist,
                                CCU_ADD_PORT_OPTION);
@@ -114,10 +113,10 @@ static inline int add_uri_into_optlist(
  * @param[out] request_pdu CoAP request PDU to add options to.
  * @return 1 on success, 0 if error.
  */
-static inline int add_uri_into_pdu(const coap_uri_t* client_uri,
-                                   const coap_address_t* destination_address,
-                                   coap_optlist_t** options_list,
-                                   coap_pdu_t* request_pdu) {
+static int add_uri_into_pdu(const coap_uri_t* client_uri,
+                            const coap_address_t* destination_address,
+                            coap_optlist_t** options_list,
+                            coap_pdu_t* request_pdu) {
   enum { CCU_COAP_ERROR_INDICATOR = 0 };
   int result =
       add_uri_into_optlist(client_uri, destination_address, options_list);
@@ -172,7 +171,7 @@ coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
 }
 
 coap_status_result_t coap_client_wait_for_coap_response(
-    coap_context_t* coap_session_context, coap_session_t* coap_session,
+    coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };
   const u_int16_t maximum_rounded_wait_seconds =

@@ -68,7 +68,7 @@ static coap_pdu_code_t map_message_1_status_to_response(
   }
 }
 
-static inline void log_message_1_failure(
+static void log_message_1_failure(
     const edhoc_server_message_1_status_t status) {
   static const char ERROR_PREFIX[] = "Message 1 processing failed: ";
   switch (status) {

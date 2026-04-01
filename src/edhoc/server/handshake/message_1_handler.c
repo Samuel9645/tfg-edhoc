@@ -20,14 +20,21 @@ bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
   return payload != NULL && payload_len > 0 && payload[0] == EDCC_CBOR_TRUE;
 }
 
+static bool arguments_are_invalid(const uint8_t** payload,
+                                  const size_t* length) {
+  return !payload || !*payload || !length || *length == 0;
+}
+
+static bool first_byte_is_not_cbor_true(const uint8_t** payload) {
+  return (*payload)[0] != EDCC_CBOR_TRUE;
+}
+
 edhoc_server_message_1_status_t edhoc_server_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
-  const bool payload_is_invalid = (!*payload || !length || *length == 0);
-  if (payload_is_invalid) {
+  if (arguments_are_invalid(payload, length)) {
     return CSH_ERR_INVALID_ARGS;
   }
-  const bool first_byte_is_not_cbor_true = (*payload)[0] != EDCC_CBOR_TRUE;
-  if (first_byte_is_not_cbor_true) {
+  if (first_byte_is_not_cbor_true(payload)) {
     return CSH_ERR_PREFIX_MISSING;
   }
 
@@ -45,9 +52,9 @@ static bool edhoc_server_message_1_has_invalid_args(
     return true;
   }
 
-  const bool session_already_exists = (request_data->edhoc_ctx != NULL);
+  const bool session_already_exists = request_data->edhoc_ctx != NULL;
   const bool payload_is_too_short =
-      (request_data->request_data.payload_length <= 1);
+      request_data->request_data.payload_length <= 1;
   return session_already_exists || payload_is_too_short;
 }
 

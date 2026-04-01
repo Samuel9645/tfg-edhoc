@@ -1,5 +1,5 @@
 /**
- * @file coap_shared.h
+ * @file helpers.h
  *
  * @brief Shared utilities for CoAP client and server implementations.
  *
@@ -75,9 +75,6 @@ coap_optlist_t* coap_common_create_coap_edhoc_optlist(
  * @param[in] response_code The CoAP response code to check.
  * @return true if response indicates success (2.04 Changed), false otherwise.
  */
-static inline bool coap_response_indicates_success(
-    coap_pdu_code_t response_code) {
-  return response_code == COAP_RESPONSE_CODE_CHANGED;
-}
+bool coap_response_indicates_success(coap_pdu_code_t response_code);
 
 #endif  // COAP_COMMON_HELPERS_H_

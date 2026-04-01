@@ -59,3 +59,6 @@ coap_optlist_t* coap_common_create_coap_edhoc_optlist(
   }
   return optlist;
 }
+bool coap_response_indicates_success(const coap_pdu_code_t response_code) {
+  return response_code == COAP_RESPONSE_CODE_CHANGED;
+}

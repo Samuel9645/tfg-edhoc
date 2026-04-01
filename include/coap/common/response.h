@@ -2,10 +2,8 @@
 #define COAP_COMMON_RESPONSE_H_
 
 #include <coap3/coap.h>
-#include <stddef.h>
 #include <stdint.h>
 
-#include "coap/coap_config.h"
 #include "coap/common/status.h"
 
 /**

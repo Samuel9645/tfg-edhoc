@@ -12,6 +12,7 @@ add_subdirectory(externals)
 
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
@@ -22,6 +23,12 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
 )
 
+set(MESSAGE_1_HANDLER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_result.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/request_data.c
+)
+
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
@@ -30,9 +37,9 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handle_libedhoc_errors.c
+    ${MESSAGE_1_HANDLER_SOURCES}
 )
 
 set(SERVER_SOURCES
@@ -47,6 +54,7 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )
 
 set(CLIENT_SOURCES
@@ -55,15 +63,15 @@ set(CLIENT_SOURCES
 )
 
 # Define main executable
-add_executable(server 
-  ${SERVER_SOURCES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_server.c
+add_executable(server
+    ${SERVER_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main_server.c
 )
-add_executable(client 
-  ${CLIENT_SOURCES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main_client.c
+add_executable(client
+    ${CLIENT_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main_client.c
 )
-    
+
 # Link libraries
 target_link_libraries(server PRIVATE libedhoc libcoap::coap-3)
 target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
@@ -88,7 +96,7 @@ set_target_properties(client PROPERTIES
 set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
 set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" "-Werror" ${MEMORY_CHECK_FLAGS})
 
-target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS}) 
+target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS})
 target_compile_options(client PRIVATE ${CUSTOM_COMPILE_FLAGS})
 target_link_options(server PRIVATE ${MEMORY_CHECK_FLAGS})
 target_link_options(client PRIVATE ${MEMORY_CHECK_FLAGS})

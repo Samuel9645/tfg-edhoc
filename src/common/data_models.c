@@ -1,0 +1,29 @@
+/**
+ * @file data_models.c
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 01/04/2026
+ * @brief Definitions for helpers related to data models
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+#include "common/data_models.h"
+
+bool common_request_payload_is_valid(const common_request_payload_t* payload) {
+  return payload != NULL && payload->payload != NULL &&
+         payload->payload_length > 0;
+}
+
+bool common_response_buffer_is_valid(const common_response_buffer_t* buffer) {
+  return buffer != NULL && buffer->payload != NULL;
+}
+
+bool common_response_buffer_is_writable(
+    const common_response_buffer_t* buffer) {
+  return common_response_buffer_is_valid(buffer) &&
+         buffer->payload_capacity > 0;
+}
+
+bool common_response_buffer_has_content(
+    const common_response_buffer_t* buffer) {
+  return common_response_buffer_is_writable(buffer) &&
+         buffer->payload_length > 0;
+}

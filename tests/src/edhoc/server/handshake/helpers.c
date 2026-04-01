@@ -30,6 +30,13 @@ static void setup_valid_message_1_response_data(
   response_data->payload_length = buffer_capacity;
 }
 
+void override_test_request_payload(handshake_test_env_t* env,
+                                   const uint8_t* new_payload,
+                                   const size_t new_len) {
+  env->request.base_data.request_data.payload = new_payload;
+  env->request.base_data.request_data.payload_length = new_len;
+}
+
 void setup_testing_environment(handshake_test_env_t* env) {
   TEST_ASSERT_NOT_NULL_MESSAGE(env,
                                "Test environment pointer must not be NULL");

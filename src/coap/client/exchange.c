@@ -78,6 +78,23 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   return COAP_RESPONSE_OK;
 }
 
+bool coap_client_exchange_session_data_is_valid(
+    const coap_client_exchange_session_data_t* session_data) {
+  return session_data != NULL && session_data->context != NULL &&
+         session_data->session != NULL;
+}
+
+bool coap_client_exchange_request_data_is_valid(
+    const coap_client_exchange_request_data_t* request_data) {
+  return request_data != NULL &&
+         common_request_payload_is_valid(&request_data->request_data);
+}
+
+bool coap_client_exchange_response_size_fits(const size_t message_length,
+                                             const size_t capacity) {
+  return message_length > 0 && message_length <= capacity;
+}
+
 coap_status_result_t coap_client_exchange_init(
     const coap_client_exchange_session_data_t* session_data,
     coap_client_exchange_t* exchange) {

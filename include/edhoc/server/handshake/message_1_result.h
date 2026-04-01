@@ -7,10 +7,8 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANSHAKE_RESULT_H_
-#define EDHOC_SERVER_HANSHAKE_RESULT_H_
-
-#include <edhoc.h>
+#ifndef EDHOC_SERVER_MESSAGE_1_RESULT_H
+#define EDHOC_SERVER_MESSAGE_1_RESULT_H
 
 /**
  * @brief Error codes for EDHOC server handshake operations.
@@ -38,14 +36,10 @@ typedef struct edhoc_server_message_1_result {
   struct edhoc_context* edhoc_ctx;
 } edhoc_server_message_1_result_t;
 
-static inline edhoc_server_message_1_result_t edhoc_server_message_1_ok(
-    struct edhoc_context* edhoc_ctx) {
-  return (edhoc_server_message_1_result_t){.status = CSH_OK,
-                                           .edhoc_ctx = edhoc_ctx};
-}
-static inline edhoc_server_message_1_result_t edhoc_server_message_1_failure(
-    const edhoc_server_message_1_status_t status) {
-  return (edhoc_server_message_1_result_t){.status = status, .edhoc_ctx = NULL};
-}
+edhoc_server_message_1_result_t edhoc_server_message_1_ok(
+    struct edhoc_context* edhoc_ctx);
 
-#endif  // EDHOC_SERVER_HANSHAKE_RESULT_H_
+edhoc_server_message_1_result_t edhoc_server_message_1_failure(
+    edhoc_server_message_1_status_t status);
+
+#endif  // EDHOC_SERVER_MESSAGE_1_RESULT_H

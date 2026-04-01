@@ -1,12 +1,12 @@
 /**
- * @file credentials_authentication.h
+ * @file authentication.h
  *
  * @note The reason why it appears like the initialization is made twice
- * in the fetch and in the verify is that the edhoc library uses the same
- * structure for both the own credentials and the peer credentials, so in the
- * fetch we initialize the structure with our own public key and in the verify
- * we initialize it with the peer public key. This is a design choice of the
- * library to simplify the handling of credentials, but it may seem a bit
+ * in the fetching and verifying is that the edhoc library uses the same
+ * structure for both the own credentials and the peer credentials.
+ * So in the fetch we initialize the structure with our own public key, and in
+ * verify we initialize it with the peer public key. This is a design choice of
+ * the library to simplify the handling of credentials, but it may seem a bit
  * redundant at first glance.
  */
 
@@ -27,11 +27,12 @@
  * @param[in] own_key_id Own key identifier as integer
  * @return EDHOC_SUCCESS on success, error code otherwise
  */
-int edhoc_credentials_fetch(void* user_context, struct edhoc_auth_creds* credentials,
-                     const uint8_t* own_public_key,
-                     size_t own_public_key_length,
-                     const uint8_t* own_private_key,
-                     size_t own_private_key_length, int32_t own_key_id);
+int edhoc_credentials_fetch(void* user_context,
+                            struct edhoc_auth_creds* credentials,
+                            const uint8_t* own_public_key,
+                            size_t own_public_key_length,
+                            const uint8_t* own_private_key,
+                            size_t own_private_key_length, int32_t own_key_id);
 
 /**
  * @brief Verify peer's authentication credentials
@@ -47,9 +48,10 @@ int edhoc_credentials_fetch(void* user_context, struct edhoc_auth_creds* credent
  */
 int edhoc_credentials_verify(const void* user_context,
                              struct edhoc_auth_creds* credentials,
-                             int32_t expected_key_id, const uint8_t* peer_public_key,
-                      size_t peer_public_key_length,
-                      const uint8_t** public_key_reference,
-                      size_t* public_key_length);
+                             int32_t expected_key_id,
+                             const uint8_t* peer_public_key,
+                             size_t peer_public_key_length,
+                             const uint8_t** public_key_reference,
+                             size_t* public_key_length);
 
-#endif // EDHOC_CREDENTIALS_AUTHENTICATION_H_
+#endif  // EDHOC_CREDENTIALS_AUTHENTICATION_H_

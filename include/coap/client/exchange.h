@@ -34,11 +34,8 @@ typedef struct {
  * @param[in] session_data Session and endpoint data.
  * @return true if context and session are non-NULL, false otherwise.
  */
-static inline bool coap_client_exchange_session_data_is_valid(
-    const coap_client_exchange_session_data_t* session_data) {
-  return (session_data != NULL) && (session_data->context != NULL) &&
-         (session_data->session != NULL);
-}
+bool coap_client_exchange_session_data_is_valid(
+    const coap_client_exchange_session_data_t* session_data);
 
 /**
  * @brief CoAP exchange state for EDHOC client messages.
@@ -71,11 +68,8 @@ typedef struct {
   content_format_edhoc_values_t content_format;
 } coap_client_exchange_request_data_t;
 
-static inline bool coap_client_exchange_request_data_is_valid(
-    const coap_client_exchange_request_data_t* request_data) {
-  return (request_data != NULL) &&
-         common_request_payload_is_valid(&request_data->request_data);
-}
+bool coap_client_exchange_request_data_is_valid(
+    const coap_client_exchange_request_data_t* request_data);
 
 /**
  * @brief Check if response message size fits in buffer capacity.
@@ -84,10 +78,8 @@ static inline bool coap_client_exchange_request_data_is_valid(
  * @param[in] capacity Available buffer capacity.
  * @return true if message fits, false otherwise.
  */
-static inline bool coap_client_exchange_response_size_fits(
-    size_t message_length, size_t capacity) {
-  return message_length > 0 && message_length <= capacity;
-}
+bool coap_client_exchange_response_size_fits(size_t message_length,
+                                             size_t capacity);
 
 /**
  * @brief Initialize exchange state and register response handler.

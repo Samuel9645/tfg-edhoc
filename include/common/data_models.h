@@ -22,11 +22,7 @@ typedef struct {
   size_t payload_length;
 } common_request_payload_t;
 
-static inline bool common_request_payload_is_valid(
-    const common_request_payload_t* payload) {
-  return (payload != NULL) && (payload->payload != NULL) &&
-         (payload->payload_length > 0);
-}
+bool common_request_payload_is_valid(const common_request_payload_t* payload);
 
 /**
  * @brief Generic response buffer descriptor.
@@ -42,20 +38,8 @@ typedef struct {
   size_t payload_length;
 } common_response_buffer_t;
 
-static inline bool common_response_buffer_is_valid(
-    const common_response_buffer_t* buffer) {
-  return (buffer != NULL) && (buffer->payload != NULL);
-}
-static inline bool common_response_buffer_is_writable(
-    const common_response_buffer_t* buffer) {
-  return common_response_buffer_is_valid(buffer) &&
-         (buffer->payload_capacity > 0);
-}
-
-static inline bool common_response_buffer_has_content(
-    const common_response_buffer_t* buffer) {
-  return common_response_buffer_is_writable(buffer) &&
-         (buffer->payload_length > 0);
-}
+bool common_response_buffer_is_valid(const common_response_buffer_t* buffer);
+bool common_response_buffer_is_writable(const common_response_buffer_t* buffer);
+bool common_response_buffer_has_content(const common_response_buffer_t* buffer);
 
 #endif  // COMMON_DATA_MODELS_H_

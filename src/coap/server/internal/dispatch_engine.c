@@ -12,15 +12,13 @@
  */
 static bool coap_server_dispatch_deps_are_valid(
     const coap_server_dispatch_deps_t* deps) {
-  return (deps != NULL) &&
-         (deps->extract_payload_if_valid_edhoc_request != NULL) &&
-         (deps->add_edhoc_response_options != NULL) &&
-         (deps->is_message_1 != NULL) &&
-         (deps->process_message_1_result != NULL) &&
-         (deps->extract_fields_if_message_3 != NULL) &&
-         (deps->handle_message_1 != NULL) && (deps->handle_message_3 != NULL) &&
-         (deps->add_response_payload != NULL) &&
-         (deps->get_session_app_data != NULL);
+  return deps != NULL && deps->extract_payload_if_valid_edhoc_request != NULL &&
+         deps->add_edhoc_response_options != NULL &&
+         deps->is_message_1 != NULL && deps->process_message_1_result != NULL &&
+         deps->extract_fields_if_message_3 != NULL &&
+         deps->handle_message_1 != NULL && deps->handle_message_3 != NULL &&
+         deps->add_response_payload != NULL &&
+         deps->get_session_app_data != NULL;
 }
 
 static bool coap_server_dispatch_has_invalid_deps_or_args(
@@ -71,8 +69,7 @@ void coap_server_dispatch_post_with_dependencies(
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
   struct edhoc_extracted_fields message_3_extracted_fields = {0};
 
-  struct edhoc_context* edhoc_ctx =
-      (struct edhoc_context*)deps->get_session_app_data(session);
+  struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
   if (deps->is_message_1(request_payload, request_len)) {
     if (edhoc_ctx != NULL) {

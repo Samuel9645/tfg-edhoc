@@ -1,5 +1,5 @@
 /**
- * @file coap_client_utils.h
+ * @file utils.h
  *
  * @brief Client-side utilities for CoAP.
  *
@@ -103,7 +103,7 @@ coap_status_result_t coap_client_send_coap_request(coap_session_t* coap_session,
  * failure.
  */
 coap_status_result_t coap_client_wait_for_coap_response(
-    coap_context_t* coap_session_context, coap_session_t* coap_session,
+    coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response);
 
 #endif  // COAP_CLIENT_UTILS_H_

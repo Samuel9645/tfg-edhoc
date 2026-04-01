@@ -23,6 +23,16 @@ typedef struct edhoc_server_message_1_request_data {
 } edhoc_server_message_1_request_data_t;
 
 /**
+ * @brief Check whether payload is properly formatted as EDHOC Message 1.
+ *
+ * @param[in] payload Request payload.
+ * @param[in] payload_len Request payload length.
+ * @return true if payload matches Message 1 framing, false otherwise.
+ */
+bool edhoc_server_is_properly_formatted_message_1(const uint8_t* payload,
+                                                  size_t payload_len);
+
+/**
  * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
  * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
  * success.

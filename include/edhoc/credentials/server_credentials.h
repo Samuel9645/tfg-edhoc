@@ -1,5 +1,5 @@
 /**
- * @file handshake.h
+ * @file server_credentials.h
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since Tue 31 Mar
  * @brief Static fixed credentials for EDHOC server and related credential

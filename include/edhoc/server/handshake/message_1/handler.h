@@ -23,28 +23,6 @@ typedef struct edh_srv_message_1_request {
 } edh_srv_message_1_request_t;
 
 /**
- * @brief Check whether payload is properly formatted as EDHOC Message 1.
- *
- * @param[in] payload Request payload.
- * @param[in] payload_len Request payload length.
- * @return true if payload matches Message 1 framing, false otherwise.
- */
-bool edh_srv_message_1_is_properly_formatted(const uint8_t* payload,
-                                             size_t payload_len);
-
-/**
- * @brief Strips the CBOR TRUE prefix from the EDHOC Message 1 payload.
- * @param[in,out] payload Pointer to the buffer address; advanced by 1 byte on
- * success.
- * @param[in,out] length Pointer to the buffer length; decremented by 1 on
- * success.
- * @return EDHS_M1_OK if prefix was removed, or a EDHS_M1_ERR code if
- * invalid/missing.
- */
-edh_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
-    const uint8_t** payload, size_t* length);
-
-/**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
  * @param[in] message_1_request_data Session/request metadata for Message 1

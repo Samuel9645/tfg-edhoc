@@ -6,13 +6,12 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "../../../../../include/edhoc/server/handshake/message_1_handler/helpers.h"
+// ReSharper disable CppDFAConstantParameter
+#include "../../../../../../include/edhoc/server/handshake/message_1/handler/helpers.h"
 
 #include <edhoc.h>
 #include <string.h>
 #include <unity.h>
-
-#include "edhoc/common/constants.h"
 
 enum { ARBITRARY_NONZERO_VALUE = 0xFF };
 
@@ -39,7 +38,7 @@ static void setup_valid_message_1_response_data(
 
 void tst_edh_srv_hnd_override_req(tst_edh_srv_hnd_env_t* env,
                                   const uint8_t* new_payload,
-                                   const size_t new_len) {
+                                  const size_t new_len) {
   env->request.base_data.request_data.payload = new_payload;
   env->request.base_data.request_data.payload_length = new_len;
 }
@@ -51,8 +50,9 @@ void tst_edh_srv_hnd_setup_env(tst_edh_srv_hnd_env_t* env) {
   env->session_dummy = 0;
   env->pdu_dummy = 0;
   memset(env->req_payload, 0, sizeof(env->req_payload));
-  const uint8_t payload_with_prefix[] = {EDH_COM_CBOR_TRUE, 0x01, 0x02};
-  memcpy(env->req_payload, payload_with_prefix, sizeof(payload_with_prefix));
+  const uint8_t clean_message_1_payload[] = {0x01, 0x02};
+  memcpy(env->req_payload, clean_message_1_payload,
+         sizeof(clean_message_1_payload));
   memset(env->res_payload, 0, sizeof(env->res_payload));
   env->res_written_len = ARBITRARY_NONZERO_VALUE;
 
@@ -68,12 +68,12 @@ void tst_edh_srv_hnd_set_m1_valid(uint8_t* buffer, const size_t buffer_capacity,
   TEST_ASSERT_NOT_NULL_MESSAGE(buffer, "Buffer pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(written_len,
                                "Written length pointer must not be NULL");
-  const uint8_t payload_with_prefix[] = {EDH_COM_CBOR_TRUE, 0x01, 0x02};
+  const uint8_t clean_message_1_payload[] = {0x01, 0x02};
   TEST_ASSERT_LESS_OR_EQUAL_size_t_MESSAGE(
-      sizeof(payload_with_prefix), buffer_capacity,
+      sizeof(clean_message_1_payload), buffer_capacity,
       "Buffer capacity is too small for valid Message 1 payload");
-  memcpy(buffer, payload_with_prefix, sizeof(payload_with_prefix));
-  *written_len = sizeof(payload_with_prefix);
+  memcpy(buffer, clean_message_1_payload, sizeof(clean_message_1_payload));
+  *written_len = sizeof(clean_message_1_payload);
 }
 
 void tst_edh_srv_hnd_reset_res(com_response_buffer_t* response_data) {

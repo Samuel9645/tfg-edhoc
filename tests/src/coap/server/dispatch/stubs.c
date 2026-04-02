@@ -11,6 +11,8 @@
 // parameters
 #include "coap/server/dispatch/stubs.h"
 
+#include <string.h>
+
 cp_status_t stb_cp_srv_extract_payload_success(
     const coap_pdu_t* request,
     const cp_cfg_content_format_edhoc_values_t expected_format,
@@ -63,20 +65,51 @@ void* stb_cp_srv_get_session_valid(const coap_session_t* session) {
   return &dummy_edhoc_context_for_stub;
 }
 
-bool stb_edh_srv_check_is_m1_true(const uint8_t* payload,
-                                  const size_t payload_len) {
-  (void)payload;
-  (void)payload_len;
+bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
+                                      size_t request_len,
+                                      com_request_payload_t* parsed_payload) {
+  (void)request_payload;
+  (void)request_len;
+  if (parsed_payload) {
+    static const uint8_t stub_payload[] = {0x01, 0x02};
+    parsed_payload->payload = stub_payload;
+    parsed_payload->payload_length = sizeof(stub_payload);
+  }
   return true;
 }
 
-bool stb_edh_srv_check_is_m1_false(const uint8_t* payload, const size_t payload_len) {
-  (void)payload;
-  (void)payload_len;
+bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
+                                       size_t request_len,
+                                       com_request_payload_t* parsed_payload) {
+  (void)request_payload;
+  (void)request_len;
+  (void)parsed_payload;
   return false;
 }
 
-ehd_message_1_handler_result_t test_edh_srv_handle_m1_success(
+bool stb_edh_srv_parse_message_3_true(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields) {
+  (void)request_payload;
+  (void)request_len;
+  (void)edhoc_ctx;
+  (void)extracted_fields;
+  return true;
+}
+
+bool stb_edh_srv_parse_message_3_false(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields) {
+  (void)request_payload;
+  (void)request_len;
+  (void)edhoc_ctx;
+  (void)extracted_fields;
+  return false;
+}
+
+ehd_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
@@ -116,29 +149,6 @@ coap_pdu_code_t stb_cp_srv_process_m1_fail(
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
-bool stb_edh_srv_check_m3_true(
-    const uint8_t* request_payload, const size_t request_len,
-                       const struct edhoc_context* edhoc_ctx,
-                       struct edhoc_extracted_fields* extracted_fields) {
-  (void)request_payload;
-  (void)request_len;
-  (void)edhoc_ctx;
-  (void)extracted_fields;
-  return true;
-}
-
-bool stb_edh_srv_check_m3_false(
-    const uint8_t* request_payload,
-                           const size_t request_len,
-                           const struct edhoc_context* edhoc_ctx,
-                           struct edhoc_extracted_fields* extracted_fields) {
-  (void)request_payload;
-  (void)request_len;
-  (void)edhoc_ctx;
-  (void)extracted_fields;
-  return false;
-}
-
 edh_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data) {
@@ -167,7 +177,9 @@ coap_pdu_code_t stb_cp_srv_process_m3_fail(
   return COAP_RESPONSE_CODE_INTERNAL_ERROR;
 }
 
-cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response, const uint8_t* payload, const size_t payload_len) {
+cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response,
+                                      const uint8_t* payload,
+                                      size_t payload_len) {
   (void)response;
   (void)payload;
   (void)payload_len;
@@ -176,7 +188,7 @@ cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response, const uint8_t* paylo
 
 cp_status_t stb_cp_srv_add_payload_fail(coap_pdu_t* response,
                                         const uint8_t* payload,
-                                                    const size_t payload_len) {
+                                        size_t payload_len) {
   (void)response;
   (void)payload;
   (void)payload_len;

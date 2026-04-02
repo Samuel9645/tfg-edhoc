@@ -14,13 +14,13 @@
  * @brief Represents a single test case for Message 1 handling, including input
  * request data and expected response buffer state.
  */
-typedef struct tst_edh_srv_hnd_test_case {
+typedef struct tst_edh_srv_hnd_test_case_message_1_handler {
   /* Description of the test case for debugging purposes. */
   const char* description;
   /* Input request data for Message 1 handler. */
   const edh_srv_message_1_request_t* request;
   /* Response buffer to check for side effects after handler execution. */
   com_response_buffer_t* response;
-} handshake_test_case_t;
+} tst_edh_srv_hnd_test_case_message_1_handler_t;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_SCENARIOS_H_

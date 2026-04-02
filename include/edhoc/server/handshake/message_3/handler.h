@@ -10,11 +10,12 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
 
 #include <edhoc_helpers.h>
-#include <stddef.h>
 
 #include "common/data_models.h"
 #include "edhoc/server/handshake/common/request_data.h"
 #include "edhoc/server/handshake/message_3/result.h"
+
+// TODO: Redefine this, message 3 doesnt need all the base data
 
 /**
  * @brief Input data required to process EDHOC Message 3.
@@ -26,20 +27,6 @@ typedef struct edh_srv_message_3_request {
   /** Pre-extracted Message 3 fields (including inner EDHOC message). */
   struct edhoc_extracted_fields* message_3_extracted_fields;
 } edh_srv_message_3_request_t;
-
-/**
- * @brief Check whether payload is properly formatted as EDHOC Message 3 and
- * then extract the fields if so.
- * @param[in] request_payload Request payload.
- * @param[in] request_len Request payload length.
- * @param[in] edhoc_ctx EDHOC context with private connection ID.
- * @param[out] extracted_fields Populated with extracted message fields on
- * success.
- * @return true if payload is valid Message 3, false otherwise.
- */
-bool edh_srv_parse_message_3(const uint8_t* request_payload, size_t request_len,
-                             const struct edhoc_context* edhoc_ctx,
-                             struct edhoc_extracted_fields* extracted_fields);
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.

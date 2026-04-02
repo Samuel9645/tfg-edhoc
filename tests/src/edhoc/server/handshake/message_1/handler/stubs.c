@@ -9,7 +9,7 @@
 // ReSharper disable CppParameterMayBeConst
 // since the real implementations expects non-const pointers to allow output
 // parameters
-#include "../../../../../include/edhoc/server/handshake/message_1_handler/stubs.h"
+#include "../../../../../../include/edhoc/server/handshake/message_1/handler/stubs.h"
 
 #include <edhoc.h>
 #include <string.h>
@@ -68,7 +68,8 @@ void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len) {
   }
 }
 
-void edh_message_1_handler_add_error(const int edhoc_api_result, const struct edhoc_context* edhoc_context,
+void tst_edh_message_1_handler_add_error(
+    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
     const char* generic_error_message, com_response_buffer_t* response_data) {
   (void)edhoc_api_result;
   (void)edhoc_context;

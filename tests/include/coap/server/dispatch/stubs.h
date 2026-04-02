@@ -2,9 +2,6 @@
  * @file stubs.h
  *
  * @brief Stub implementations used by EDHOC dispatcher seam unit tests.
- *
- * Each function updates trace state and returns deterministic results to drive
- * success and error paths through the dispatcher.
  */
 #ifndef COAP_SERVER_DISPATCH_STUBS_H_
 #define COAP_SERVER_DISPATCH_STUBS_H_
@@ -15,6 +12,7 @@
 #include "coap/common/status.h"
 #include "coap/config.h"
 #include "edhoc/server/handshake/message_1/handler.h"
+#include "edhoc/server/handshake/message_1/parser.h"
 #include "edhoc/server/handshake/message_3/handler.h"
 
 cp_status_t stb_cp_srv_extract_payload_success(
@@ -37,9 +35,23 @@ void* stb_cp_srv_get_session_null(const coap_session_t* session);
 
 void* stb_cp_srv_get_session_valid(const coap_session_t* session);
 
-bool stb_edh_srv_check_is_m1_true(const uint8_t* payload, size_t payload_len);
+bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
+                                      size_t request_len,
+                                      com_request_payload_t* parsed_payload);
 
-bool stb_edh_srv_check_is_m1_false(const uint8_t* payload, size_t payload_len);
+bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
+                                       size_t request_len,
+                                       com_request_payload_t* parsed_payload);
+
+bool stb_edh_srv_parse_message_3_true(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields);
+
+bool stb_edh_srv_parse_message_3_false(
+    const uint8_t* request_payload, size_t request_len,
+    const struct edhoc_context* edhoc_ctx,
+    struct edhoc_extracted_fields* extracted_fields);
 
 ehd_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
@@ -59,16 +71,6 @@ coap_pdu_code_t stb_cp_srv_process_m1_ok(
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
     ehd_message_1_handler_result_t message_1_result, coap_session_t* session);
 
-bool stb_edh_srv_check_m3_true(const uint8_t* request_payload,
-                               size_t request_len,
-                               const struct edhoc_context* edhoc_ctx,
-                               struct edhoc_extracted_fields* extracted_fields);
-
-bool stb_edh_srv_check_m3_false(
-    const uint8_t* request_payload, size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields);
-
 edh_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data);
@@ -85,10 +87,10 @@ coap_pdu_code_t stb_cp_srv_process_m3_fail(
 
 cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response,
                                       const uint8_t* payload,
-                                             size_t payload_len);
+                                      size_t payload_len);
 
 cp_status_t stb_cp_srv_add_payload_fail(coap_pdu_t* response,
                                         const uint8_t* payload,
-                                               size_t payload_len);
+                                        size_t payload_len);
 
 #endif  // COAP_SERVER_DISPATCH_STUBS_H_

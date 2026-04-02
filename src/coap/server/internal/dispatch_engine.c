@@ -12,9 +12,10 @@
 static bool dispatch_deps_are_valid(const cp_serv_dispatch_deps_t* deps) {
   return deps != NULL && deps->extract_payload_if_valid_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
-         deps->is_message_1 != NULL && deps->process_message_1_result != NULL &&
-         deps->extract_fields_if_message_3 != NULL &&
-         deps->handle_message_1 != NULL && deps->handle_message_3 != NULL &&
+         deps->parse_message_1 != NULL &&
+         deps->process_message_1_result != NULL &&
+         deps->parse_message_3 != NULL && deps->handle_message_1 != NULL &&
+         deps->handle_message_3 != NULL &&
          deps->process_message_3_result != NULL &&
          deps->add_response_payload != NULL &&
          deps->get_session_app_data != NULL;
@@ -64,11 +65,13 @@ void cp_srv_dispatch_post_with_dependencies(
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  com_request_payload_t message_1_parsed_payload = {0};
   struct edhoc_extracted_fields message_3_extracted_fields = {0};
 
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
-  if (deps->is_message_1(request_payload, request_len)) {
+  if (deps->parse_message_1(request_payload, request_len,
+                            &message_1_parsed_payload)) {
     if (edhoc_ctx != NULL) {
       coap_log_err("EDHOC context already exists for this session\n");
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
@@ -79,19 +82,14 @@ void cp_srv_dispatch_post_with_dependencies(
         .base_data = {.session = session,
                       .edhoc_ctx = edhoc_ctx,
                       .response = response,
-                      .request_data =
-                          {
-                              .payload = request_payload,
-                              .payload_length = request_len,
-                          }},
+                      .request_data = message_1_parsed_payload},
         .credentials = credentials};
 
     const ehd_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
-  } else if (deps->extract_fields_if_message_3(request_payload, request_len,
-                                               edhoc_ctx,
-                                               &message_3_extracted_fields)) {
+  } else if (deps->parse_message_3(request_payload, request_len, edhoc_ctx,
+                                   &message_3_extracted_fields)) {
     if (edhoc_ctx == NULL) {
       coap_log_err("received Message 3 without EDHOC context\n");
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);

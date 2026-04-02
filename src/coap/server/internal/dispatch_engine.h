@@ -6,7 +6,9 @@
 
 #include "coap/common/status.h"
 #include "coap/config.h"
+#include "common/data_models.h"
 #include "edhoc/server/handshake/message_1/handler.h"
+#include "edhoc/server/handshake/message_1/parser.h"
 #include "edhoc/server/handshake/message_3/handler.h"
 
 /**
@@ -34,17 +36,17 @@ typedef struct cp_srv_dispatch_deps_t {
       coap_pdu_t* response,
       cp_cfg_content_format_edhoc_values_t content_format);
 
-  /** Checks if payload conforms to EDHOC Message 1 format. */
-  bool (*is_message_1)(const uint8_t* payload, size_t payload_len);
+  /** Parses EDHOC Message 1 and returns the stripped payload view. */
+  bool (*parse_message_1)(const uint8_t* request_payload, size_t request_len,
+                          com_request_payload_t* parsed_payload);
 
   /**
-   * Checks if payload conforms to EDHOC Message 3 format (with prepended
-   * connection ID). Also extracts Message 3 fields for handler processing.
+   * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
+   * Message 3 fields for handler processing.
    */
-  bool (*extract_fields_if_message_3)(
-      const uint8_t* request_payload, size_t request_len,
-      const struct edhoc_context* edhoc_ctx,
-      struct edhoc_extracted_fields* extracted_fields);
+  bool (*parse_message_3)(const uint8_t* request_payload, size_t request_len,
+                          const struct edhoc_context* edhoc_ctx,
+                          struct edhoc_extracted_fields* extracted_fields);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   ehd_message_1_handler_result_t (*handle_message_1)(
@@ -67,7 +69,7 @@ typedef struct cp_srv_dispatch_deps_t {
   /** Adds response payload bytes to outgoing CoAP PDU. */
   cp_status_t (*add_response_payload)(coap_pdu_t* response,
                                       const uint8_t* payload,
-                                             size_t payload_len);
+                                      size_t payload_len);
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);

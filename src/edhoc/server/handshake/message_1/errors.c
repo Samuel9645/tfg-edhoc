@@ -48,7 +48,8 @@ static edh_message_1_error_context_t prepare_message_1_error_context(
   return error_ctx;
 }
 
-void edh_message_1_handler_add_error(const int edhoc_api_result, const struct edhoc_context* edhoc_context,
+void tst_edh_message_1_handler_add_error(
+    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
     const char* generic_error_message, com_response_buffer_t* response_data) {
   const edh_message_1_error_context_t error_ctx =
       prepare_message_1_error_context(edhoc_api_result, edhoc_context, generic_error_message);

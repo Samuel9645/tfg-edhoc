@@ -80,7 +80,6 @@ void cp_srv_dispatch_post_with_dependencies(
 
     const edh_srv_message_1_request_t request_data = {
         .payload = message_1_parsed_payload, .credentials = credentials};
-
     const ehd_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
@@ -93,17 +92,7 @@ void cp_srv_dispatch_post_with_dependencies(
     }
 
     const edh_srv_message_3_request_t request_data = {
-        .base_data =
-            {
-                .session = session,
-                .edhoc_ctx = edhoc_ctx,
-                .response = response,
-                .request_data =
-                    {
-                        .buffer = request_payload,
-                        .length = request_len,
-                    },
-            },
+        .edhoc_ctx = edhoc_ctx,
         .message_3_extracted_fields = &message_3_extracted_fields,
     };
     const edh_message_3_handler_status_t message_3_result =
@@ -114,7 +103,6 @@ void cp_srv_dispatch_post_with_dependencies(
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
     return;
   }
-
   if (response_data.length > 0 &&
       deps->add_response_payload(response, response_payload,
                                  response_data.length) != CP_STATUS_SUCCESS) {

@@ -45,7 +45,7 @@ tst_edh_srv_message_3_request_without_extracted_fields(void) {
 static edh_srv_message_3_request_t
 tst_edh_srv_message_3_request_without_context(void) {
   edh_srv_message_3_request_t request = env.request;
-  request.base_data.edhoc_ctx = NULL;
+  request.edhoc_ctx = NULL;
   return request;
 }
 

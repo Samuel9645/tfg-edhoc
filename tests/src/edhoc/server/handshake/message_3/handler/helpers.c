@@ -12,36 +12,41 @@
 #include <unity.h>
 
 static const uint8_t CLEAN_MESSAGE_3_PAYLOAD[] = {0x21, 0x22, 0x23};
+static const size_t CLEAN_MESSAGE_3_PAYLOAD_SIZE =
+    sizeof(CLEAN_MESSAGE_3_PAYLOAD);
 
 enum { ARBITRARY_NONZERO_VALUE = 0xFF };
+
+static void set_response_payload(const uint8_t* payload,
+                                 const size_t payload_len,
+                                 com_response_buffer_t* response_data) {
+  response_data->buffer = (uint8_t*)payload;
+  response_data->capacity = payload_len;
+  response_data->length = 0;
+}
 
 void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env) {
   TEST_ASSERT_NOT_NULL_MESSAGE(env,
                                "Test environment pointer must not be NULL");
 
-  env->session_dummy = 0;
-  env->context_dummy = 0;
-  env->response_dummy = 0;
   memset(env->request_payload, 0, sizeof(env->request_payload));
   memcpy(env->request_payload, CLEAN_MESSAGE_3_PAYLOAD,
-         sizeof(CLEAN_MESSAGE_3_PAYLOAD));
+         CLEAN_MESSAGE_3_PAYLOAD_SIZE);
   memset(env->response_payload, 0, sizeof(env->response_payload));
-  env->request.base_data.session = (coap_session_t*)&env->session_dummy;
-  env->request.base_data.edhoc_ctx = (struct edhoc_context*)&env->context_dummy;
-  env->request.base_data.response = (coap_pdu_t*)&env->response_dummy;
-  env->request.base_data.request_data.buffer = env->request_payload;
-  env->request.base_data.request_data.length =
-      sizeof(CLEAN_MESSAGE_3_PAYLOAD);
-  env->request.message_3_extracted_fields = &env->extracted_fields;
+  env->response_written_len = ARBITRARY_NONZERO_VALUE;
+  set_response_payload(env->response_payload, sizeof(env->response_payload),
+                       &env->response);
+  env->context_dummy = 0;
   env->extracted_fields = (struct edhoc_extracted_fields){
       .buffer = env->request_payload,
       .buffer_size = sizeof(CLEAN_MESSAGE_3_PAYLOAD),
       .edhoc_message_ptr = env->request_payload,
       .edhoc_message_size = sizeof(CLEAN_MESSAGE_3_PAYLOAD),
   };
-  env->response.buffer = env->response_payload;
-  env->response.capacity = sizeof(env->response_payload);
-  env->response.length = ARBITRARY_NONZERO_VALUE;
+  env->request = (edh_srv_message_3_request_t){
+      .edhoc_ctx = (struct edhoc_context*)&env->context_dummy,
+      .message_3_extracted_fields = &env->extracted_fields,
+  };
 }
 
 void tst_edh_srv_message_3_reset_response(com_response_buffer_t* response) {

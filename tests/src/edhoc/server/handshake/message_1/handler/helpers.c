@@ -45,14 +45,14 @@ void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env) {
   TEST_ASSERT_NOT_NULL_MESSAGE(env,
                                "Test environment pointer must not be NULL");
 
-  memset(env->req_payload, 0, sizeof(env->req_payload));
-  memcpy(env->req_payload, CLEAN_MESSAGE_1_PAYLOAD,
-         sizeof(CLEAN_MESSAGE_1_PAYLOAD));
-  memset(env->res_payload, 0, sizeof(env->res_payload));
-  env->res_written_len = ARBITRARY_NONZERO_VALUE;
-  set_request_payload(env->req_payload, sizeof(env->req_payload),
+  memset(env->request_payload, 0, sizeof(env->request_payload));
+  memcpy(env->request_payload, CLEAN_MESSAGE_1_PAYLOAD,
+         CLEAN_MESSAGE_1_PAYLOAD_SIZE);
+  memset(env->response_payload, 0, sizeof(env->response_payload));
+  env->response_written_len = ARBITRARY_NONZERO_VALUE;
+  set_request_payload(env->request_payload, sizeof(env->request_payload),
                       &env->request);
-  set_response_payload(env->res_payload, sizeof(env->res_payload),
+  set_response_payload(env->response_payload, sizeof(env->response_payload),
                        &env->response);
   env->request.credentials = &DUMMY_TEST_CREDS;
 }

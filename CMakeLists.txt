@@ -28,7 +28,6 @@ set(MESSAGE_1_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/request_data.c
 )
 
 set(SERVER_SPECIFIC_SOURCES

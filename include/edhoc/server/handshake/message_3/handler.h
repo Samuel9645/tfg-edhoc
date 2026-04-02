@@ -12,17 +12,14 @@
 #include <edhoc_helpers.h>
 
 #include "common/data_models.h"
-#include "edhoc/server/handshake/common/request_data.h"
 #include "edhoc/server/handshake/message_3/result.h"
-
-// TODO: Redefine this, message 3 doesnt need all the base data
 
 /**
  * @brief Input data required to process EDHOC Message 3.
  */
 typedef struct edh_srv_message_3_request {
-  /** Common session/context/response/request metadata. */
-  edh_srv_request_t base_data;
+  /** EDHOC context associated with the session */
+  struct edhoc_context* edhoc_ctx;
 
   /** Pre-extracted Message 3 fields (including inner EDHOC message). */
   struct edhoc_extracted_fields* message_3_extracted_fields;

@@ -2,19 +2,8 @@
 #define EDHOC_CONFIG_H_
 
 #include <stddef.h>
-#include <stdint.h>
 
-// TODO: delete not used constants
 enum {
-  // Cryptographic constants
-  EDH_CFG_NONCE_LENGTH_BYTES = 13,
-  EDH_CFG_AES_CCM_TAG_LENGTH = 16,
-
-  // Key and message constants
-  EDH_CFG_EXPORTED_SECRET_LENGTH = 32,
-  EDH_CFG_PLAINTEXT_MAX_LENGTH = 256,
-  EDH_CFG_CIPHERTEXT_MAX_LENGTH =
-      EDH_CFG_PLAINTEXT_MAX_LENGTH + EDH_CFG_AES_CCM_TAG_LENGTH,
   EDH_CFG_MESSAGE_BUFFER_LENGTH = 512,
 };
 

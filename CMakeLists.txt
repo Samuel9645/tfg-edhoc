@@ -30,20 +30,24 @@ set(MESSAGE_1_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
 )
 
+set(MESSAGE_3_HANDLER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/errors.c
+)
+
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/request.c
+    ${MESSAGE_1_HANDLER_SOURCES}
+    ${MESSAGE_3_HANDLER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_1_mapper.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_3_mapper.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
-    ${MESSAGE_1_HANDLER_SOURCES}
 )
 
 set(SERVER_SOURCES

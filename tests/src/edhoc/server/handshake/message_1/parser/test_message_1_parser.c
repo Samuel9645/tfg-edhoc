@@ -17,8 +17,7 @@
 #include "edhoc/server/handshake/payload.h"
 
 void test_parser_returns_stripped_message_1_payload(void) {
-  const tst_edh_srv_hnd_payload_t payload_with_prefix =
-      get_valid_message_1_payload();
+  const tst_edh_payload_t payload_with_prefix = get_valid_message_1_payload();
   com_request_payload_t parsed_payload = {0};
 
   const bool parsed = edh_srv_parse_message_1(
@@ -31,7 +30,7 @@ void test_parser_returns_stripped_message_1_payload(void) {
 }
 
 void test_parser_fails_on_invalid_data(void) {
-  const tst_edh_srv_hnd_payload_t payload_with_invalid_prefix =
+  const tst_edh_payload_t payload_with_invalid_prefix =
       get_invalid_prefix_payload();
   com_request_payload_t parsed_payload = {0};
 
@@ -53,8 +52,7 @@ void test_parser_fails_on_invalid_data(void) {
 }
 
 void test_parser_fails_when_prefix_is_missing(void) {
-  const tst_edh_srv_hnd_payload_t payload_without_prefix =
-      get_invalid_prefix_payload();
+  const tst_edh_payload_t payload_without_prefix = get_invalid_prefix_payload();
   com_request_payload_t parsed_payload = {0};
 
   const bool parsed =

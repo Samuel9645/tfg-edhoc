@@ -42,10 +42,10 @@ void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env);
 
 /**
  * @brief Resets the response buffer in the test environment to a known state.
- * @param[in,out] response_data Pointer to the com_response_buffer_t to
+ * @param[in,out] response Pointer to the com_response_buffer_t to
  * reset.
  */
-void tst_edh_reset_message_1_response(com_response_buffer_t* response_data);
+void tst_edh_reset_message_1_response(com_response_buffer_t* response);
 
 /**
  * @brief Asserts that the response buffer has not been modified (i.e., no

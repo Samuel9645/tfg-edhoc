@@ -19,6 +19,7 @@
 #include <unity.h>
 
 #include "edhoc/config.h"
+#include "edhoc/server/handshake/common/helpers.h"
 #include "edhoc/server/handshake/message_1/handler/helpers.h"
 #include "edhoc/server/handshake/message_1/handler/scenarios.h"
 #include "edhoc/server/handshake/message_1/handler/stubs.h"
@@ -51,7 +52,7 @@ static void ensure_context_is_freed_on_failure(
 
 void test_handler_fails_on_invalid_data(void) {
   edh_srv_message_1_request_t empty_request = {0};
-  com_response_buffer_t empty_response = {0};
+  com_response_buffer_t empty_response = tst_edh_invalid_response();
 
   const tst_edh_srv_hnd_test_case_message_1_handler_t test_cases[] = {
       {"both arguments are missing", NULL, NULL},
@@ -70,14 +71,15 @@ void test_handler_fails_on_invalid_data(void) {
                               test_cases[i].description);
     ensure_context_is_freed_on_failure(result);
     if (test_cases[i].response) {
-      tst_edh_assert_message_1_handler_response_clean(test_cases[i].response);
+      tst_edh_srv_assert_response_clean(test_cases[i].response);
     }
   }
 }
 
 void test_handler_fails_on_too_large_request_data(void) {
-  const uint8_t large_buffer[EDH_CFG_MESSAGE_BUFFER_LENGTH + 1] = {0};
-  tst_edh_override_message_1_handler_request(&env, large_buffer, sizeof(large_buffer));
+  static const uint8_t large_buffer[EDH_CFG_MESSAGE_BUFFER_LENGTH + 1] = {0};
+  env.request.payload.buffer = large_buffer;
+  env.request.payload.length = sizeof(large_buffer);
 
   const ehd_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
@@ -102,11 +104,9 @@ static void assert_m1_failed_with_edhoc_error(
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
-  TEST_ASSERT_EQUAL(TST_EDH_SRV_HND_MOCK_ERROR_LEN,
-                    env.response.length);
+  TEST_ASSERT_EQUAL(TST_EDH_SRV_HND_MOCK_ERROR_LEN, env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD,
-                           env.response.buffer,
-                           TST_EDH_SRV_HND_MOCK_ERROR_LEN);
+                           env.response.buffer, TST_EDH_SRV_HND_MOCK_ERROR_LEN);
 }
 
 void test_handler_fails_when_message_1_processing_fails(void) {

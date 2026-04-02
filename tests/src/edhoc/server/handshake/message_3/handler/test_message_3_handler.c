@@ -12,6 +12,7 @@
 #include <string.h>
 #include <unity.h>
 
+#include "edhoc/server/handshake/common/helpers.h"
 #include "edhoc/server/handshake/message_3/handler/helpers.h"
 #include "edhoc/server/handshake/message_3/handler/scenarios.h"
 #include "edhoc/server/handshake/message_3/handler/stubs.h"
@@ -43,7 +44,7 @@ void test_handler_returns_success_for_valid_message_3_data(void) {
 
 void test_handler_fails_on_invalid_data(void) {
   edh_srv_message_3_request_t empty_request = tst_empty_message_3_request();
-  com_response_buffer_t empty_response = tst_invalid_message_3_response();
+  com_response_buffer_t empty_response = tst_edh_invalid_response();
   edh_srv_message_3_request_t request_without_extracted_fields =
       tst_message_3_request_without_extracted_fields(&env);
   edh_srv_message_3_request_t request_without_context =
@@ -69,7 +70,7 @@ void test_handler_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(EDH_MSG3_HDL_ERR_INVALID_ARGS, status,
                               test_cases[i].description);
     if (test_cases[i].response) {
-      tst_edh_srv_message_3_assert_response_clean(test_cases[i].response);
+      tst_edh_srv_assert_response_clean(test_cases[i].response);
     }
   }
 }

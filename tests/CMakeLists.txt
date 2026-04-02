@@ -81,6 +81,11 @@ add_unity_test(test_message_1_parser
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser.c
 )
 
+set(COMMON_HANDLER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/helpers.c
+    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+)
+
 add_unity_test(test_message_1_handler
     /src/edhoc/server/handshake/message_1/handler/test_message_1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/helpers.c
@@ -88,7 +93,7 @@ add_unity_test(test_message_1_handler
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
-    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+    ${COMMON_HANDLER_SOURCES}
 )
 
 add_unity_test(test_message_3_handler
@@ -96,7 +101,7 @@ add_unity_test(test_message_3_handler
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/stubs.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler.c
-    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+    ${COMMON_HANDLER_SOURCES}
 )
 
 add_unity_test(test_message_3_parser

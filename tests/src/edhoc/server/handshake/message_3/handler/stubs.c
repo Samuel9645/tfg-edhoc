@@ -7,7 +7,7 @@
  */
 
 // ReSharper disable CppParameterMayBeConst
-#include "../../../../../../include/edhoc/server/handshake/message_3/handler/stubs.h"
+#include "edhoc/server/handshake/message_3/handler/stubs.h"
 
 #include <edhoc.h>
 #include <string.h>
@@ -35,7 +35,8 @@ int edhoc_message_3_process(struct edhoc_context* edhoc_context,
 }
 
 int edhoc_message_4_compose(
-    struct edhoc_context* edhoc_context, uint8_t* message_4,
+    struct edhoc_context* edhoc_context,
+    uint8_t* message_4,           // NOLINT(*-non-const-parameter)
     const size_t message_4_size,  // NOLINT(*-non-const-parameter)
     size_t* message_4_length) {   // NOLINT(*-non-const-parameter)
   (void)edhoc_context;

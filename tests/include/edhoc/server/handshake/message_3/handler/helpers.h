@@ -31,13 +31,7 @@ edh_srv_message_3_request_t tst_message_3_request_without_extracted_fields(
 edh_srv_message_3_request_t tst_message_3_request_without_context(
     const tst_edh_srv_message_3_env_t* env);
 
-com_response_buffer_t tst_invalid_message_3_response(void);
-
 edh_srv_message_3_request_t tst_empty_message_3_request(void);
 
-void tst_edh_srv_message_3_reset_response(com_response_buffer_t* response);
-
-void tst_edh_srv_message_3_assert_response_clean(
-    const com_response_buffer_t* response);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_HELPERS_H_

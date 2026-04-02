@@ -1,6 +1,6 @@
 
 /**
- * @file test_handshake_mocked_libedhoc.c
+ * @file test_message_1_handler_mocked_libedhoc.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 31/03/2026
  * @brief Unit tests for EDHOC server handshake message processing logic.
@@ -109,7 +109,8 @@ void test_handle_message_1_propagates_library_error_payload(void) {
   tst_edh_srv_hnd_stub_edhoc_process_res =
       EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
   const uint8_t expected_error_pdu[] = {0x01, 0x02, 0x03};
-  tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu, sizeof(expected_error_pdu));
+  tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu,
+                                          sizeof(expected_error_pdu));
 
   const ehd_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);

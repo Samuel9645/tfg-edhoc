@@ -72,8 +72,8 @@ bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
   (void)request_len;
   if (parsed_payload) {
     static const uint8_t stub_payload[] = {0x01, 0x02};
-    parsed_payload->payload = stub_payload;
-    parsed_payload->payload_length = sizeof(stub_payload);
+    parsed_payload->buffer = stub_payload;
+    parsed_payload->length = sizeof(stub_payload);
   }
   return true;
 }
@@ -129,7 +129,7 @@ ehd_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
-  response_data->payload_length = 10;
+  response_data->length = 10;
   return edh_message_1_handler_ok(&dummy_edhoc_context_for_stub);
 }
 

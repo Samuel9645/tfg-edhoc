@@ -29,8 +29,8 @@ void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env) {
   env->request.base_data.session = (coap_session_t*)&env->session_dummy;
   env->request.base_data.edhoc_ctx = (struct edhoc_context*)&env->context_dummy;
   env->request.base_data.response = (coap_pdu_t*)&env->response_dummy;
-  env->request.base_data.request_data.payload = env->request_payload;
-  env->request.base_data.request_data.payload_length =
+  env->request.base_data.request_data.buffer = env->request_payload;
+  env->request.base_data.request_data.length =
       sizeof(CLEAN_MESSAGE_3_PAYLOAD);
   env->request.message_3_extracted_fields = &env->extracted_fields;
   env->extracted_fields = (struct edhoc_extracted_fields){
@@ -39,30 +39,30 @@ void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env) {
       .edhoc_message_ptr = env->request_payload,
       .edhoc_message_size = sizeof(CLEAN_MESSAGE_3_PAYLOAD),
   };
-  env->response.payload = env->response_payload;
-  env->response.payload_capacity = sizeof(env->response_payload);
-  env->response.payload_length = ARBITRARY_NONZERO_VALUE;
+  env->response.buffer = env->response_payload;
+  env->response.capacity = sizeof(env->response_payload);
+  env->response.length = ARBITRARY_NONZERO_VALUE;
 }
 
 void tst_edh_srv_message_3_reset_response(com_response_buffer_t* response) {
   TEST_ASSERT_NOT_NULL_MESSAGE(response, "Response pointer must not be NULL");
-  TEST_ASSERT_NOT_NULL_MESSAGE(response->payload,
+  TEST_ASSERT_NOT_NULL_MESSAGE(response->buffer,
                                "Response payload pointer must not be NULL");
-  response->payload_length = ARBITRARY_NONZERO_VALUE;
-  memset(response->payload, 0, response->payload_capacity);
+  response->length = ARBITRARY_NONZERO_VALUE;
+  memset(response->buffer, 0, response->capacity);
 }
 
 void tst_edh_srv_message_3_assert_response_clean(
     const com_response_buffer_t* response) {
-  if (!response || !response->payload || !response->payload_length) {
+  if (!response || !response->buffer || !response->length) {
     return;
   }
 
   TEST_ASSERT_NOT_NULL_MESSAGE(response, "Response pointer must not be NULL");
-  TEST_ASSERT_NOT_NULL_MESSAGE(response->payload,
+  TEST_ASSERT_NOT_NULL_MESSAGE(response->buffer,
                                "Response payload pointer must not be NULL");
-  TEST_ASSERT_EQUAL(ARBITRARY_NONZERO_VALUE, response->payload_length);
+  TEST_ASSERT_EQUAL(ARBITRARY_NONZERO_VALUE, response->length);
   TEST_ASSERT_EACH_EQUAL_UINT8_MESSAGE(
-      0, response->payload, response->payload_capacity,
+      0, response->buffer, response->capacity,
       "Handler should not modify the response buffer on invalid args");
 }

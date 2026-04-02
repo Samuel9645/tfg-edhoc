@@ -59,7 +59,7 @@ void edh_message_3_handler_add_error(const int edhoc_api_result,
   (void)edhoc_api_result;
   (void)generic_error_message;
 
-  if (!response_data || !response_data->payload) {
+  if (!response_data || !response_data->buffer) {
     return;
   }
 
@@ -70,9 +70,9 @@ void edh_message_3_handler_add_error(const int edhoc_api_result,
                               ? stub_error_payload
                               : TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD;
 
-  if (response_data->payload_capacity >= length) {
-    memcpy(response_data->payload, source, length);
-    response_data->payload_length = length;
+  if (response_data->capacity >= length) {
+    memcpy(response_data->buffer, source, length);
+    response_data->length = length;
   }
 }
 

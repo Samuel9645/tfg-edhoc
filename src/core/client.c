@@ -66,21 +66,21 @@ com_emulation_status_t core_run_client(void) {
   cp_cli_exchange_request_data_t request_data = {
       .request_data =
           {
-              .payload = request_payload,
-              .payload_length = 0,
+              .buffer = request_payload,
+              .length = 0,
           },
       .content_format = CP_CFG_CONTENT_CID_EDHOC,
   };
 
   com_response_buffer_t response_data = {
-      .payload = response_payload,
-      .payload_capacity = CP_CFG_MAX_PDU_SIZE,
-      .payload_length = 0,
+      .buffer = response_payload,
+      .capacity = CP_CFG_MAX_PDU_SIZE,
+      .length = 0,
   };
 
   if (edh_cli_handshake_compose_message_1(
           &client_resources.handshake, EDH_CFG_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.payload_length) !=
+          request_payload, &request_data.request_data.length) !=
       EDH_CLI_HANDSHAKE_SUCCESS) {
     coap_log_err("Failed to compose EDHOC message 1\n");
     cp_cli_cleanup_resources(&client_resources);
@@ -98,7 +98,7 @@ com_emulation_status_t core_run_client(void) {
                                    &response_data) != CP_STATUS_SUCCESS ||
       edh_cli_handshake_process_message_2(
           &client_resources.handshake, response_payload,
-          response_data.payload_length) != EDH_CLI_HANDSHAKE_SUCCESS) {
+          response_data.length) != EDH_CLI_HANDSHAKE_SUCCESS) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
@@ -108,7 +108,7 @@ com_emulation_status_t core_run_client(void) {
 
   if (edh_cli_handshake_compose_message_3(
           &client_resources.handshake, EDH_CFG_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.payload_length) !=
+          request_payload, &request_data.request_data.length) !=
       EDH_CLI_HANDSHAKE_SUCCESS) {
     coap_log_err("Failed to compose EDHOC message 3\n");
     cp_cli_cleanup_resources(&client_resources);
@@ -121,7 +121,7 @@ com_emulation_status_t core_run_client(void) {
                                    &response_data) != CP_STATUS_SUCCESS ||
       edh_cli_handshake_process_message_4(
           &client_resources.handshake, response_payload,
-          response_data.payload_length) != EDH_CLI_HANDSHAKE_SUCCESS) {
+          response_data.length) != EDH_CLI_HANDSHAKE_SUCCESS) {
     coap_log_err(
         "Failed to complete EDHOC message 3 exchange or process message 4\n");
     cp_cli_cleanup_resources(&client_resources);

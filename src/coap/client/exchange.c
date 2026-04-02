@@ -140,8 +140,8 @@ cp_status_t cp_cli_exchange_send(
   }
 
   if (cp_com_add_response_payload(
-          request_pdu, request_data->request_data.payload,
-          request_data->request_data.payload_length) == CP_STATUS_ERROR) {
+          request_pdu, request_data->request_data.buffer,
+          request_data->request_data.length) == CP_STATUS_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
     return CP_STATUS_ERROR;
@@ -166,7 +166,7 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_respon
 
   if (!exchange->have_response ||
       !cp_cli_exchange_response_size_fits(exchange->incoming_message_length,
-                                          response_data->payload_capacity)) {
+                                          response_data->capacity)) {
     coap_log_err("invalid response data\n");
     return CP_STATUS_ERROR;
   }
@@ -174,9 +174,9 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_respon
   const bool is_error_response =
       !cp_com_coap_response_indicates_success(exchange->last_response_code);
 
-  memcpy(response_data->payload, exchange->incoming_message,
+  memcpy(response_data->buffer, exchange->incoming_message,
          exchange->incoming_message_length);
-  response_data->payload_length = exchange->incoming_message_length;
+  response_data->length = exchange->incoming_message_length;
   exchange->have_response = false;
   exchange->incoming_message_length = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;

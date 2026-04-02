@@ -25,9 +25,9 @@ void test_parser_returns_stripped_message_1_payload(void) {
       payload_with_prefix.data, payload_with_prefix.length, &parsed_payload);
 
   TEST_ASSERT_TRUE(parsed);
-  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], parsed_payload.payload);
+  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], parsed_payload.buffer);
   TEST_ASSERT_EQUAL(payload_with_prefix.length - 1,
-                    parsed_payload.payload_length);
+                    parsed_payload.length);
 }
 
 void test_parser_fails_on_invalid_data(void) {
@@ -62,6 +62,6 @@ void test_parser_fails_when_prefix_is_missing(void) {
                               payload_without_prefix.length, &parsed_payload);
 
   TEST_ASSERT_FALSE(parsed);
-  TEST_ASSERT_NULL(parsed_payload.payload);
-  TEST_ASSERT_EQUAL(0, parsed_payload.payload_length);
+  TEST_ASSERT_NULL(parsed_payload.buffer);
+  TEST_ASSERT_EQUAL(0, parsed_payload.length);
 }

@@ -8,15 +8,15 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
 
-#include "edhoc/server/handshake/common/request_data.h"
+#include "common/data_models.h"
 #include "edhoc/server/handshake/message_1/result.h"
 
 /**
  * @brief Input data required to process EDHOC Message 1.
  */
 typedef struct edh_srv_message_1_request {
-  /** Common session/context/response/request metadata. */
-  edh_srv_request_t base_data;
+  /** Incoming Message payload bytes and size. */
+  com_request_payload_t payload;
 
   /** Server credentials for setting up the EDHOC context. */
   const struct edhoc_credentials* credentials;
@@ -25,9 +25,9 @@ typedef struct edh_srv_message_1_request {
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
- * @param[in] message_1_request_data Session/request metadata for Message 1
+ * @param[in] request Session/request metadata for Message 1
  * processing, including credentials.
- * @param[out] response_data Response buffer metadata for Message 2.
+ * @param[out] response Response buffer metadata for Message 2.
  * @return Struct containing status code and allocated EDHOC context on success,
  * or error code and NULL context on failure.
  * @warning This function dynamically allocates the EDHOC context using
@@ -36,7 +36,7 @@ typedef struct edh_srv_message_1_request {
  * itself and returns a NULL pointer.
  */
 ehd_message_1_handler_result_t edh_srv_handle_message_1(
-    const edh_srv_message_1_request_t* message_1_request_data,
-    com_response_buffer_t* response_data);
+    const edh_srv_message_1_request_t* request,
+    com_response_buffer_t* response);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_

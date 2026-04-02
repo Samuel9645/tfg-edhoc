@@ -59,9 +59,9 @@ void cp_srv_dispatch_post_with_dependencies(
   uint8_t response_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
 
   com_response_buffer_t response_data = {
-      .payload = response_payload,
-      .payload_capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
-      .payload_length = 0,
+      .buffer = response_payload,
+      .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
+      .length = 0,
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -79,11 +79,7 @@ void cp_srv_dispatch_post_with_dependencies(
     }
 
     const edh_srv_message_1_request_t request_data = {
-        .base_data = {.session = session,
-                      .edhoc_ctx = edhoc_ctx,
-                      .response = response,
-                      .request_data = message_1_parsed_payload},
-        .credentials = credentials};
+        .payload = message_1_parsed_payload, .credentials = credentials};
 
     const ehd_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
@@ -104,8 +100,8 @@ void cp_srv_dispatch_post_with_dependencies(
                 .response = response,
                 .request_data =
                     {
-                        .payload = request_payload,
-                        .payload_length = request_len,
+                        .buffer = request_payload,
+                        .length = request_len,
                     },
             },
         .message_3_extracted_fields = &message_3_extracted_fields,
@@ -119,10 +115,9 @@ void cp_srv_dispatch_post_with_dependencies(
     return;
   }
 
-  if (response_data.payload_length > 0 &&
+  if (response_data.length > 0 &&
       deps->add_response_payload(response, response_payload,
-                                 response_data.payload_length) !=
-          CP_STATUS_SUCCESS) {
+                                 response_data.length) != CP_STATUS_SUCCESS) {
     coap_log_err("failed to add response payload\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;

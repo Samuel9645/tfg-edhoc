@@ -35,13 +35,13 @@ void edh_srv_set_error_info(const char* error_message,
 void edh_srv_add_edhoc_error_to_response(
     const int edhoc_api_result, const struct edhoc_error_info* error_info,
     com_response_buffer_t* response_data) {
-  if (!response_data || !response_data->payload) {
+  if (!response_data || !response_data->buffer) {
     return;
   }
 
   size_t error_payload_len = 0;
-  edhoc_message_error_compose(response_data->payload,
-                              response_data->payload_capacity,
+  edhoc_message_error_compose(response_data->buffer,
+                              response_data->capacity,
                               &error_payload_len, edhoc_api_result, error_info);
-  response_data->payload_length = error_payload_len;
+  response_data->length = error_payload_len;
 }

@@ -23,19 +23,19 @@
 #include "edhoc/server/handshake/message_1/handler/scenarios.h"
 #include "edhoc/server/handshake/message_1/handler/stubs.h"
 
-static tst_edh_srv_hnd_env_t env = {0};
+static tst_message_1_handler_env_t env = {0};
 
 void setUp(void) {
   tst_edh_srv_hnd_reset_stub_results();
   memset(&env, 0, sizeof(env));
-  tst_edh_srv_hnd_setup_env(&env);
+  tst_edh_setup_message_1_handler_env(&env);
 }
 
 // ============================================================================
 // Message 1 Handler Tests
 // ============================================================================
 
-void test_handler_returns_success_for_valid_message_1_data(void) {
+void test_handler_ok_for_valid_data(void) {
   const ehd_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
@@ -70,14 +70,14 @@ void test_handler_fails_on_invalid_data(void) {
                               test_cases[i].description);
     ensure_context_is_freed_on_failure(result);
     if (test_cases[i].response) {
-      tst_edh_srv_hnd_assert_res_clean(test_cases[i].response);
+      tst_edh_assert_message_1_handler_response_clean(test_cases[i].response);
     }
   }
 }
 
 void test_handler_fails_on_too_large_request_data(void) {
   const uint8_t large_buffer[EDH_CFG_MESSAGE_BUFFER_LENGTH + 1] = {0};
-  tst_edh_srv_hnd_override_req(&env, large_buffer, sizeof(large_buffer));
+  tst_edh_override_message_1_handler_request(&env, large_buffer, sizeof(large_buffer));
 
   const ehd_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
@@ -103,9 +103,9 @@ static void assert_m1_failed_with_edhoc_error(
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
   TEST_ASSERT_EQUAL(TST_EDH_SRV_HND_MOCK_ERROR_LEN,
-                    env.response.payload_length);
+                    env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD,
-                           env.response.payload,
+                           env.response.buffer,
                            TST_EDH_SRV_HND_MOCK_ERROR_LEN);
 }
 
@@ -132,7 +132,7 @@ void test_handler_fails_when_message_2_composition_fails(void) {
 void test_handler_propagates_library_error_payload(void) {
   tst_edh_srv_hnd_stub_edhoc_process_res =
       EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
-  const uint8_t expected_error_pdu[] = {0x01, 0x02, 0x03};
+  const uint8_t expected_error_pdu[] = {0x81, 0x82, 0x77};
   tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu,
                                           sizeof(expected_error_pdu));
 
@@ -141,7 +141,7 @@ void test_handler_propagates_library_error_payload(void) {
 
   TEST_ASSERT_EQUAL(EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
                     result.status);
-  TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.payload_length);
-  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.payload,
+  TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.length);
+  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.buffer,
                            sizeof(expected_error_pdu));
 }

@@ -75,7 +75,7 @@ void tst_edh_message_1_handler_add_error(
   (void)edhoc_context;
   (void)generic_error_message;
 
-  if (!response_data || !response_data->payload)
+  if (!response_data || !response_data->buffer)
     return;
 
   const size_t len =
@@ -83,9 +83,9 @@ void tst_edh_message_1_handler_add_error(
   const uint8_t* src = stub_error_len > 0 ? stub_error_payload
                                           : TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD;
 
-  if (response_data->payload_capacity >= len) {
-    memcpy(response_data->payload, src, len);
-    response_data->payload_length = len;
+  if (response_data->capacity >= len) {
+    memcpy(response_data->buffer, src, len);
+    response_data->length = len;
   }
 }
 

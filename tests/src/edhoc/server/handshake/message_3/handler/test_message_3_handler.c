@@ -29,9 +29,9 @@ static void assert_handler_writes_error_payload(
     const edh_message_3_handler_status_t expected_status) {
   TEST_ASSERT_EQUAL(expected_status, status);
   TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN,
-                    env.response.payload_length);
+                    env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD,
-                           env.response.payload,
+                           env.response.buffer,
                            TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN);
 }
 

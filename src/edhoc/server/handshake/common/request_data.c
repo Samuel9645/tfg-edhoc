@@ -10,6 +10,6 @@
 bool edh_srv_request_data_is_valid(const edh_srv_request_t* request_data) {
   return request_data != NULL && request_data->session != NULL &&
          request_data->response != NULL &&
-         request_data->request_data.payload != NULL &&
-         request_data->request_data.payload_length > 0;
+         request_data->request_data.buffer != NULL &&
+         request_data->request_data.length > 0;
 }

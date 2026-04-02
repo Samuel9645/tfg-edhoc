@@ -16,30 +16,35 @@
  */
 typedef struct com_request_payload {
   /** Pointer to request bytes to send or process. */
-  const uint8_t* payload;
+  const uint8_t* buffer;
 
   /** Length of payload in bytes. */
-  size_t payload_length;
+  size_t length;
 } com_request_payload_t;
 
 bool com_request_payload_is_valid(const com_request_payload_t* payload);
+
+bool com_request_payload_is_larger_than(const com_request_payload_t* payload,
+                                        size_t length);
 
 /**
  * @brief Generic response buffer descriptor.
  */
 typedef struct {
   /** Caller-provided buffer where response bytes are written. */
-  uint8_t* payload;
+  uint8_t* buffer;
 
   /** Capacity of payload buffer in bytes. */
-  size_t payload_capacity;
+  size_t capacity;
 
   /** Output number of bytes written to payload buffer. */
-  size_t payload_length;
+  size_t length;
 } com_response_buffer_t;
 
 bool com_response_buffer_is_valid(const com_response_buffer_t* buffer);
+
 bool com_response_buffer_is_writable(const com_response_buffer_t* buffer);
+
 bool com_response_buffer_has_content(const com_response_buffer_t* buffer);
 
 #endif  // COMMON_DATA_MODELS_H_

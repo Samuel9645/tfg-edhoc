@@ -51,8 +51,8 @@ bool edh_srv_parse_message_1(const uint8_t* request_payload,
   }
 
   *parsed_payload = (com_request_payload_t){
-      .payload = payload_ptr,
-      .payload_length = payload_len,
+      .buffer = payload_ptr,
+      .length = payload_len,
   };
   return true;
 }

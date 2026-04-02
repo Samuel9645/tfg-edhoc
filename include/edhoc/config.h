@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// TODO: delete not used constants
 enum {
   // Cryptographic constants
   EDH_CFG_NONCE_LENGTH_BYTES = 13,

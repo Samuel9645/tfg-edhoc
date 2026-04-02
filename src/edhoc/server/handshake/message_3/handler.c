@@ -49,8 +49,8 @@ edh_message_3_handler_status_t edh_srv_handle_message_3(
   }
 
   edhoc_api_result = edhoc_message_4_compose(
-      edhoc_context, response_data->payload, response_data->payload_capacity,
-      &response_data->payload_length);
+      edhoc_context, response_data->buffer, response_data->capacity,
+      &response_data->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_message_3_handler_add_error(
         edhoc_api_result, "Message 4 composing failed", response_data);

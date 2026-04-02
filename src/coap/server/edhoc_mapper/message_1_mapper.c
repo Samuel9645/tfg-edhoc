@@ -19,7 +19,6 @@ static coap_pdu_code_t map_message_1_status_to_response(
 
   case EDH_MSG1_HDL_ERR_PREFIX_MISSING:
   case EDH_MSG1_HDL_ERR_INVALID_ARGS:
-  case EDH_MSG1_HDL_ERR_COAP_SESSION_ALREADY_HAS_DATA:
   case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
 
@@ -42,8 +41,6 @@ static const char* message_1_status_to_error_string(
     return "missing CBOR true prefix";
   case EDH_MSG1_HDL_ERR_CALLOC_FAILED:
     return "memory allocation failed";
-  case EDH_MSG1_HDL_ERR_COAP_SESSION_ALREADY_HAS_DATA:
-    return "session already has EDHOC data";
   case EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
     return "libedhoc context setup failed";
   case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:

@@ -17,11 +17,11 @@
 
 #include "coap/common/helpers.h"
 
-cp_status_result_t cp_com_resolve_address(const coap_str_const_t* host,
-                                          const uint16_t port,
+cp_status_t cp_com_resolve_address(const coap_str_const_t* host,
+                                   const uint16_t port,
                                           const int scheme_hint_bits,
                                           coap_address_t* destination_address) {
-  cp_status_result_t result = CP_STATUS_ERROR;
+  cp_status_t result = CP_STATUS_ERROR;
 
   coap_addr_info_t* addr_info =
       coap_resolve_address_info(host, port, port, port, port, AF_UNSPEC,

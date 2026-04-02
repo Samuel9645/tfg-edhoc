@@ -9,7 +9,7 @@
 #include "edhoc/server/handshake/message_3/handler.h"
 #include "internal/dispatch_engine.h"
 
-static cp_status_result_t add_edhoc_response_options(
+static cp_status_t add_edhoc_response_options(
     coap_pdu_t* response,
     const cp_cfg_content_format_edhoc_values_t content_format) {
   if (!response) {
@@ -32,17 +32,17 @@ static cp_status_result_t add_edhoc_response_options(
   return CP_STATUS_SUCCESS;
 }
 
-static const cp_server_dispatch_deps_t coap_server_edhoc_dispatch_default_deps = {
-        .extract_payload_if_valid_edhoc_request =
-            cp_srv_request_extract_payload_if_valid_edhoc_request,
-        .add_edhoc_response_options = add_edhoc_response_options,
-        .is_message_1 = edh_srv_hnd_m1_is_properly_formatted,
-        .extract_fields_if_message_3 = edh_srv_hnd_m3_parse,
-        .handle_message_1 = edh_srv_hnd_m1_handle,
-        .process_message_1_result = cp_srv_m1_map_process_result,
-        .handle_message_3 = edh_srv_hnd_m3_handle,
-        .process_message_3_result = cp_srv_m3_map_process_result,
-        .add_response_payload = cp_com_add_response_payload,
+static const cp_serv_dispatch_deps_t coap_server_edhoc_dispatch_default_deps = {
+    .extract_payload_if_valid_edhoc_request =
+        cp_srv_extract_payload_if_valid_edhoc_request,
+    .add_edhoc_response_options = add_edhoc_response_options,
+    .is_message_1 = edh_srv_message_1_is_properly_formatted,
+    .extract_fields_if_message_3 = edh_srv_parse_message_3,
+    .handle_message_1 = edh_srv_handle_message_1,
+    .process_message_1_result = cp_srv_map_message_1_result_to_coap,
+    .handle_message_3 = edh_srv_handle_message_3,
+    .process_message_3_result = cp_srv_map_message_3_result_to_coap,
+    .add_response_payload = cp_com_add_response_payload,
         .get_session_app_data = coap_session_get_app_data,
 };
 

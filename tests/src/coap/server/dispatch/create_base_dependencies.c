@@ -2,8 +2,8 @@
 
 #include "coap/server/dispatch/stubs.h"
 
-cp_server_dispatch_deps_t test_cp_srv_dispatch_create_base_dependencies(void) {
-  return (cp_server_dispatch_deps_t){
+cp_serv_dispatch_deps_t test_cp_srv_dispatch_create_base_dependencies(void) {
+  return (cp_serv_dispatch_deps_t){
       .extract_payload_if_valid_edhoc_request =
           stb_cp_srv_extract_payload_success,
       .add_edhoc_response_options = stb_cp_srv_add_options_success,

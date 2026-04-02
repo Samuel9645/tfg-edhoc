@@ -19,7 +19,7 @@ typedef struct {
   uint8_t req_payload[TST_EDH_SRV_HND_BUF_LEN];
   uint8_t res_payload[TST_EDH_SRV_HND_BUF_LEN];
   size_t res_written_len;
-  struct edh_srv_hnd_m1_request request;
+  struct edh_srv_message_1_request request;
   com_response_buffer_t response;
 } tst_edh_srv_hnd_env_t;
 

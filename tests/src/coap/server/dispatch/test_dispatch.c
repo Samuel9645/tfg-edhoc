@@ -47,7 +47,7 @@ void tearDown(void) {
 }
 
 void test_server_sends_changed_response_for_valid_message_1(void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_cp_srv_get_session_null;
 
@@ -58,7 +58,7 @@ void test_server_sends_changed_response_for_valid_message_1(void) {
 }
 
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.extract_payload_if_valid_edhoc_request = stb_cp_srv_extract_payload_fail;
 
@@ -69,7 +69,7 @@ void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
 }
 
 void test_server_responds_with_internal_error_on_server_side_failure(void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.add_edhoc_response_options = stb_cp_srv_add_options_fail;
 
@@ -81,7 +81,7 @@ void test_server_responds_with_internal_error_on_server_side_failure(void) {
 
 void test_server_responds_with_bad_request_if_context_already_exists_for_message_1(
     void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_cp_srv_get_session_valid;
 
@@ -92,7 +92,7 @@ void test_server_responds_with_bad_request_if_context_already_exists_for_message
 }
 
 void test_server_responds_with_error_when_message_1_processing_fails(void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_cp_srv_get_session_null;
   deps.process_message_1_result = stb_cp_srv_process_m1_fail;
@@ -106,7 +106,7 @@ void test_server_responds_with_error_when_message_1_processing_fails(void) {
 
 void test_server_responds_with_internal_error_if_adding_response_payload_fails(
     void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_cp_srv_get_session_null;
   deps.handle_message_1 = stb_edh_srv_handle_m1_ok_valid_len;
@@ -120,7 +120,7 @@ void test_server_responds_with_internal_error_if_adding_response_payload_fails(
 
 void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.is_message_1 = stb_edh_srv_check_is_m1_false;
   deps.extract_fields_if_message_3 = stb_edh_srv_check_m3_true;
@@ -133,7 +133,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
 }
 
 void test_server_sends_changed_response_for_valid_message_3(void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.is_message_1 = stb_edh_srv_check_is_m1_false;
   deps.extract_fields_if_message_3 = stb_edh_srv_check_m3_true;
@@ -147,7 +147,7 @@ void test_server_sends_changed_response_for_valid_message_3(void) {
 
 void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
-  cp_server_dispatch_deps_t deps =
+  cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
   deps.is_message_1 = stb_edh_srv_check_is_m1_false;
   deps.extract_fields_if_message_3 = stb_edh_srv_check_m3_false;

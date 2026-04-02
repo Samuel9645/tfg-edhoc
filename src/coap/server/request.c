@@ -16,7 +16,7 @@ static bool coap_server_extract_request_payload_args_are_valid(
   return request != NULL && payload != NULL && payload_len != NULL;
 }
 
-cp_status_result_t cp_srv_request_extract_payload_if_valid_edhoc_request(
+cp_status_t cp_srv_extract_payload_if_valid_edhoc_request(
     const coap_pdu_t* request,
     const cp_cfg_content_format_edhoc_values_t expected_format,
     const uint8_t** payload, size_t* payload_len) {

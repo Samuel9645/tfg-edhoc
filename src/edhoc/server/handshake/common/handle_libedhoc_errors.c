@@ -12,8 +12,8 @@
 #include <string.h>
 
 // TODO: do not simply return, add error code
-void edh_srv_hnd_com_set_error_info(const char* error_message,
-                                    struct edhoc_error_info* error_info) {
+void edh_srv_set_error_info(const char* error_message,
+                            struct edhoc_error_info* error_info) {
   if (!error_info || !error_message) {
     return;
   }
@@ -32,7 +32,7 @@ void edh_srv_hnd_com_set_error_info(const char* error_message,
   error_info->written_entries = len;
 }
 
-void edh_srv_hnd_com_add_edhoc_error_to_response(
+void edh_srv_add_edhoc_error_to_response(
     const int edhoc_api_result, const struct edhoc_error_info* error_info,
     com_response_buffer_t* response_data) {
   if (!response_data || !response_data->payload) {

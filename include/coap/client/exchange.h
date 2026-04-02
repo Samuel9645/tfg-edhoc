@@ -87,7 +87,7 @@ bool cp_cli_exchange_response_size_fits(size_t message_length, size_t capacity);
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_result_t cp_cli_exchange_init(
+cp_status_t cp_cli_exchange_init(
     const cp_cli_exchange_session_data_t* session_data,
     cp_cli_exchange_t* exchange);
 
@@ -99,7 +99,7 @@ cp_status_result_t cp_cli_exchange_init(
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_result_t cp_cli_exchange_send(
+cp_status_t cp_cli_exchange_send(
     cp_cli_exchange_t* exchange,
     const cp_cli_exchange_request_data_t* request_data);
 
@@ -114,8 +114,7 @@ cp_status_result_t cp_cli_exchange_send(
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.
  */
-cp_status_result_t cp_cli_exchange_wait_and_get(
-    cp_cli_exchange_t* exchange, com_response_buffer_t* response_data);
+cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_response_buffer_t* response_data);
 
 /**
  * @brief Reset response state before next request.

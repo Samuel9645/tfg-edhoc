@@ -25,7 +25,7 @@ static edhs_m1_error_context_t prepare_message_1_error_context(
   edhs_m1_error_context_t error_ctx = {0};
 
   if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
-    edh_srv_hnd_com_set_error_info(generic_error_message, &error_ctx.info);
+    edh_srv_set_error_info(generic_error_message, &error_ctx.info);
     return error_ctx;
   }
 
@@ -44,16 +44,15 @@ static edhs_m1_error_context_t prepare_message_1_error_context(
       context, error_ctx.suites_buffer, EDHS_M1_CIPHER_SUITES_ARRAY_SIZE,
       &own_len, peer_suites, ARRAY_SIZE(peer_suites), &peer_len);
 
-  edh_srv_hnd_com_set_error_info(generic_error_message, &error_ctx.info);
+  edh_srv_set_error_info(generic_error_message, &error_ctx.info);
   return error_ctx;
 }
 
-void edh_srv_hnd_m1_add_error_to_response(
-    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
+void edh_message_1_handler_add_error(const int edhoc_api_result, const struct edhoc_context* edhoc_context,
     const char* generic_error_message, com_response_buffer_t* response_data) {
   const edhs_m1_error_context_t error_ctx = prepare_message_1_error_context(
       edhoc_api_result, edhoc_context, generic_error_message);
 
-  edh_srv_hnd_com_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
-                                              response_data);
+  edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
+                                      response_data);
 }

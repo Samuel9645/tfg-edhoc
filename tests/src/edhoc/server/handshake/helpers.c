@@ -20,7 +20,7 @@ static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 
 static void setup_valid_message_1_request_data(
     coap_session_t* session, coap_pdu_t* response, const uint8_t* payload,
-    const size_t payload_len, edh_srv_hnd_m1_request_t* request_data) {
+    const size_t payload_len, edh_srv_message_1_request_t* request_data) {
   request_data->base_data.session = session;
   request_data->base_data.edhoc_ctx = NULL;
   request_data->base_data.response = response;
@@ -51,7 +51,7 @@ void tst_edh_srv_hnd_setup_env(tst_edh_srv_hnd_env_t* env) {
   env->session_dummy = 0;
   env->pdu_dummy = 0;
   memset(env->req_payload, 0, sizeof(env->req_payload));
-  const uint8_t payload_with_prefix[] = {EDH_COM_CONST_CBOR_TRUE, 0x01, 0x02};
+  const uint8_t payload_with_prefix[] = {EDH_COM_CBOR_TRUE, 0x01, 0x02};
   memcpy(env->req_payload, payload_with_prefix, sizeof(payload_with_prefix));
   memset(env->res_payload, 0, sizeof(env->res_payload));
   env->res_written_len = ARBITRARY_NONZERO_VALUE;
@@ -68,7 +68,7 @@ void tst_edh_srv_hnd_set_m1_valid(uint8_t* buffer, const size_t buffer_capacity,
   TEST_ASSERT_NOT_NULL_MESSAGE(buffer, "Buffer pointer must not be NULL");
   TEST_ASSERT_NOT_NULL_MESSAGE(written_len,
                                "Written length pointer must not be NULL");
-  const uint8_t payload_with_prefix[] = {EDH_COM_CONST_CBOR_TRUE, 0x01, 0x02};
+  const uint8_t payload_with_prefix[] = {EDH_COM_CBOR_TRUE, 0x01, 0x02};
   TEST_ASSERT_LESS_OR_EQUAL_size_t_MESSAGE(
       sizeof(payload_with_prefix), buffer_capacity,
       "Buffer capacity is too small for valid Message 1 payload");

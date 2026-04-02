@@ -26,7 +26,7 @@
  * @param[in] message_3_result Message 3 processing result from the EDHOC layer.
  * @return Mapped CoAP response code for the operation.
  */
-coap_pdu_code_t cp_srv_m3_map_process_result(
-    edh_srv_hnd_m3_result_t message_3_result);
+coap_pdu_code_t cp_srv_map_message_3_result_to_coap(
+    edh_message_3_handler_status_t message_3_result);
 
 #endif  // COAP_SERVER_EDHOC_MAPPER_MESSAGE_3_MAPPER_H_

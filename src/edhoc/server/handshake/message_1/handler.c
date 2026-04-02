@@ -15,10 +15,9 @@
 #include "edhoc/config.h"
 #include "edhoc/server/handshake/message_1/errors.h"
 
-bool edh_srv_hnd_m1_is_properly_formatted(const uint8_t* payload,
-                                          const size_t payload_len) {
-  return payload != NULL && payload_len > 0 &&
-         payload[0] == EDH_COM_CONST_CBOR_TRUE;
+bool edh_srv_message_1_is_properly_formatted(const uint8_t* payload,
+                                             const size_t payload_len) {
+  return payload != NULL && payload_len > 0 && payload[0] == EDH_COM_CBOR_TRUE;
 }
 
 static bool arguments_are_invalid(const uint8_t** payload,
@@ -27,27 +26,27 @@ static bool arguments_are_invalid(const uint8_t** payload,
 }
 
 static bool first_byte_is_not_cbor_true(const uint8_t** payload) {
-  return (*payload)[0] != EDH_COM_CONST_CBOR_TRUE;
+  return (*payload)[0] != EDH_COM_CBOR_TRUE;
 }
 
-edh_srv_hnd_m1_status_t edh_srv_hnd_m1_remove_cbor_true_prefix(
+edh_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
   if (arguments_are_invalid(payload, length)) {
-    return EDH_SERV_HND_M1_ERR_INVALID_ARGS;
+    return EDH_MSG1_HDL_ERR_INVALID_ARGS;
   }
   if (first_byte_is_not_cbor_true(payload)) {
-    return EDH_SERV_HND_M1_ERR_PREFIX_MISSING;
+    return EDH_MSG1_HDL_ERR_PREFIX_MISSING;
   }
 
   *payload += 1;
   *length -= 1;
-  return EDH_SERV_HND_M1_OK;
+  return EDH_MSG1_HDL_OK;
 }
 
 static bool edhoc_server_message_1_has_invalid_args(
-    const edh_srv_hnd_com_request_t* request_data,
+    const edh_srv_request_t* request_data,
     const com_response_buffer_t* response_data) {
-  if (!request_data || !edh_srv_hnd_com_request_data_is_valid(request_data) ||
+  if (!request_data || !edh_srv_request_data_is_valid(request_data) ||
       !com_response_buffer_is_valid(response_data)) {
     return true;
   }
@@ -58,63 +57,62 @@ static bool edhoc_server_message_1_has_invalid_args(
   return session_already_exists || payload_is_too_short;
 }
 
-edh_srv_hnd_m1_result_t edh_srv_hnd_m1_handle(
-    const edh_srv_hnd_m1_request_t* message_1_request_data,
+ehd_message_1_handler_result_t edh_srv_handle_message_1(
+    const edh_srv_message_1_request_t* message_1_request_data,
     com_response_buffer_t* response_data) {
   if (!message_1_request_data) {
-    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);
+    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
   }
-  const edh_srv_hnd_com_request_t* base_data =
-      &message_1_request_data->base_data;
+  const edh_srv_request_t* base_data = &message_1_request_data->base_data;
   if (edhoc_server_message_1_has_invalid_args(base_data, response_data)) {
-    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_INVALID_ARGS);
+    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
   }
 
   if (base_data->request_data.payload_length > EDH_CFG_MESSAGE_BUFFER_LENGTH) {
-    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_PAYLOAD_TOO_LARGE);
+    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE);
   }
   const uint8_t* no_prefix_payload = base_data->request_data.payload;
   size_t no_prefix_payload_len = base_data->request_data.payload_length;
-  if (edh_srv_hnd_m1_remove_cbor_true_prefix(
-          &no_prefix_payload, &no_prefix_payload_len) != EDH_SERV_HND_M1_OK) {
-    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_PREFIX_MISSING);
+  if (edh_srv_remove_cbor_true_prefix(
+          &no_prefix_payload, &no_prefix_payload_len) != EDH_MSG1_HDL_OK) {
+    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_PREFIX_MISSING);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    return edh_srv_hnd_m1_failure(EDH_SERV_HND_M1_ERR_CALLOC_FAILED);
+    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_CALLOC_FAILED);
   }
 
   int edhoc_api_result =
       edh_com_setup_context(edhoc_ctx, message_1_request_data->credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     free(edhoc_ctx);
-    return edh_srv_hnd_m1_failure(
-        EDH_SERV_HND_M1_ERR_EDHOC_CONTEXT_SETUP_FAILED);
+    return edh_message_1_handler_failure(
+        EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
   }
 
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, no_prefix_payload,
                                              no_prefix_payload_len);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edh_srv_hnd_m1_add_error_to_response(edhoc_api_result, edhoc_ctx,
-                                         "Message 1 processing failed",
+    edh_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
+                                    "Message 1 processing failed",
                                          response_data);
     free(edhoc_ctx);
-    return edh_srv_hnd_m1_failure(
-        EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+    return edh_message_1_handler_failure(
+        EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
   }
 
   edhoc_api_result = edhoc_message_2_compose(edhoc_ctx, response_data->payload,
                                              response_data->payload_capacity,
                                              &response_data->payload_length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edh_srv_hnd_m1_add_error_to_response(edhoc_api_result, edhoc_ctx,
-                                         "Message 2 composing failed",
+    edh_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
+                                    "Message 2 composing failed",
                                          response_data);
     free(edhoc_ctx);
-    return edh_srv_hnd_m1_failure(
-        EDH_SERV_HND_M1_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+    return edh_message_1_handler_failure(
+        EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
 
-  return edh_srv_hnd_m1_ok(edhoc_ctx);
+  return edh_message_1_handler_ok(edhoc_ctx);
 }

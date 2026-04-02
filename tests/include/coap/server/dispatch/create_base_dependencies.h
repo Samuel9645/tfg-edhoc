@@ -17,6 +17,6 @@
  * @return Initialized dependency table for
  * coap_server_dispatch_post_with_dependencies().
  */
-cp_server_dispatch_deps_t test_cp_srv_dispatch_create_base_dependencies(void);
+cp_serv_dispatch_deps_t test_cp_srv_dispatch_create_base_dependencies(void);
 
 #endif  // COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_

@@ -22,10 +22,12 @@
  * @param[in] expected_format Expected content format value.
  * @param[out] payload Pointer to request payload on success.
  * @param[out] payload_len Payload length on success.
- * @return CP_STATUS_SUCCESS if request is valid and payload is extracted, CP_STATUS_ERROR otherwise.
+ * @return CP_STATUS_SUCCESS if request is valid and payload is extracted,
+ * CP_STATUS_ERROR otherwise.
  */
-cp_status_result_t cp_srv_request_extract_payload_if_valid_edhoc_request(
-    const coap_pdu_t* request, cp_cfg_content_format_edhoc_values_t expected_format,
+cp_status_t cp_srv_extract_payload_if_valid_edhoc_request(
+    const coap_pdu_t* request,
+    cp_cfg_content_format_edhoc_values_t expected_format,
     const uint8_t** payload, size_t* payload_len);
 
 #endif  // COAP_SERVER_REQUEST_H_

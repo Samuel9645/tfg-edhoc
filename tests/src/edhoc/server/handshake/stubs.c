@@ -68,8 +68,7 @@ void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len) {
   }
 }
 
-void edh_srv_hnd_m1_add_error_to_response(
-    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
+void edh_message_1_handler_add_error(const int edhoc_api_result, const struct edhoc_context* edhoc_context,
     const char* generic_error_message, com_response_buffer_t* response_data) {
   (void)edhoc_api_result;
   (void)edhoc_context;

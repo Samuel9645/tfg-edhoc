@@ -9,7 +9,6 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_ERRORS_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_ERRORS_H_
 
-
 #include "common/data_models.h"
 
 /**
@@ -20,8 +19,8 @@
  * @param[in] generic_error_message Generic error text for the operation.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void edh_srv_hnd_m3_add_error_to_response(int edhoc_api_result,
-                                          const char* generic_error_message,
-                                          com_response_buffer_t* response_data);
+void edh_message_3_handler_add_error(int edhoc_api_result,
+                                     const char* generic_error_message,
+                                     com_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_ERRORS_H_

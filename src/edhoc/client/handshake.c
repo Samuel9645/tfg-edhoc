@@ -76,7 +76,7 @@ edh_cli_handshake_status_t edh_cli_handshake_compose_message_1(
     return EDH_CLI_HANDSHAKE_INVALID_ARGUMENT;
   }
 
-  payload[0] = EDH_COM_CONST_CBOR_TRUE;
+  payload[0] = EDH_COM_CBOR_TRUE;
   size_t message_len = 0;
   if (edhoc_message_1_compose(&handshake->context, &payload[1],
                               payload_capacity - 1,

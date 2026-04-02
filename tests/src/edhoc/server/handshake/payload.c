@@ -25,5 +25,5 @@ tst_edh_srv_hnd_payload_t get_invalid_prefix_payload(void) {
 }
 
 tst_edh_srv_hnd_payload_t get_valid_message_1_payload(void) {
-  return create_payload(EDH_COM_CONST_CBOR_TRUE);
+  return create_payload(EDH_COM_CBOR_TRUE);
 }

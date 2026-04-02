@@ -13,11 +13,11 @@
 /**
  * @brief Result codes for EDHOC server Message 3 operations.
  */
-typedef enum edh_srv_hnd_m3_result {
-  EDH_SRV_HND_M3_OK = 0,
-  EDH_SRV_HND_M3_ERR_INVALID_ARGS,
-  EDH_SRV_HND_M3_ERR_MESSAGE_3_PROCESS_FAILED,
-  EDH_SRV_HND_M3_ERR_MESSAGE_4_COMPOSE_FAILED,
-} edh_srv_hnd_m3_result_t;
+typedef enum edh_message_3_handler_status {
+  EDH_MSG3_HDL_OK = 0,
+  EDH_MSG3_HDL_ERR_INVALID_ARGS,
+  EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED,
+  EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED,
+} edh_message_3_handler_status_t;
 
 #endif  // EDHOC_SERVER_MESSAGE_3_RESULT_H

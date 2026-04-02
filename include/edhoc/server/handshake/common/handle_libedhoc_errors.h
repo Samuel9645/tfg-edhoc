@@ -20,8 +20,8 @@
  * @param[in] error_message Generic error text to expose in EDHOC error payload.
  * @param[out] error_info Target struct to initialize.
  */
-void edh_srv_hnd_com_set_error_info(const char* error_message,
-                                    struct edhoc_error_info* error_info);
+void edh_srv_set_error_info(const char* error_message,
+                            struct edhoc_error_info* error_info);
 
 /**
  * @brief Compose and write an EDHOC error message payload into the response
@@ -35,7 +35,7 @@ void edh_srv_hnd_com_set_error_info(const char* error_message,
  * @param[in] error_info Prepared EDHOC error info to embed in the response.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void edh_srv_hnd_com_add_edhoc_error_to_response(
+void edh_srv_add_edhoc_error_to_response(
     int edhoc_api_result, const struct edhoc_error_info* error_info,
     com_response_buffer_t* response_data);
 

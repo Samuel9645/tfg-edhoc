@@ -19,13 +19,13 @@
 /**
  * @brief Input data required to process EDHOC Message 3.
  */
-typedef struct edh_srv_hnd_m3_request_data {
+typedef struct edh_srv_message_3_request {
   /** Common session/context/response/request metadata. */
-  edh_srv_hnd_com_request_t base_data;
+  edh_srv_request_t base_data;
 
   /** Pre-extracted Message 3 fields (including inner EDHOC message). */
   struct edhoc_extracted_fields* message_3_extracted_fields;
-} edh_srv_hnd_m3_request_data_t;
+} edh_srv_message_3_request_t;
 
 /**
  * @brief Check whether payload is properly formatted as EDHOC Message 3 and
@@ -37,9 +37,9 @@ typedef struct edh_srv_hnd_m3_request_data {
  * success.
  * @return true if payload is valid Message 3, false otherwise.
  */
-bool edh_srv_hnd_m3_parse(const uint8_t* request_payload, size_t request_len,
-                          const struct edhoc_context* edhoc_ctx,
-                          struct edhoc_extracted_fields* extracted_fields);
+bool edh_srv_parse_message_3(const uint8_t* request_payload, size_t request_len,
+                             const struct edhoc_context* edhoc_ctx,
+                             struct edhoc_extracted_fields* extracted_fields);
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.
@@ -56,8 +56,8 @@ bool edh_srv_hnd_m3_parse(const uint8_t* request_payload, size_t request_len,
  * resources associated with this handshake; use com_session_resources_t +
  * com_cleanup_resources() for centralized teardown.
  */
-edh_srv_hnd_m3_result_t edh_srv_hnd_m3_handle(
-    const edh_srv_hnd_m3_request_data_t* request_data,
+edh_message_3_handler_status_t edh_srv_handle_message_3(
+    const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

@@ -9,7 +9,7 @@
  * @param[in] deps Dispatch dependencies structure.
  * @return true if all function pointers are present, false if any are NULL.
  */
-static bool dispatch_deps_are_valid(const cp_server_dispatch_deps_t* deps) {
+static bool dispatch_deps_are_valid(const cp_serv_dispatch_deps_t* deps) {
   return deps != NULL && deps->extract_payload_if_valid_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
          deps->is_message_1 != NULL && deps->process_message_1_result != NULL &&
@@ -22,14 +22,14 @@ static bool dispatch_deps_are_valid(const cp_server_dispatch_deps_t* deps) {
 
 static bool dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
-    const coap_pdu_t* response, const cp_server_dispatch_deps_t* deps) {
+    const coap_pdu_t* response, const cp_serv_dispatch_deps_t* deps) {
   return !session || !request || !response || !dispatch_deps_are_valid(deps);
 }
 
 void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
-    const cp_server_dispatch_deps_t* deps) {
+    const cp_serv_dispatch_deps_t* deps) {
   if (dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
     if (response) {
@@ -75,7 +75,7 @@ void cp_srv_dispatch_post_with_dependencies(
       return;
     }
 
-    const edh_srv_hnd_m1_request_t request_data = {
+    const edh_srv_message_1_request_t request_data = {
         .base_data = {.session = session,
                       .edhoc_ctx = edhoc_ctx,
                       .response = response,
@@ -86,7 +86,7 @@ void cp_srv_dispatch_post_with_dependencies(
                           }},
         .credentials = credentials};
 
-    const edh_srv_hnd_m1_result_t message_1_result =
+    const ehd_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
   } else if (deps->extract_fields_if_message_3(request_payload, request_len,
@@ -98,7 +98,7 @@ void cp_srv_dispatch_post_with_dependencies(
       return;
     }
 
-    const edh_srv_hnd_m3_request_data_t request_data = {
+    const edh_srv_message_3_request_t request_data = {
         .base_data =
             {
                 .session = session,
@@ -112,7 +112,7 @@ void cp_srv_dispatch_post_with_dependencies(
             },
         .message_3_extracted_fields = &message_3_extracted_fields,
     };
-    const edh_srv_hnd_m3_result_t message_3_result =
+    const edh_message_3_handler_status_t message_3_result =
         deps->handle_message_3(&request_data, &response_data);
     response_code = deps->process_message_3_result(message_3_result);
   } else {

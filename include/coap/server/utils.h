@@ -24,8 +24,8 @@ coap_context_t* cp_srv_create_context(void);
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-cp_status_result_t cp_srv_setup_endpoints(coap_context_t* coap_context,
-                                          const char* listen_address_string);
+cp_status_t cp_srv_setup_endpoints(coap_context_t* coap_context,
+                                   const char* listen_address_string);
 
 /**
  * @brief Join a multicast group for discovery traffic.
@@ -35,8 +35,7 @@ cp_status_result_t cp_srv_setup_endpoints(coap_context_t* coap_context,
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-cp_status_result_t cp_srv_join_multicast_group(
-    coap_context_t* coap_context, const char* multicast_address_string);
+cp_status_t cp_srv_join_multicast_group(coap_context_t* coap_context, const char* multicast_address_string);
 
 /**
  * @brief Add a GET resource and register its request handler.
@@ -47,8 +46,7 @@ cp_status_result_t cp_srv_join_multicast_group(
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-cp_status_result_t cp_srv_add_post_resource(
-    coap_context_t* coap_context, const char* resource_path,
+cp_status_t cp_srv_add_post_resource(coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler);
 
 /**
@@ -58,6 +56,6 @@ cp_status_result_t cp_srv_add_post_resource(
  * @return CP_STATUS_SUCCESS on graceful stop, CP_STATUS_ERROR
  * on I/O failure.
  */
-cp_status_result_t cp_srv_run_input_output_loop(coap_context_t* coap_context);
+cp_status_t cp_srv_run_input_output_loop(coap_context_t* coap_context);
 
 #endif  // COAP_SERVER_UTILS_H_

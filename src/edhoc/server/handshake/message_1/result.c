@@ -9,12 +9,13 @@
 
 #include <stddef.h>
 
-edh_srv_hnd_m1_result_t edh_srv_hnd_m1_ok(struct edhoc_context* edhoc_ctx) {
-  return (edh_srv_hnd_m1_result_t){.status = EDH_SERV_HND_M1_OK,
-                                   .edhoc_ctx = edhoc_ctx};
+ehd_message_1_handler_result_t edh_message_1_handler_ok(
+    struct edhoc_context* edhoc_ctx) {
+  return (ehd_message_1_handler_result_t){.status = EDH_MSG1_HDL_OK,
+                                          .edhoc_ctx = edhoc_ctx};
 }
 
-edh_srv_hnd_m1_result_t edh_srv_hnd_m1_failure(
-    const edh_srv_hnd_m1_status_t status) {
-  return (edh_srv_hnd_m1_result_t){.status = status, .edhoc_ctx = NULL};
+ehd_message_1_handler_result_t edh_message_1_handler_failure(
+    const edh_message_1_handler_status_t status) {
+  return (ehd_message_1_handler_result_t){.status = status, .edhoc_ctx = NULL};
 }

@@ -45,8 +45,7 @@
  * @note Inspired by libcoap-minimal common.cc and common.hh files:
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>.
  */
-cp_status_result_t cp_com_resolve_address(const coap_str_const_t* host,
-                                          uint16_t port, int scheme_hint_bits,
+cp_status_t cp_com_resolve_address(const coap_str_const_t* host, uint16_t port, int scheme_hint_bits,
                                           coap_address_t* destination_address);
 
 /**

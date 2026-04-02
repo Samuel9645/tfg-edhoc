@@ -9,7 +9,7 @@
 // ReSharper disable CppParameterMayBeConst
 // since the real implementations expects non-const pointers to allow output
 // parameters
-#include "edhoc/server/handshake/stubs.h"
+#include "../../../../../include/edhoc/server/handshake/message_1_handler/stubs.h"
 
 #include <edhoc.h>
 #include <string.h>

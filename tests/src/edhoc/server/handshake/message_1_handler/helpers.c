@@ -6,7 +6,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/server/handshake/helpers.h"
+#include "../../../../../include/edhoc/server/handshake/message_1_handler/helpers.h"
 
 #include <edhoc.h>
 #include <string.h>

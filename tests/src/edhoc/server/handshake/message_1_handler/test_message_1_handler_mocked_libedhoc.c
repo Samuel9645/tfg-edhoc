@@ -18,10 +18,10 @@
 #include <string.h>
 #include <unity.h>
 
+#include "../../../../../include/edhoc/server/handshake/message_1_handler/scenarios.h"
+#include "../../../../../include/edhoc/server/handshake/message_1_handler/stubs.h"
 #include "edhoc/server/handshake/helpers.h"
 #include "edhoc/server/handshake/payload.h"
-#include "edhoc/server/handshake/scenarios.h"
-#include "edhoc/server/handshake/stubs.h"
 
 static tst_edh_srv_hnd_env_t env;
 

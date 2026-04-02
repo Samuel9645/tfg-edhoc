@@ -76,17 +76,17 @@ add_unity_test(test_dispatch
 )
 
 add_unity_test(test_handshake
-    src/edhoc/server/handshake/test_message_1_handler.c
+    src/edhoc/server/handshake/message_1_handler/test_message_1_handler.c
     ${SERVER_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
+    src/edhoc/server/handshake/message_1_handler/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
 )
 
 add_unity_test(test_handshake_mocked_libedhoc
-    src/edhoc/server/handshake/test_message_1_handler_mocked_libedhoc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/helpers.c
+    src/edhoc/server/handshake/message_1_handler/test_message_1_handler_mocked_libedhoc.c
+    src/edhoc/server/handshake/message_1_handler/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/stubs.c
+    src/edhoc/server/handshake/message_1_handler/stubs.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/common/request_data.c

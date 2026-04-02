@@ -15,7 +15,7 @@
 
 #include "edhoc/server/handshake/message_3/errors.h"
 
-static bool edhoc_server_message_3_has_invalid_args(
+static bool message_3_has_invalid_args(
     const edh_srv_message_3_request_t* request_data,
     const com_response_buffer_t* response_data) {
   if (!request_data ||
@@ -32,8 +32,8 @@ static bool edhoc_server_message_3_has_invalid_args(
 
 bool edh_srv_parse_message_3(const uint8_t* request_payload,
                              const size_t request_len,
-                          const struct edhoc_context* edhoc_ctx,
-                          struct edhoc_extracted_fields* extracted_fields) {
+                             const struct edhoc_context* edhoc_ctx,
+                             struct edhoc_extracted_fields* extracted_fields) {
   if (!request_payload || request_len == 0 || !edhoc_ctx || !extracted_fields) {
     return false;
   }
@@ -56,7 +56,7 @@ bool edh_srv_parse_message_3(const uint8_t* request_payload,
 edh_message_3_handler_status_t edh_srv_handle_message_3(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data) {
-  if (edhoc_server_message_3_has_invalid_args(request_data, response_data)) {
+  if (message_3_has_invalid_args(request_data, response_data)) {
     return EDH_MSG3_HDL_ERR_INVALID_ARGS;
   }
 

@@ -10,22 +10,11 @@
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
 
-typedef struct {
-  struct edhoc_error_info info;
-} edhs_m3_error_context_t;
-
-static edhs_m3_error_context_t prepare_message_3_error_context(
-    const char* generic_error_message) {
-  edhs_m3_error_context_t error_ctx = {0};
-  edh_srv_set_error_info(generic_error_message, &error_ctx.info);
-  return error_ctx;
-}
-
-void edh_message_3_handler_add_error(const int edhoc_api_result, const char* generic_error_message,
-    com_response_buffer_t* response_data) {
-  const edhs_m3_error_context_t error_ctx =
-      prepare_message_3_error_context(generic_error_message);
-
-  edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
+void edh_message_3_handler_add_error(const int edhoc_api_result,
+                                     const char* generic_error_message,
+                                     com_response_buffer_t* response_data) {
+  struct edhoc_error_info error_info = {0};
+  edh_srv_set_error_info(generic_error_message, &error_info);
+  edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_info,
                                       response_data);
 }

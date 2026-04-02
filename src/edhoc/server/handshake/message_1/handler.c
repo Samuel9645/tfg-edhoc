@@ -43,7 +43,7 @@ edh_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
   return EDH_MSG1_HDL_OK;
 }
 
-static bool edhoc_server_message_1_has_invalid_args(
+static bool message_1_has_invalid_args(
     const edh_srv_request_t* request_data,
     const com_response_buffer_t* response_data) {
   if (!request_data || !edh_srv_request_data_is_valid(request_data) ||
@@ -64,7 +64,7 @@ ehd_message_1_handler_result_t edh_srv_handle_message_1(
     return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
   }
   const edh_srv_request_t* base_data = &message_1_request_data->base_data;
-  if (edhoc_server_message_1_has_invalid_args(base_data, response_data)) {
+  if (message_1_has_invalid_args(base_data, response_data)) {
     return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
   }
 
@@ -96,7 +96,7 @@ ehd_message_1_handler_result_t edh_srv_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
                                     "Message 1 processing failed",
-                                         response_data);
+                                    response_data);
     free(edhoc_ctx);
     return edh_message_1_handler_failure(
         EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
@@ -108,7 +108,7 @@ ehd_message_1_handler_result_t edh_srv_handle_message_1(
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
                                     "Message 2 composing failed",
-                                         response_data);
+                                    response_data);
     free(edhoc_ctx);
     return edh_message_1_handler_failure(
         EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);

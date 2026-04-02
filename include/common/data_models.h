@@ -14,7 +14,7 @@
 /**
  * @brief Generic request payload descriptor.
  */
-typedef struct {
+typedef struct com_request_payload {
   /** Pointer to request bytes to send or process. */
   const uint8_t* payload;
 

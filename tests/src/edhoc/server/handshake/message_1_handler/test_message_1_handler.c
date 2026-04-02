@@ -13,9 +13,10 @@
 #include <string.h>
 #include <unity.h>
 
-#include "../../../../../include/edhoc/server/handshake/message_1_handler/scenarios.h"
 #include "edhoc/config.h"
-#include "edhoc/server/handshake/helpers.h"
+#include "edhoc/server/handshake/message_1/handler.h"
+#include "edhoc/server/handshake/message_1_handler/helpers.h"
+#include "edhoc/server/handshake/message_1_handler/scenarios.h"
 #include "edhoc/server/handshake/payload.h"
 
 // ============================================================================

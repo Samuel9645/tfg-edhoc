@@ -69,24 +69,24 @@ endfunction()
 # ==============================================================================
 
 add_unity_test(test_dispatch
-    src/coap/server/dispatch/test_dispatch.c
+    /src/coap/server/dispatch/test_dispatch.c
     ${SERVER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/stubs.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/create_base_dependencies.c
 )
 
 add_unity_test(test_handshake
-    src/edhoc/server/handshake/message_1_handler/test_message_1_handler.c
+    /src/edhoc/server/handshake/message_1_handler/test_message_1_handler.c
     ${SERVER_SOURCES}
-    src/edhoc/server/handshake/message_1_handler/helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
 )
 
 add_unity_test(test_handshake_mocked_libedhoc
-    src/edhoc/server/handshake/message_1_handler/test_message_1_handler_mocked_libedhoc.c
-    src/edhoc/server/handshake/message_1_handler/helpers.c
+    /src/edhoc/server/handshake/message_1_handler/test_message_1_handler_mocked_libedhoc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/payload.c
-    src/edhoc/server/handshake/message_1_handler/stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1_handler/stubs.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/common/request_data.c
@@ -94,7 +94,7 @@ add_unity_test(test_handshake_mocked_libedhoc
 )
 
 add_unity_test(test_integration
-    src/core/test_integration.c
+    /src/core/test_integration.c
     ${CORE_SOURCES}
 )
 

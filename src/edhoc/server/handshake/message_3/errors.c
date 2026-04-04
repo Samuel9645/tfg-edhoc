@@ -10,7 +10,7 @@
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
 
-void edh_message_3_handler_add_error(const int edhoc_api_result,
+void edh_srv_message_3_handler_add_error(const int edhoc_api_result,
                                      const char* generic_error_message,
                                      com_response_buffer_t* response_data) {
   struct edhoc_error_info error_info = {0};

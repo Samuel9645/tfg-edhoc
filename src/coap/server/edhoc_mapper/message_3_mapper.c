@@ -10,7 +10,7 @@
 #include "coap/server/edhoc_mapper/message_3_mapper.h"
 
 static coap_pdu_code_t map_message_3_status_to_response(
-    const edh_message_3_handler_status_t result) {
+    const edh_srv_message_3_handler_status_t result) {
   switch (result) {
   case EDH_MSG3_HDL_OK:
     return COAP_RESPONSE_CODE_CHANGED;
@@ -26,7 +26,7 @@ static coap_pdu_code_t map_message_3_status_to_response(
 }
 
 static const char* message_3_result_to_error_string(
-    const edh_message_3_handler_status_t result) {
+    const edh_srv_message_3_handler_status_t result) {
   switch (result) {
   case EDH_MSG3_HDL_ERR_INVALID_ARGS:
     return "invalid arguments or missing context";
@@ -42,7 +42,7 @@ static const char* message_3_result_to_error_string(
 }
 
 coap_pdu_code_t cp_srv_map_message_3_result_to_coap(
-    const edh_message_3_handler_status_t message_3_result) {
+    const edh_srv_message_3_handler_status_t message_3_result) {
   if (message_3_result != EDH_MSG3_HDL_OK) {
     const char* error_message =
         message_3_result_to_error_string(message_3_result);

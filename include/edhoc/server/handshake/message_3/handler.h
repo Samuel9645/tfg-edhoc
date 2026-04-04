@@ -40,7 +40,7 @@ typedef struct edh_srv_message_3_request {
  * resources associated with this handshake; use com_session_resources_t +
  * com_cleanup_resources() for centralized teardown.
  */
-edh_message_3_handler_status_t edh_srv_handle_message_3(
+edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data);
 

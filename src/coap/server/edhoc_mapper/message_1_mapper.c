@@ -12,42 +12,42 @@
 #include <stdlib.h>
 
 static coap_pdu_code_t map_message_1_status_to_response(
-    const enum edh_message_1_handler_status status) {
+    const enum edh_srv_message_1_handler_status status) {
   switch (status) {
-  case EDH_MSG1_HDL_OK:
+  case EDH_SRV_MSG1_HDL_OK:
     return COAP_RESPONSE_CODE_CHANGED;
 
-  case EDH_MSG1_HDL_ERR_PREFIX_MISSING:
-  case EDH_MSG1_HDL_ERR_INVALID_ARGS:
-  case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_PREFIX_MISSING:
+  case EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
 
-  case EDH_MSG1_HDL_ERR_CALLOC_FAILED:
-  case EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
-  case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_CALLOC_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 }
 
 static const char* message_1_status_to_error_string(
-    const enum edh_message_1_handler_status status) {
+    const enum edh_srv_message_1_handler_status status) {
   switch (status) {
-  case EDH_MSG1_HDL_ERR_INVALID_ARGS:
+  case EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS:
     return "invalid arguments";
-  case EDH_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE:
+  case EDH_SRV_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE:
     return "payload exceeds maximum buffer size";
-  case EDH_MSG1_HDL_ERR_PREFIX_MISSING:
+  case EDH_SRV_MSG1_HDL_ERR_PREFIX_MISSING:
     return "missing CBOR true prefix";
-  case EDH_MSG1_HDL_ERR_CALLOC_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_CALLOC_FAILED:
     return "memory allocation failed";
-  case EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
     return "libedhoc context setup failed";
-  case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
     return "libedhoc message_1_process failed";
-  case EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
+  case EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
     return "libedhoc message_2_compose failed";
-  case EDH_MSG1_HDL_OK:
+  case EDH_SRV_MSG1_HDL_OK:
     return "THIS SHOULD NEVER HAPPEN: failure logger called on success status";
   default:
     return "unknown error";
@@ -55,9 +55,9 @@ static const char* message_1_status_to_error_string(
 }
 
 coap_pdu_code_t cp_srv_map_message_1_result_to_coap(
-    const ehd_message_1_handler_result_t message_1_result,
+    const ehd_srv_message_1_handler_result_t message_1_result,
     coap_session_t* session) {
-  if (message_1_result.status != EDH_MSG1_HDL_OK) {
+  if (message_1_result.status != EDH_SRV_MSG1_HDL_OK) {
     const char* error_message =
         message_1_status_to_error_string(message_1_result.status);
     coap_log_err("Message 1 processing failed: %s\n", error_message);

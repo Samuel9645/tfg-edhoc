@@ -109,32 +109,32 @@ bool stb_edh_srv_parse_message_3_false(
   return false;
 }
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
+  return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS);
 }
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return edh_message_1_handler_ok(&dummy_edhoc_context_for_stub);
+  return edh_srv_message_1_handler_ok(&dummy_edhoc_context_for_stub);
 }
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
   response_data->length = 10;
-  return edh_message_1_handler_ok(&dummy_edhoc_context_for_stub);
+  return edh_srv_message_1_handler_ok(&dummy_edhoc_context_for_stub);
 }
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    const ehd_message_1_handler_result_t message_1_result,
+    const ehd_srv_message_1_handler_result_t message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;
@@ -142,14 +142,14 @@ coap_pdu_code_t stb_cp_srv_process_m1_ok(
 }
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    const ehd_message_1_handler_result_t message_1_result,
+    const ehd_srv_message_1_handler_result_t message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
-edh_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
+edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
@@ -157,7 +157,7 @@ edh_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
   return EDH_MSG3_HDL_OK;
 }
 
-edh_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
+edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data) {
   (void)request_data;
@@ -166,13 +166,13 @@ edh_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
 }
 
 coap_pdu_code_t stb_cp_srv_process_m3_ok(
-    const edh_message_3_handler_status_t message_3_result) {
+    const edh_srv_message_3_handler_status_t message_3_result) {
   (void)message_3_result;
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
 coap_pdu_code_t stb_cp_srv_process_m3_fail(
-    const edh_message_3_handler_status_t message_3_result) {
+    const edh_srv_message_3_handler_status_t message_3_result) {
   (void)message_3_result;
   return COAP_RESPONSE_CODE_INTERNAL_ERROR;
 }

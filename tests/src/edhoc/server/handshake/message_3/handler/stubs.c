@@ -54,7 +54,7 @@ void tst_edh_srv_message_3_set_stub_error_response(const uint8_t* data,
   }
 }
 
-void edh_message_3_handler_add_error(const int edhoc_api_result,
+void edh_srv_message_3_handler_add_error(const int edhoc_api_result,
                                      const char* generic_error_message,
                                      com_response_buffer_t* response_data) {
   (void)edhoc_api_result;

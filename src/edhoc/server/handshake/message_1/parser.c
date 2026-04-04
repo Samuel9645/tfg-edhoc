@@ -20,18 +20,18 @@ static bool first_byte_is_not_cbor_true(const uint8_t** payload) {
   return (*payload)[0] != EDH_COM_CBOR_TRUE;
 }
 
-edh_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
+edh_srv_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length) {
   if (arguments_are_invalid(payload, length)) {
-    return EDH_MSG1_HDL_ERR_INVALID_ARGS;
+    return EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS;
   }
   if (first_byte_is_not_cbor_true(payload)) {
-    return EDH_MSG1_HDL_ERR_PREFIX_MISSING;
+    return EDH_SRV_MSG1_HDL_ERR_PREFIX_MISSING;
   }
 
   *payload += 1;
   *length -= 1;
-  return EDH_MSG1_HDL_OK;
+  return EDH_SRV_MSG1_HDL_OK;
 }
 
 bool edh_srv_parse_message_1(const uint8_t* request_payload,
@@ -46,7 +46,7 @@ bool edh_srv_parse_message_1(const uint8_t* request_payload,
   const uint8_t* payload_ptr = request_payload;
   size_t payload_len = request_len;
   if (edh_srv_remove_cbor_true_prefix(&payload_ptr, &payload_len) !=
-      EDH_MSG1_HDL_OK) {
+      EDH_SRV_MSG1_HDL_OK) {
     return false;
   }
 

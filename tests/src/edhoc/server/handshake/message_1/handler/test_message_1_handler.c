@@ -37,16 +37,16 @@ void setUp(void) {
 // ============================================================================
 
 void test_handler_ok_for_valid_data(void) {
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(EDH_MSG1_HDL_OK, result.status);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.edhoc_ctx);
   free(result.edhoc_ctx);
 }
 
 static void ensure_context_is_freed_on_failure(
-    const ehd_message_1_handler_result_t result) {
+    const ehd_srv_message_1_handler_result_t result) {
   TEST_ASSERT_NULL(result.edhoc_ctx);
 }
 
@@ -64,10 +64,10 @@ void test_handler_fails_on_invalid_data(void) {
 
   const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    const ehd_message_1_handler_result_t result =
+    const ehd_srv_message_1_handler_result_t result =
         edh_srv_handle_message_1(test_cases[i].request, test_cases[i].response);
 
-    TEST_ASSERT_EQUAL_MESSAGE(EDH_MSG1_HDL_ERR_INVALID_ARGS, result.status,
+    TEST_ASSERT_EQUAL_MESSAGE(EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS, result.status,
                               test_cases[i].description);
     ensure_context_is_freed_on_failure(result);
     if (test_cases[i].response) {
@@ -81,26 +81,26 @@ void test_handler_fails_on_too_large_request_data(void) {
   env.request.payload.buffer = large_buffer;
   env.request.payload.length = sizeof(large_buffer);
 
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(EDH_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE, result.status);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE, result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
 void test_handler_fails_when_context_setup_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_setup_res = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED, result.status);
   ensure_context_is_freed_on_failure(result);
 }
 
 static void assert_m1_failed_with_edhoc_error(
-    const ehd_message_1_handler_result_t result,
-    const edh_message_1_handler_status_t expected_status) {
+    const ehd_srv_message_1_handler_result_t result,
+    const edh_srv_message_1_handler_status_t expected_status) {
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
@@ -112,21 +112,21 @@ static void assert_m1_failed_with_edhoc_error(
 void test_handler_fails_when_message_1_processing_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
 
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(
-      result, EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+      result, EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
 }
 
 void test_handler_fails_when_message_2_composition_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
   assert_m1_failed_with_edhoc_error(
-      result, EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+      result, EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
 }
 
 void test_handler_propagates_library_error_payload(void) {
@@ -136,10 +136,10 @@ void test_handler_propagates_library_error_payload(void) {
   tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu,
                                           sizeof(expected_error_pdu));
 
-  const ehd_message_1_handler_result_t result =
+  const ehd_srv_message_1_handler_result_t result =
       edh_srv_handle_message_1(&env.request, &env.response);
 
-  TEST_ASSERT_EQUAL(EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
                     result.status);
   TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.buffer,

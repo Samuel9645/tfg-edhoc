@@ -53,37 +53,37 @@ bool stb_edh_srv_parse_message_3_false(
     const struct edhoc_context* edhoc_ctx,
     struct edhoc_extracted_fields* extracted_fields);
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data);
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data);
 
-ehd_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
+ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     const edh_srv_message_1_request_t* request_data,
     com_response_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    ehd_message_1_handler_result_t message_1_result, coap_session_t* session);
+    ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    ehd_message_1_handler_result_t message_1_result, coap_session_t* session);
+    ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
 
-edh_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
+edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data);
 
-edh_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
+edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m3_ok(
-    edh_message_3_handler_status_t message_3_result);
+    edh_srv_message_3_handler_status_t message_3_result);
 
 coap_pdu_code_t stb_cp_srv_process_m3_fail(
-    edh_message_3_handler_status_t message_3_result);
+    edh_srv_message_3_handler_status_t message_3_result);
 
 cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response,
                                       const uint8_t* payload,

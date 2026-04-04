@@ -19,7 +19,7 @@
  * @param[in] generic_error_message Generic error text for the operation.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void edh_message_3_handler_add_error(int edhoc_api_result,
+void edh_srv_message_3_handler_add_error(int edhoc_api_result,
                                      const char* generic_error_message,
                                      com_response_buffer_t* response_data);
 

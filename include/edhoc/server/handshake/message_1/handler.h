@@ -35,7 +35,7 @@ typedef struct edh_srv_message_1_request {
  * responsible for freeing it. On failure, the function safely cleans up after
  * itself and returns a NULL pointer.
  */
-ehd_message_1_handler_result_t edh_srv_handle_message_1(
+ehd_srv_message_1_handler_result_t edh_srv_handle_message_1(
     const edh_srv_message_1_request_t* request,
     com_response_buffer_t* response);
 

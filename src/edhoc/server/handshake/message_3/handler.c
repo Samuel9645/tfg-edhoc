@@ -20,7 +20,7 @@ static bool message_3_has_valid_args(
          request_data->edhoc_ctx && com_response_buffer_is_valid(response_data);
 }
 
-edh_message_3_handler_status_t edh_srv_handle_message_3(
+edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
     const edh_srv_message_3_request_t* request_data,
     com_response_buffer_t* response_data) {
   if (!message_3_has_valid_args(request_data, response_data)) {
@@ -34,7 +34,7 @@ edh_message_3_handler_status_t edh_srv_handle_message_3(
       request_data->message_3_extracted_fields->edhoc_message_ptr,
       request_data->message_3_extracted_fields->edhoc_message_size);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edh_message_3_handler_add_error(
+    edh_srv_message_3_handler_add_error(
         edhoc_api_result, "Message 3 processing failed", response_data);
     return EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED;
   }
@@ -43,7 +43,7 @@ edh_message_3_handler_status_t edh_srv_handle_message_3(
       edhoc_message_4_compose(request_data->edhoc_ctx, response_data->buffer,
                               response_data->capacity, &response_data->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edh_message_3_handler_add_error(
+    edh_srv_message_3_handler_add_error(
         edhoc_api_result, "Message 4 composing failed", response_data);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
   }

@@ -26,48 +26,48 @@ static bool message_1_handler_has_valid_args(
   return request_is_valid(request) && com_response_buffer_is_valid(response);
 }
 
-ehd_message_1_handler_result_t edh_srv_handle_message_1(
+ehd_srv_message_1_handler_result_t edh_srv_handle_message_1(
     const edh_srv_message_1_request_t* request,
     com_response_buffer_t* response) {
   if (!message_1_handler_has_valid_args(request, response)) {
-    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_INVALID_ARGS);
+    return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS);
   }
 
   if (request->payload.length > EDH_CFG_MESSAGE_BUFFER_LENGTH) {
-    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE);
+    return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    return edh_message_1_handler_failure(EDH_MSG1_HDL_ERR_CALLOC_FAILED);
+    return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_CALLOC_FAILED);
   }
 
   int edhoc_api_result = edh_com_setup_context(edhoc_ctx, request->credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     free(edhoc_ctx);
-    return edh_message_1_handler_failure(
-        EDH_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
+    return edh_srv_message_1_handler_failure(
+        EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
   }
 
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, request->payload.buffer,
                                              request->payload.length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    tst_edh_message_1_handler_add_error(
+    edh_srv_message_1_handler_add_error(
         edhoc_api_result, edhoc_ctx, "Message 1 processing failed", response);
     free(edhoc_ctx);
-    return edh_message_1_handler_failure(
-        EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
+    return edh_srv_message_1_handler_failure(
+        EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
   }
 
   edhoc_api_result = edhoc_message_2_compose(
       edhoc_ctx, response->buffer, response->capacity, &response->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    tst_edh_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
+    edh_srv_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
                                         "Message 2 composing failed", response);
     free(edhoc_ctx);
-    return edh_message_1_handler_failure(
-        EDH_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
+    return edh_srv_message_1_handler_failure(
+        EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
 
-  return edh_message_1_handler_ok(edhoc_ctx);
+  return edh_srv_message_1_handler_ok(edhoc_ctx);
 }

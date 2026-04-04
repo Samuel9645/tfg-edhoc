@@ -14,15 +14,15 @@
 
 enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
-typedef struct edh_message_1_error_context {
+typedef struct edh_srv_message_1_error_context {
   struct edhoc_error_info info;
   int32_t suites_buffer[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE];
-} edh_message_1_error_context_t;
+} edh_srv_message_1_error_context_t;
 
-static edh_message_1_error_context_t prepare_message_1_error_context(
+static edh_srv_message_1_error_context_t prepare_message_1_error_context(
     const int edhoc_api_result, const struct edhoc_context* context,
     const char* generic_error_message) {
-  edh_message_1_error_context_t error_ctx = {0};
+  edh_srv_message_1_error_context_t error_ctx = {0};
 
   if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
     edh_srv_set_error_info(generic_error_message, &error_ctx.info);
@@ -48,10 +48,10 @@ static edh_message_1_error_context_t prepare_message_1_error_context(
   return error_ctx;
 }
 
-void tst_edh_message_1_handler_add_error(
+void edh_srv_message_1_handler_add_error(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
     const char* generic_error_message, com_response_buffer_t* response_data) {
-  const edh_message_1_error_context_t error_ctx =
+  const edh_srv_message_1_error_context_t error_ctx =
       prepare_message_1_error_context(edhoc_api_result, edhoc_context, generic_error_message);
 
   edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,

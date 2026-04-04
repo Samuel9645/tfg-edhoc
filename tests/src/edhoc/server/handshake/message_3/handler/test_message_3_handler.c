@@ -26,8 +26,8 @@ void setUp(void) {
 }
 
 static void assert_handler_writes_error_payload(
-    const edh_message_3_handler_status_t status,
-    const edh_message_3_handler_status_t expected_status) {
+    const edh_srv_message_3_handler_status_t status,
+    const edh_srv_message_3_handler_status_t expected_status) {
   TEST_ASSERT_EQUAL(expected_status, status);
   TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN, env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD,
@@ -36,7 +36,7 @@ static void assert_handler_writes_error_payload(
 }
 
 void test_handler_returns_success_for_valid_message_3_data(void) {
-  const edh_message_3_handler_status_t status =
+  const edh_srv_message_3_handler_status_t status =
       edh_srv_handle_message_3(&env.request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_OK, status);
@@ -64,7 +64,7 @@ void test_handler_fails_on_invalid_data(void) {
 
   const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < num_cases; i++) {
-    const edh_message_3_handler_status_t status =
+    const edh_srv_message_3_handler_status_t status =
         edh_srv_handle_message_3(test_cases[i].request, test_cases[i].response);
 
     TEST_ASSERT_EQUAL_MESSAGE(EDH_MSG3_HDL_ERR_INVALID_ARGS, status,
@@ -78,7 +78,7 @@ void test_handler_fails_on_invalid_data(void) {
 void test_handler_fails_when_message_3_processing_fails(void) {
   tst_edh_srv_message_3_stub_edhoc_process_result = EDHOC_ERROR_CRYPTO_FAILURE;
 
-  const edh_message_3_handler_status_t status =
+  const edh_srv_message_3_handler_status_t status =
       edh_srv_handle_message_3(&env.request, &env.response);
 
   assert_handler_writes_error_payload(
@@ -89,7 +89,7 @@ void test_handler_fails_when_message_4_composition_fails(void) {
   tst_edh_srv_message_3_stub_edhoc_compose_result =
       EDHOC_ERROR_BUFFER_TOO_SMALL;
 
-  const edh_message_3_handler_status_t status =
+  const edh_srv_message_3_handler_status_t status =
       edh_srv_handle_message_3(&env.request, &env.response);
 
   assert_handler_writes_error_payload(

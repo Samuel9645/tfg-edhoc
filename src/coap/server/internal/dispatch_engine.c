@@ -80,7 +80,7 @@ void cp_srv_dispatch_post_with_dependencies(
 
     const edh_srv_message_1_request_t request_data = {
         .payload = message_1_parsed_payload, .credentials = credentials};
-    const ehd_message_1_handler_result_t message_1_result =
+    const ehd_srv_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
   } else if (deps->parse_message_3(request_payload, request_len, edhoc_ctx,
@@ -95,7 +95,7 @@ void cp_srv_dispatch_post_with_dependencies(
         .edhoc_ctx = edhoc_ctx,
         .message_3_extracted_fields = &message_3_extracted_fields,
     };
-    const edh_message_3_handler_status_t message_3_result =
+    const edh_srv_message_3_handler_status_t message_3_result =
         deps->handle_message_3(&request_data, &response_data);
     response_code = deps->process_message_3_result(message_3_result);
   } else {

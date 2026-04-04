@@ -16,7 +16,7 @@
 #include "common/data_models.h"
 #include "edhoc/server/handshake/message_1/result.h"
 
-edh_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
+edh_srv_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
     const uint8_t** payload, size_t* length);
 
 /**

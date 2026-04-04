@@ -7,8 +7,8 @@
  */
 #include "common/data_models.h"
 
-bool com_readonly_buffer_is_valid(const com_readonly_buffer_t* buffer) {
-  return buffer != NULL && buffer->bytes != NULL && buffer->length > 0;
+bool com_readonly_buffer_is_valid(const com_readonly_buffer_t buffer) {
+  return buffer.bytes != NULL && buffer.length > 0;
 }
 
 static bool writable_buffer_is_valid(const com_writable_buffer_t* buffer) {

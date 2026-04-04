@@ -22,7 +22,7 @@ typedef struct com_readonly_buffer {
   size_t length;
 } com_readonly_buffer_t;
 
-bool com_readonly_buffer_is_valid(const com_readonly_buffer_t* buffer);
+bool com_readonly_buffer_is_valid(com_readonly_buffer_t buffer);
 
 /**
  * @brief Generic response buffer descriptor.

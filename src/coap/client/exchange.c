@@ -87,7 +87,7 @@ bool cp_cli_exchange_session_data_is_valid(
 bool cp_cli_exchange_request_data_is_valid(
     const cp_cli_exchange_request_data_t* request_data) {
   return request_data != NULL &&
-         com_readonly_buffer_is_valid(&request_data->request_data);
+         com_readonly_buffer_is_valid(request_data->request_data);
 }
 
 bool cp_cli_exchange_response_size_fits(const size_t message_length,
@@ -123,7 +123,7 @@ cp_status_t cp_cli_init_exchange(
 }
 
 cp_status_t cp_cli_exchange_send(
-    cp_cli_exchange_t* exchange,
+    const cp_cli_exchange_t* exchange,
     const cp_cli_exchange_request_data_t* request_data) {
   if (exchange == NULL || request_data == NULL ||
       !cp_cli_exchange_request_data_is_valid(request_data)) {

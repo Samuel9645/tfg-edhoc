@@ -1,5 +1,5 @@
 /**
- * @file process.c
+ * @file cli_m2_process.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Processing implementation for client handshake Message 2.
@@ -24,7 +24,7 @@ static edh_cli_message_2_result_t edh_cli_message_2_create_result(
 }
 
 edh_cli_message_2_result_t edh_cli_process_message_2(
-    edh_cli_handshake_t* state, const com_readonly_buffer_t* message_2,
+    edh_cli_handshake_t* state, const com_readonly_buffer_t message_2,
     com_writable_buffer_t* message_2_error) {
   if (!edh_cli_handshake_is_initialized(state) ||
       !com_readonly_buffer_is_valid(message_2) ||
@@ -34,7 +34,7 @@ edh_cli_message_2_result_t edh_cli_process_message_2(
   }
 
   const int edhoc_result = edhoc_message_2_process(
-      &state->context, message_2->bytes, message_2->length);
+      &state->context, message_2.bytes, message_2.length);
   if (edhoc_result != EDHOC_SUCCESS) {
     edh_cli_message_2_handler_add_error(
         edhoc_result, "Failed to process EDHOC message 2", message_2_error);

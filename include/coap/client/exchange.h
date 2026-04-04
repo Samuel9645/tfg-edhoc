@@ -100,7 +100,7 @@ cp_status_t cp_cli_init_exchange(
  * failure.
  */
 cp_status_t cp_cli_exchange_send(
-    cp_cli_exchange_t* exchange,
+    const cp_cli_exchange_t* exchange,
     const cp_cli_exchange_request_data_t* request_data);
 
 /**

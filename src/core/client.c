@@ -159,7 +159,7 @@ com_emulation_status_t core_run_client(void) {
   request_output.length = 0;
   const edh_cli_message_2_result_t message_2_result =
       edh_cli_handshake_process_message_2(&client_resources.handshake,
-                                          &message_2_input, &request_output);
+                                          message_2_input, &request_output);
   if (message_2_result.status != EDH_CLI_MSG2_PROCESS_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
     cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
@@ -206,7 +206,7 @@ com_emulation_status_t core_run_client(void) {
   request_output.length = 0;
   const edh_cli_message_4_result_t message_4_result =
       edh_cli_handshake_process_message_4(&client_resources.handshake,
-                                          &message_4_input, &request_output);
+                                          message_4_input, &request_output);
   if (message_4_result.status != EDH_CLI_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
     cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,

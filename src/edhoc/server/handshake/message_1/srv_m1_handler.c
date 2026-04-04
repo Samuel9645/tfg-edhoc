@@ -1,5 +1,5 @@
 /**
- * @file handler.c
+ * @file srv_m1_handler.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Definition for the Message 1 handler
@@ -16,7 +16,7 @@
 
 static bool request_is_valid(const edh_srv_message_1_request_t* request) {
   return request && request->credentials &&
-         com_readonly_buffer_is_valid(&request->payload);
+         com_readonly_buffer_is_valid(request->payload);
 }
 
 static bool message_1_handler_has_valid_args(

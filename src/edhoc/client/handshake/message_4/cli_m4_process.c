@@ -1,5 +1,5 @@
 /**
- * @file process.c
+ * @file cli_m4_process.c
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Processing implementation for client handshake Message 4.
@@ -23,7 +23,7 @@ static edh_cli_message_4_result_t edh_cli_message_4_create_result(
 }
 
 edh_cli_message_4_result_t edh_cli_process_message_4(
-    edh_cli_handshake_t* state, const com_readonly_buffer_t* message_4,
+    edh_cli_handshake_t* state, const com_readonly_buffer_t message_4,
     com_writable_buffer_t* message_4_error) {
   if (!edh_cli_handshake_is_initialized(state) ||
       !com_readonly_buffer_is_valid(message_4) ||
@@ -33,7 +33,7 @@ edh_cli_message_4_result_t edh_cli_process_message_4(
   }
 
   const int edhoc_result = edhoc_message_4_process(
-      &state->context, message_4->bytes, message_4->length);
+      &state->context, message_4.bytes, message_4.length);
   if (edhoc_result != EDHOC_SUCCESS) {
     edh_cli_message_4_handler_add_error(
         edhoc_result, "Failed to process EDHOC message 4", message_4_error);

@@ -1,5 +1,5 @@
 /**
- * @file compose.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Composition API for client handshake Message 3.

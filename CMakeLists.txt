@@ -39,7 +39,8 @@ set(MESSAGE_3_HANDLER_SOURCES
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/request.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builder.c
     ${MESSAGE_1_HANDLER_SOURCES}
     ${MESSAGE_3_HANDLER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_1_mapper.c

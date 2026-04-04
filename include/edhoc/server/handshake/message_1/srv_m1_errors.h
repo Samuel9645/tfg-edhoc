@@ -1,5 +1,5 @@
 /**
- * @file errors.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Message 1 specific EDHOC error-response composition.
@@ -27,6 +27,6 @@
  */
 void edh_srv_message_1_handler_add_error(
     int edhoc_api_result, const struct edhoc_context* edhoc_context,
-                                     const char* generic_error_message, com_writable_buffer_t* response_data);
+    const char* generic_error_message, com_writable_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_

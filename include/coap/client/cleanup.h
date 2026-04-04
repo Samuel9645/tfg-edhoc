@@ -28,10 +28,6 @@ typedef struct {
  *
  * @note Preferred single cleanup entry point for client handshake/exchange
  * state.
- *
- * @warning When using this function, avoid manual calls to
- * edh_cli_handshake_deinit() for the same resources in the same control
- * path.
  */
 void cp_cli_cleanup_resources(cp_cli_session_resources_t* resources);
 

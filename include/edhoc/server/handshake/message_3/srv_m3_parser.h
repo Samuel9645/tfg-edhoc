@@ -1,5 +1,5 @@
 /**
- * @file parser.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 02/04/2026
  * @brief Parsing helpers for EDHOC server Message 3.

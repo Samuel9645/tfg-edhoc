@@ -1,5 +1,5 @@
 /**
- * @file cli_handshake.h
+ * @file
  * @author Samuel Rodriguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Public facade for modular client handshake init/compose/process APIs.

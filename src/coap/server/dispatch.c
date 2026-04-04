@@ -5,7 +5,7 @@
 #include "coap/config.h"
 #include "coap/server/edhoc_mapper/message_1_mapper.h"
 #include "coap/server/edhoc_mapper/message_3_mapper.h"
-#include "coap/server/request.h"
+#include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
@@ -35,8 +35,7 @@ static cp_status_t add_edhoc_response_options(
 }
 
 static const cp_serv_dispatch_deps_t coap_server_edhoc_dispatch_default_deps = {
-    .extract_payload_if_valid_edhoc_request =
-        cp_srv_extract_payload_if_valid_edhoc_request,
+    .parse_edhoc_request = cp_srv_parse_edhoc_request,
     .add_edhoc_response_options = add_edhoc_response_options,
     .parse_message_1 = edh_srv_parse_message_1,
     .parse_message_3 = edh_srv_parse_message_3,

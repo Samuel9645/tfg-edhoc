@@ -1,5 +1,5 @@
 /**
- * @file helpers.h
+ * @file
  *
  * @brief Shared utilities for CoAP client and server implementations.
  *

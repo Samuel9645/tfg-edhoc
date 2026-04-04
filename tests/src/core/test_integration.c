@@ -1,5 +1,5 @@
 /**
- * @file test_integration.c
+ * @file
  *
  * @brief Simple integration test for the standalone EDHOC client and server
  * binaries.

@@ -10,7 +10,7 @@
  * @return true if all function pointers are present, false if any are NULL.
  */
 static bool dispatch_deps_are_valid(const cp_serv_dispatch_deps_t* deps) {
-  return deps != NULL && deps->extract_payload_if_valid_edhoc_request != NULL &&
+  return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
          deps->parse_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
@@ -27,6 +27,19 @@ static bool dispatch_has_invalid_deps_or_args(
   return !session || !request || !response || !dispatch_deps_are_valid(deps);
 }
 
+static coap_pdu_code_t map_parse_result_to_pdu_code(
+    const cp_srv_parse_edhoc_request_status_t status) {
+  switch (status) {
+  case CP_SRV_EDH_REQ_ERR_UNSUPPORTED_FORMAT:
+    return COAP_RESPONSE_CODE_UNSUPPORTED_CONTENT_FORMAT;
+  case CP_SRV_EDH_REQ_ERR_NO_PAYLOAD:
+  case CP_SRV_EDH_REQ_ERR_MALFORMED_PDU:
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  default:
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
+}
+
 void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
@@ -39,13 +52,11 @@ void cp_srv_dispatch_post_with_dependencies(
     return;
   }
 
-  const uint8_t* request_payload = NULL;
-  size_t request_len = 0;
-  if (deps->extract_payload_if_valid_edhoc_request(
-          request, CP_CFG_CONTENT_CID_EDHOC, &request_payload, &request_len) !=
-      CP_STATUS_SUCCESS) {
-    coap_log_err("failed to validate EDHOC request\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+  const cp_srv_parse_edhoc_request_result_t parse_result =
+      deps->parse_edhoc_request(request, CP_CFG_CONTENT_CID_EDHOC);
+  if (parse_result.status != CP_SRV_EDH_REQ_OK) {
+    coap_pdu_set_code(response,
+                      map_parse_result_to_pdu_code(parse_result.status));
     return;
   }
 
@@ -70,6 +81,10 @@ void cp_srv_dispatch_post_with_dependencies(
 
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
+  // TODO: remove this quick fix
+
+  const uint8_t* request_payload = parse_result.parsed_response.bytes;
+  const size_t request_len = parse_result.parsed_response.length;
   if (deps->parse_message_1(request_payload, request_len,
                             &message_1_parsed_payload)) {
     if (edhoc_ctx != NULL) {

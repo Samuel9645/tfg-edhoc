@@ -1,15 +1,16 @@
 /**
- * @file errors.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Message 1 specific EDHOC error-response composition.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
+#include "edhoc/server/handshake/message_1/srv_m1_errors.h"
+
 #include <edhoc_helpers.h>
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
-#include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 
 enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
 

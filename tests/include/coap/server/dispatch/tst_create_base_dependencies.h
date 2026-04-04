@@ -1,5 +1,5 @@
 /**
- * @file create_base_dependencies.h
+ * @file
  *
  * @brief Dependency-table builder for EDHOC dispatcher seam tests.
  *

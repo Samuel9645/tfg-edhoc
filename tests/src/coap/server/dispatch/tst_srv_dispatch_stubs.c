@@ -1,5 +1,5 @@
 /**
- * @file stubs.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 31/03/2026
  * @brief Stubs to use when testing
@@ -9,32 +9,31 @@
 // ReSharper disable CppParameterMayBeConst
 // since the real implementations expects non-const pointers to allow output
 // parameters
-#include <string.h>
-
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 
-cp_status_t stb_cp_srv_extract_payload_success(
+#include <string.h>
+
+#include "coap/server/internal/parse_edhoc_result_builder.h"
+
+static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
+
+cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_ok(
     const coap_pdu_t* request,
-    const cp_cfg_content_format_edhoc_values_t expected_format,
-    const uint8_t** payload,
-    size_t* payload_len) {  // NOLINT(*-non-const-parameter)
+    const cp_cfg_content_format_edhoc_values_t expected_format) {
   (void)request;
   (void)expected_format;
-  (void)payload;
-  (void)payload_len;
-  return CP_STATUS_SUCCESS;
+  return cp_srv_internal_parse_edhoc_ok((com_readonly_buffer_t){
+      .bytes = DUMMY_PAYLOAD,
+      .length = sizeof(DUMMY_PAYLOAD),
+  });
 }
 
-cp_status_t stb_cp_srv_extract_payload_fail(
+cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_fail(
     const coap_pdu_t* request,
-    const cp_cfg_content_format_edhoc_values_t expected_format,
-    const uint8_t** payload,
-    size_t* payload_len) {  // NOLINT(*-non-const-parameter)
+    const cp_cfg_content_format_edhoc_values_t expected_format) {
   (void)request;
   (void)expected_format;
-  (void)payload;
-  (void)payload_len;
-  return CP_STATUS_ERROR;
+  return cp_srv_internal_parse_edhoc_failure(CP_SRV_EDH_REQ_ERR_MALFORMED_PDU);
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};

@@ -1,5 +1,5 @@
 /**
- * @file state.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Common client handshake lifecycle state helpers and teardown logic.

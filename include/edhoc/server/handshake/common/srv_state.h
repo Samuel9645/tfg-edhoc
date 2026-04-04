@@ -1,5 +1,5 @@
 /**
- * @file state.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Common server handshake lifecycle state and teardown API.

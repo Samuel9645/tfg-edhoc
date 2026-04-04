@@ -1,5 +1,5 @@
 /**
- * @file message_1_mapper.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief CoAP adapter declarations to translate Message 1 EDHOC results into

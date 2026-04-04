@@ -1,5 +1,5 @@
 /**
- * @file data_models.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Definitions for helpers related to data models

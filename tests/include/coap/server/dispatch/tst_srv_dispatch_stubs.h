@@ -1,5 +1,5 @@
 /**
- * @file stubs.h
+ * @file
  *
  * @brief Stub implementations used by EDHOC dispatcher seam unit tests.
  */
@@ -11,19 +11,18 @@
 
 #include "coap/common/status.h"
 #include "coap/config.h"
+#include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 
-cp_status_t stb_cp_srv_extract_payload_success(
+cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_ok(
     const coap_pdu_t* request,
-    cp_cfg_content_format_edhoc_values_t expected_format,
-    const uint8_t** payload, size_t* payload_len);
+    cp_cfg_content_format_edhoc_values_t expected_format);
 
-cp_status_t stb_cp_srv_extract_payload_fail(
+cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_fail(
     const coap_pdu_t* request,
-    cp_cfg_content_format_edhoc_values_t expected_format,
-    const uint8_t** payload, size_t* payload_len);
+    cp_cfg_content_format_edhoc_values_t expected_format);
 
 cp_status_t stb_cp_srv_add_options_success(
     coap_pdu_t* response, cp_cfg_content_format_edhoc_values_t content_format);
@@ -66,10 +65,12 @@ ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     com_writable_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
+    ehd_srv_message_1_handler_result_t message_1_result,
+    coap_session_t* session);
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
+    ehd_srv_message_1_handler_result_t message_1_result,
+    coap_session_t* session);
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,

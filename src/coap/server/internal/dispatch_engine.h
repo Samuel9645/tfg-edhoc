@@ -6,6 +6,7 @@
 
 #include "coap/common/status.h"
 #include "coap/config.h"
+#include "coap/server/srv_parse_edhoc_request.h"
 #include "common/data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
@@ -26,10 +27,9 @@
  */
 typedef struct cp_srv_dispatch_deps_t {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
-  cp_status_t (*extract_payload_if_valid_edhoc_request)(
+  cp_srv_parse_edhoc_request_result_t (*parse_edhoc_request)(
       const coap_pdu_t* request,
-      cp_cfg_content_format_edhoc_values_t expected_format,
-      const uint8_t** payload, size_t* payload_len);
+      cp_cfg_content_format_edhoc_values_t expected_format);
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
   cp_status_t (*add_edhoc_response_options)(
@@ -55,7 +55,8 @@ typedef struct cp_srv_dispatch_deps_t {
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
+      ehd_srv_message_1_handler_result_t message_1_result,
+      coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
   edh_srv_message_3_handler_status_t (*handle_message_3)(

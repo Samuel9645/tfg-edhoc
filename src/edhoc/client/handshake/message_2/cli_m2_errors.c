@@ -1,5 +1,5 @@
 /**
- * @file errors.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Message 2 specific EDHOC error-response composition for client side.
@@ -7,6 +7,7 @@
  */
 
 #include "edhoc/client/handshake/message_2/cli_m2_errors.h"
+
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
 
 void edh_cli_message_2_handler_add_error(const int edhoc_api_result,

@@ -1,5 +1,5 @@
 /**
- * @file stubs.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 31/03/2026
  * @brief Stubs to link to when testing
@@ -9,11 +9,12 @@
 // ReSharper disable CppParameterMayBeConst
 // since the real implementations expects non-const pointers to allow output
 // parameters
+#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.h"
+
 #include <edhoc.h>
 #include <string.h>
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
-#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.h"
 /**
  * @brief Global variables to control the behavior of the stubs in tests. Tests
  * can set these variables to simulate different scenarios and verify how the

@@ -1,5 +1,5 @@
 /**
- * @file result.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief EDHOC results type definition to integrate with any layer above the

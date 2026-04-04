@@ -1,5 +1,5 @@
 /**
- * @file authentication.h
+ * @file
  *
  * @note The reason why it appears like the initialization is made twice
  * in the fetching and verifying is that the edhoc library uses the same

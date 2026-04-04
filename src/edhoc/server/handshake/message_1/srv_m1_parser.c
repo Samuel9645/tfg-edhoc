@@ -1,15 +1,15 @@
 /**
- * @file parser.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 02/04/2026
  * @brief Parsing helpers for EDHOC server Message 1.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
+#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+
 #include <edhoc/common/constants.h>
 #include <stdbool.h>
-
-#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 
 static bool arguments_are_invalid(const uint8_t** payload,
                                   const size_t* length) {

@@ -1,5 +1,5 @@
 /**
- * @file test_message_3_handler.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 02/04/2026
  * @brief Handler tests for EDHOC server message 3.

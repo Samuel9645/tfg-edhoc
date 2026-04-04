@@ -1,5 +1,5 @@
 /**
- * @file errors.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Message 3 specific EDHOC error-response composition for client side.

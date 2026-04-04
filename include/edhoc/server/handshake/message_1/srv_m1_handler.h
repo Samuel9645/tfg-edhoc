@@ -1,5 +1,5 @@
 /**
- * @file handler.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief Logic for handling EDHOC Message 1 on the server side

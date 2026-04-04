@@ -1,5 +1,5 @@
 /**
- * @file data_models.h
+ * @file
  *
  * @brief Data models for EDHOC handshake and CoAP exchange state.
  */
@@ -14,6 +14,7 @@
 /**
  * @brief Generic readonly buffer
  */
+// TODO: make length const
 typedef struct com_readonly_buffer {
   /** Pointer to the data */
   const uint8_t* bytes;

@@ -1,5 +1,5 @@
 /**
- * @file scenarios.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 30/03/2026
  * @brief Scenario table definition

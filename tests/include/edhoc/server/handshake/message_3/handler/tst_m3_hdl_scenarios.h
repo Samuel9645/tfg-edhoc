@@ -1,5 +1,5 @@
 /**
- * @file scenarios.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 02/04/2026
  * @brief Scenario table definition for EDHOC server message 3 handler tests.

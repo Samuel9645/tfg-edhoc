@@ -1,5 +1,5 @@
 /**
- * @file handle_libedhoc_errors.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 30/03/2026
  * @brief Shared functions to compose EDHOC error payloads into response

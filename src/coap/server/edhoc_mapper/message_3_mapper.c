@@ -1,5 +1,5 @@
 /**
- * @file message_3_mapper.c
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
  * @brief CoAP adapter implementation that maps Message 3 EDHOC result codes

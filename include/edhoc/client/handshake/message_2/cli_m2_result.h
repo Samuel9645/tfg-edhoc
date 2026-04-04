@@ -1,5 +1,5 @@
 /**
- * @file result.h
+ * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Result codes for client handshake Message 2 processing.

@@ -1,5 +1,5 @@
 /**
- * @file test_dispatch.c
+ * @file
  *
  * @brief Unit tests for the CoAP server EDHOC dispatcher with dependency
  * injection.
@@ -60,7 +60,7 @@ void test_server_sends_changed_response_for_valid_message_1(void) {
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
   cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
-  deps.extract_payload_if_valid_edhoc_request = stb_cp_srv_extract_payload_fail;
+  deps.parse_edhoc_request = stb_cp_srv_parse_edhoc_request_fail;
 
   cp_srv_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);

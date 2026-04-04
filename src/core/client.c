@@ -6,8 +6,35 @@
 #include "coap/client/exchange.h"
 #include "coap/client/utils.h"
 #include "coap/config.h"
-#include "edhoc/client/state.h"
+#include "edhoc/client/handshake.h"
 #include "edhoc/config.h"
+#include "edhoc/credentials/authentication.h"
+#include "edhoc/credentials/client_private_key.h"
+#include "edhoc/credentials/public_data.h"
+
+static int client_credential_fetch(void* user_context,
+                                   struct edhoc_auth_creds* credentials) {
+  return edh_cred_auth_fetch(
+      user_context, credentials, EDH_CRED_PUB_CLI_PK,
+      ARRAY_SIZE(EDH_CRED_PUB_CLI_PK), EDH_CRED_CLI_PRIVATE_KEY,
+      ARRAY_SIZE(EDH_CRED_CLI_PRIVATE_KEY), EDH_CRED_PUB_CLI_KID);
+}
+
+// ReSharper disable once CppParameterMayBeConstPtrOrRef (libedhoc signature
+// forces it)
+static int client_credential_verify(void* user_context,
+                                    struct edhoc_auth_creds* credentials,
+                                    const uint8_t** public_key_reference,
+                                    size_t* public_key_length) {
+  return edh_cred_auth_verify(
+      user_context, credentials, EDH_CRED_PUB_SRV_KID, EDH_CRED_PUB_SRV_PK,
+      ARRAY_SIZE(EDH_CRED_PUB_SRV_PK), public_key_reference, public_key_length);
+}
+
+static const struct edhoc_credentials credentials = {
+    .fetch = client_credential_fetch,
+    .verify = client_credential_verify,
+};
 
 static void cp_cli_try_send_edhoc_error_payload(
     cp_cli_session_resources_t* client_resources,
@@ -70,7 +97,8 @@ com_emulation_status_t core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  if (edh_cli_init_handshake(&client_resources.handshake) != EDH_CLI_INIT_OK) {
+  if (edh_cli_init_handshake(&client_resources.handshake, &credentials) !=
+      EDH_CLI_INIT_OK) {
     coap_log_err("Failed to initialize EDHOC handshake\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

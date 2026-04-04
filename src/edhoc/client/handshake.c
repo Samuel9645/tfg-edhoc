@@ -7,15 +7,17 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/client/handshake/init/init.h"
+#include "edhoc/client/handshake.h"
+
+#include "edhoc/client/handshake/common/state.h"
 #include "edhoc/client/handshake/message_1/compose.h"
 #include "edhoc/client/handshake/message_2/process.h"
 #include "edhoc/client/handshake/message_3/compose.h"
 #include "edhoc/client/handshake/message_4/process.h"
-#include "edhoc/client/state.h"
 
-edh_cli_init_status_t edh_cli_init_handshake(edh_cli_handshake_t* state) {
-  return edh_cli_init(state);
+edh_cli_init_status_t edh_cli_init_handshake(
+    edh_cli_handshake_t* state, const struct edhoc_credentials* credentials) {
+  return edh_cli_init(state, credentials);
 }
 
 edh_cli_message_1_result_t edh_cli_handshake_compose_message_1(

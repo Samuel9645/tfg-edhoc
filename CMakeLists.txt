@@ -63,7 +63,6 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/state.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/init/init.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/errors.c

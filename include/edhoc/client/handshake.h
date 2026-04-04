@@ -1,5 +1,5 @@
 /**
- * @file state.h
+ * @file handshake.h
  * @author Samuel Rodriguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
  * @brief Public facade for modular client handshake init/compose/process APIs.
@@ -9,12 +9,8 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_H_
 #define EDHOC_CLIENT_HANDSHAKE_H_
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include "common/data_models.h"
 #include "edhoc/client/handshake/common/state.h"
-#include "edhoc/client/handshake/init/result.h"
 #include "edhoc/client/handshake/message_1/result.h"
 #include "edhoc/client/handshake/message_2/result.h"
 #include "edhoc/client/handshake/message_3/result.h"
@@ -24,11 +20,13 @@
  * @brief Initialize client EDHOC handshake state and protocol context.
  *
  * @param[out] state Caller-owned handshake state.
+ * @param credentials Credentials for EDHOC context setup.
  * @return Initialization status code.
  *
  * @note This function does not allocate memory with calloc.
  */
-edh_cli_init_status_t edh_cli_init_handshake(edh_cli_handshake_t* state);
+edh_cli_init_status_t edh_cli_init_handshake(
+    edh_cli_handshake_t* state, const struct edhoc_credentials* credentials);
 
 /**
  * @brief Compose EDHOC Message 1 into the provided payload buffer.

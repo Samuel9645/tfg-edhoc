@@ -21,6 +21,27 @@ typedef struct edh_cli_handshake {
 } edh_cli_handshake_t;
 
 /**
+ * @brief Status codes for client handshake initialization.
+ */
+typedef enum edh_cli_init_status {
+  EDH_CLI_INIT_OK = 0,
+  EDH_CLI_INIT_ERR_INVALID_ARGS,
+  EDH_CLI_INIT_ERR_EDHOC_CONTEXT_SETUP_FAILED,
+} edh_cli_init_status_t;
+
+/**
+ * @brief Initialize EDHOC context and mark handshake as initialized.
+ *
+ * @param[out] state Caller-owned handshake state.
+ * @param[in] credentials Credentials for EDHOC context setup.
+ * @return Initialization status code.
+ *
+ * @note This function does not allocate memory with calloc.
+ */
+edh_cli_init_status_t edh_cli_init(edh_cli_handshake_t* state,
+                                   const struct edhoc_credentials* credentials);
+
+/**
  * @brief Check whether handshake context has been initialized.
  *
  * @param[in] state Handshake state to inspect.

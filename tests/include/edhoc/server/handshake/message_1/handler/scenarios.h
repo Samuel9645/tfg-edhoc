@@ -20,7 +20,7 @@ typedef struct tst_edh_srv_hnd_test_case_message_1_handler {
   /* Input request data for Message 1 handler. */
   const edh_srv_message_1_request_t* request;
   /* Response buffer to check for side effects after handler execution. */
-  com_response_buffer_t* response;
+  com_writable_buffer_t* response;
 } tst_edh_srv_hnd_test_case_message_1_handler_t;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_SCENARIOS_H_

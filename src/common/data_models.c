@@ -7,18 +7,18 @@
  */
 #include "common/data_models.h"
 
-bool com_request_payload_is_valid(const com_request_payload_t* payload) {
-  return payload != NULL && payload->buffer != NULL && payload->length > 0;
+bool com_readonly_buffer_is_valid(const com_readonly_buffer_t* buffer) {
+  return buffer != NULL && buffer->bytes != NULL && buffer->length > 0;
 }
 
-bool com_response_buffer_is_valid(const com_response_buffer_t* buffer) {
-  return buffer != NULL && buffer->buffer != NULL;
+static bool writable_buffer_is_valid(const com_writable_buffer_t* buffer) {
+  return buffer != NULL && buffer->bytes != NULL;
 }
 
-bool com_response_buffer_is_writable(const com_response_buffer_t* buffer) {
-  return com_response_buffer_is_valid(buffer) && buffer->capacity > 0;
+bool com_writable_buffer_is_writable(const com_writable_buffer_t* buffer) {
+  return writable_buffer_is_valid(buffer) && buffer->capacity > 0;
 }
 
-bool com_response_buffer_has_content(const com_response_buffer_t* buffer) {
-  return com_response_buffer_is_writable(buffer) && buffer->length > 0;
+bool com_writable_buffer_has_content(const com_writable_buffer_t* buffer) {
+  return com_writable_buffer_is_writable(buffer) && buffer->length > 0;
 }

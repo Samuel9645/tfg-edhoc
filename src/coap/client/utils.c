@@ -48,7 +48,7 @@ cp_status_t cp_cli_create_coap_session(
     const coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session) {
   *coap_session_context = coap_new_context(NULL);
-  if (!*coap_session_context) {
+  if (*coap_session_context == NULL) {
     coap_log_err("cannot create libcoap context\n");
     return CP_STATUS_ERROR;
   }
@@ -64,7 +64,7 @@ cp_status_t cp_cli_create_coap_session(
   *coap_session =
       coap_new_client_session(*coap_session_context, local_interface_address,
                               destination_address, protocol);
-  if (!*coap_session) {
+  if (*coap_session == NULL) {
     coap_log_err("cannot create client session\n");
     return CP_STATUS_ERROR;
   }

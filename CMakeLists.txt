@@ -62,6 +62,16 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/state.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/init/init.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/compose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/compose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )
 

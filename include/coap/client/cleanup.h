@@ -3,7 +3,7 @@
 
 #include "coap/client/exchange.h"
 #include "common/cleanup.h"
-#include "edhoc/client/handshake.h"
+#include "edhoc/client/state.h"
 
 /**
  * @brief Client-specific resource bundle that extends generic session cleanup

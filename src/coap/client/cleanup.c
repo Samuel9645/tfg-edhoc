@@ -5,6 +5,6 @@ void cp_cli_cleanup_resources(cp_cli_session_resources_t* resources) {
     return;
   }
 
-  edh_cli_handshake_deinit(&resources->handshake);
+  edh_cli_clear_state(&resources->handshake);
   com_cleanup_resources(&resources->session_resources);
 }

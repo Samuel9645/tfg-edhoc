@@ -6,11 +6,28 @@
 #include "coap/client/exchange.h"
 #include "coap/client/utils.h"
 #include "coap/config.h"
-#include "edhoc/client/handshake.h"
+#include "edhoc/client/state.h"
 #include "edhoc/config.h"
 
-// TODO: SEND ERROR RESPONSES TO SERVER IN CASE OF FAILURE INSTEAD OF JUST
-// FAILING SILENTLY
+static void cp_cli_try_send_edhoc_error_payload(
+    cp_cli_session_resources_t* client_resources,
+    cp_cli_exchange_request_data_t* request_data,
+    const com_writable_buffer_t* error_payload_data,
+    com_writable_buffer_t* receive_buffer) {
+  if (client_resources == NULL || request_data == NULL ||
+      error_payload_data == NULL || receive_buffer == NULL ||
+      !com_writable_buffer_has_content(error_payload_data)) {
+    return;
+  }
+
+  request_data->request_data.length = error_payload_data->length;
+  request_data->content_format = CP_CFG_CONTENT_CID_EDHOC;
+
+  cp_cli_exchange_reset(&client_resources->exchange);
+  (void)cp_cli_exchange_send(&client_resources->exchange, request_data);
+  (void)cp_cli_exchange_wait_and_get(&client_resources->exchange,
+                                     receive_buffer);
+}
 
 com_emulation_status_t core_run_client(void) {
   coap_startup();
@@ -46,15 +63,14 @@ com_emulation_status_t core_run_client(void) {
       .destination = destination_address,
   };
 
-  if (cp_cli_exchange_init(&exchange_session_data,
+  if (cp_cli_init_exchange(&exchange_session_data,
                            &client_resources.exchange) != CP_STATUS_SUCCESS) {
     coap_log_err("Failed to initialize CoAP exchange\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  if (edh_cli_handshake_init(&client_resources.handshake) !=
-      EDH_CLI_HANDSHAKE_SUCCESS) {
+  if (edh_cli_init_handshake(&client_resources.handshake) != EDH_CLI_INIT_OK) {
     coap_log_err("Failed to initialize EDHOC handshake\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
@@ -66,26 +82,33 @@ com_emulation_status_t core_run_client(void) {
   cp_cli_exchange_request_data_t request_data = {
       .request_data =
           {
-              .buffer = request_payload,
+              .bytes = request_payload,
               .length = 0,
           },
       .content_format = CP_CFG_CONTENT_CID_EDHOC,
   };
 
-  com_response_buffer_t response_data = {
-      .buffer = response_payload,
+  com_writable_buffer_t response_data = {
+      .bytes = response_payload,
       .capacity = CP_CFG_MAX_PDU_SIZE,
       .length = 0,
   };
 
-  if (edh_cli_handshake_compose_message_1(
-          &client_resources.handshake, EDH_CFG_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.length) !=
-      EDH_CLI_HANDSHAKE_SUCCESS) {
+  com_writable_buffer_t request_output = {
+      .bytes = request_payload,
+      .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
+      .length = 0,
+  };
+
+  const edh_cli_message_1_result_t message_1_result =
+      edh_cli_handshake_compose_message_1(&client_resources.handshake,
+                                          &request_output);
+  if (message_1_result.status != EDH_CLI_MSG1_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 1\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  request_data.request_data.length = message_1_result.output.length;
 
   if (cp_cli_exchange_send(&client_resources.exchange, &request_data) !=
       CP_STATUS_SUCCESS) {
@@ -95,35 +118,72 @@ com_emulation_status_t core_run_client(void) {
   }
 
   if (cp_cli_exchange_wait_and_get(&client_resources.exchange,
-                                   &response_data) != CP_STATUS_SUCCESS ||
-      edh_cli_handshake_process_message_2(
-          &client_resources.handshake, response_payload,
-          response_data.length) != EDH_CLI_HANDSHAKE_SUCCESS) {
+                                   &response_data) != CP_STATUS_SUCCESS) {
+    coap_log_err("Failed to receive EDHOC message 2\n");
+    cp_cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+
+  const com_readonly_buffer_t message_2_input = {
+      .bytes = response_payload,
+      .length = response_data.length,
+  };
+  request_output.length = 0;
+  const edh_cli_message_2_result_t message_2_result =
+      edh_cli_handshake_process_message_2(&client_resources.handshake,
+                                          &message_2_input, &request_output);
+  if (message_2_result.status != EDH_CLI_MSG2_PROCESS_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
+    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+                                        &message_2_result.output,
+                                        &response_data);
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
   cp_cli_exchange_reset(&client_resources.exchange);
 
-  if (edh_cli_handshake_compose_message_3(
-          &client_resources.handshake, EDH_CFG_MESSAGE_BUFFER_LENGTH,
-          request_payload, &request_data.request_data.length) !=
-      EDH_CLI_HANDSHAKE_SUCCESS) {
+  request_output.length = 0;
+  const edh_cli_message_3_result_t message_3_result =
+      edh_cli_handshake_compose_message_3(&client_resources.handshake,
+                                          &request_output);
+  if (message_3_result.status != EDH_CLI_MSG3_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 3\n");
+    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+                                        &message_3_result.output,
+                                        &response_data);
+    cp_cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+  request_data.request_data.length = message_3_result.output.length;
+
+  if (cp_cli_exchange_send(&client_resources.exchange, &request_data) !=
+      CP_STATUS_SUCCESS) {
+    coap_log_err("Failed to send EDHOC message 3\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  if (cp_cli_exchange_send(&client_resources.exchange, &request_data) !=
-          CP_STATUS_SUCCESS ||
-      cp_cli_exchange_wait_and_get(&client_resources.exchange,
-                                   &response_data) != CP_STATUS_SUCCESS ||
-      edh_cli_handshake_process_message_4(
-          &client_resources.handshake, response_payload,
-          response_data.length) != EDH_CLI_HANDSHAKE_SUCCESS) {
-    coap_log_err(
-        "Failed to complete EDHOC message 3 exchange or process message 4\n");
+  if (cp_cli_exchange_wait_and_get(&client_resources.exchange,
+                                   &response_data) != CP_STATUS_SUCCESS) {
+    coap_log_err("Failed to receive EDHOC message 4\n");
+    cp_cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+
+  const com_readonly_buffer_t message_4_input = {
+      .bytes = response_payload,
+      .length = response_data.length,
+  };
+  request_output.length = 0;
+  const edh_cli_message_4_result_t message_4_result =
+      edh_cli_handshake_process_message_4(&client_resources.handshake,
+                                          &message_4_input, &request_output);
+  if (message_4_result.status != EDH_CLI_MSG4_PROCESS_OK) {
+    coap_log_err("Failed to process EDHOC message 4\n");
+    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+                                        &message_4_result.output,
+                                        &response_data);
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }

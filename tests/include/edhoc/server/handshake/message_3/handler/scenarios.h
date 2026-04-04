@@ -13,7 +13,7 @@
 typedef struct tst_edh_srv_message_3_test_case {
   const char* description;
   const edh_srv_message_3_request_t* request;
-  com_response_buffer_t* response;
+  com_writable_buffer_t* response;
 } message_3_handler_test_case_t;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_SCENARIOS_H_

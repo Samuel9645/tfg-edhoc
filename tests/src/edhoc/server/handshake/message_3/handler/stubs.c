@@ -56,11 +56,11 @@ void tst_edh_srv_message_3_set_stub_error_response(const uint8_t* data,
 
 void edh_srv_message_3_handler_add_error(const int edhoc_api_result,
                                      const char* generic_error_message,
-                                     com_response_buffer_t* response_data) {
+                                         com_writable_buffer_t* response_data) {
   (void)edhoc_api_result;
   (void)generic_error_message;
 
-  if (!response_data || !response_data->buffer) {
+  if (!response_data || !response_data->bytes) {
     return;
   }
 
@@ -72,7 +72,7 @@ void edh_srv_message_3_handler_add_error(const int edhoc_api_result,
                               : TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD;
 
   if (response_data->capacity >= length) {
-    memcpy(response_data->buffer, source, length);
+    memcpy(response_data->bytes, source, length);
     response_data->length = length;
   }
 }

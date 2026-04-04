@@ -16,10 +16,10 @@
 extern const uint8_t TST_CANARY_PATTERN;
 extern const uint8_t TST_NONZERO_VALUE;
 
-com_response_buffer_t tst_edh_invalid_response(void);
+com_writable_buffer_t tst_edh_invalid_response(void);
 
-void tst_edh_reset_response(com_response_buffer_t* response);
+void tst_edh_reset_response(com_writable_buffer_t* response);
 
-void tst_edh_srv_assert_response_clean(const com_response_buffer_t* response);
+void tst_edh_srv_assert_response_clean(const com_writable_buffer_t* response);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_COMMON_HELPERS_H_

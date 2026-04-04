@@ -37,11 +37,11 @@ void* stb_cp_srv_get_session_valid(const coap_session_t* session);
 
 bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
                                       size_t request_len,
-                                      com_request_payload_t* parsed_payload);
+                                      com_readonly_buffer_t* parsed_payload);
 
 bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
                                        size_t request_len,
-                                       com_request_payload_t* parsed_payload);
+                                       com_readonly_buffer_t* parsed_payload);
 
 bool stb_edh_srv_parse_message_3_true(
     const uint8_t* request_payload, size_t request_len,
@@ -55,15 +55,15 @@ bool stb_edh_srv_parse_message_3_false(
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
     ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
@@ -73,11 +73,11 @@ coap_pdu_code_t stb_cp_srv_process_m1_fail(
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
     const edh_srv_message_3_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m3_ok(
     edh_srv_message_3_handler_status_t message_3_result);

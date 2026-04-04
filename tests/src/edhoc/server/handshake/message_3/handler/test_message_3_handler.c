@@ -31,7 +31,7 @@ static void assert_handler_writes_error_payload(
   TEST_ASSERT_EQUAL(expected_status, status);
   TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN, env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD,
-                           env.response.buffer,
+                           env.response.bytes,
                            TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN);
 }
 
@@ -44,7 +44,7 @@ void test_handler_returns_success_for_valid_message_3_data(void) {
 
 void test_handler_fails_on_invalid_data(void) {
   edh_srv_message_3_request_t empty_request = tst_empty_message_3_request();
-  com_response_buffer_t empty_response = tst_edh_invalid_response();
+  com_writable_buffer_t empty_response = tst_edh_invalid_response();
   edh_srv_message_3_request_t request_without_extracted_fields =
       tst_message_3_request_without_extracted_fields(&env);
   edh_srv_message_3_request_t request_without_context =

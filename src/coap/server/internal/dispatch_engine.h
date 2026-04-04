@@ -38,7 +38,7 @@ typedef struct cp_srv_dispatch_deps_t {
 
   /** Parses EDHOC Message 1 and returns the stripped payload view. */
   bool (*parse_message_1)(const uint8_t* request_payload, size_t request_len,
-                          com_request_payload_t* parsed_payload);
+                          com_readonly_buffer_t* parsed_payload);
 
   /**
    * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
@@ -51,7 +51,7 @@ typedef struct cp_srv_dispatch_deps_t {
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   ehd_srv_message_1_handler_result_t (*handle_message_1)(
       const edh_srv_message_1_request_t* request_data,
-      com_response_buffer_t* response_data);
+      com_writable_buffer_t* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
@@ -60,7 +60,7 @@ typedef struct cp_srv_dispatch_deps_t {
   /** Processes EDHOC Message 3 and generates Message 4 response. */
   edh_srv_message_3_handler_status_t (*handle_message_3)(
       const edh_srv_message_3_request_t* request_data,
-      com_response_buffer_t* response_data);
+      com_writable_buffer_t* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
   coap_pdu_code_t (*process_message_3_result)(

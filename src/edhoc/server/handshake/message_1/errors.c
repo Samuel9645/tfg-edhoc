@@ -50,7 +50,7 @@ static edh_srv_message_1_error_context_t prepare_message_1_error_context(
 
 void edh_srv_message_1_handler_add_error(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message, com_response_buffer_t* response_data) {
+    const char* generic_error_message, com_writable_buffer_t* response_data) {
   const edh_srv_message_1_error_context_t error_ctx =
       prepare_message_1_error_context(edhoc_api_result, edhoc_context, generic_error_message);
 

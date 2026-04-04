@@ -87,7 +87,7 @@ bool cp_cli_exchange_session_data_is_valid(
 bool cp_cli_exchange_request_data_is_valid(
     const cp_cli_exchange_request_data_t* request_data) {
   return request_data != NULL &&
-         com_request_payload_is_valid(&request_data->request_data);
+         com_readonly_buffer_is_valid(&request_data->request_data);
 }
 
 bool cp_cli_exchange_response_size_fits(const size_t message_length,
@@ -95,7 +95,7 @@ bool cp_cli_exchange_response_size_fits(const size_t message_length,
   return message_length > 0 && message_length <= capacity;
 }
 
-cp_status_t cp_cli_exchange_init(
+cp_status_t cp_cli_init_exchange(
     const cp_cli_exchange_session_data_t* session_data,
     cp_cli_exchange_t* exchange) {
   if (!exchange || !cp_cli_exchange_session_data_is_valid(session_data)) {
@@ -125,7 +125,7 @@ cp_status_t cp_cli_exchange_init(
 cp_status_t cp_cli_exchange_send(
     cp_cli_exchange_t* exchange,
     const cp_cli_exchange_request_data_t* request_data) {
-  if (!exchange || !request_data ||
+  if (exchange == NULL || request_data == NULL ||
       !cp_cli_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
     return CP_STATUS_ERROR;
@@ -139,9 +139,9 @@ cp_status_t cp_cli_exchange_send(
     return CP_STATUS_ERROR;
   }
 
-  if (cp_com_add_response_payload(
-          request_pdu, request_data->request_data.buffer,
-          request_data->request_data.length) == CP_STATUS_ERROR) {
+  if (cp_com_add_response_payload(request_pdu, request_data->request_data.bytes,
+                                  request_data->request_data.length) ==
+      CP_STATUS_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
     return CP_STATUS_ERROR;
@@ -151,8 +151,9 @@ cp_status_t cp_cli_exchange_send(
   return cp_cli_send_coap_request(exchange->session_data.session, request_pdu);
 }
 
-cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_response_buffer_t* response_data) {
-  if (!exchange || !com_response_buffer_is_writable(response_data)) {
+cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange,
+                                         com_writable_buffer_t* response_data) {
+  if (exchange == NULL || !com_writable_buffer_is_writable(response_data)) {
     coap_log_err("invalid arguments to wait_and_get\n");
     return CP_STATUS_ERROR;
   }
@@ -174,7 +175,7 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_respon
   const bool is_error_response =
       !cp_com_coap_response_indicates_success(exchange->last_response_code);
 
-  memcpy(response_data->buffer, exchange->incoming_message,
+  memcpy(response_data->bytes, exchange->incoming_message,
          exchange->incoming_message_length);
   response_data->length = exchange->incoming_message_length;
   exchange->have_response = false;
@@ -185,7 +186,7 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange, com_respon
 }
 
 void cp_cli_exchange_reset(cp_cli_exchange_t* exchange) {
-  if (!exchange) {
+  if (exchange == NULL) {
     return;
   }
 

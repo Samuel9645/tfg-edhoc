@@ -34,7 +34,7 @@ void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env) {
       .edhoc_ctx = (struct edhoc_context*)&env->context_dummy,
       .message_3_extracted_fields = &env->extracted_fields,
   };
-  env->response.buffer = env->response_payload;
+  env->response.bytes = env->response_payload;
   env->response.capacity = sizeof(env->response_payload);
   tst_edh_reset_response(&env->response);
 }

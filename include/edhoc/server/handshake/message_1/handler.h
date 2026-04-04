@@ -16,7 +16,7 @@
  */
 typedef struct edh_srv_message_1_request {
   /** Incoming Message payload bytes and size. */
-  com_request_payload_t payload;
+  com_readonly_buffer_t payload;
 
   /** Server credentials for setting up the EDHOC context. */
   const struct edhoc_credentials* credentials;
@@ -37,6 +37,6 @@ typedef struct edh_srv_message_1_request {
  */
 ehd_srv_message_1_handler_result_t edh_srv_handle_message_1(
     const edh_srv_message_1_request_t* request,
-    com_response_buffer_t* response);
+    com_writable_buffer_t* response);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_

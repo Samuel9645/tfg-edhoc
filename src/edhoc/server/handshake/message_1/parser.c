@@ -36,7 +36,7 @@ edh_srv_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
 
 bool edh_srv_parse_message_1(const uint8_t* request_payload,
                              const size_t request_len,
-                             com_request_payload_t* parsed_payload) {
+                             com_readonly_buffer_t* parsed_payload) {
   // Validate framing and return a borrowed view of Message 1 without the
   // leading CBOR TRUE marker. No payload bytes are copied.
   if (!request_payload || request_len == 0 || !parsed_payload) {
@@ -50,8 +50,8 @@ bool edh_srv_parse_message_1(const uint8_t* request_payload,
     return false;
   }
 
-  *parsed_payload = (com_request_payload_t){
-      .buffer = payload_ptr,
+  *parsed_payload = (com_readonly_buffer_t){
+      .bytes = payload_ptr,
       .length = payload_len,
   };
   return true;

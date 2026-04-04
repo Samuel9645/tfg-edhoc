@@ -28,7 +28,7 @@ typedef struct {
   const char* description;
   const uint8_t* payload;
   size_t length;
-  com_request_payload_t* output;
+  com_readonly_buffer_t* output;
 } message_1_parser_test_case_t;
 
 #endif /* TST_EDH_SRV_MESSAGE_1_PARSER_SCENARIOS_H */

@@ -42,6 +42,6 @@ typedef struct edh_srv_message_3_request {
  */
 edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
     const edh_srv_message_3_request_t* request_data,
-    com_response_buffer_t* response_data);
+    com_writable_buffer_t* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

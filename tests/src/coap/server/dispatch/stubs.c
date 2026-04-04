@@ -67,12 +67,12 @@ void* stb_cp_srv_get_session_valid(const coap_session_t* session) {
 
 bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
                                       size_t request_len,
-                                      com_request_payload_t* parsed_payload) {
+                                      com_readonly_buffer_t* parsed_payload) {
   (void)request_payload;
   (void)request_len;
   if (parsed_payload) {
     static const uint8_t stub_payload[] = {0x01, 0x02};
-    parsed_payload->buffer = stub_payload;
+    parsed_payload->bytes = stub_payload;
     parsed_payload->length = sizeof(stub_payload);
   }
   return true;
@@ -80,7 +80,7 @@ bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
 
 bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
                                        size_t request_len,
-                                       com_request_payload_t* parsed_payload) {
+                                       com_readonly_buffer_t* parsed_payload) {
   (void)request_payload;
   (void)request_len;
   (void)parsed_payload;
@@ -111,7 +111,7 @@ bool stb_edh_srv_parse_message_3_false(
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data) {
+    com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
   return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS);
@@ -119,7 +119,7 @@ ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data) {
+    com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
   return edh_srv_message_1_handler_ok(&dummy_edhoc_context_for_stub);
@@ -127,7 +127,7 @@ ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
     const edh_srv_message_1_request_t* request_data,
-    com_response_buffer_t* response_data) {
+    com_writable_buffer_t* response_data) {
   (void)request_data;
   response_data->length = 10;
   return edh_srv_message_1_handler_ok(&dummy_edhoc_context_for_stub);
@@ -151,7 +151,7 @@ coap_pdu_code_t stb_cp_srv_process_m1_fail(
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
     const edh_srv_message_3_request_t* request_data,
-    com_response_buffer_t* response_data) {
+    com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
   return EDH_MSG3_HDL_OK;
@@ -159,7 +159,7 @@ edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
     const edh_srv_message_3_request_t* request_data,
-    com_response_buffer_t* response_data) {
+    com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
   return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;

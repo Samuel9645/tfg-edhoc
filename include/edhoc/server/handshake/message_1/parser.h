@@ -34,6 +34,6 @@ edh_srv_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
  * false otherwise.
  */
 bool edh_srv_parse_message_1(const uint8_t* request_payload, size_t request_len,
-                             com_request_payload_t* parsed_payload);
+                             com_readonly_buffer_t* parsed_payload);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_H_

@@ -18,13 +18,13 @@
 
 void test_parser_returns_stripped_message_1_payload(void) {
   const tst_edh_payload_t payload_with_prefix = get_valid_message_1_payload();
-  com_request_payload_t parsed_payload = {0};
+  com_readonly_buffer_t parsed_payload = {0};
 
   const bool parsed = edh_srv_parse_message_1(
       payload_with_prefix.data, payload_with_prefix.length, &parsed_payload);
 
   TEST_ASSERT_TRUE(parsed);
-  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], parsed_payload.buffer);
+  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], parsed_payload.bytes);
   TEST_ASSERT_EQUAL(payload_with_prefix.length - 1,
                     parsed_payload.length);
 }
@@ -32,7 +32,7 @@ void test_parser_returns_stripped_message_1_payload(void) {
 void test_parser_fails_on_invalid_data(void) {
   const tst_edh_payload_t payload_with_invalid_prefix =
       get_invalid_prefix_payload();
-  com_request_payload_t parsed_payload = {0};
+  com_readonly_buffer_t parsed_payload = {0};
 
   const message_1_parser_test_case_t test_cases[] = {
       {"parse fails with NULL payload", NULL, 5, &parsed_payload},
@@ -53,13 +53,13 @@ void test_parser_fails_on_invalid_data(void) {
 
 void test_parser_fails_when_prefix_is_missing(void) {
   const tst_edh_payload_t payload_without_prefix = get_invalid_prefix_payload();
-  com_request_payload_t parsed_payload = {0};
+  com_readonly_buffer_t parsed_payload = {0};
 
   const bool parsed =
       edh_srv_parse_message_1(payload_without_prefix.data,
                               payload_without_prefix.length, &parsed_payload);
 
   TEST_ASSERT_FALSE(parsed);
-  TEST_ASSERT_NULL(parsed_payload.buffer);
+  TEST_ASSERT_NULL(parsed_payload.bytes);
   TEST_ASSERT_EQUAL(0, parsed_payload.length);
 }

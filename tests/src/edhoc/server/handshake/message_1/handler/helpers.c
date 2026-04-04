@@ -29,19 +29,19 @@ void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env) {
          CLEAN_MESSAGE_1_PAYLOAD_SIZE);
   env->request = (edh_srv_message_1_request_t){
       .payload =
-          (com_request_payload_t){.buffer = env->request_payload,
+          (com_readonly_buffer_t){.bytes = env->request_payload,
                                   .length = CLEAN_MESSAGE_1_PAYLOAD_SIZE},
       .credentials = &DUMMY_TEST_CREDS};
   env->response =
-      (com_response_buffer_t){.buffer = env->response_payload,
+      (com_writable_buffer_t){.bytes = env->response_payload,
                               .capacity = sizeof(env->response_payload)};
   tst_edh_reset_message_1_response(&env->response);
 }
 
-void tst_edh_reset_message_1_response(com_response_buffer_t* response) {
+void tst_edh_reset_message_1_response(com_writable_buffer_t* response) {
   TEST_ASSERT_NOT_NULL(response);
-  TEST_ASSERT_NOT_NULL(response->buffer);
+  TEST_ASSERT_NOT_NULL(response->bytes);
 
   response->length = TST_NONZERO_VALUE;
-  memset(response->buffer, TST_CANARY_PATTERN, response->capacity);
+  memset(response->bytes, TST_CANARY_PATTERN, response->capacity);
 }

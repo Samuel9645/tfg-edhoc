@@ -12,39 +12,34 @@
 #include <stdint.h>
 
 /**
- * @brief Generic request payload descriptor.
+ * @brief Generic readonly buffer
  */
-typedef struct com_request_payload {
-  /** Pointer to request bytes to send or process. */
-  const uint8_t* buffer;
+typedef struct com_readonly_buffer {
+  /** Pointer to the data */
+  const uint8_t* bytes;
 
-  /** Length of payload in bytes. */
+  /** Input length of data to process in bytes. */
   size_t length;
-} com_request_payload_t;
+} com_readonly_buffer_t;
 
-bool com_request_payload_is_valid(const com_request_payload_t* payload);
-
-bool com_request_payload_is_larger_than(const com_request_payload_t* payload,
-                                        size_t length);
+bool com_readonly_buffer_is_valid(const com_readonly_buffer_t* buffer);
 
 /**
  * @brief Generic response buffer descriptor.
  */
-typedef struct {
+typedef struct com_writable_buffer {
   /** Caller-provided buffer where response bytes are written. */
-  uint8_t* buffer;
+  uint8_t* bytes;
 
-  /** Capacity of payload buffer in bytes. */
+  /** Capacity of buffer in bytes. */
   size_t capacity;
 
-  /** Output number of bytes written to payload buffer. */
+  /** Output number of bytes written to buffer. */
   size_t length;
-} com_response_buffer_t;
+} com_writable_buffer_t;
 
-bool com_response_buffer_is_valid(const com_response_buffer_t* buffer);
+bool com_writable_buffer_is_writable(const com_writable_buffer_t* buffer);
 
-bool com_response_buffer_is_writable(const com_response_buffer_t* buffer);
-
-bool com_response_buffer_has_content(const com_response_buffer_t* buffer);
+bool com_writable_buffer_has_content(const com_writable_buffer_t* buffer);
 
 #endif  // COMMON_DATA_MODELS_H_

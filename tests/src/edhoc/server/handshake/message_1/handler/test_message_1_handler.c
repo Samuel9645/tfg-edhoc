@@ -52,7 +52,7 @@ static void ensure_context_is_freed_on_failure(
 
 void test_handler_fails_on_invalid_data(void) {
   edh_srv_message_1_request_t empty_request = {0};
-  com_response_buffer_t empty_response = tst_edh_invalid_response();
+  com_writable_buffer_t empty_response = tst_edh_invalid_response();
 
   const tst_edh_srv_hnd_test_case_message_1_handler_t test_cases[] = {
       {"both arguments are missing", NULL, NULL},
@@ -78,7 +78,7 @@ void test_handler_fails_on_invalid_data(void) {
 
 void test_handler_fails_on_too_large_request_data(void) {
   static const uint8_t large_buffer[EDH_CFG_MESSAGE_BUFFER_LENGTH + 1] = {0};
-  env.request.payload.buffer = large_buffer;
+  env.request.payload.bytes = large_buffer;
   env.request.payload.length = sizeof(large_buffer);
 
   const ehd_srv_message_1_handler_result_t result =
@@ -106,7 +106,7 @@ static void assert_m1_failed_with_edhoc_error(
   ensure_context_is_freed_on_failure(result);
   TEST_ASSERT_EQUAL(TST_EDH_SRV_HND_MOCK_ERROR_LEN, env.response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD,
-                           env.response.buffer, TST_EDH_SRV_HND_MOCK_ERROR_LEN);
+                           env.response.bytes, TST_EDH_SRV_HND_MOCK_ERROR_LEN);
 }
 
 void test_handler_fails_when_message_1_processing_fails(void) {
@@ -142,6 +142,6 @@ void test_handler_propagates_library_error_payload(void) {
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
                     result.status);
   TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.length);
-  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.buffer,
+  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.bytes,
                            sizeof(expected_error_pdu));
 }

@@ -58,14 +58,14 @@ void cp_srv_dispatch_post_with_dependencies(
 
   uint8_t response_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
 
-  com_response_buffer_t response_data = {
-      .buffer = response_payload,
+  com_writable_buffer_t response_data = {
+      .bytes = response_payload,
       .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
       .length = 0,
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  com_request_payload_t message_1_parsed_payload = {0};
+  com_readonly_buffer_t message_1_parsed_payload = {0};
   struct edhoc_extracted_fields message_3_extracted_fields = {0};
 
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);

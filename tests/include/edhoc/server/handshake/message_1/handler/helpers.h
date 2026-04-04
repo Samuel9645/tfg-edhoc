@@ -18,7 +18,7 @@ typedef struct tst_message_1_handler_env {
   uint8_t response_payload[TST_EDH_SRV_HND_BUF_LEN];
   size_t response_written_len;
   edh_srv_message_1_request_t request;
-  com_response_buffer_t response;
+  com_writable_buffer_t response;
 } tst_message_1_handler_env_t;
 
 /**
@@ -45,7 +45,7 @@ void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env);
  * @param[in,out] response Pointer to the com_response_buffer_t to
  * reset.
  */
-void tst_edh_reset_message_1_response(com_response_buffer_t* response);
+void tst_edh_reset_message_1_response(com_writable_buffer_t* response);
 
 /**
  * @brief Asserts that the response buffer has not been modified (i.e., no
@@ -53,7 +53,7 @@ void tst_edh_reset_message_1_response(com_response_buffer_t* response);
  * @param[in] response Pointer to the com_response_buffer_t to check.
  */
 void tst_edh_assert_message_1_handler_response_clean(
-    const com_response_buffer_t* response);
+    const com_writable_buffer_t* response);
 
 /**
  * @brief Sets the payload for a valid Message 1 in the test environment.

@@ -20,7 +20,7 @@ typedef struct {
   uint8_t response_payload[TST_EDH_SRV_MESSAGE_3_BUFFER_LENGTH];
   size_t response_written_len;
   edh_srv_message_3_request_t request;
-  com_response_buffer_t response;
+  com_writable_buffer_t response;
 } tst_edh_srv_message_3_env_t;
 
 void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env);

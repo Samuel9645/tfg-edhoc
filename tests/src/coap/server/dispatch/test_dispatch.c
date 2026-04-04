@@ -16,8 +16,8 @@
 #include <edhoc.h>
 #include <unity.h>
 
-#include "coap/server/dispatch/create_base_dependencies.h"
-#include "coap/server/dispatch/stubs.h"
+#include "coap/server/dispatch/tst_create_base_dependencies.h"
+#include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 
 static coap_session_t* dummy_session = NULL;
 static coap_pdu_t* dummy_request = NULL;

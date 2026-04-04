@@ -6,9 +6,9 @@
 #include "coap/server/edhoc_mapper/message_1_mapper.h"
 #include "coap/server/edhoc_mapper/message_3_mapper.h"
 #include "coap/server/request.h"
-#include "edhoc/server/handshake/message_1/parser.h"
-#include "edhoc/server/handshake/message_3/handler.h"
-#include "edhoc/server/handshake/message_3/parser.h"
+#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "edhoc/server/handshake/message_3/srv_m3_handler.h"
+#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "internal/dispatch_engine.h"
 
 static cp_status_t add_edhoc_response_options(

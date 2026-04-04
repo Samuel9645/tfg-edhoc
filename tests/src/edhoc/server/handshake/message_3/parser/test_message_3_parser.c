@@ -13,9 +13,9 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/message_3/parser.h"
-#include "edhoc/server/handshake/message_3/parser/scenarios.h"
-#include "edhoc/server/handshake/message_3/parser/stubs.h"
+#include "edhoc/server/handshake/message_3/parser/tst_m3_parser_scenarios.h"
+#include "edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.h"
+#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
 enum { TEST_MESSAGE_3_PAYLOAD_LENGTH = 5 };
 

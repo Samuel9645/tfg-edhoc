@@ -24,16 +24,16 @@ set(BASE_SOURCES
 )
 
 set(MESSAGE_1_HANDLER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/result.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_result.c
 )
 
 set(MESSAGE_3_HANDLER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_errors.c
 )
 
 set(SERVER_SPECIFIC_SOURCES
@@ -61,15 +61,15 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/state.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/compose.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/errors.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/compose.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/errors.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/cli_handshake.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/cli_state.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_compose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )

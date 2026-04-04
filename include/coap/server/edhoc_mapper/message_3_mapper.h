@@ -12,7 +12,7 @@
 
 #include <coap3/coap.h>
 
-#include "edhoc/server/handshake/message_3/result.h"
+#include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
 /**
  * @brief Process Message 3 EDHOC result and map it to the corresponding CoAP

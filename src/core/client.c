@@ -6,7 +6,7 @@
 #include "coap/client/exchange.h"
 #include "coap/client/utils.h"
 #include "coap/config.h"
-#include "edhoc/client/handshake.h"
+#include "edhoc/client/cli_handshake.h"
 #include "edhoc/config.h"
 #include "edhoc/credentials/authentication.h"
 #include "edhoc/credentials/client_private_key.h"

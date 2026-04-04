@@ -12,9 +12,9 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/message_1/parser.h"
-#include "edhoc/server/handshake/message_1/parser/scenarios.h"
-#include "edhoc/server/handshake/payload.h"
+#include "edhoc/server/handshake/message_1/parser/tst_m1_parser_scenarios.h"
+#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "edhoc/server/handshake/tst_srv_payload.h"
 
 void test_parser_returns_stripped_message_1_payload(void) {
   const tst_edh_payload_t payload_with_prefix = get_valid_message_1_payload();

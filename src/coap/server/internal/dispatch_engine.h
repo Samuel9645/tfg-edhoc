@@ -7,9 +7,9 @@
 #include "coap/common/status.h"
 #include "coap/config.h"
 #include "common/data_models.h"
-#include "edhoc/server/handshake/message_1/handler.h"
-#include "edhoc/server/handshake/message_1/parser.h"
-#include "edhoc/server/handshake/message_3/handler.h"
+#include "edhoc/server/handshake/message_1/srv_m1_handler.h"
+#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.

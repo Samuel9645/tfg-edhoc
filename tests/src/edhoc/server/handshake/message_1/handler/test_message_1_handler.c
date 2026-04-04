@@ -19,10 +19,10 @@
 #include <unity.h>
 
 #include "edhoc/config.h"
-#include "edhoc/server/handshake/common/helpers.h"
-#include "edhoc/server/handshake/message_1/handler/helpers.h"
-#include "edhoc/server/handshake/message_1/handler/scenarios.h"
-#include "edhoc/server/handshake/message_1/handler/stubs.h"
+#include "edhoc/server/handshake/common/tst_srv_m1_helpers.h"
+#include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_helpers.h"
+#include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_scenarios.h"
+#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.h"
 
 static tst_message_1_handler_env_t env = {0};
 

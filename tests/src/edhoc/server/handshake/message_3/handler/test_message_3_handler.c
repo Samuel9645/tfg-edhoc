@@ -12,10 +12,10 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/common/helpers.h"
-#include "edhoc/server/handshake/message_3/handler/helpers.h"
-#include "edhoc/server/handshake/message_3/handler/scenarios.h"
-#include "edhoc/server/handshake/message_3/handler/stubs.h"
+#include "edhoc/server/handshake/common/tst_srv_m1_helpers.h"
+#include "edhoc/server/handshake/message_3/handler/tst_m3_hdl_helpers.h"
+#include "edhoc/server/handshake/message_3/handler/tst_m3_hdl_scenarios.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_stubs.h"
 
 static tst_edh_srv_message_3_env_t env = {0};
 

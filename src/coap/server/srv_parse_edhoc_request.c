@@ -45,3 +45,19 @@ cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
       .length = len,
   });
 }
+
+const char* cp_srv_parse_edhoc_request_status_to_string(
+    const cp_srv_parse_edhoc_request_status_t status) {
+  switch (status) {
+  case CP_SRV_EDH_REQ_OK:
+    return "ok";
+  case CP_SRV_EDH_REQ_ERR_INVALID_ARGS:
+    return "invalid arguments";
+  case CP_SRV_EDH_REQ_ERR_NO_PAYLOAD:
+    return "no payload";
+  case CP_SRV_EDH_REQ_ERR_UNSUPPORTED_FORMAT:
+    return "unsupported format";
+  default:
+    return "unknown failure";
+  }
+}

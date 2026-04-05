@@ -35,7 +35,6 @@ typedef struct cp_srv_parse_edhoc_request_result {
 
 /**
  * @brief Validate EDHOC CoAP request content format and extract payload.
- *
  * @param[in] request Incoming CoAP request.
  * @param[in] expected_format Expected content format value.
  * @return Struct containing the status and the parsed response on success, empty response on failure
@@ -43,5 +42,14 @@ typedef struct cp_srv_parse_edhoc_request_result {
 cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
     const coap_pdu_t* request,
     cp_cfg_content_format_edhoc_values_t expected_format);
+
+/**
+ * @brief Convert a parsing status code into a human-readable string.
+ * @param status status of the parsing operation
+ * @return human-readable string describing the parsing status, useful for
+ * logging and debugging.
+ */
+const char* cp_srv_parse_edhoc_request_status_to_string(
+    cp_srv_parse_edhoc_request_status_t status);
 
 #endif  // COAP_SERVER_REQUEST_H_

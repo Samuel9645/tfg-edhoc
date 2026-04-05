@@ -66,7 +66,9 @@ void cp_srv_dispatch_post_with_dependencies(
   const cp_srv_parse_edhoc_request_result_t parse_result =
       deps->parse_edhoc_request(request, CP_CFG_CONTENT_CID_EDHOC);
   if (parse_result.status != CP_SRV_EDH_REQ_OK) {
-    // TODO: add logging
+    coap_log_err(
+        "failed to parse EDHOC message %s\n",
+        cp_srv_parse_edhoc_request_status_to_string(parse_result.status));
     coap_pdu_set_code(response,
                       map_parse_result_to_pdu_code(parse_result.status));
     return;

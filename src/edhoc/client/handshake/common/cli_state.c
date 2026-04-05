@@ -30,7 +30,10 @@ enum edh_cli_init_status edh_cli_init(
 }
 
 bool edh_cli_handshake_is_initialized(const struct edh_cli_handshake* state) {
-  return state != NULL && state->initialized;
+  if (state == NULL) {
+    return false;
+  }
+  return state->initialized;
 }
 
 void edh_cli_clear_state(struct edh_cli_handshake* state) {

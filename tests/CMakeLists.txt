@@ -103,6 +103,14 @@ add_unity_test(test_message_1_handler
     ${COMMON_HANDLER_SOURCES}
 )
 
+add_unity_test(test_message_1_errors
+    /src/edhoc/server/handshake/message_1/errors/test_srv_message_1_errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors/tst_srv_m1_errors_stubs.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
+    ${COMMON_SRV_SOURCES}
+)
+
 add_unity_test(test_message_3_handler
     /src/edhoc/server/handshake/message_3/handler/test_message_3_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_m3_helpers.c

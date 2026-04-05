@@ -14,14 +14,14 @@
 
 enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
-// TODO: add tests for error functions to remove unused warning, since it is
-// true that is not being used
 /**
  * WHY DO WE NEED THIS?
  * The edhoc_error_get_cipher_suites function requires a buffer to write the
  * cipher suites into, if we don't store this buffer in this struct the pointer
  * will not be valid after the prepare_message_1_error_context function returns
  */
+// ReSharper disable once CppClassNeverUsed it is acctually used in the
+// test_srv_message_1_errors.c test
 struct edh_srv_message_1_error_context {
   struct edhoc_error_info info;
   int32_t suites_buffer[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE];

@@ -10,9 +10,7 @@
 #define COAP_SERVER_REQUEST_H_
 
 #include <coap3/coap.h>
-#include <stdint.h>
 
-#include "coap/common/status.h"
 #include "coap/config.h"
 #include "common/data_models.h"
 
@@ -37,7 +35,8 @@ typedef struct cp_srv_parse_edhoc_request_result {
  * @brief Validate EDHOC CoAP request content format and extract payload.
  * @param[in] request Incoming CoAP request.
  * @param[in] expected_format Expected content format value.
- * @return Struct containing the status and the parsed response on success, empty response on failure
+ * @return Struct containing the status and the parsed response on success,
+ * empty response on failure
  */
 cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
     const coap_pdu_t* request,

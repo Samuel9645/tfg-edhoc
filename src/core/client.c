@@ -38,17 +38,17 @@ static const struct edhoc_credentials credentials = {
 
 static void cp_cli_try_send_edhoc_error_payload(
     cp_cli_session_resources_t* client_resources,
-    cp_cli_exchange_request_data_t* request_data,
+    cp_cli_exchange_request_t request_data,
     const com_writable_buffer_t* error_payload_data,
     com_writable_buffer_t* receive_buffer) {
-  if (client_resources == NULL || request_data == NULL ||
-      error_payload_data == NULL || receive_buffer == NULL ||
+  if (client_resources == NULL || error_payload_data == NULL ||
+      receive_buffer == NULL ||
       !com_writable_buffer_has_content(error_payload_data)) {
     return;
   }
 
-  request_data->request_data.length = error_payload_data->length;
-  request_data->content_format = CP_CFG_CONTENT_CID_EDHOC;
+  request_data.buffer.length = error_payload_data->length;
+  request_data.content_format = CP_CFG_CONTENT_CID_EDHOC;
 
   cp_cli_exchange_reset(&client_resources->exchange);
   (void)cp_cli_exchange_send(&client_resources->exchange, request_data);
@@ -107,8 +107,8 @@ com_emulation_status_t core_run_client(void) {
   uint8_t request_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
   uint8_t response_payload[CP_CFG_MAX_PDU_SIZE] = {0};
 
-  cp_cli_exchange_request_data_t request_data = {
-      .request_data =
+  cp_cli_exchange_request_t request_data = {
+      .buffer =
           {
               .bytes = request_payload,
               .length = 0,
@@ -136,9 +136,9 @@ com_emulation_status_t core_run_client(void) {
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  request_data.request_data.length = message_1_result.output.length;
+  request_data.buffer.length = message_1_result.output.length;
 
-  if (cp_cli_exchange_send(&client_resources.exchange, &request_data) !=
+  if (cp_cli_exchange_send(&client_resources.exchange, request_data) !=
       CP_STATUS_SUCCESS) {
     coap_log_err("Failed to send CoAP request for message 1\n");
     cp_cli_cleanup_resources(&client_resources);
@@ -162,7 +162,7 @@ com_emulation_status_t core_run_client(void) {
                                           message_2_input, &request_output);
   if (message_2_result.status != EDH_CLI_MSG2_PROCESS_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
-    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+    cp_cli_try_send_edhoc_error_payload(&client_resources, request_data,
                                         &message_2_result.output,
                                         &response_data);
     cp_cli_cleanup_resources(&client_resources);
@@ -177,15 +177,15 @@ com_emulation_status_t core_run_client(void) {
                                           &request_output);
   if (message_3_result.status != EDH_CLI_MSG3_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 3\n");
-    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+    cp_cli_try_send_edhoc_error_payload(&client_resources, request_data,
                                         &message_3_result.output,
                                         &response_data);
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  request_data.request_data.length = message_3_result.output.length;
+  request_data.buffer.length = message_3_result.output.length;
 
-  if (cp_cli_exchange_send(&client_resources.exchange, &request_data) !=
+  if (cp_cli_exchange_send(&client_resources.exchange, request_data) !=
       CP_STATUS_SUCCESS) {
     coap_log_err("Failed to send EDHOC message 3\n");
     cp_cli_cleanup_resources(&client_resources);
@@ -209,7 +209,7 @@ com_emulation_status_t core_run_client(void) {
                                           message_4_input, &request_output);
   if (message_4_result.status != EDH_CLI_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
-    cp_cli_try_send_edhoc_error_payload(&client_resources, &request_data,
+    cp_cli_try_send_edhoc_error_payload(&client_resources, request_data,
                                         &message_4_result.output,
                                         &response_data);
     cp_cli_cleanup_resources(&client_resources);

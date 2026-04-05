@@ -85,14 +85,8 @@ bool cp_cli_exchange_session_data_is_valid(
 }
 
 bool cp_cli_exchange_request_data_is_valid(
-    const cp_cli_exchange_request_data_t* request_data) {
-  return request_data != NULL &&
-         com_readonly_buffer_is_valid(request_data->request_data);
-}
-
-bool cp_cli_exchange_response_size_fits(const size_t message_length,
-                                        const size_t capacity) {
-  return message_length > 0 && message_length <= capacity;
+    const cp_cli_exchange_request_t request_data) {
+  return com_readonly_buffer_is_valid(request_data.buffer);
 }
 
 cp_status_t cp_cli_init_exchange(
@@ -124,8 +118,8 @@ cp_status_t cp_cli_init_exchange(
 
 cp_status_t cp_cli_exchange_send(
     const cp_cli_exchange_t* exchange,
-    const cp_cli_exchange_request_data_t* request_data) {
-  if (exchange == NULL || request_data == NULL ||
+                                 const cp_cli_exchange_request_t request_data) {
+  if (exchange == NULL ||
       !cp_cli_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
     return CP_STATUS_ERROR;
@@ -133,14 +127,14 @@ cp_status_t cp_cli_exchange_send(
 
   coap_pdu_t* request_pdu = cp_cli_prepare_post_request(
       &exchange->session_data.uri, &exchange->session_data.destination,
-      exchange->session_data.session, request_data->content_format);
+      exchange->session_data.session, request_data.content_format);
   if (!request_pdu) {
     coap_log_err("failed to prepare CoAP request\n");
     return CP_STATUS_ERROR;
   }
 
-  if (cp_com_add_response_payload(request_pdu, request_data->request_data.bytes,
-                                  request_data->request_data.length) ==
+  if (cp_com_add_response_payload(request_pdu, request_data.buffer.bytes,
+                                  request_data.buffer.length) ==
       CP_STATUS_ERROR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);
@@ -165,9 +159,10 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange,
     return CP_STATUS_ERROR;
   }
 
+  const size_t message_length = exchange->incoming_message_length;
+  const size_t capacity = response_data->capacity;
   if (!exchange->have_response ||
-      !cp_cli_exchange_response_size_fits(exchange->incoming_message_length,
-                                          response_data->capacity)) {
+      !(message_length > 0 && message_length <= capacity)) {
     coap_log_err("invalid response data\n");
     return CP_STATUS_ERROR;
   }

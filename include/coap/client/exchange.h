@@ -59,25 +59,16 @@ typedef struct cp_cli_exchange {
 /**
  * @brief Input data used to send one EDHOC request message.
  */
-typedef struct cp_cli_exchange_request_data {
+typedef struct cp_cli_exchange_request {
   /** Payload pointer and length for this outgoing request. */
-  com_readonly_buffer_t request_data;
+  com_readonly_buffer_t buffer;
 
   /** CoAP content-format option value to attach to the request. */
   cp_cfg_content_format_edhoc_values_t content_format;
-} cp_cli_exchange_request_data_t;
+} cp_cli_exchange_request_t;
 
 bool cp_cli_exchange_request_data_is_valid(
-    const cp_cli_exchange_request_data_t* request_data);
-
-/**
- * @brief Check if response message size fits in buffer capacity.
- *
- * @param[in] message_length Size of incoming message.
- * @param[in] capacity Available buffer capacity.
- * @return true if message fits, false otherwise.
- */
-bool cp_cli_exchange_response_size_fits(size_t message_length, size_t capacity);
+    cp_cli_exchange_request_t request_data);
 
 /**
  * @brief Initialize exchange state and register response handler.
@@ -99,9 +90,8 @@ cp_status_t cp_cli_init_exchange(
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_exchange_send(
-    const cp_cli_exchange_t* exchange,
-    const cp_cli_exchange_request_data_t* request_data);
+cp_status_t cp_cli_exchange_send(const cp_cli_exchange_t* exchange,
+                                 cp_cli_exchange_request_t request_data);
 
 /**
  * @brief Wait for response and copy payload to caller buffer.

@@ -63,14 +63,14 @@ void cp_srv_dispatch_post_with_dependencies(
     return;
   }
 
-  const cp_srv_parse_edhoc_request_result_t parse_result =
+  const cp_srv_parse_edhoc_request_result_t parse_edhoc_result =
       deps->parse_edhoc_request(request, CP_CFG_CONTENT_CID_EDHOC);
-  if (parse_result.status != CP_SRV_EDH_REQ_OK) {
+  if (parse_edhoc_result.status != CP_SRV_EDH_REQ_OK) {
     coap_log_err(
         "failed to parse EDHOC message %s\n",
-        cp_srv_parse_edhoc_request_status_to_string(parse_result.status));
+        cp_srv_parse_edhoc_request_status_to_string(parse_edhoc_result.status));
     coap_pdu_set_code(response,
-                      map_parse_result_to_pdu_code(parse_result.status));
+                      map_parse_result_to_pdu_code(parse_edhoc_result.status));
     return;
   }
 
@@ -95,11 +95,11 @@ void cp_srv_dispatch_post_with_dependencies(
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
   // TODO: remove this quick fix
-  const uint8_t* request_payload = parse_result.parsed_request.bytes;
-  const size_t request_len = parse_result.parsed_request.length;
+  const uint8_t* request_payload = parse_edhoc_result.parsed_request.bytes;
+  const size_t request_len = parse_edhoc_result.parsed_request.length;
   if (edhoc_ctx == NULL) {
     const edh_srv_parse_message_1_result_t parse_message_1_result =
-        deps->parse_message_1(parse_result.parsed_request);
+        deps->parse_message_1(parse_edhoc_result.parsed_request);
     if (parse_message_1_result.status != EDH_SRV_MSG1_PARSE_OK) {
       coap_log_err("failed to parse Message 1: %s\n",
                    edh_srv_parse_message_1_status_to_string(

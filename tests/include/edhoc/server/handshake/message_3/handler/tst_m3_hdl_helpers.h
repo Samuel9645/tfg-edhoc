@@ -13,25 +13,35 @@
 
 enum { TST_EDH_SRV_MESSAGE_3_BUFFER_LENGTH = 256 };
 
-typedef struct {
-  int context_dummy;
-  struct edhoc_extracted_fields extracted_fields;
+/**
+ * @brief Test environment for Message 3 Handler.
+ * Contains physical memory buffers and the "View" structs used by the API.
+ */
+struct tst_edh_srv_message_3_env {
+  struct edhoc_context context;
   uint8_t request_payload[TST_EDH_SRV_MESSAGE_3_BUFFER_LENGTH];
   uint8_t response_payload[TST_EDH_SRV_MESSAGE_3_BUFFER_LENGTH];
-  size_t response_written_len;
-  edh_srv_message_3_request_t request;
-  com_writable_buffer_t response;
-} tst_edh_srv_message_3_env_t;
 
-void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env);
+  struct edh_srv_message_3_request request;
+  struct com_writable_buffer response;
+};
 
-edh_srv_message_3_request_t tst_message_3_request_without_extracted_fields(
-    const tst_edh_srv_message_3_env_t* env);
+/**
+ * @brief Initialize env buffers and link the 'request' and 'response' views.
+ */
+void tst_edh_srv_message_3_setup_env(struct tst_edh_srv_message_3_env* env);
 
-edh_srv_message_3_request_t tst_message_3_request_without_context(
-    const tst_edh_srv_message_3_env_t* env);
+/**
+ * @brief Returns a request struct with a valid context but an invalid/NULL
+ * buffer.
+ */
+struct edh_srv_message_3_request tst_message_3_request_without_buffer(
+    const struct tst_edh_srv_message_3_env* env);
 
-edh_srv_message_3_request_t tst_empty_message_3_request(void);
-
+/**
+ * @brief Returns a request struct with a valid buffer but a NULL context.
+ */
+struct edh_srv_message_3_request tst_message_3_request_without_context(
+    const struct tst_edh_srv_message_3_env* env);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_HELPERS_H_

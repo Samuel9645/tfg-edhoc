@@ -6,17 +6,22 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
+#include "edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.h"
+
 #include <edhoc.h>
 #include <edhoc_helpers.h>
 
-#include "edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.h"
-
 int tst_edh_srv_message_3_parser_stub_extract_result = EDHOC_SUCCESS;
 bool tst_edh_srv_message_3_parser_stub_equal_result = true;
+struct edhoc_extracted_fields tst_edh_srv_message_3_extracted_fields_result = {
+    0};
 
 int edhoc_extract_connection_id(
     struct edhoc_extracted_fields* extracted_fields) {
-  (void)extracted_fields;
+  if (tst_edh_srv_message_3_parser_stub_extract_result == EDHOC_SUCCESS &&
+      extracted_fields != NULL) {
+    *extracted_fields = tst_edh_srv_message_3_extracted_fields_result;
+  }
   return tst_edh_srv_message_3_parser_stub_extract_result;
 }
 
@@ -30,4 +35,6 @@ bool edhoc_connection_id_equal(const struct edhoc_connection_id* conn_id_1,
 void tst_edh_srv_message_3_parser_reset_stub_results(void) {
   tst_edh_srv_message_3_parser_stub_extract_result = EDHOC_SUCCESS;
   tst_edh_srv_message_3_parser_stub_equal_result = true;
+  tst_edh_srv_message_3_extracted_fields_result =
+      (struct edhoc_extracted_fields){0};
 }

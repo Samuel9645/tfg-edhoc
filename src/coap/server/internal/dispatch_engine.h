@@ -11,6 +11,7 @@
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
+#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.
@@ -44,9 +45,9 @@ typedef struct cp_srv_dispatch_deps_t {
    * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
    * Message 3 fields for handler processing.
    */
-  bool (*parse_message_3)(const uint8_t* request_payload, size_t request_len,
-                          const struct edhoc_context* edhoc_ctx,
-                          struct edhoc_extracted_fields* extracted_fields);
+  edh_srv_parse_message_3_result_t (*parse_message_3)(
+      com_readonly_buffer_t request_buffer,
+      const struct edhoc_context* edhoc_ctx);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   ehd_srv_message_1_handler_result_t (*handle_message_1)(
@@ -60,7 +61,7 @@ typedef struct cp_srv_dispatch_deps_t {
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
   edh_srv_message_3_handler_status_t (*handle_message_3)(
-      const edh_srv_message_3_request_t* request_data,
+      edh_srv_message_3_request_t request_data,
       com_writable_buffer_t* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */

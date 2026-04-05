@@ -33,6 +33,7 @@ set(MESSAGE_1_HANDLER_SOURCES
 
 set(MESSAGE_3_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_errors.c
 )

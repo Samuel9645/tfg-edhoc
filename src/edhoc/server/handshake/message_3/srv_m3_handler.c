@@ -6,47 +6,60 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include <edhoc.h>
-#include <stdbool.h>
-
-#include "edhoc/server/handshake/message_3/srv_m3_errors.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 
-static bool message_3_has_valid_args(
-    const edh_srv_message_3_request_t* request_data,
-    const com_writable_buffer_t* response_data) {
-  return request_data && request_data->message_3_extracted_fields &&
-         request_data->edhoc_ctx &&
-         com_writable_buffer_is_writable(response_data);
-}
+#include <edhoc.h>
+
+#include "edhoc/server/handshake/message_3/srv_m3_errors.h"
 
 edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
-    const edh_srv_message_3_request_t* request_data,
-    com_writable_buffer_t* response_data) {
-  if (!message_3_has_valid_args(request_data, response_data)) {
-    return EDH_MSG3_HDL_ERR_INVALID_ARGS;
+    const edh_srv_message_3_request_t request,
+    com_writable_buffer_t* response_buffer) {
+  if (request.edhoc_ctx == NULL) {
+    return EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT;
+  }
+  if (!com_readonly_buffer_is_valid(request.parsed_message_3)) {
+    return EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3;
+  }
+  if (!com_writable_buffer_is_writable(response_buffer)) {
+    return EDH_MSG3_HDL_ERR_INVALID_RESPONSE_BUFFER;
   }
 
-  int edhoc_api_result = EDHOC_SUCCESS;
-
-  edhoc_api_result = edhoc_message_3_process(
-      request_data->edhoc_ctx,
-      request_data->message_3_extracted_fields->edhoc_message_ptr,
-      request_data->message_3_extracted_fields->edhoc_message_size);
+  int edhoc_api_result =
+      edhoc_message_3_process(request.edhoc_ctx, request.parsed_message_3.bytes,
+                              request.parsed_message_3.length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_srv_message_3_handler_add_error(
-        edhoc_api_result, "Message 3 processing failed", response_data);
+        edhoc_api_result, "Message 3 processing failed", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED;
   }
-
-  edhoc_api_result =
-      edhoc_message_4_compose(request_data->edhoc_ctx, response_data->bytes,
-                              response_data->capacity, &response_data->length);
+  edhoc_api_result = edhoc_message_4_compose(
+      request.edhoc_ctx, response_buffer->bytes, response_buffer->capacity,
+      &response_buffer->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_srv_message_3_handler_add_error(
-        edhoc_api_result, "Message 4 composing failed", response_data);
+        edhoc_api_result, "Message 4 composing failed", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
-
   return EDH_MSG3_HDL_OK;
+}
+
+const char* edh_srv_handle_message_3_error_code_to_string(
+    const edh_srv_message_3_handler_status_t error_code) {
+  switch (error_code) {
+  case EDH_MSG3_HDL_OK:
+    return "ok";
+  case EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT:
+    return "null edhoc context";
+  case EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3:
+    return "invalid parsed message 3";
+  case EDH_MSG3_HDL_ERR_INVALID_RESPONSE_BUFFER:
+    return "invalid response buffer";
+  case EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED:
+    return "message 3 process failed";
+  case EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED:
+    return "message 4 compose failed";
+  default:
+    return "unknown";
+  }
 }

@@ -15,6 +15,7 @@
 
 #include "coap/server/internal/parse_edhoc_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
+#include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
 
@@ -81,26 +82,24 @@ edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_failure(
       EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING);
 }
 
-bool stb_edh_srv_parse_message_3_true(
-    const uint8_t* request_payload, size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields) {
-  (void)request_payload;
-  (void)request_len;
+edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_ok(
+    com_readonly_buffer_t request_buffer,
+    const struct edhoc_context* edhoc_ctx) {
+  (void)request_buffer;
   (void)edhoc_ctx;
-  (void)extracted_fields;
-  return true;
+  return cp_srv_internal_parse_message_3_ok((com_readonly_buffer_t){
+      .bytes = DUMMY_PAYLOAD,
+      .length = sizeof(DUMMY_PAYLOAD),
+  });
 }
 
-bool stb_edh_srv_parse_message_3_false(
-    const uint8_t* request_payload, size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields) {
-  (void)request_payload;
-  (void)request_len;
+edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_failure(
+    com_readonly_buffer_t request_buffer,
+    const struct edhoc_context* edhoc_ctx) {
+  (void)request_buffer;
   (void)edhoc_ctx;
-  (void)extracted_fields;
-  return false;
+  return cp_srv_internal_parse_message_3_failure(
+      EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
 }
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
@@ -144,7 +143,7 @@ coap_pdu_code_t stb_cp_srv_process_m1_fail(
 }
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
-    const edh_srv_message_3_request_t* request_data,
+    const edh_srv_message_3_request_t request_data,
     com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
@@ -152,7 +151,7 @@ edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
 }
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
-    const edh_srv_message_3_request_t* request_data,
+    const edh_srv_message_3_request_t request_data,
     com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;

@@ -16,44 +16,37 @@ static const uint8_t CLEAN_MESSAGE_3_PAYLOAD[] = {0x21, 0x22, 0x23};
 static const size_t CLEAN_MESSAGE_3_PAYLOAD_SIZE =
     sizeof(CLEAN_MESSAGE_3_PAYLOAD);
 
-void tst_edh_srv_message_3_setup_env(tst_edh_srv_message_3_env_t* env) {
+void tst_edh_srv_message_3_setup_env(struct tst_edh_srv_message_3_env* env) {
   TEST_ASSERT_NOT_NULL_MESSAGE(env,
                                "Test environment pointer must not be NULL");
-
-  *env = (tst_edh_srv_message_3_env_t){0};
+  *env = (struct tst_edh_srv_message_3_env){0};
   memcpy(env->request_payload, CLEAN_MESSAGE_3_PAYLOAD,
          CLEAN_MESSAGE_3_PAYLOAD_SIZE);
-  env->extracted_fields = (struct edhoc_extracted_fields){
-      .buffer = env->request_payload,
-      .buffer_size = CLEAN_MESSAGE_3_PAYLOAD_SIZE,
-      .edhoc_message_ptr = env->request_payload,
-      .edhoc_message_size = CLEAN_MESSAGE_3_PAYLOAD_SIZE,
-  };
-  env->request = (edh_srv_message_3_request_t){
-      .edhoc_ctx = (struct edhoc_context*)&env->context_dummy,
-      .message_3_extracted_fields = &env->extracted_fields,
-  };
-  env->response.bytes = env->response_payload;
-  env->response.capacity = sizeof(env->response_payload);
-  tst_edh_reset_response(&env->response);
+  env->request = (struct edh_srv_message_3_request){
+      .edhoc_ctx = &env->context,  // Points to the actual context in the env
+      .parsed_message_3 = {.bytes = env->request_payload,
+                           .length = CLEAN_MESSAGE_3_PAYLOAD_SIZE}};
+  env->response =
+      (struct com_writable_buffer){.bytes = env->response_payload,
+                                   .capacity = sizeof(env->response_payload),
+                                   .length = 0};
 }
 
-edh_srv_message_3_request_t tst_message_3_request_without_extracted_fields(
-    const tst_edh_srv_message_3_env_t* env) {
-  edh_srv_message_3_request_t request = env->request;
-  request.message_3_extracted_fields = NULL;
+struct edh_srv_message_3_request tst_message_3_request_without_buffer(
+    const struct tst_edh_srv_message_3_env* env) {
+  struct edh_srv_message_3_request request = env->request;
+  request.parsed_message_3.bytes = NULL;
+  request.parsed_message_3.length = 0;
   return request;
 }
 
-edh_srv_message_3_request_t tst_message_3_request_without_context(
-
-    const tst_edh_srv_message_3_env_t* env) {
-  edh_srv_message_3_request_t request = env->request;
+struct edh_srv_message_3_request tst_message_3_request_without_context(
+    const struct tst_edh_srv_message_3_env* env) {
+  struct edh_srv_message_3_request request = env->request;
   request.edhoc_ctx = NULL;
   return request;
 }
 
-edh_srv_message_3_request_t tst_empty_message_3_request(void) {
-  return (edh_srv_message_3_request_t){0};
+struct edh_srv_message_3_request tst_empty_message_3_request(void) {
+  return (struct edh_srv_message_3_request){0};
 }
-

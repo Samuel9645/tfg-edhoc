@@ -18,30 +18,24 @@
  * @brief Input data required to process EDHOC Message 3.
  */
 typedef struct edh_srv_message_3_request {
-  /** EDHOC context associated with the session */
   struct edhoc_context* edhoc_ctx;
-
-  /** Pre-extracted Message 3 fields (including inner EDHOC message). */
-  struct edhoc_extracted_fields* message_3_extracted_fields;
+  com_readonly_buffer_t parsed_message_3;
 } edh_srv_message_3_request_t;
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.
- *
- * @param[in] request_data Session/request metadata for Message 3 processing.
- * @param[out] response_data Response buffer metadata for Message 4.
- * @return Struct containing Message 3 operation status.
+ * @param[in] request Session/request metadata for Message 3 processing.
+ * @param[out] response_buffer Response buffer metadata for Message 4.
+ * @return Message 3 operation status.
  *
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
- * the dispatcher from CoAP session app-data. It is used for validation and
- * call-scoped protocol operations only; ownership remains in session app-data.
- *
- * @warning Before process exit, caller must clean the CoAP session/context
- * resources associated with this handshake; use com_session_resources_t +
- * com_cleanup_resources() for centralized teardown.
+ * the dispatcher.
  */
 edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
-    const edh_srv_message_3_request_t* request_data,
-    com_writable_buffer_t* response_data);
+    edh_srv_message_3_request_t request,
+    com_writable_buffer_t* response_buffer);
+
+const char* edh_srv_handle_message_3_error_code_to_string(
+    edh_srv_message_3_handler_status_t error_code);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

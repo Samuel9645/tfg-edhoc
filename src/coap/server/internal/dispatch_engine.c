@@ -51,6 +51,18 @@ static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
   }
 }
 
+coap_pdu_code_t map_parse_message_3_status_to_pdu_code(
+    const edh_srv_parse_message_3_status_t status) {
+  switch (status) {
+  case EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
+  case EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
+  case EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  default:
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
+}
+
 void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
@@ -73,30 +85,20 @@ void cp_srv_dispatch_post_with_dependencies(
                       map_parse_result_to_pdu_code(parse_edhoc_result.status));
     return;
   }
-
   if (deps->add_edhoc_response_options(response, CP_CFG_CONTENT_EDHOC) !=
       CP_STATUS_SUCCESS) {
     coap_log_err("failed to add EDHOC response options\n");
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
-
   uint8_t response_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
-
   com_writable_buffer_t response_data = {
       .bytes = response_payload,
       .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
       .length = 0,
   };
-
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  struct edhoc_extracted_fields message_3_extracted_fields = {0};
-
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
-
-  // TODO: remove this quick fix
-  const uint8_t* request_payload = parse_edhoc_result.parsed_request.bytes;
-  const size_t request_len = parse_edhoc_result.parsed_request.length;
   if (edhoc_ctx == NULL) {
     const edh_srv_parse_message_1_result_t parse_message_1_result =
         deps->parse_message_1(parse_edhoc_result.parsed_request);
@@ -114,25 +116,23 @@ void cp_srv_dispatch_post_with_dependencies(
     const ehd_srv_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
-  } else if (deps->parse_message_3(request_payload, request_len, edhoc_ctx,
-                                   &message_3_extracted_fields)) {
-    if (edhoc_ctx == NULL) {
-      coap_log_err("received Message 3 without EDHOC context\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+  } else {
+    const edh_srv_parse_message_3_result_t parse_message_3_result =
+        deps->parse_message_3(parse_edhoc_result.parsed_request, edhoc_ctx);
+    if (parse_message_3_result.status != EDH_SRV_MSG3_PARSE_OK) {
+      coap_log_err("failed to parse Message 3: %s\n",
+                   edh_srv_parse_message_3_status_to_string(
+                       parse_message_3_result.status));
+      coap_pdu_set_code(response, map_parse_message_3_status_to_pdu_code(
+                                      parse_message_3_result.status));
       return;
     }
-
-    const edh_srv_message_3_request_t request_data = {
+    const struct edh_srv_message_3_request handler_request = {
         .edhoc_ctx = edhoc_ctx,
-        .message_3_extracted_fields = &message_3_extracted_fields,
-    };
+        .parsed_message_3 = parse_message_3_result.parsed_message_3};
     const edh_srv_message_3_handler_status_t message_3_result =
-        deps->handle_message_3(&request_data, &response_data);
+        deps->handle_message_3(handler_request, &response_data);
     response_code = deps->process_message_3_result(message_3_result);
-  } else {
-    coap_log_err("received invalid or unexpected EDHOC message\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
-    return;
   }
   if (response_data.length > 0 &&
       deps->add_response_payload(response, response_payload,

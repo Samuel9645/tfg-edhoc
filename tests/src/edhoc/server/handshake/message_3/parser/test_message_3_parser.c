@@ -17,72 +17,75 @@
 #include "edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
-enum { TEST_MESSAGE_3_PAYLOAD_LENGTH = 5 };
+enum { TEST_MSG_3_PAYLOAD_LENGTH = 5 };
 
-static const uint8_t
-    DEFAULT_TEST_MESSAGE_3_PAYLOAD[TEST_MESSAGE_3_PAYLOAD_LENGTH] = {
-        0x01, 0x02, 0x03, 0x04, 0x05};
-static uint8_t request_payload[TEST_MESSAGE_3_PAYLOAD_LENGTH] = {0};
-static struct edhoc_context context = {0};
-static struct edhoc_extracted_fields extracted_fields = {0};
+static struct {
+  uint8_t data[TEST_MSG_3_PAYLOAD_LENGTH];
+  struct com_readonly_buffer request_buffer;
+  struct edhoc_context context;
+} env;
 
 void setUp(void) {
   tst_edh_srv_message_3_parser_reset_stub_results();
-  memcpy(request_payload, DEFAULT_TEST_MESSAGE_3_PAYLOAD,
-         sizeof(request_payload));
-  context = (struct edhoc_context){0};
-  extracted_fields = (struct edhoc_extracted_fields){0};
-}
-
-void test_parser_returns_extracted_fields_for_valid_message_3_data(void) {
-  const bool parsed = edh_srv_parse_message_3(
-      request_payload, sizeof(request_payload), &context, &extracted_fields);
-
-  TEST_ASSERT_TRUE(parsed);
-  TEST_ASSERT_EQUAL_PTR(request_payload, extracted_fields.buffer);
-  TEST_ASSERT_EQUAL(sizeof(request_payload), extracted_fields.buffer_size);
-  TEST_ASSERT_EQUAL_PTR(request_payload, extracted_fields.edhoc_message_ptr);
-  TEST_ASSERT_EQUAL(sizeof(request_payload),
-                    extracted_fields.edhoc_message_size);
-}
-
-void test_parser_fails_on_invalid_request_buffer(void) {
-  const message_3_parser_test_case_t test_cases[] = {
-      {"request payload is missing", NULL, sizeof(request_payload), &context,
-       &extracted_fields},
-      {"request payload length is zero", request_payload, 0, &context,
-       &extracted_fields},
-      {"context is missing", request_payload, sizeof(request_payload), NULL,
-       &extracted_fields},
-      {"extracted fields output is missing", request_payload,
-       sizeof(request_payload), &context, NULL},
+  const uint8_t mock_data[TEST_MSG_3_PAYLOAD_LENGTH] = {0x01, 0x02, 0x03, 0x04,
+                                                        0x05};
+  memcpy(env.data, mock_data, TEST_MSG_3_PAYLOAD_LENGTH);
+  env.request_buffer = (struct com_readonly_buffer){
+      .bytes = env.data,
+      .length = TEST_MSG_3_PAYLOAD_LENGTH,
   };
+  memset(&env.context, 0, sizeof(struct edhoc_context));
+}
 
-  const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
-  for (size_t i = 0; i < num_cases; i++) {
-    const bool parsed = edh_srv_parse_message_3(
-        test_cases[i].request_payload, test_cases[i].request_length,
-        test_cases[i].context, test_cases[i].extracted_fields);
+void test_parser_advances_pointers_on_success(void) {
+  const uint8_t* advanced_pointed = env.data + 2;
+  const int reduced_length = TEST_MSG_3_PAYLOAD_LENGTH - 2;
+  tst_edh_srv_message_3_extracted_fields_result =
+      (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,
+                                      .edhoc_message_size = reduced_length};
 
-    TEST_ASSERT_FALSE_MESSAGE(parsed, test_cases[i].description);
-  }
+  const struct edh_srv_parse_message_3_result result =
+      edh_srv_parse_message_3(env.request_buffer, &env.context);
+
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_OK, result.status);
+  TEST_ASSERT_EQUAL_PTR(advanced_pointed, result.parsed_message_3.bytes);
+  TEST_ASSERT_EQUAL(reduced_length, result.parsed_message_3.length);
+}
+
+void test_parser_fails_when_buffer_is_invalid(void) {
+  const struct com_readonly_buffer invalid_buf = {.bytes = NULL, .length = 5};
+
+  const struct edh_srv_parse_message_3_result result =
+      edh_srv_parse_message_3(invalid_buf, &env.context);
+
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+                    result.status);
+}
+
+void test_parser_fails_when_context_is_null(void) {
+  const struct edh_srv_parse_message_3_result result =
+      edh_srv_parse_message_3(env.request_buffer, NULL);
+
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT, result.status);
 }
 
 void test_parser_fails_when_connection_id_extraction_fails(void) {
   tst_edh_srv_message_3_parser_stub_extract_result =
       EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-  const bool parsed = edh_srv_parse_message_3(
-      request_payload, sizeof(request_payload), &context, &extracted_fields);
+  const struct edh_srv_parse_message_3_result result =
+      edh_srv_parse_message_3(env.request_buffer, &env.context);
 
-  TEST_ASSERT_FALSE(parsed);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
+                    result.status);
 }
 
-void test_parser_fails_when_connection_id_does_not_match_context(void) {
+void test_parser_fails_on_connection_id_mismatch(void) {
   tst_edh_srv_message_3_parser_stub_equal_result = false;
 
-  const bool parsed = edh_srv_parse_message_3(
-      request_payload, sizeof(request_payload), &context, &extracted_fields);
+  const struct edh_srv_parse_message_3_result result =
+      edh_srv_parse_message_3(env.request_buffer, &env.context);
 
-  TEST_ASSERT_FALSE(parsed);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
+                    result.status);
 }

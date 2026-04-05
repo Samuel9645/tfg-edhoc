@@ -15,6 +15,7 @@
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
+#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
 cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_ok(
     const coap_pdu_t* request,
@@ -40,15 +41,13 @@ edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_ok(
 edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_failure(
     com_readonly_buffer_t request_buffer);
 
-bool stb_edh_srv_parse_message_3_true(
-    const uint8_t* request_payload, size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields);
+edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_ok(
+    com_readonly_buffer_t request_buffer,
+    const struct edhoc_context* edhoc_ctx);
 
-bool stb_edh_srv_parse_message_3_false(
-    const uint8_t* request_payload, size_t request_len,
-    const struct edhoc_context* edhoc_ctx,
-    struct edhoc_extracted_fields* extracted_fields);
+edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_failure(
+    com_readonly_buffer_t request_buffer,
+    const struct edhoc_context* edhoc_ctx);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
     const edh_srv_message_1_request_t* request_data,
@@ -71,11 +70,11 @@ coap_pdu_code_t stb_cp_srv_process_m1_fail(
     coap_session_t* session);
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
-    const edh_srv_message_3_request_t* request_data,
+    edh_srv_message_3_request_t request_data,
     com_writable_buffer_t* response_data);
 
 edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
-    const edh_srv_message_3_request_t* request_data,
+    edh_srv_message_3_request_t request_data,
     com_writable_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m3_ok(

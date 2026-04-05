@@ -75,17 +75,22 @@ add_unity_test(test_dispatch
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_create_base_dependencies.c
 )
 
+set(COMMON_SRV_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+)
+
 add_unity_test(test_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_message_1_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/tst_srv_payload.c
-    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
+    ${COMMON_SRV_SOURCES}
 )
 
 set(COMMON_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/tst_srv_handshake_helpers.c
     ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+    ${COMMON_SRV_SOURCES}
 )
 
 add_unity_test(test_message_1_handler
@@ -110,6 +115,8 @@ add_unity_test(test_message_3_parser
     /src/edhoc/server/handshake/message_3/parser/test_message_3_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
+    ${COMMON_SRV_SOURCES}
 )
 
 add_unity_test(test_integration

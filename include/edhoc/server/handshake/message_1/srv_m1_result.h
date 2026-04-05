@@ -10,10 +10,7 @@
 #ifndef EDHOC_SERVER_MESSAGE_1_RESULT_H
 #define EDHOC_SERVER_MESSAGE_1_RESULT_H
 
-/**
- * @brief Error codes for EDHOC server handshake operations.
- */
-typedef enum edh_srv_message_1_handler_status {
+enum edh_srv_message_1_handler_status {
   EDH_SRV_MSG1_HDL_OK = 0,
   EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS,
   EDH_SRV_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER,
@@ -22,17 +19,17 @@ typedef enum edh_srv_message_1_handler_status {
   EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED,
   EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
   EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED,
-} edh_srv_message_1_handler_status_t;
+};
 
-/**
- * @brief Result of handling EDHOC Message 1, including status and allocated
- * context on success.
- */
-typedef struct ehd_srv_message_1_handler_result {
-  /** Status of the handshake operation. */
-  edh_srv_message_1_handler_status_t status;
-  /** Pointer to the allocated EDHOC context on success, NULL on failure. */
+struct ehd_srv_message_1_handler_result {
+  enum edh_srv_message_1_handler_status status;
+  /**
+   * Pointer to the allocated EDHOC context on success, NULL on failure.
+   * @warning The caller is responsible for freeing the allocated context using
+   * edhoc_context_deinit() to clean up the library context and then free() when
+   * no longer needed.
+   */
   struct edhoc_context* edhoc_ctx;
-} ehd_srv_message_1_handler_result_t;
+};
 
 #endif  // EDHOC_SERVER_MESSAGE_1_RESULT_H

@@ -15,9 +15,9 @@
 #include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 
-ehd_srv_message_1_handler_result_t edh_srv_handle_message_1(
-    const edh_srv_message_1_request_t request,
-    com_writable_buffer_t* response) {
+struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
+    const struct edh_srv_message_1_request request,
+    struct com_writable_buffer* response) {
   if (request.credentials == NULL) {
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS);

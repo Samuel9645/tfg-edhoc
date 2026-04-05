@@ -12,8 +12,9 @@
 
 #include "edhoc/common/setup.h"
 
-edh_cli_init_status_t edh_cli_init(
-    edh_cli_handshake_t* state, const struct edhoc_credentials* credentials) {
+enum edh_cli_init_status edh_cli_init(
+    struct edh_cli_handshake* state,
+    const struct edhoc_credentials* credentials) {
   if (state == NULL) {
     return EDH_CLI_INIT_ERR_INVALID_ARGS;
   }
@@ -28,11 +29,11 @@ edh_cli_init_status_t edh_cli_init(
   return EDH_CLI_INIT_OK;
 }
 
-bool edh_cli_handshake_is_initialized(const edh_cli_handshake_t* state) {
+bool edh_cli_handshake_is_initialized(const struct edh_cli_handshake* state) {
   return state != NULL && state->initialized;
 }
 
-void edh_cli_clear_state(edh_cli_handshake_t* state) {
+void edh_cli_clear_state(struct edh_cli_handshake* state) {
   if (!edh_cli_handshake_is_initialized(state)) {
     return;
   }

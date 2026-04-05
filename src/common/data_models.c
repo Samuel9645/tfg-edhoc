@@ -7,18 +7,18 @@
  */
 #include "common/data_models.h"
 
-bool com_readonly_buffer_is_valid(const com_readonly_buffer_t buffer) {
+bool com_readonly_buffer_is_valid(const struct com_readonly_buffer buffer) {
   return buffer.bytes != NULL && buffer.length > 0;
 }
 
-static bool writable_buffer_is_valid(const com_writable_buffer_t* buffer) {
+static bool writable_buffer_is_valid(const struct com_writable_buffer* buffer) {
   return buffer != NULL && buffer->bytes != NULL;
 }
 
-bool com_writable_buffer_is_writable(const com_writable_buffer_t* buffer) {
+bool com_writable_buffer_is_writable(const struct com_writable_buffer* buffer) {
   return writable_buffer_is_valid(buffer) && buffer->capacity > 0;
 }
 
-bool com_writable_buffer_has_content(const com_writable_buffer_t* buffer) {
+bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer) {
   return com_writable_buffer_is_writable(buffer) && buffer->length > 0;
 }

@@ -13,13 +13,13 @@
 
 enum { TST_EDH_SRV_HND_BUF_LEN = 256 };
 
-typedef struct tst_message_1_handler_env {
+struct tst_message_1_handler_env {
   uint8_t request_payload[TST_EDH_SRV_HND_BUF_LEN];
   uint8_t response_payload[TST_EDH_SRV_HND_BUF_LEN];
   size_t response_written_len;
-  edh_srv_message_1_request_t valid_request;
-  com_writable_buffer_t response;
-} tst_message_1_handler_env_t;
+  struct edh_srv_message_1_request valid_request;
+  struct com_writable_buffer response;
+};
 
 /**
  * @brief Overrides the request payload in the test environment with new data.
@@ -30,7 +30,7 @@ typedef struct tst_message_1_handler_env {
  * EDH_SRV_HND_TST_BUF_LEN.
  */
 void tst_edh_override_message_1_handler_request(
-    tst_message_1_handler_env_t* env, const uint8_t* new_payload,
+    struct tst_message_1_handler_env* env, const uint8_t* new_payload,
     size_t new_len);
 
 /**
@@ -38,14 +38,14 @@ void tst_edh_override_message_1_handler_request(
  * @param[out] env Pointer to uninitialized handshake_test_env_t struct to
  * populate.
  */
-void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env);
+void tst_edh_setup_message_1_handler_env(struct tst_message_1_handler_env* env);
 
 /**
  * @brief Resets the response buffer in the test environment to a known state.
  * @param[in,out] response Pointer to the com_response_buffer_t to
  * reset.
  */
-void tst_edh_reset_message_1_response(com_writable_buffer_t* response);
+void tst_edh_reset_message_1_response(struct com_writable_buffer* response);
 
 /**
  * @brief Asserts that the response buffer has not been modified (i.e., no
@@ -53,7 +53,7 @@ void tst_edh_reset_message_1_response(com_writable_buffer_t* response);
  * @param[in] response Pointer to the com_response_buffer_t to check.
  */
 void tst_edh_assert_message_1_handler_response_clean(
-    const com_writable_buffer_t* response);
+    const struct com_writable_buffer* response);
 
 /**
  * @brief Sets the payload for a valid Message 1 in the test environment.

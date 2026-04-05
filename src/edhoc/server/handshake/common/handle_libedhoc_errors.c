@@ -34,7 +34,7 @@ void edh_srv_set_error_info(const char* error_message,
 
 void edh_srv_add_edhoc_error_to_response(
     const int edhoc_api_result, const struct edhoc_error_info* error_info,
-    com_writable_buffer_t* response_data) {
+    struct com_writable_buffer* response_data) {
   if (!response_data || !response_data->bytes) {
     return;
   }

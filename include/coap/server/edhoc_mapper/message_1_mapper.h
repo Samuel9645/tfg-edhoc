@@ -28,6 +28,7 @@
  * @return Mapped CoAP response code for the operation.
  */
 coap_pdu_code_t cp_srv_map_message_1_result_to_coap(
-    ehd_srv_message_1_handler_result_t message_1_result, coap_session_t* session);
+    struct ehd_srv_message_1_handler_result message_1_result,
+    coap_session_t* session);
 
 #endif  // COAP_SERVER_EDHOC_MAPPER_MESSAGE_1_MAPPER_H_

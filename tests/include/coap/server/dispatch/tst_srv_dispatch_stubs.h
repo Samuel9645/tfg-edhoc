@@ -17,78 +17,80 @@
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
-cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_ok(
+struct cp_srv_parse_edhoc_request_result stb_cp_srv_parse_edhoc_request_ok(
     const coap_pdu_t* request,
-    cp_cfg_content_format_edhoc_values_t expected_format);
+    enum cp_cfg_content_format_edhoc_values expected_format);
 
-cp_srv_parse_edhoc_request_result_t stb_cp_srv_parse_edhoc_request_fail(
+struct cp_srv_parse_edhoc_request_result stb_cp_srv_parse_edhoc_request_fail(
     const coap_pdu_t* request,
-    cp_cfg_content_format_edhoc_values_t expected_format);
+    enum cp_cfg_content_format_edhoc_values expected_format);
 
-cp_status_t stb_cp_srv_add_options_success(
-    coap_pdu_t* response, cp_cfg_content_format_edhoc_values_t content_format);
+enum cp_status stb_cp_srv_add_options_success(
+    coap_pdu_t* response,
+    enum cp_cfg_content_format_edhoc_values content_format);
 
-cp_status_t stb_cp_srv_add_options_fail(
-    coap_pdu_t* response, cp_cfg_content_format_edhoc_values_t content_format);
+enum cp_status stb_cp_srv_add_options_fail(
+    coap_pdu_t* response,
+    enum cp_cfg_content_format_edhoc_values content_format);
 
 void* stb_cp_srv_get_session_null(const coap_session_t* session);
 
 void* stb_cp_srv_get_session_valid(const coap_session_t* session);
 
-edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_ok(
-    com_readonly_buffer_t request_buffer);
+struct edh_srv_parse_message_1_result stb_edh_srv_parse_message_1_ok(
+    struct com_readonly_buffer request_buffer);
 
-edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_failure(
-    com_readonly_buffer_t request_buffer);
+struct edh_srv_parse_message_1_result stb_edh_srv_parse_message_1_failure(
+    struct com_readonly_buffer request_buffer);
 
-edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_ok(
-    com_readonly_buffer_t request_buffer,
+struct edh_srv_parse_message_3_result stb_edh_srv_parse_message_3_ok(
+    struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx);
 
-edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_failure(
-    com_readonly_buffer_t request_buffer,
+struct edh_srv_parse_message_3_result stb_edh_srv_parse_message_3_failure(
+    struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx);
 
-ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
-    edh_srv_message_1_request_t request_data,
-    com_writable_buffer_t* response_data);
+struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
+    struct edh_srv_message_1_request request_data,
+    struct com_writable_buffer* response_data);
 
-ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
-    edh_srv_message_1_request_t request_data,
-    com_writable_buffer_t* response_data);
+struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
+    struct edh_srv_message_1_request request_data,
+    struct com_writable_buffer* response_data);
 
-ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
-    edh_srv_message_1_request_t request_data,
-    com_writable_buffer_t* response_data);
+struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
+    struct edh_srv_message_1_request request_data,
+    struct com_writable_buffer* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    ehd_srv_message_1_handler_result_t message_1_result,
+    struct ehd_srv_message_1_handler_result message_1_result,
     coap_session_t* session);
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    ehd_srv_message_1_handler_result_t message_1_result,
+    struct ehd_srv_message_1_handler_result message_1_result,
     coap_session_t* session);
 
-edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_ok(
-    edh_srv_message_3_request_t request_data,
-    com_writable_buffer_t* response_data);
+enum edh_srv_message_3_handler_status stb_edh_srv_handle_m3_ok(
+    struct edh_srv_message_3_request request_data,
+    struct com_writable_buffer* response_data);
 
-edh_srv_message_3_handler_status_t stb_edh_srv_handle_m3_fail(
-    edh_srv_message_3_request_t request_data,
-    com_writable_buffer_t* response_data);
+enum edh_srv_message_3_handler_status stb_edh_srv_handle_m3_fail(
+    struct edh_srv_message_3_request request_data,
+    struct com_writable_buffer* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m3_ok(
-    edh_srv_message_3_handler_status_t message_3_result);
+    enum edh_srv_message_3_handler_status message_3_result);
 
 coap_pdu_code_t stb_cp_srv_process_m3_fail(
-    edh_srv_message_3_handler_status_t message_3_result);
+    enum edh_srv_message_3_handler_status message_3_result);
 
-cp_status_t stb_cp_srv_add_payload_ok(coap_pdu_t* response,
-                                      const uint8_t* payload,
-                                      size_t payload_len);
+enum cp_status stb_cp_srv_add_payload_ok(coap_pdu_t* response,
+                                         const uint8_t* payload,
+                                         size_t payload_len);
 
-cp_status_t stb_cp_srv_add_payload_fail(coap_pdu_t* response,
-                                        const uint8_t* payload,
-                                        size_t payload_len);
+enum cp_status stb_cp_srv_add_payload_fail(coap_pdu_t* response,
+                                           const uint8_t* payload,
+                                           size_t payload_len);
 
 #endif  // COAP_SERVER_DISPATCH_STUBS_H_

@@ -21,10 +21,9 @@
 #include "edhoc/config.h"
 #include "edhoc/server/handshake/common/tst_srv_m1_helpers.h"
 #include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_helpers.h"
-#include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_scenarios.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.h"
 
-static tst_message_1_handler_env_t env = {0};
+static struct tst_message_1_handler_env env = {0};
 
 void setUp(void) {
   tst_edh_srv_hnd_reset_stub_results();
@@ -37,7 +36,7 @@ void setUp(void) {
 // ============================================================================
 
 void test_handler_ok_for_valid_data(void) {
-  const ehd_srv_message_1_handler_result_t result =
+  const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_OK, result.status);
@@ -46,22 +45,22 @@ void test_handler_ok_for_valid_data(void) {
 }
 
 static void ensure_context_is_freed_on_failure(
-    const ehd_srv_message_1_handler_result_t result) {
+    const struct ehd_srv_message_1_handler_result result) {
   TEST_ASSERT_NULL(result.edhoc_ctx);
 }
 
 void test_handler_fails_on_invalid_data(void) {
-  const edh_srv_message_1_request_t empty_request = {0};
+  const struct edh_srv_message_1_request empty_request = {0};
   const struct edhoc_credentials dummy_credentials = {0};
-  const edh_srv_message_1_request_t empty_request_with_credentials = {
+  const struct edh_srv_message_1_request empty_request_with_credentials = {
       .credentials = &dummy_credentials};
-  com_writable_buffer_t empty_response = tst_edh_invalid_response();
+  struct com_writable_buffer empty_response = tst_edh_invalid_response();
 
   const struct {
     const char* description;
-    edh_srv_message_1_request_t request;
-    com_writable_buffer_t* response;
-    edh_srv_message_1_handler_status_t expected_status;
+    struct edh_srv_message_1_request request;
+    struct com_writable_buffer* response;
+    enum edh_srv_message_1_handler_status expected_status;
   } test_cases[] = {
       {"empty request", empty_request_with_credentials, &env.response,
        EDH_SRV_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER},
@@ -74,7 +73,7 @@ void test_handler_fails_on_invalid_data(void) {
   };
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
-    const ehd_srv_message_1_handler_result_t result =
+    const struct ehd_srv_message_1_handler_result result =
         edh_srv_handle_message_1(test_cases[i].request, test_cases[i].response);
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
@@ -89,7 +88,7 @@ void test_handler_fails_on_invalid_data(void) {
 void test_handler_fails_when_context_setup_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_setup_res = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-  const ehd_srv_message_1_handler_result_t result =
+  const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED,
@@ -98,8 +97,8 @@ void test_handler_fails_when_context_setup_fails(void) {
 }
 
 static void assert_m1_failed_with_edhoc_error(
-    const ehd_srv_message_1_handler_result_t result,
-    const edh_srv_message_1_handler_status_t expected_status) {
+    const struct ehd_srv_message_1_handler_result result,
+    const enum edh_srv_message_1_handler_status expected_status) {
   TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
                             "Wrong status code returned");
   ensure_context_is_freed_on_failure(result);
@@ -111,7 +110,7 @@ static void assert_m1_failed_with_edhoc_error(
 void test_handler_fails_when_message_1_processing_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
 
-  const ehd_srv_message_1_handler_result_t result =
+  const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   assert_m1_failed_with_edhoc_error(
@@ -121,7 +120,7 @@ void test_handler_fails_when_message_1_processing_fails(void) {
 void test_handler_fails_when_message_2_composition_fails(void) {
   tst_edh_srv_hnd_stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
-  const ehd_srv_message_1_handler_result_t result =
+  const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   assert_m1_failed_with_edhoc_error(
@@ -135,7 +134,7 @@ void test_handler_propagates_library_error_payload(void) {
   tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu,
                                           sizeof(expected_error_pdu));
 
-  const ehd_srv_message_1_handler_result_t result =
+  const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,

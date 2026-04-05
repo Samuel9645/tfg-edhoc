@@ -12,9 +12,9 @@
 
 #include "edhoc/server/handshake/message_3/srv_m3_errors.h"
 
-edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
-    const edh_srv_message_3_request_t request,
-    com_writable_buffer_t* response_buffer) {
+enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
+    const struct edh_srv_message_3_request request,
+    struct com_writable_buffer* response_buffer) {
   if (request.edhoc_ctx == NULL) {
     return EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT;
   }
@@ -45,7 +45,7 @@ edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
 }
 
 const char* edh_srv_handle_message_3_status_code_to_string(
-    const edh_srv_message_3_handler_status_t status) {
+    const enum edh_srv_message_3_handler_status status) {
   switch (status) {
   case EDH_MSG3_HDL_OK:
     return "ok";

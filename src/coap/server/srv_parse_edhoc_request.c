@@ -10,9 +10,9 @@
 
 #include "coap/server/internal/parse_edhoc_result_builders.h"
 
-cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
+struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
     const coap_pdu_t* request,
-    const cp_cfg_content_format_edhoc_values_t expected_format) {
+    const enum cp_cfg_content_format_edhoc_values expected_format) {
   if (request == NULL) {
     coap_log_err("request pdu is null\n");
     return cp_srv_internal_parse_edhoc_failure(CP_SRV_EDH_REQ_ERR_INVALID_ARGS);
@@ -40,14 +40,14 @@ cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
     coap_log_err("cannot get request pdu data\n");
     return cp_srv_internal_parse_edhoc_failure(CP_SRV_EDH_REQ_ERR_NO_PAYLOAD);
   }
-  return cp_srv_internal_parse_edhoc_ok((com_readonly_buffer_t){
+  return cp_srv_internal_parse_edhoc_ok((struct com_readonly_buffer){
       .bytes = data,
       .length = len,
   });
 }
 
 const char* cp_srv_parse_edhoc_request_status_to_string(
-    const cp_srv_parse_edhoc_request_status_t status) {
+    const enum cp_srv_parse_edhoc_request_status status) {
   switch (status) {
   case CP_SRV_EDH_REQ_OK:
     return "ok";

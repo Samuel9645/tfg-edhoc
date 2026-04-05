@@ -11,9 +11,9 @@
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "internal/dispatch_engine.h"
 
-static cp_status_t add_edhoc_response_options(
+static enum cp_status add_edhoc_response_options(
     coap_pdu_t* response,
-    const cp_cfg_content_format_edhoc_values_t content_format) {
+    const enum cp_cfg_content_format_edhoc_values content_format) {
   if (!response) {
     coap_log_err("response pdu is null\n");
     return CP_STATUS_ERROR;
@@ -34,8 +34,9 @@ static cp_status_t add_edhoc_response_options(
   return CP_STATUS_SUCCESS;
 }
 
-static const cp_serv_dispatch_deps_t coap_server_edhoc_dispatch_default_deps = {
-    .parse_edhoc_request = cp_srv_parse_edhoc_request,
+static const struct cp_srv_dispatch_deps
+    coap_server_edhoc_dispatch_default_deps = {
+        .parse_edhoc_request = cp_srv_parse_edhoc_request,
     .add_edhoc_response_options = add_edhoc_response_options,
     .parse_message_1 = edh_srv_parse_message_1,
     .parse_message_3 = edh_srv_parse_message_3,

@@ -14,7 +14,6 @@
 #define EDHOC_CREDENTIALS_AUTHENTICATION_H_
 
 #include <edhoc_context.h>
-#include <stdint.h>
 
 /**
  * @brief Fetch and setup authentication credentials

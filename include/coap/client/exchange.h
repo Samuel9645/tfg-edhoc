@@ -9,23 +9,12 @@
 #include "coap/config.h"
 #include "common/data_models.h"
 
-/**
- * @brief Input data used to initialize client exchange state.
- * Also embedded in coap_client_exchange_t as session data.
- */
-typedef struct cp_cli_exchange_session_data {
-  /** Context used by wait loop and response callback registration. */
+struct cp_cli_exchange_session_data {
   coap_context_t* context;
-
-  /** Session used to send requests and store app-data pointer. */
   coap_session_t* session;
-
-  /** Cached URI used for outgoing EDHOC POST requests. */
   coap_uri_t uri;
-
-  /** Cached destination address associated with uri. */
   coap_address_t destination;
-} cp_cli_exchange_session_data_t;
+};
 
 /**
  * @brief Validate session data has required pointer fields.
@@ -34,41 +23,29 @@ typedef struct cp_cli_exchange_session_data {
  * @return true if context and session are non-NULL, false otherwise.
  */
 bool cp_cli_exchange_session_data_is_valid(
-    const cp_cli_exchange_session_data_t* session_data);
+    const struct cp_cli_exchange_session_data* session_data);
 
 /**
  * @brief CoAP exchange state for EDHOC client messages.
  */
-typedef struct cp_cli_exchange {
-  /** Shared session data (transport and endpoint info). */
-  cp_cli_exchange_session_data_t session_data;
-
-  /** Response-ready flag set by response callback. */
+struct cp_cli_exchange {
+  struct cp_cli_exchange_session_data session_data;
   bool have_response;
-
-  /** Internal receive buffer populated by response callback. */
   uint8_t incoming_message[CP_CFG_MAX_PDU_SIZE];
-
-  /** Number of valid bytes currently stored in incoming_message. */
   size_t incoming_message_length;
-
-  /** Last non-empty response code received for this exchange. */
   coap_pdu_code_t last_response_code;
-} cp_cli_exchange_t;
+};
 
 /**
  * @brief Input data used to send one EDHOC request message.
  */
-typedef struct cp_cli_exchange_request {
-  /** Payload pointer and length for this outgoing request. */
-  com_readonly_buffer_t buffer;
-
-  /** CoAP content-format option value to attach to the request. */
-  cp_cfg_content_format_edhoc_values_t content_format;
-} cp_cli_exchange_request_t;
+struct cp_cli_exchange_request {
+  struct com_readonly_buffer buffer;
+  enum cp_cfg_content_format_edhoc_values content_format;
+};
 
 bool cp_cli_exchange_request_data_is_valid(
-    cp_cli_exchange_request_t request_data);
+    struct cp_cli_exchange_request request_data);
 
 /**
  * @brief Initialize exchange state and register response handler.
@@ -78,9 +55,9 @@ bool cp_cli_exchange_request_data_is_valid(
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_init_exchange(
-    const cp_cli_exchange_session_data_t* session_data,
-    cp_cli_exchange_t* exchange);
+enum cp_status cp_cli_init_exchange(
+    const struct cp_cli_exchange_session_data* session_data,
+    struct cp_cli_exchange* exchange);
 
 /**
  * @brief Send EDHOC payload in a CoAP POST request.
@@ -90,8 +67,9 @@ cp_status_t cp_cli_init_exchange(
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_exchange_send(const cp_cli_exchange_t* exchange,
-                                 cp_cli_exchange_request_t request_data);
+enum cp_status cp_cli_exchange_send(
+    const struct cp_cli_exchange* exchange,
+    struct cp_cli_exchange_request request_data);
 
 /**
  * @brief Wait for response and copy payload to caller buffer.
@@ -104,14 +82,15 @@ cp_status_t cp_cli_exchange_send(const cp_cli_exchange_t* exchange,
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.
  */
-cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange,
-                                         com_writable_buffer_t* response_data);
+enum cp_status cp_cli_exchange_wait_and_get(
+    struct cp_cli_exchange* exchange,
+    struct com_writable_buffer* response_data);
 
 /**
  * @brief Reset response state before next request.
  *
  * @param[in,out] exchange Initialized exchange state.
  */
-void cp_cli_exchange_reset(cp_cli_exchange_t* exchange);
+void cp_cli_exchange_reset(struct cp_cli_exchange* exchange);
 
 #endif  // COAP_CLIENT_EXCHANGE_H_

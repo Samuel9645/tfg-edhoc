@@ -10,10 +10,10 @@
 
 #include "coap/server/srv_parse_edhoc_request.h"
 
-cp_srv_parse_edhoc_request_result_t cp_srv_internal_parse_edhoc_failure(
-    cp_srv_parse_edhoc_request_status_t status);
+struct cp_srv_parse_edhoc_request_result cp_srv_internal_parse_edhoc_failure(
+    enum cp_srv_parse_edhoc_request_status status);
 
-cp_srv_parse_edhoc_request_result_t cp_srv_internal_parse_edhoc_ok(
-    com_readonly_buffer_t parsed_data);
+struct cp_srv_parse_edhoc_request_result cp_srv_internal_parse_edhoc_ok(
+    struct com_readonly_buffer parsed_data);
 
 #endif  // COAP_SERVER_INTERNAL_PARSE_EDHOC_RESULT_BUILDER_H_

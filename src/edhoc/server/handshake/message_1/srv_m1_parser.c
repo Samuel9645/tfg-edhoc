@@ -12,8 +12,8 @@
 
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 
-edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
-    const com_readonly_buffer_t request_buffer) {
+struct edh_srv_parse_message_1_result edh_srv_parse_message_1(
+    const struct com_readonly_buffer request_buffer) {
   if (!com_readonly_buffer_is_valid(request_buffer)) {
     return cp_srv_internal_parse_message_1_failure(
         EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER);
@@ -23,14 +23,14 @@ edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
     return cp_srv_internal_parse_message_1_failure(
         EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING);
   }
-  return cp_srv_internal_parse_message_1_ok((com_readonly_buffer_t){
+  return cp_srv_internal_parse_message_1_ok((struct com_readonly_buffer){
       .bytes = request_buffer.bytes + 1,
       .length = request_buffer.length - 1,
   });
 }
 
 const char* edh_srv_parse_message_1_status_to_string(
-    const edh_srv_parse_message_1_status_t status) {
+    const enum edh_srv_parse_message_1_status status) {
   switch (status) {
   case EDH_SRV_MSG1_PARSE_OK:
     return "ok";

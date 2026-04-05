@@ -17,11 +17,11 @@
 
 #include "coap/common/helpers.h"
 
-cp_status_t cp_com_resolve_address(const coap_str_const_t* host,
-                                   const uint16_t port,
+enum cp_status cp_com_resolve_address(const coap_str_const_t* host,
+                                      const uint16_t port,
                                           const int scheme_hint_bits,
                                           coap_address_t* destination_address) {
-  cp_status_t result = CP_STATUS_ERROR;
+  enum cp_status result = CP_STATUS_ERROR;
 
   coap_addr_info_t* addr_info =
       coap_resolve_address_info(host, port, port, port, port, AF_UNSPEC,
@@ -36,7 +36,7 @@ cp_status_t cp_com_resolve_address(const coap_str_const_t* host,
 }
 
 coap_optlist_t* cp_com_create_coap_edhoc_optlist(
-    const cp_cfg_content_format_edhoc_values_t content_format) {
+    const enum cp_cfg_content_format_edhoc_values content_format) {
   enum { CREATE_PORT_HOST_OPTION = 1 };
   coap_optlist_t* optlist = NULL;
   enum { ENCODE_BUFFER_SIZE = 4 };

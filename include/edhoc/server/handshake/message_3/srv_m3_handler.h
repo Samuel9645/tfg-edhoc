@@ -14,13 +14,10 @@
 #include "common/data_models.h"
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
-/**
- * @brief Input data required to process EDHOC Message 3.
- */
-typedef struct edh_srv_message_3_request {
+struct edh_srv_message_3_request {
   struct edhoc_context* edhoc_ctx;
-  com_readonly_buffer_t parsed_message_3;
-} edh_srv_message_3_request_t;
+  struct com_readonly_buffer parsed_message_3;
+};
 
 /**
  * @brief Handle EDHOC Message 3 and compose Message 4.
@@ -31,11 +28,11 @@ typedef struct edh_srv_message_3_request {
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher.
  */
-edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
-    edh_srv_message_3_request_t request,
-    com_writable_buffer_t* response_buffer);
+enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
+    struct edh_srv_message_3_request request,
+    struct com_writable_buffer* response_buffer);
 
 const char* edh_srv_handle_message_3_status_code_to_string(
-    edh_srv_message_3_handler_status_t status);
+    enum edh_srv_message_3_handler_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

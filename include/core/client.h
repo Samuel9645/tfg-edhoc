@@ -8,6 +8,6 @@
  *
  * @return COM_EMULATION_SUCCESS on success, COM_EMULATION_FAILURE on failure
  */
-com_emulation_status_t core_run_client(void);
+enum com_emulation_status core_run_client(void);
 
 #endif  // CORE_CLIENT_H_

@@ -7,11 +7,12 @@
  */
 
 // ReSharper disable CppParameterMayBeConst
+#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_stubs.h"
+
 #include <edhoc.h>
 #include <string.h>
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
-#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_stubs.h"
 
 const uint8_t TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE,
                                                             0xEF};
@@ -53,9 +54,9 @@ void tst_edh_srv_message_3_set_stub_error_response(const uint8_t* data,
   }
 }
 
-void edh_srv_message_3_handler_add_error(const int edhoc_api_result,
-                                     const char* generic_error_message,
-                                         com_writable_buffer_t* response_data) {
+void edh_srv_message_3_handler_add_error(
+    const int edhoc_api_result, const char* generic_error_message,
+    struct com_writable_buffer* response_data) {
   (void)edhoc_api_result;
   (void)generic_error_message;
 

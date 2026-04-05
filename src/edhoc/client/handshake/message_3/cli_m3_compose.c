@@ -12,10 +12,10 @@
 
 #include "edhoc/client/handshake/message_3/cli_m3_errors.h"
 
-static edh_cli_message_3_result_t edh_cli_message_3_create_result(
-    const edh_cli_message_3_compose_status_t status,
-    const com_writable_buffer_t* message_3) {
-  edh_cli_message_3_result_t result = {
+static struct edh_cli_message_3_result edh_cli_message_3_create_result(
+    const enum edh_cli_message_3_compose_status status,
+    const struct com_writable_buffer* message_3) {
+  struct edh_cli_message_3_result result = {
       .status = status,
       .output = {0},
   };
@@ -25,8 +25,8 @@ static edh_cli_message_3_result_t edh_cli_message_3_create_result(
   return result;
 }
 
-edh_cli_message_3_result_t edh_cli_compose_message_3(
-    edh_cli_handshake_t* state, com_writable_buffer_t* message_3) {
+struct edh_cli_message_3_result edh_cli_compose_message_3(
+    struct edh_cli_handshake* state, struct com_writable_buffer* message_3) {
   const size_t min_payload_capacity = 1;
   if (!edh_cli_handshake_is_initialized(state) ||
       !com_writable_buffer_is_writable(message_3) ||

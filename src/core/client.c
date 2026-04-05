@@ -37,10 +37,10 @@ static const struct edhoc_credentials credentials = {
 };
 
 static void cp_cli_try_send_edhoc_error_payload(
-    cp_cli_session_resources_t* client_resources,
-    cp_cli_exchange_request_t request_data,
-    const com_writable_buffer_t* error_payload_data,
-    com_writable_buffer_t* receive_buffer) {
+    struct cp_cli_session_resources* client_resources,
+    struct cp_cli_exchange_request request_data,
+    const struct com_writable_buffer* error_payload_data,
+    struct com_writable_buffer* receive_buffer) {
   if (client_resources == NULL || error_payload_data == NULL ||
       receive_buffer == NULL ||
       !com_writable_buffer_has_content(error_payload_data)) {
@@ -56,11 +56,11 @@ static void cp_cli_try_send_edhoc_error_payload(
                                      receive_buffer);
 }
 
-com_emulation_status_t core_run_client(void) {
+enum com_emulation_status core_run_client(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_DEBUG);
 
-  cp_cli_session_resources_t client_resources = {0};
+  struct cp_cli_session_resources client_resources = {0};
 
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
@@ -83,7 +83,7 @@ com_emulation_status_t core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  cp_cli_exchange_session_data_t exchange_session_data = {
+  struct cp_cli_exchange_session_data exchange_session_data = {
       .context = client_resources.session_resources.coap_context,
       .session = client_resources.session_resources.coap_session,
       .uri = client_uri,
@@ -107,7 +107,7 @@ com_emulation_status_t core_run_client(void) {
   uint8_t request_payload[CP_CFG_MAX_PDU_SIZE] = {0};
   uint8_t response_payload[CP_CFG_MAX_PDU_SIZE] = {0};
 
-  cp_cli_exchange_request_t request_data = {
+  struct cp_cli_exchange_request request_data = {
       .buffer =
           {
               .bytes = request_payload,
@@ -116,19 +116,19 @@ com_emulation_status_t core_run_client(void) {
       .content_format = CP_CFG_CONTENT_CID_EDHOC,
   };
 
-  com_writable_buffer_t response_data = {
+  struct com_writable_buffer response_data = {
       .bytes = response_payload,
       .capacity = CP_CFG_MAX_PDU_SIZE,
       .length = 0,
   };
 
-  com_writable_buffer_t request_output = {
+  struct com_writable_buffer request_output = {
       .bytes = request_payload,
       .capacity = CP_CFG_MAX_PDU_SIZE,
       .length = 0,
   };
 
-  const edh_cli_message_1_result_t message_1_result =
+  const struct edh_cli_message_1_result message_1_result =
       edh_cli_handshake_compose_message_1(&client_resources.handshake,
                                           &request_output);
   if (message_1_result.status != EDH_CLI_MSG1_COMPOSE_OK) {
@@ -152,12 +152,12 @@ com_emulation_status_t core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  const com_readonly_buffer_t message_2_input = {
+  const struct com_readonly_buffer message_2_input = {
       .bytes = response_payload,
       .length = response_data.length,
   };
   request_output.length = 0;
-  const edh_cli_message_2_result_t message_2_result =
+  const struct edh_cli_message_2_result message_2_result =
       edh_cli_handshake_process_message_2(&client_resources.handshake,
                                           message_2_input, &request_output);
   if (message_2_result.status != EDH_CLI_MSG2_PROCESS_OK) {
@@ -172,7 +172,7 @@ com_emulation_status_t core_run_client(void) {
   cp_cli_exchange_reset(&client_resources.exchange);
 
   request_output.length = 0;
-  const edh_cli_message_3_result_t message_3_result =
+  const struct edh_cli_message_3_result message_3_result =
       edh_cli_handshake_compose_message_3(&client_resources.handshake,
                                           &request_output);
   if (message_3_result.status != EDH_CLI_MSG3_COMPOSE_OK) {
@@ -199,12 +199,12 @@ com_emulation_status_t core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  const com_readonly_buffer_t message_4_input = {
+  const struct com_readonly_buffer message_4_input = {
       .bytes = response_payload,
       .length = response_data.length,
   };
   request_output.length = 0;
-  const edh_cli_message_4_result_t message_4_result =
+  const struct edh_cli_message_4_result message_4_result =
       edh_cli_handshake_process_message_4(&client_resources.handshake,
                                           message_4_input, &request_output);
   if (message_4_result.status != EDH_CLI_MSG4_PROCESS_OK) {

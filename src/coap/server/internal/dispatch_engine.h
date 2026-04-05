@@ -21,61 +21,60 @@
  * This enables unit testing of the dispatcher logic independent of actual
  * EDHOC processing and CoAP PDU handling.
  *
- * @note Each function pointer may be NULL if not used by a particular test
- * scenario, but all pointers must be non-NULL when passed to the dispatcher.
+ * @note All pointers must be non-NULL when passed to the dispatcher.
  *
  * @see coap_server_dispatch_post_with_dependencies for usage.
  */
-typedef struct cp_srv_dispatch_deps_t {
+struct cp_srv_dispatch_deps {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
-  cp_srv_parse_edhoc_request_result_t (*parse_edhoc_request)(
+  struct cp_srv_parse_edhoc_request_result (*parse_edhoc_request)(
       const coap_pdu_t* request,
-      cp_cfg_content_format_edhoc_values_t expected_format);
+      enum cp_cfg_content_format_edhoc_values expected_format);
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
-  cp_status_t (*add_edhoc_response_options)(
+  enum cp_status (*add_edhoc_response_options)(
       coap_pdu_t* response,
-      cp_cfg_content_format_edhoc_values_t content_format);
+      enum cp_cfg_content_format_edhoc_values content_format);
 
   /** Parses EDHOC Message 1 and returns the stripped payload view. */
-  edh_srv_parse_message_1_result_t (*parse_message_1)(
-      com_readonly_buffer_t readonly_buffer);
+  struct edh_srv_parse_message_1_result (*parse_message_1)(
+      struct com_readonly_buffer readonly_buffer);
 
   /**
    * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
    * Message 3 fields for handler processing.
    */
-  edh_srv_parse_message_3_result_t (*parse_message_3)(
-      com_readonly_buffer_t request_buffer,
+  struct edh_srv_parse_message_3_result (*parse_message_3)(
+      struct com_readonly_buffer request_buffer,
       const struct edhoc_context* edhoc_ctx);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  ehd_srv_message_1_handler_result_t (*handle_message_1)(
-      edh_srv_message_1_request_t request_data,
-      com_writable_buffer_t* response_data);
+  struct ehd_srv_message_1_handler_result (*handle_message_1)(
+      struct edh_srv_message_1_request request_data,
+      struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      ehd_srv_message_1_handler_result_t message_1_result,
+      struct ehd_srv_message_1_handler_result message_1_result,
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  edh_srv_message_3_handler_status_t (*handle_message_3)(
-      edh_srv_message_3_request_t request_data,
-      com_writable_buffer_t* response_data);
+  enum edh_srv_message_3_handler_status (*handle_message_3)(
+      struct edh_srv_message_3_request request_data,
+      struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
   coap_pdu_code_t (*process_message_3_result)(
-      edh_srv_message_3_handler_status_t message_3_result);
+      enum edh_srv_message_3_handler_status message_3_result);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
-  cp_status_t (*add_response_payload)(coap_pdu_t* response,
-                                      const uint8_t* payload,
-                                      size_t payload_len);
+  enum cp_status (*add_response_payload)(coap_pdu_t* response,
+                                         const uint8_t* payload,
+                                         size_t payload_len);
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);
-} cp_serv_dispatch_deps_t;
+};
 
 /**
  * @brief Dispatch incoming EDHOC-over-CoAP POST request with injected
@@ -108,6 +107,6 @@ typedef struct cp_srv_dispatch_deps_t {
 void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
-    const cp_serv_dispatch_deps_t* deps);
+    const struct cp_srv_dispatch_deps* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

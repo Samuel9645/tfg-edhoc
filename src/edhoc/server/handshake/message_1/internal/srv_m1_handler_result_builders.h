@@ -9,10 +9,10 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_INTERNAL_SRV_M1_HANDLER_RESULT_BUILDERS_H_
 #include "edhoc/server/handshake/message_1/srv_m1_result.h"
 
-ehd_srv_message_1_handler_result_t edh_srv_message_1_handler_ok(
+struct ehd_srv_message_1_handler_result edh_srv_message_1_handler_ok(
     struct edhoc_context* edhoc_ctx);
 
-ehd_srv_message_1_handler_result_t edh_srv_message_1_handler_failure(
-    edh_srv_message_1_handler_status_t status);
+struct ehd_srv_message_1_handler_result edh_srv_message_1_handler_failure(
+    enum edh_srv_message_1_handler_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_INTERNAL_SRV_M1_HANDLER_RESULT_BUILDERS_H_

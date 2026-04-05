@@ -25,8 +25,9 @@
  *
  * @note This function does not allocate memory with calloc.
  */
-edh_cli_init_status_t edh_cli_init_handshake(
-    edh_cli_handshake_t* state, const struct edhoc_credentials* credentials);
+enum edh_cli_init_status edh_cli_init_handshake(
+    struct edh_cli_handshake* state,
+    const struct edhoc_credentials* credentials);
 
 /**
  * @brief Compose EDHOC Message 1 into the provided payload buffer.
@@ -35,8 +36,8 @@ edh_cli_init_status_t edh_cli_init_handshake(
  * @param[out] message_1 Destination buffer descriptor for Message 1 payload.
  * @return Result wrapper containing status and output view.
  */
-edh_cli_message_1_result_t edh_cli_handshake_compose_message_1(
-    edh_cli_handshake_t* state, com_writable_buffer_t* message_1);
+struct edh_cli_message_1_result edh_cli_handshake_compose_message_1(
+    struct edh_cli_handshake* state, struct com_writable_buffer* message_1);
 
 /**
  * @brief Process EDHOC Message 2 and compose error payload on failure.
@@ -47,9 +48,9 @@ edh_cli_message_1_result_t edh_cli_handshake_compose_message_1(
  * payload.
  * @return Result wrapper containing status and output view.
  */
-edh_cli_message_2_result_t edh_cli_handshake_process_message_2(
-    edh_cli_handshake_t* state, com_readonly_buffer_t message_2,
-    com_writable_buffer_t* message_2_error);
+struct edh_cli_message_2_result edh_cli_handshake_process_message_2(
+    struct edh_cli_handshake* state, struct com_readonly_buffer message_2,
+    struct com_writable_buffer* message_2_error);
 
 /**
  * @brief Compose EDHOC Message 3 and compose error payload on failure.
@@ -59,8 +60,8 @@ edh_cli_message_2_result_t edh_cli_handshake_process_message_2(
  * success or EDHOC error payload on failure.
  * @return Result wrapper containing status and output view.
  */
-edh_cli_message_3_result_t edh_cli_handshake_compose_message_3(
-    edh_cli_handshake_t* state, com_writable_buffer_t* message_3);
+struct edh_cli_message_3_result edh_cli_handshake_compose_message_3(
+    struct edh_cli_handshake* state, struct com_writable_buffer* message_3);
 
 /**
  * @brief Process EDHOC Message 4 and compose error payload on failure.
@@ -71,8 +72,8 @@ edh_cli_message_3_result_t edh_cli_handshake_compose_message_3(
  * payload.
  * @return Result wrapper containing status and output view.
  */
-edh_cli_message_4_result_t edh_cli_handshake_process_message_4(
-    edh_cli_handshake_t* state, com_readonly_buffer_t message_4,
-    com_writable_buffer_t* message_4_error);
+struct edh_cli_message_4_result edh_cli_handshake_process_message_4(
+    struct edh_cli_handshake* state, struct com_readonly_buffer message_4,
+    struct com_writable_buffer* message_4_error);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_H_

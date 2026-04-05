@@ -2,8 +2,9 @@
 
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 
-cp_serv_dispatch_deps_t test_cp_srv_dispatch_create_base_dependencies(void) {
-  return (cp_serv_dispatch_deps_t){
+struct cp_srv_dispatch_deps test_cp_srv_dispatch_create_base_dependencies(
+    void) {
+  return (struct cp_srv_dispatch_deps){
       .parse_edhoc_request = stb_cp_srv_parse_edhoc_request_ok,
       .add_edhoc_response_options = stb_cp_srv_add_options_success,
       .parse_message_1 = stb_edh_srv_parse_message_1_ok,

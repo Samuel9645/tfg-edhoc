@@ -7,17 +7,17 @@
 
 #include "parse_edhoc_result_builders.h"
 
-cp_srv_parse_edhoc_request_result_t cp_srv_internal_parse_edhoc_failure(
-    const cp_srv_parse_edhoc_request_status_t status) {
-  return (cp_srv_parse_edhoc_request_result_t){
+struct cp_srv_parse_edhoc_request_result cp_srv_internal_parse_edhoc_failure(
+    const enum cp_srv_parse_edhoc_request_status status) {
+  return (struct cp_srv_parse_edhoc_request_result){
       .status = status,
       .parsed_request = {0},
   };
 }
 
-cp_srv_parse_edhoc_request_result_t cp_srv_internal_parse_edhoc_ok(
-    const com_readonly_buffer_t parsed_data) {
-  return (cp_srv_parse_edhoc_request_result_t){
+struct cp_srv_parse_edhoc_request_result cp_srv_internal_parse_edhoc_ok(
+    const struct com_readonly_buffer parsed_data) {
+  return (struct cp_srv_parse_edhoc_request_result){
       .status = CP_SRV_EDH_REQ_OK,
       .parsed_request = parsed_data,
   };

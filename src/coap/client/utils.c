@@ -21,7 +21,7 @@
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
-cp_status_t cp_cli_parse_and_resolve_coap_uri(
+enum cp_status cp_cli_parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address) {
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
@@ -31,7 +31,7 @@ cp_status_t cp_cli_parse_and_resolve_coap_uri(
   }
 
   const uint32_t masked_protocol = 1 << parsed_uri->scheme;
-  const cp_status_t resolve_status =
+  const enum cp_status resolve_status =
       cp_com_resolve_address(&parsed_uri->host, parsed_uri->port,
                              (int)masked_protocol, destination_address);
   if (resolve_status != CP_STATUS_SUCCESS) {
@@ -43,7 +43,7 @@ cp_status_t cp_cli_parse_and_resolve_coap_uri(
   return CP_STATUS_SUCCESS;
 }
 
-cp_status_t cp_cli_create_coap_session(
+enum cp_status cp_cli_create_coap_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     const coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session) {
@@ -135,7 +135,7 @@ static int add_uri_into_pdu(const coap_uri_t* client_uri,
 coap_pdu_t* cp_cli_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_session_t* coap_session,
-    const cp_cfg_content_format_edhoc_values_t content_format) {
+    const enum cp_cfg_content_format_edhoc_values content_format) {
   coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
   if (!request_pdu) {
     coap_log_err("cannot create PDU\n");
@@ -159,8 +159,8 @@ coap_pdu_t* cp_cli_prepare_post_request(
   return request_pdu;
 }
 
-cp_status_t cp_cli_send_coap_request(coap_session_t* coap_session,
-                                     coap_pdu_t* request_pdu) {
+enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
+                                        coap_pdu_t* request_pdu) {
   if (coap_send(coap_session, request_pdu) == COAP_INVALID_MID) {
     coap_log_err("cannot send CoAP pdu\n");
     return CP_STATUS_ERROR;
@@ -169,7 +169,8 @@ cp_status_t cp_cli_send_coap_request(coap_session_t* coap_session,
   return CP_STATUS_SUCCESS;
 }
 
-cp_status_t cp_cli_wait_for_coap_response(coap_context_t* coap_session_context, const coap_session_t* coap_session,
+enum cp_status cp_cli_wait_for_coap_response(
+    coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };
   const u_int16_t maximum_rounded_wait_seconds =

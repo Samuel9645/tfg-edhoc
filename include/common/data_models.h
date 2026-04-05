@@ -11,36 +11,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/**
- * @brief Generic readonly buffer
- */
 // TODO: make length const
-typedef struct com_readonly_buffer {
-  /** Pointer to the data */
+struct com_readonly_buffer {
   const uint8_t* bytes;
-
-  /** Input length of data to process in bytes. */
   size_t length;
-} com_readonly_buffer_t;
+};
 
-bool com_readonly_buffer_is_valid(com_readonly_buffer_t buffer);
+bool com_readonly_buffer_is_valid(struct com_readonly_buffer buffer);
 
-/**
- * @brief Generic response buffer descriptor.
- */
-typedef struct com_writable_buffer {
-  /** Caller-provided buffer where response bytes are written. */
+struct com_writable_buffer {
   uint8_t* bytes;
-
-  /** Capacity of buffer in bytes. */
   size_t capacity;
-
-  /** Output number of bytes written to buffer. */
   size_t length;
-} com_writable_buffer_t;
+};
 
-bool com_writable_buffer_is_writable(const com_writable_buffer_t* buffer);
+bool com_writable_buffer_is_writable(const struct com_writable_buffer* buffer);
 
-bool com_writable_buffer_has_content(const com_writable_buffer_t* buffer);
+bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer);
 
 #endif  // COMMON_DATA_MODELS_H_

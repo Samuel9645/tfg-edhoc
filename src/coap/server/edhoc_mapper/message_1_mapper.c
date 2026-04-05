@@ -34,7 +34,7 @@ static coap_pdu_code_t map_message_1_status_to_response(
 }
 
 coap_pdu_code_t cp_srv_map_message_1_result_to_coap(
-    const ehd_srv_message_1_handler_result_t message_1_result,
+    const struct ehd_srv_message_1_handler_result message_1_result,
     coap_session_t* session) {
   if (message_1_result.status != EDH_SRV_MSG1_HDL_OK) {
     const char* error_message =

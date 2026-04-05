@@ -11,16 +11,16 @@
 
 #include "common/data_models.h"
 
-typedef enum edh_srv_parse_message_1_status {
+enum edh_srv_parse_message_1_status {
   EDH_SRV_MSG1_PARSE_OK = 0,
   EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
   EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING
-} edh_srv_parse_message_1_status_t;
+};
 
-typedef struct edh_srv_parse_message_1_result {
-  edh_srv_parse_message_1_status_t status;
-  com_readonly_buffer_t parsed_message_1;
-} edh_srv_parse_message_1_result_t;
+struct edh_srv_parse_message_1_result {
+  enum edh_srv_parse_message_1_status status;
+  struct com_readonly_buffer parsed_message_1;
+};
 
 /**
  * @brief Parse EDHOC Message 1 payload into a clean payload view for the
@@ -30,8 +30,8 @@ typedef struct edh_srv_parse_message_1_result {
  * without the CBOR prefix on success, empty parse result with the corresponding
  * error status on failure.
  */
-edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
-    com_readonly_buffer_t request_buffer);
+struct edh_srv_parse_message_1_result edh_srv_parse_message_1(
+    struct com_readonly_buffer request_buffer);
 
 /**
  * @brief Convert a parsing status code into a human-readable string.
@@ -40,6 +40,6 @@ edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
  * logging and debugging.
  */
 const char* edh_srv_parse_message_1_status_to_string(
-    edh_srv_parse_message_1_status_t status);
+    enum edh_srv_parse_message_1_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_

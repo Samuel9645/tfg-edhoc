@@ -11,26 +11,15 @@
 
 #include "common/data_models.h"
 
-/**
- * @brief Status codes for client handshake Message 2 processing.
- */
-typedef enum edh_cli_message_2_process_status {
+enum edh_cli_message_2_process_status {
   EDH_CLI_MSG2_PROCESS_OK = 0,
   EDH_CLI_MSG2_PROCESS_ERR_INVALID_ARGS,
   EDH_CLI_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,
-} edh_cli_message_2_process_status_t;
+};
 
-/**
- * @brief Result wrapper for Message 2 process operation.
- *
- * @note output is a non-owning view into caller-provided buffer.
- */
-typedef struct edh_cli_message_2_result {
-  /** Operation status code. */
-  edh_cli_message_2_process_status_t status;
-
-  /** Output payload view (error payload on failure, empty on success). */
-  com_writable_buffer_t output;
-} edh_cli_message_2_result_t;
+struct edh_cli_message_2_result {
+  enum edh_cli_message_2_process_status status;
+  struct com_writable_buffer output;
+};
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_RESULT_H_

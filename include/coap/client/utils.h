@@ -35,7 +35,7 @@
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_parse_and_resolve_coap_uri(
+enum cp_status cp_cli_parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address);
 
@@ -55,7 +55,7 @@ cp_status_t cp_cli_parse_and_resolve_coap_uri(
  * @note On failure, both output parameters (context and session) are set to
  * NULL and any allocated resources are freed.
  */
-cp_status_t cp_cli_create_coap_session(
+enum cp_status cp_cli_create_coap_session(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_response_handler_t response_handler,
     coap_context_t** coap_session_context, coap_session_t** coap_session);
@@ -81,7 +81,7 @@ cp_status_t cp_cli_create_coap_session(
 coap_pdu_t* cp_cli_prepare_post_request(
     const coap_uri_t* client_uri, const coap_address_t* destination_address,
     coap_session_t* coap_session,
-    cp_cfg_content_format_edhoc_values_t content_format);
+    enum cp_cfg_content_format_edhoc_values content_format);
 
 /**
  * @brief Send a prepared CoAP request.
@@ -91,8 +91,8 @@ coap_pdu_t* cp_cli_prepare_post_request(
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_send_coap_request(coap_session_t* coap_session,
-                                     coap_pdu_t* request_pdu);
+enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
+                                        coap_pdu_t* request_pdu);
 
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.
@@ -103,7 +103,8 @@ cp_status_t cp_cli_send_coap_request(coap_session_t* coap_session,
  * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
  * failure.
  */
-cp_status_t cp_cli_wait_for_coap_response(coap_context_t* coap_session_context, const coap_session_t* coap_session,
+enum cp_status cp_cli_wait_for_coap_response(
+    coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response);
 
 #endif  // COAP_CLIENT_UTILS_H_

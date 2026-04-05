@@ -1,6 +1,6 @@
 #include "common/cleanup.h"
 
-void com_cleanup_resources(com_session_resources_t* resources) {
+void com_cleanup_resources(struct com_session_resources* resources) {
   if (resources == NULL) {
     return;
   }

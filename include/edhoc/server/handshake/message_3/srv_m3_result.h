@@ -10,16 +10,13 @@
 #ifndef EDHOC_SERVER_MESSAGE_3_RESULT_H
 #define EDHOC_SERVER_MESSAGE_3_RESULT_H
 
-/**
- * @brief Result codes for EDHOC server Message 3 operations.
- */
-typedef enum edh_srv_message_3_handler_status {
+enum edh_srv_message_3_handler_status {
   EDH_MSG3_HDL_OK = 0,
   EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT,
   EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3,
   EDH_MSG3_HDL_ERR_INVALID_RESPONSE_BUFFER,
   EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED,
   EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED,
-} edh_srv_message_3_handler_status_t;
+};
 
 #endif  // EDHOC_SERVER_MESSAGE_3_RESULT_H

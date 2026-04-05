@@ -10,10 +10,10 @@
 
 #include "edhoc/client/handshake/message_2/cli_m2_errors.h"
 
-static edh_cli_message_2_result_t edh_cli_message_2_create_result(
-    const edh_cli_message_2_process_status_t status,
-    const com_writable_buffer_t* message_2_error) {
-  edh_cli_message_2_result_t result = {
+static struct edh_cli_message_2_result edh_cli_message_2_create_result(
+    const enum edh_cli_message_2_process_status status,
+    const struct com_writable_buffer* message_2_error) {
+  struct edh_cli_message_2_result result = {
       .status = status,
       .output = {0},
   };
@@ -23,9 +23,9 @@ static edh_cli_message_2_result_t edh_cli_message_2_create_result(
   return result;
 }
 
-edh_cli_message_2_result_t edh_cli_process_message_2(
-    edh_cli_handshake_t* state, const com_readonly_buffer_t message_2,
-    com_writable_buffer_t* message_2_error) {
+struct edh_cli_message_2_result edh_cli_process_message_2(
+    struct edh_cli_handshake* state, const struct com_readonly_buffer message_2,
+    struct com_writable_buffer* message_2_error) {
   if (!edh_cli_handshake_is_initialized(state) ||
       !com_readonly_buffer_is_valid(message_2) ||
       !com_writable_buffer_is_writable(message_2_error)) {

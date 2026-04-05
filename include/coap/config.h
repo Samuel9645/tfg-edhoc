@@ -12,9 +12,9 @@ enum {
 
 enum { CP_CFG_MAX_PDU_SIZE = 1024 };
 
-typedef enum cp_cfg_content_format_edhoc_values {
+enum cp_cfg_content_format_edhoc_values {
   CP_CFG_CONTENT_CID_EDHOC = 65,
   CP_CFG_CONTENT_EDHOC = 64
-} cp_cfg_content_format_edhoc_values_t;
+};
 
 #endif  // COAP_CONFIG_H_

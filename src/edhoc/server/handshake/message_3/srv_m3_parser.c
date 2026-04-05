@@ -14,8 +14,8 @@
 
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
-edh_srv_parse_message_3_result_t edh_srv_parse_message_3(
-    const com_readonly_buffer_t request_buffer,
+struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
+    const struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx) {
   if (!com_readonly_buffer_is_valid(request_buffer)) {
     return cp_srv_internal_parse_message_3_failure(
@@ -49,7 +49,7 @@ edh_srv_parse_message_3_result_t edh_srv_parse_message_3(
 }
 
 const char* edh_srv_parse_message_3_status_to_string(
-    const edh_srv_parse_message_3_status_t status) {
+    const enum edh_srv_parse_message_3_status status) {
   switch (status) {
   case EDH_SRV_MSG3_PARSE_OK:
     return "ok";

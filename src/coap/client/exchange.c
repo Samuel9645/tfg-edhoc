@@ -32,7 +32,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
   (void)sent;
   (void)id;
 
-  cp_cli_exchange_t* exchange = coap_session_get_app_data(session);
+  struct cp_cli_exchange* exchange = coap_session_get_app_data(session);
   if (!exchange) {
     coap_log_err("missing client exchange state in response handler\n");
     return COAP_RESPONSE_FAIL;
@@ -79,19 +79,19 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
 }
 
 bool cp_cli_exchange_session_data_is_valid(
-    const cp_cli_exchange_session_data_t* session_data) {
+    const struct cp_cli_exchange_session_data* session_data) {
   return session_data != NULL && session_data->context != NULL &&
          session_data->session != NULL;
 }
 
 bool cp_cli_exchange_request_data_is_valid(
-    const cp_cli_exchange_request_t request_data) {
+    const struct cp_cli_exchange_request request_data) {
   return com_readonly_buffer_is_valid(request_data.buffer);
 }
 
-cp_status_t cp_cli_init_exchange(
-    const cp_cli_exchange_session_data_t* session_data,
-    cp_cli_exchange_t* exchange) {
+enum cp_status cp_cli_init_exchange(
+    const struct cp_cli_exchange_session_data* session_data,
+    struct cp_cli_exchange* exchange) {
   if (!exchange || !cp_cli_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
     return CP_STATUS_ERROR;
@@ -116,9 +116,9 @@ cp_status_t cp_cli_init_exchange(
   return CP_STATUS_SUCCESS;
 }
 
-cp_status_t cp_cli_exchange_send(
-    const cp_cli_exchange_t* exchange,
-                                 const cp_cli_exchange_request_t request_data) {
+enum cp_status cp_cli_exchange_send(
+    const struct cp_cli_exchange* exchange,
+    const struct cp_cli_exchange_request request_data) {
   if (exchange == NULL ||
       !cp_cli_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
@@ -145,8 +145,9 @@ cp_status_t cp_cli_exchange_send(
   return cp_cli_send_coap_request(exchange->session_data.session, request_pdu);
 }
 
-cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange,
-                                         com_writable_buffer_t* response_data) {
+enum cp_status cp_cli_exchange_wait_and_get(
+    struct cp_cli_exchange* exchange,
+    struct com_writable_buffer* response_data) {
   if (exchange == NULL || !com_writable_buffer_is_writable(response_data)) {
     coap_log_err("invalid arguments to wait_and_get\n");
     return CP_STATUS_ERROR;
@@ -180,7 +181,7 @@ cp_status_t cp_cli_exchange_wait_and_get(cp_cli_exchange_t* exchange,
   return is_error_response ? CP_STATUS_ERROR : CP_STATUS_SUCCESS;
 }
 
-void cp_cli_exchange_reset(cp_cli_exchange_t* exchange) {
+void cp_cli_exchange_reset(struct cp_cli_exchange* exchange) {
   if (exchange == NULL) {
     return;
   }

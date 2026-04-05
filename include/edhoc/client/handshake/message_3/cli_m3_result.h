@@ -11,28 +11,17 @@
 
 #include "common/data_models.h"
 
-/**
- * @brief Status codes for client handshake Message 3 composition.
- */
-typedef enum edh_cli_message_3_compose_status {
+enum edh_cli_message_3_compose_status {
   EDH_CLI_MSG3_COMPOSE_OK = 0,
   EDH_CLI_MSG3_COMPOSE_ERR_INVALID_ARGS,
   EDH_CLI_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
   EDH_CLI_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
   EDH_CLI_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
-} edh_cli_message_3_compose_status_t;
+};
 
-/**
- * @brief Result wrapper for Message 3 compose operation.
- *
- * @note output is a non-owning view into caller-provided buffer.
- */
-typedef struct edh_cli_message_3_result {
-  /** Operation status code. */
-  edh_cli_message_3_compose_status_t status;
-
-  /** Output payload view (Message 3 on success, EDHOC error on failure). */
-  com_writable_buffer_t output;
-} edh_cli_message_3_result_t;
+struct edh_cli_message_3_result {
+  enum edh_cli_message_3_compose_status status;
+  struct com_writable_buffer output;
+};
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_RESULT_H_

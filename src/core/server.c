@@ -18,8 +18,8 @@ static void edhoc_post_handler(coap_resource_t* resource,
   cp_srv_dispatch_edhoc_post(session, request, &EDH_CRED_SRV_CRED, response);
 }
 
-com_emulation_status_t core_run_server(void) {
-  com_session_resources_t server_resources = {0};
+enum com_emulation_status core_run_server(void) {
+  struct com_session_resources server_resources = {0};
 
   server_resources.coap_context = cp_srv_create_context();
   if (!server_resources.coap_context) {

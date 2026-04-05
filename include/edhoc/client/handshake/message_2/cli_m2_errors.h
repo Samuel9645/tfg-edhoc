@@ -21,6 +21,6 @@
  */
 void edh_cli_message_2_handler_add_error(int edhoc_api_result,
                                          const char* generic_error_message,
-                                         com_writable_buffer_t* response_data);
+    struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_ERRORS_H_

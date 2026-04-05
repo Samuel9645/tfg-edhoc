@@ -10,10 +10,10 @@
 
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
-edh_srv_parse_message_3_result_t cp_srv_internal_parse_message_3_failure(
-    edh_srv_parse_message_3_status_t status);
+struct edh_srv_parse_message_3_result cp_srv_internal_parse_message_3_failure(
+    enum edh_srv_parse_message_3_status status);
 
-edh_srv_parse_message_3_result_t cp_srv_internal_parse_message_3_ok(
-    com_readonly_buffer_t parsed_message_3);
+struct edh_srv_parse_message_3_result cp_srv_internal_parse_message_3_ok(
+    struct com_readonly_buffer parsed_message_3);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_INTERNAL_SRV_M3_PARSER_RESULT_BUILDERS_H_

@@ -7,16 +7,16 @@
 
 #include "srv_m1_parser_result_builders.h"
 
-edh_srv_parse_message_1_result_t cp_srv_internal_parse_message_1_failure(
-    edh_srv_parse_message_1_status_t status) {
-  return (edh_srv_parse_message_1_result_t){
+struct edh_srv_parse_message_1_result cp_srv_internal_parse_message_1_failure(
+    enum edh_srv_parse_message_1_status status) {
+  return (struct edh_srv_parse_message_1_result){
       .status = status,
       .parsed_message_1 = {.bytes = NULL, .length = 0},
   };
 }
 
-inline edh_srv_parse_message_1_result_t cp_srv_internal_parse_message_1_ok(
-    const com_readonly_buffer_t parsed_message_1) {
-  return (edh_srv_parse_message_1_result_t){
+inline struct edh_srv_parse_message_1_result cp_srv_internal_parse_message_1_ok(
+    const struct com_readonly_buffer parsed_message_1) {
+  return (struct edh_srv_parse_message_1_result){
       .status = EDH_SRV_MSG1_PARSE_OK, .parsed_message_1 = parsed_message_1};
 }

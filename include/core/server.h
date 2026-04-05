@@ -9,6 +9,6 @@
  *
  * @return COM_EMULATION_SUCCESS on success, COM_EMULATION_FAILURE on failure
  */
-com_emulation_status_t core_run_server(void);
+enum com_emulation_status core_run_server(void);
 
 #endif  // CORE_SERVER_H_

@@ -14,25 +14,26 @@
 
 enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
+// TODO: add tests for error functions to remove unused warning, since it is
+// true that is not being used
 /**
  * WHY DO WE NEED THIS?
  * The edhoc_error_get_cipher_suites function requires a buffer to write the
  * cipher suites into, if we don't store this buffer in this struct the pointer
  * will not be valid after the prepare_message_1_error_context function returns
  */
-typedef struct edh_srv_message_1_error_context {
+struct edh_srv_message_1_error_context {
   struct edhoc_error_info info;
   int32_t suites_buffer[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE];
-} edh_srv_message_1_error_context_t;
+};
 
-static edh_srv_message_1_error_context_t prepare_message_1_error_context(
+static void prepare_message_1_error_context(
     const int edhoc_api_result, const struct edhoc_context* context,
-    const char* generic_error_message) {
-  edh_srv_message_1_error_context_t error_ctx = {0};
-
+    const char* generic_error_message,
+    struct edh_srv_message_1_error_context* error_ctx) {
   if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
-    edh_srv_set_error_info(generic_error_message, &error_ctx.info);
-    return error_ctx;
+    edh_srv_set_error_info(generic_error_message, &error_ctx->info);
+    return;
   }
 
   int32_t peer_suites[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE] = {0};
@@ -47,20 +48,19 @@ static edh_srv_message_1_error_context_t prepare_message_1_error_context(
    not utilized.
    */
   edhoc_error_get_cipher_suites(
-      context, error_ctx.suites_buffer, EDH_SRV_CIPHER_SUITES_ARRAY_SIZE,
+      context, error_ctx->suites_buffer, EDH_SRV_CIPHER_SUITES_ARRAY_SIZE,
       &own_len, peer_suites, ARRAY_SIZE(peer_suites), &peer_len);
 
-  edh_srv_set_error_info(generic_error_message, &error_ctx.info);
-  return error_ctx;
+  edh_srv_set_error_info(generic_error_message, &error_ctx->info);
 }
 
 void edh_srv_message_1_handler_add_error(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message, com_writable_buffer_t* response_data) {
-  const edh_srv_message_1_error_context_t error_ctx =
-      prepare_message_1_error_context(edhoc_api_result, edhoc_context,
-                                      generic_error_message);
-
+    const char* generic_error_message,
+    struct com_writable_buffer* response_data) {
+  struct edh_srv_message_1_error_context error_ctx = {0};
+  prepare_message_1_error_context(edhoc_api_result, edhoc_context,
+                                  generic_error_message, &error_ctx);
   edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
                                       response_data);
 }

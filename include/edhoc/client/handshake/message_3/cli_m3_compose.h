@@ -9,9 +9,6 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_COMPOSE_H_
 #define EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_COMPOSE_H_
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include "common/data_models.h"
 #include "edhoc/client/handshake/common/cli_state.h"
 #include "edhoc/client/handshake/message_3/cli_m3_result.h"
@@ -24,7 +21,7 @@
  * error payload.
  * @return Result wrapper containing status and output view.
  */
-edh_cli_message_3_result_t edh_cli_compose_message_3(
-    edh_cli_handshake_t* state, com_writable_buffer_t* message_3);
+struct edh_cli_message_3_result edh_cli_compose_message_3(
+    struct edh_cli_handshake* state, struct com_writable_buffer* message_3);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_COMPOSE_H_

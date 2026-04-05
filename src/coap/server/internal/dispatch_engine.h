@@ -37,8 +37,8 @@ typedef struct cp_srv_dispatch_deps_t {
       cp_cfg_content_format_edhoc_values_t content_format);
 
   /** Parses EDHOC Message 1 and returns the stripped payload view. */
-  bool (*parse_message_1)(const uint8_t* request_payload, size_t request_len,
-                          com_readonly_buffer_t* parsed_payload);
+  edh_srv_parse_message_1_result_t (*parse_message_1)(
+      com_readonly_buffer_t readonly_buffer);
 
   /**
    * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts

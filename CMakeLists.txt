@@ -26,6 +26,7 @@ set(BASE_SOURCES
 set(MESSAGE_1_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_result.c
 )
@@ -40,7 +41,7 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builder.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builders.c
     ${MESSAGE_1_HANDLER_SOURCES}
     ${MESSAGE_3_HANDLER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_1_mapper.c

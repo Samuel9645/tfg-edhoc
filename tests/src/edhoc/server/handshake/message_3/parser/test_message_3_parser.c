@@ -46,7 +46,7 @@ void test_parser_returns_extracted_fields_for_valid_message_3_data(void) {
                     extracted_fields.edhoc_message_size);
 }
 
-void test_parser_fails_on_invalid_data(void) {
+void test_parser_fails_on_invalid_request_buffer(void) {
   const message_3_parser_test_case_t test_cases[] = {
       {"request payload is missing", NULL, sizeof(request_payload), &context,
        &extracted_fields},

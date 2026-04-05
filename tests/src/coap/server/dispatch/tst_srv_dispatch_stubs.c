@@ -13,7 +13,8 @@
 
 #include <string.h>
 
-#include "coap/server/internal/parse_edhoc_result_builder.h"
+#include "coap/server/internal/parse_edhoc_result_builders.h"
+#include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
 
@@ -64,26 +65,20 @@ void* stb_cp_srv_get_session_valid(const coap_session_t* session) {
   return &dummy_edhoc_context_for_stub;
 }
 
-bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
-                                      size_t request_len,
-                                      com_readonly_buffer_t* parsed_payload) {
-  (void)request_payload;
-  (void)request_len;
-  if (parsed_payload) {
-    static const uint8_t stub_payload[] = {0x01, 0x02};
-    parsed_payload->bytes = stub_payload;
-    parsed_payload->length = sizeof(stub_payload);
-  }
-  return true;
+edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_ok(
+    const com_readonly_buffer_t request_buffer) {
+  (void)request_buffer;
+  return cp_srv_internal_parse_message_1_ok((com_readonly_buffer_t){
+      .bytes = DUMMY_PAYLOAD,
+      .length = sizeof(DUMMY_PAYLOAD),
+  });
 }
 
-bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
-                                       size_t request_len,
-                                       com_readonly_buffer_t* parsed_payload) {
-  (void)request_payload;
-  (void)request_len;
-  (void)parsed_payload;
-  return false;
+edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_failure(
+    const com_readonly_buffer_t request_buffer) {
+  (void)request_buffer;
+  return cp_srv_internal_parse_message_1_failure(
+      EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING);
 }
 
 bool stb_edh_srv_parse_message_3_true(

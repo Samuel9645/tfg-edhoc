@@ -30,7 +30,7 @@ typedef enum cp_srv_parse_edhoc_request_status {
 
 typedef struct cp_srv_parse_edhoc_request_result {
   cp_srv_parse_edhoc_request_status_t status;
-  const com_readonly_buffer_t parsed_response;
+  const com_readonly_buffer_t parsed_request;
 } cp_srv_parse_edhoc_request_result_t;
 
 /**

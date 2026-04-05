@@ -78,7 +78,9 @@ add_unity_test(test_dispatch
 add_unity_test(test_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_message_1_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/tst_srv_payload.c
+    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
 )
 
 set(COMMON_HANDLER_SOURCES

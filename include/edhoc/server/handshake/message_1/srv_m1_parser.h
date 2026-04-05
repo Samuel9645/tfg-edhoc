@@ -6,34 +6,40 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_H_
-#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_H_
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_
 
 #include "common/data_models.h"
-#include "edhoc/server/handshake/message_1/srv_m1_result.h"
 
-edh_srv_message_1_handler_status_t edh_srv_remove_cbor_true_prefix(
-    const uint8_t** payload, size_t* length);
+typedef enum edh_srv_parse_message_1_status {
+  EDH_SRV_MSG1_PARSE_OK = 0,
+  EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING
+} edh_srv_parse_message_1_status_t;
+
+typedef struct edh_srv_parse_message_1_result {
+  edh_srv_parse_message_1_status_t status;
+  com_readonly_buffer_t parsed_message_1;
+} edh_srv_parse_message_1_result_t;
 
 /**
  * @brief Parse EDHOC Message 1 payload into a clean payload view for the
  * handler.
- *
- * Validates Message 1 framing and strips the CBOR TRUE prefix. On success,
- * `parsed_payload` points to the original input buffer advanced past the
- * prefix, with the corresponding reduced length.
- *
- * @param[in] request_payload Raw incoming payload bytes.
- * @param[in] request_len Raw incoming payload length.
- * @param[out] parsed_payload Output borrowed view without CBOR TRUE prefix.
- * @return true if payload is valid Message 1 and output is populated;
- * false otherwise.
+ * @param[in] request_buffer Input buffer containing the request.
+ * @return Result struct containing the status code and the parsed message 1
+ * without the CBOR prefix on success, empty parse result with the corresponding
+ * error status on failure.
  */
-bool edh_srv_parse_message_1(const uint8_t* request_payload, size_t request_len,
-                             com_readonly_buffer_t* parsed_payload);
+edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
+    com_readonly_buffer_t request_buffer);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_H_
+/**
+ * @brief Convert a parsing status code into a human-readable string.
+ * @param status status of the parsing operation
+ * @return human-readable string describing the parsing status, useful for
+ * logging and debugging.
+ */
+const char* edh_srv_parse_message_1_status_to_string(
+    edh_srv_parse_message_1_status_t status);
+
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_

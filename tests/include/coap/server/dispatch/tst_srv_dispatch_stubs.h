@@ -34,13 +34,11 @@ void* stb_cp_srv_get_session_null(const coap_session_t* session);
 
 void* stb_cp_srv_get_session_valid(const coap_session_t* session);
 
-bool stb_edh_srv_parse_message_1_true(const uint8_t* request_payload,
-                                      size_t request_len,
-                                      com_readonly_buffer_t* parsed_payload);
+edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_ok(
+    com_readonly_buffer_t request_buffer);
 
-bool stb_edh_srv_parse_message_1_false(const uint8_t* request_payload,
-                                       size_t request_len,
-                                       com_readonly_buffer_t* parsed_payload);
+edh_srv_parse_message_1_result_t stb_edh_srv_parse_message_1_failure(
+    com_readonly_buffer_t request_buffer);
 
 bool stb_edh_srv_parse_message_3_true(
     const uint8_t* request_payload, size_t request_len,

@@ -40,6 +40,17 @@ static coap_pdu_code_t map_parse_result_to_pdu_code(
   }
 }
 
+static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
+    const edh_srv_parse_message_1_status_t status) {
+  switch (status) {
+  case EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER:
+  case EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING:
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  default:
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
+}
+
 void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
@@ -55,6 +66,7 @@ void cp_srv_dispatch_post_with_dependencies(
   const cp_srv_parse_edhoc_request_result_t parse_result =
       deps->parse_edhoc_request(request, CP_CFG_CONTENT_CID_EDHOC);
   if (parse_result.status != CP_SRV_EDH_REQ_OK) {
+    // TODO: add logging
     coap_pdu_set_code(response,
                       map_parse_result_to_pdu_code(parse_result.status));
     return;
@@ -76,25 +88,27 @@ void cp_srv_dispatch_post_with_dependencies(
   };
 
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  com_readonly_buffer_t message_1_parsed_payload = {0};
   struct edhoc_extracted_fields message_3_extracted_fields = {0};
 
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
   // TODO: remove this quick fix
-
-  const uint8_t* request_payload = parse_result.parsed_response.bytes;
-  const size_t request_len = parse_result.parsed_response.length;
-  if (deps->parse_message_1(request_payload, request_len,
-                            &message_1_parsed_payload)) {
-    if (edhoc_ctx != NULL) {
-      coap_log_err("EDHOC context already exists for this session\n");
-      coap_pdu_set_code(response, COAP_RESPONSE_CODE_BAD_REQUEST);
+  const uint8_t* request_payload = parse_result.parsed_request.bytes;
+  const size_t request_len = parse_result.parsed_request.length;
+  if (edhoc_ctx == NULL) {
+    const edh_srv_parse_message_1_result_t parse_message_1_result =
+        deps->parse_message_1(parse_result.parsed_request);
+    if (parse_message_1_result.status != EDH_SRV_MSG1_PARSE_OK) {
+      coap_log_err("failed to parse Message 1: %s\n",
+                   edh_srv_parse_message_1_status_to_string(
+                       parse_message_1_result.status));
+      coap_pdu_set_code(response, map_parse_message_1_status_to_pdu_code(
+                                      parse_message_1_result.status));
       return;
     }
-
     const edh_srv_message_1_request_t request_data = {
-        .payload = message_1_parsed_payload, .credentials = credentials};
+        .payload = parse_message_1_result.parsed_message_1,
+        .credentials = credentials};
     const ehd_srv_message_1_handler_result_t message_1_result =
         deps->handle_message_1(&request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);

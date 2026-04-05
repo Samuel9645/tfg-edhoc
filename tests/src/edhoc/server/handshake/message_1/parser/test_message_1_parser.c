@@ -18,48 +18,45 @@
 
 void test_parser_returns_stripped_message_1_payload(void) {
   const tst_edh_payload_t payload_with_prefix = get_valid_message_1_payload();
-  com_readonly_buffer_t parsed_payload = {0};
+  const com_readonly_buffer_t request_buffer = {
+      .bytes = payload_with_prefix.data,
+      .length = payload_with_prefix.length,
+  };
 
-  const bool parsed = edh_srv_parse_message_1(
-      payload_with_prefix.data, payload_with_prefix.length, &parsed_payload);
+  const edh_srv_parse_message_1_result_t parse_message_1_result =
+      edh_srv_parse_message_1(request_buffer);
 
-  TEST_ASSERT_TRUE(parsed);
-  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1], parsed_payload.bytes);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_OK, parse_message_1_result.status);
+  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1],
+                        parse_message_1_result.parsed_message_1.bytes);
   TEST_ASSERT_EQUAL(payload_with_prefix.length - 1,
-                    parsed_payload.length);
+                    parse_message_1_result.parsed_message_1.length);
 }
 
-void test_parser_fails_on_invalid_data(void) {
-  const tst_edh_payload_t payload_with_invalid_prefix =
-      get_invalid_prefix_payload();
-  com_readonly_buffer_t parsed_payload = {0};
+void test_parser_fails_on_invalid_request_buffer(void) {
+  const com_readonly_buffer_t empty_request = {0};
 
-  const message_1_parser_test_case_t test_cases[] = {
-      {"parse fails with NULL payload", NULL, 5, &parsed_payload},
-      {"parse fails with zero length", payload_with_invalid_prefix.data, 0,
-       &parsed_payload},
-      {"parse fails with NULL output", payload_with_invalid_prefix.data,
-       payload_with_invalid_prefix.length, NULL},
-  };
-  const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
+  const edh_srv_parse_message_1_result_t parse_message_1_result =
+      edh_srv_parse_message_1(empty_request);
 
-  for (size_t i = 0; i < num_cases; i++) {
-    const bool parsed = edh_srv_parse_message_1(
-        test_cases[i].payload, test_cases[i].length, test_cases[i].output);
-
-    TEST_ASSERT_FALSE_MESSAGE(parsed, test_cases[i].description);
-  }
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+                    parse_message_1_result.status);
+  TEST_ASSERT_NULL(parse_message_1_result.parsed_message_1.bytes);
+  TEST_ASSERT_EQUAL(0, parse_message_1_result.parsed_message_1.length);
 }
 
 void test_parser_fails_when_prefix_is_missing(void) {
   const tst_edh_payload_t payload_without_prefix = get_invalid_prefix_payload();
-  com_readonly_buffer_t parsed_payload = {0};
+  const com_readonly_buffer_t missing_prefix_request = {
+      .bytes = payload_without_prefix.data,
+      .length = payload_without_prefix.length,
+  };
 
-  const bool parsed =
-      edh_srv_parse_message_1(payload_without_prefix.data,
-                              payload_without_prefix.length, &parsed_payload);
+  const edh_srv_parse_message_1_result_t parse_message_1_result =
+      edh_srv_parse_message_1(missing_prefix_request);
 
-  TEST_ASSERT_FALSE(parsed);
-  TEST_ASSERT_NULL(parsed_payload.bytes);
-  TEST_ASSERT_EQUAL(0, parsed_payload.length);
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING,
+                    parse_message_1_result.status);
+  TEST_ASSERT_NULL(parse_message_1_result.parsed_message_1.bytes);
+  TEST_ASSERT_EQUAL(0, parse_message_1_result.parsed_message_1.length);
 }

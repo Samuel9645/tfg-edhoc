@@ -122,7 +122,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
   cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_false;
+  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
   deps.parse_message_3 = stb_edh_srv_parse_message_3_true;
   deps.get_session_app_data = stb_cp_srv_get_session_null;
 
@@ -135,7 +135,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
 void test_server_sends_changed_response_for_valid_message_3(void) {
   cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_false;
+  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
   deps.parse_message_3 = stb_edh_srv_parse_message_3_true;
   deps.get_session_app_data = stb_cp_srv_get_session_valid;
 
@@ -149,7 +149,7 @@ void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
   cp_serv_dispatch_deps_t deps =
       test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_false;
+  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
   deps.parse_message_3 = stb_edh_srv_parse_message_3_false;
   deps.get_session_app_data = stb_cp_srv_get_session_valid;
 

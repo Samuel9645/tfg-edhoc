@@ -35,7 +35,7 @@ edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
     edh_srv_message_3_request_t request,
     com_writable_buffer_t* response_buffer);
 
-const char* edh_srv_handle_message_3_error_code_to_string(
-    edh_srv_message_3_handler_status_t error_code);
+const char* edh_srv_handle_message_3_status_code_to_string(
+    edh_srv_message_3_handler_status_t status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_

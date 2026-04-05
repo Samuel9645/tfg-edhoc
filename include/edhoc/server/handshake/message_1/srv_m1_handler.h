@@ -36,7 +36,9 @@ typedef struct edh_srv_message_1_request {
  * itself and returns a NULL pointer.
  */
 ehd_srv_message_1_handler_result_t edh_srv_handle_message_1(
-    const edh_srv_message_1_request_t* request,
-    com_writable_buffer_t* response);
+    edh_srv_message_1_request_t request, com_writable_buffer_t* response);
+
+const char* edh_srv_handle_message_1_status_code_to_string(
+    enum edh_srv_message_1_handler_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_

@@ -1,11 +1,11 @@
 /**
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since 01/04/2026
- * @brief EDHOC Message 1 result constructors.
- * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ * @since 05/04/2026
+ * @brief Helper functions to build results of handling message 1 EDHOC requests
  */
-#include "edhoc/server/handshake/message_1/srv_m1_result.h"
+
+#include "srv_m1_handler_result_builders.h"
 
 #include <stddef.h>
 

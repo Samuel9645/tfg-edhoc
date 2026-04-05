@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "coap/server/internal/parse_edhoc_result_builders.h"
+#include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
@@ -103,15 +104,16 @@ edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_failure(
 }
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
-  return edh_srv_message_1_handler_failure(EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS);
+  return edh_srv_message_1_handler_failure(
+      EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS);
 }
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data) {
   (void)request_data;
   (void)response_data;
@@ -119,7 +121,7 @@ ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
 }
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data) {
   (void)request_data;
   response_data->length = 10;

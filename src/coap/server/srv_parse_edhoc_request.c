@@ -8,7 +8,7 @@
 
 #include "coap/server/srv_parse_edhoc_request.h"
 
-#include "internal/parse_edhoc_result_builders.h"
+#include "coap/server/internal/parse_edhoc_result_builders.h"
 
 cp_srv_parse_edhoc_request_result_t cp_srv_parse_edhoc_request(
     const coap_pdu_t* request,

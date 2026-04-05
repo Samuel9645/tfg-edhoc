@@ -51,7 +51,7 @@ typedef struct cp_srv_dispatch_deps_t {
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   ehd_srv_message_1_handler_result_t (*handle_message_1)(
-      const edh_srv_message_1_request_t* request_data,
+      edh_srv_message_1_request_t request_data,
       com_writable_buffer_t* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */

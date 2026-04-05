@@ -12,7 +12,7 @@
 #include <edhoc_helpers.h>
 #include <edhoc_values.h>
 
-#include "internal/srv_m3_parser_result_builders.h"
+#include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
 edh_srv_parse_message_3_result_t edh_srv_parse_message_3(
     const com_readonly_buffer_t request_buffer,

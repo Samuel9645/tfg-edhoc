@@ -91,10 +91,10 @@ void cp_srv_dispatch_post_with_dependencies(
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
-  uint8_t response_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
+  uint8_t response_payload[CP_CFG_MAX_PDU_SIZE] = {0};
   com_writable_buffer_t response_data = {
       .bytes = response_payload,
-      .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
+      .capacity = CP_CFG_MAX_PDU_SIZE,
       .length = 0,
   };
   coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
@@ -114,7 +114,7 @@ void cp_srv_dispatch_post_with_dependencies(
         .payload = parse_message_1_result.parsed_message_1,
         .credentials = credentials};
     const ehd_srv_message_1_handler_result_t message_1_result =
-        deps->handle_message_1(&request_data, &response_data);
+        deps->handle_message_1(request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
   } else {
     const edh_srv_parse_message_3_result_t parse_message_3_result =

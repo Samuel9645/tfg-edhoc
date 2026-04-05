@@ -27,8 +27,8 @@ set(MESSAGE_1_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_result.c
 )
 
 set(MESSAGE_3_HANDLER_SOURCES
@@ -102,8 +102,10 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpe
 # Add helper include directories SYSTEM is set to suppress warnings from external 
 # code
 target_include_directories(server PRIVATE include)
+target_include_directories(server PRIVATE src)
 target_include_directories(server SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 target_include_directories(client PRIVATE include)
+target_include_directories(server PRIVATE src)
 target_include_directories(client SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 
 # Set output directory for executables

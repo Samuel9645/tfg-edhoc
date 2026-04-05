@@ -26,7 +26,7 @@ void tst_edh_setup_message_1_handler_env(tst_message_1_handler_env_t* env) {
   *env = (tst_message_1_handler_env_t){0};
   memcpy(env->request_payload, CLEAN_MESSAGE_1_PAYLOAD,
          CLEAN_MESSAGE_1_PAYLOAD_SIZE);
-  env->request = (edh_srv_message_1_request_t){
+  env->valid_request = (edh_srv_message_1_request_t){
       .payload =
           (com_readonly_buffer_t){.bytes = env->request_payload,
                                   .length = CLEAN_MESSAGE_1_PAYLOAD_SIZE},

@@ -44,9 +44,9 @@ edh_srv_message_3_handler_status_t edh_srv_handle_message_3(
   return EDH_MSG3_HDL_OK;
 }
 
-const char* edh_srv_handle_message_3_error_code_to_string(
-    const edh_srv_message_3_handler_status_t error_code) {
-  switch (error_code) {
+const char* edh_srv_handle_message_3_status_code_to_string(
+    const edh_srv_message_3_handler_status_t status) {
+  switch (status) {
   case EDH_MSG3_HDL_OK:
     return "ok";
   case EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT:

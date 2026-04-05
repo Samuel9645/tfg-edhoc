@@ -17,7 +17,7 @@
 typedef struct tst_edh_srv_hnd_test_case_message_1_handler {
   /* Description of the test case for debugging purposes. */
   const char* description;
-  /* Input request data for Message 1 handler. */
+  /* Input valid_request data for Message 1 handler. */
   const edh_srv_message_1_request_t* request;
   /* Response buffer to check for side effects after handler execution. */
   com_writable_buffer_t* response;

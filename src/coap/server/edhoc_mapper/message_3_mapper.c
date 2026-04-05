@@ -33,7 +33,7 @@ coap_pdu_code_t cp_srv_map_message_3_result_to_coap(
     const edh_srv_message_3_handler_status_t message_3_result) {
   if (message_3_result != EDH_MSG3_HDL_OK) {
     const char* error_message =
-        edh_srv_handle_message_3_error_code_to_string(message_3_result);
+        edh_srv_handle_message_3_status_code_to_string(message_3_result);
     coap_log_err("Message 3 processing failed: %s\n", error_message);
   }
   return map_message_3_status_to_response(message_3_result);

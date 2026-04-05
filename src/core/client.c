@@ -104,7 +104,7 @@ com_emulation_status_t core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  uint8_t request_payload[EDH_CFG_MESSAGE_BUFFER_LENGTH] = {0};
+  uint8_t request_payload[CP_CFG_MAX_PDU_SIZE] = {0};
   uint8_t response_payload[CP_CFG_MAX_PDU_SIZE] = {0};
 
   cp_cli_exchange_request_t request_data = {
@@ -124,7 +124,7 @@ com_emulation_status_t core_run_client(void) {
 
   com_writable_buffer_t request_output = {
       .bytes = request_payload,
-      .capacity = EDH_CFG_MESSAGE_BUFFER_LENGTH,
+      .capacity = CP_CFG_MAX_PDU_SIZE,
       .length = 0,
   };
 

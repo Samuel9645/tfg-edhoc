@@ -17,7 +17,7 @@ typedef struct tst_message_1_handler_env {
   uint8_t request_payload[TST_EDH_SRV_HND_BUF_LEN];
   uint8_t response_payload[TST_EDH_SRV_HND_BUF_LEN];
   size_t response_written_len;
-  edh_srv_message_1_request_t request;
+  edh_srv_message_1_request_t valid_request;
   com_writable_buffer_t response;
 } tst_message_1_handler_env_t;
 

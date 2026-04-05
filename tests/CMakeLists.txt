@@ -99,7 +99,7 @@ add_unity_test(test_message_1_handler
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/tst_srv_payload.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_result.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.c
     ${COMMON_HANDLER_SOURCES}
 )
 

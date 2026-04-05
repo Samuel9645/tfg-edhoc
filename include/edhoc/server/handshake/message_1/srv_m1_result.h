@@ -15,9 +15,9 @@
  */
 typedef enum edh_srv_message_1_handler_status {
   EDH_SRV_MSG1_HDL_OK = 0,
-  EDH_SRV_MSG1_HDL_ERR_INVALID_ARGS,
-  EDH_SRV_MSG1_HDL_ERR_PAYLOAD_TOO_LARGE,
-  EDH_SRV_MSG1_HDL_ERR_PREFIX_MISSING,
+  EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS,
+  EDH_SRV_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER,
+  EDH_SRV_MSG1_HDL_ERR_INVALID_RESPONSE_BUFFER,
   EDH_SRV_MSG1_HDL_ERR_CALLOC_FAILED,
   EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED,
   EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
@@ -34,11 +34,5 @@ typedef struct ehd_srv_message_1_handler_result {
   /** Pointer to the allocated EDHOC context on success, NULL on failure. */
   struct edhoc_context* edhoc_ctx;
 } ehd_srv_message_1_handler_result_t;
-
-ehd_srv_message_1_handler_result_t edh_srv_message_1_handler_ok(
-    struct edhoc_context* edhoc_ctx);
-
-ehd_srv_message_1_handler_result_t edh_srv_message_1_handler_failure(
-    edh_srv_message_1_handler_status_t status);
 
 #endif  // EDHOC_SERVER_MESSAGE_1_RESULT_H

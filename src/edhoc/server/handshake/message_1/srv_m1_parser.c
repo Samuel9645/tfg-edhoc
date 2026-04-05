@@ -10,7 +10,7 @@
 
 #include <edhoc/common/constants.h>
 
-#include "internal/srv_m1_parser_result_builders.h"
+#include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 
 edh_srv_parse_message_1_result_t edh_srv_parse_message_1(
     const com_readonly_buffer_t request_buffer) {

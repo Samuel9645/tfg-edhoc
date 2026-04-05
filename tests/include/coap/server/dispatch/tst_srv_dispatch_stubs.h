@@ -50,15 +50,15 @@ edh_srv_parse_message_3_result_t stb_edh_srv_parse_message_3_failure(
     const struct edhoc_context* edhoc_ctx);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_fail(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data);
 
 ehd_srv_message_1_handler_result_t stb_edh_srv_handle_m1_ok_valid_len(
-    const edh_srv_message_1_request_t* request_data,
+    edh_srv_message_1_request_t request_data,
     com_writable_buffer_t* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(

@@ -6,6 +6,7 @@
 
 #include "coap/client/cli_utils.h"
 #include "coap/client/log_error_response.h"
+#include "coap/common/cp_get_data.h"
 #include "coap/common/helpers.h"
 #include "coap/common/response.h"
 
@@ -53,28 +54,19 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
     return COAP_RESPONSE_OK;
   }
 
-  size_t payload_length = 0;
-  const uint8_t* payload = NULL;
-  if (!coap_get_data(received, &payload_length, &payload) ||
-      payload_length == 0) {
+  const struct cp_com_get_data_result get_data_result =
+      cp_com_get_data(received);
+  if (get_data_result.status != CP_COM_GET_DATA_OK) {
     coap_log_err("cannot get response pdu data\n");
     return COAP_RESPONSE_OK;
   }
-
-  if (payload_length > sizeof(exchange->incoming_message)) {
-    coap_log_err("response payload too large\n");
-    return COAP_RESPONSE_OK;
-  }
-
-  memcpy(exchange->incoming_message, payload, payload_length);
-  exchange->incoming_message_length = payload_length;
-
+  const struct com_readonly_buffer data = get_data_result.output;
+  memcpy(exchange->incoming_message, data.bytes, data.length);
+  exchange->incoming_message_length = data.length;
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
-    cp_cli_log_received_edhoc_error_response(response_code, payload,
-                                             payload_length);
-    return COAP_RESPONSE_OK;
+    cp_cli_log_received_edhoc_error_response(response_code, data.bytes,
+                                             data.length);
   }
-
   return COAP_RESPONSE_OK;
 }
 

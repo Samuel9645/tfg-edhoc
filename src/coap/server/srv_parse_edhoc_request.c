@@ -8,6 +8,7 @@
 
 #include "coap/server/srv_parse_edhoc_request.h"
 
+#include "coap/common/cp_get_data.h"
 #include "coap/server/internal/parse_edhoc_result_builders.h"
 
 struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
@@ -34,16 +35,13 @@ struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
     return cp_srv_internal_parse_edhoc_failure(
         CP_SRV_EDH_REQ_ERR_UNSUPPORTED_FORMAT);
   }
-  size_t len = 0;
-  const uint8_t* data = NULL;
-  if (!coap_get_data(request, &len, &data) || data == NULL) {
+  const struct cp_com_get_data_result get_data_result =
+      cp_com_get_data(request);
+  if (get_data_result.status != CP_COM_GET_DATA_OK) {
     coap_log_err("cannot get request pdu data\n");
     return cp_srv_internal_parse_edhoc_failure(CP_SRV_EDH_REQ_ERR_NO_PAYLOAD);
   }
-  return cp_srv_internal_parse_edhoc_ok((struct com_readonly_buffer){
-      .bytes = data,
-      .length = len,
-  });
+  return cp_srv_internal_parse_edhoc_ok(get_data_result.output);
 }
 
 const char* cp_srv_parse_edhoc_request_status_to_string(

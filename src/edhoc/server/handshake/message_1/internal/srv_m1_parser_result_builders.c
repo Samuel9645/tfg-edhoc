@@ -8,7 +8,7 @@
 #include "srv_m1_parser_result_builders.h"
 
 struct edh_srv_parse_message_1_result cp_srv_internal_parse_message_1_failure(
-    enum edh_srv_parse_message_1_status status) {
+    const enum edh_srv_parse_message_1_status status) {
   return (struct edh_srv_parse_message_1_result){
       .status = status,
       .parsed_message_1 = {.bytes = NULL, .length = 0},

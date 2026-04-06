@@ -41,6 +41,9 @@ enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
         edhoc_api_result, "Message 4 composing failed", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
+  if (!com_writable_buffer_has_content(response_buffer)) {
+    return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_EMPTY;
+  }
   return EDH_MSG3_HDL_OK;
 }
 

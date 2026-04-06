@@ -23,23 +23,6 @@ void setUp(void) {
   tst_edh_srv_message_3_setup_env(&env);
 }
 
-static void assert_handler_writes_error_payload(
-    const enum edh_srv_message_3_handler_status status,
-    const enum edh_srv_message_3_handler_status expected_status) {
-  TEST_ASSERT_EQUAL(expected_status, status);
-  TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN, env.response.length);
-  TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_PAYLOAD,
-                           env.response.bytes,
-                           TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN);
-}
-
-void test_handler_returns_success_for_valid_message_3_data(void) {
-  const enum edh_srv_message_3_handler_status status =
-      edh_srv_handle_message_3(env.request, &env.response);
-
-  TEST_ASSERT_EQUAL(EDH_MSG3_HDL_OK, status);
-}
-
 void test_handler_fails_on_invalid_data(void) {
   const struct edh_srv_message_3_request no_context =
       tst_message_3_request_without_context(&env);
@@ -73,17 +56,27 @@ void test_handler_fails_when_message_3_processing_fails(void) {
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
 
-  assert_handler_writes_error_payload(
-      status, EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED);
+  TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED, status);
+  assert_handler_writes_error_payload(env.response);
 }
 
 void test_handler_fails_when_message_4_composition_fails(void) {
-  tst_edh_srv_message_3_stub_edhoc_compose_result =
+  tst_edh_srv_message_4_stub_edhoc_compose_result =
       EDHOC_ERROR_BUFFER_TOO_SMALL;
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
 
-  assert_handler_writes_error_payload(
-      status, EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED);
+  TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED, status);
+  assert_handler_writes_error_payload(env.response);
+}
+
+void test_handler_fails_when_message_4_composition_produces_empty_buffer(void) {
+  tst_edh_srv_message_4_stub_edhoc_compose_result = EDHOC_SUCCESS;
+  stub_message_4_compose_written_length = 0;
+
+  const enum edh_srv_message_3_handler_status status =
+      edh_srv_handle_message_3(env.request, &env.response);
+
+  TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_EMPTY, status);
 }

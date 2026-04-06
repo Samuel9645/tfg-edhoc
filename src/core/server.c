@@ -2,8 +2,9 @@
 
 #include <coap3/coap.h>
 
+#include "coap/common/cp_create_context.h"
 #include "coap/server/dispatch.h"
-#include "coap/server/utils.h"
+#include "coap/server/srv_utils.h"
 #include "common/cleanup.h"
 #include "edhoc/credentials/server_credentials.h"
 
@@ -19,14 +20,14 @@ static void edhoc_post_handler(coap_resource_t* resource,
 }
 
 enum com_emulation_status core_run_server(void) {
-  struct com_session_resources server_resources = {0};
-
-  server_resources.coap_context = cp_srv_create_context();
-  if (!server_resources.coap_context) {
-    com_cleanup_resources(&server_resources);
+  const struct cp_com_create_context_result initialization_result =
+      cp_com_create_context();
+  if (initialization_result.status != CP_COM_INIT_OK) {
     return COM_EMULATION_FAILURE;
   }
-
+  struct com_session_resources server_resources = {
+      .coap_context = initialization_result.context,
+  };
   static const char COAP_LISTEN_UCAST_IP[] = "::";
   if (cp_srv_setup_endpoints(server_resources.coap_context,
                              COAP_LISTEN_UCAST_IP) != CP_STATUS_SUCCESS) {

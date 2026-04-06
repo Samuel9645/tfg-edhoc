@@ -6,17 +6,6 @@
 #include "coap/common/status.h"
 
 /**
- * @brief Initialize libcoap and create a server context with configured block
- * mode.
- *
- * @return Pointer to created CoAP context on success, NULL on failure.
- *
- * @note On failure, any allocated resources are freed and libcoap is cleaned
- * up.
- */
-coap_context_t* cp_srv_create_context(void);
-
-/**
  * @brief Resolve local interfaces and create server endpoints.
  *
  * @param[in] coap_context Active CoAP context.

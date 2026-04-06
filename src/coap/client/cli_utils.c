@@ -11,6 +11,8 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
+#include "coap/client/cli_utils.h"
+
 #include <coap3/coap.h>
 #include <stdbool.h>
 #include <string.h>
@@ -43,36 +45,34 @@ enum cp_status cp_cli_parse_and_resolve_coap_uri(
   return CP_STATUS_SUCCESS;
 }
 
-enum cp_status cp_cli_create_coap_session(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    const coap_response_handler_t response_handler,
-    coap_context_t** coap_session_context, coap_session_t** coap_session) {
-  *coap_session_context = coap_new_context(NULL);
-  if (*coap_session_context == NULL) {
-    coap_log_err("cannot create libcoap context\n");
-    return CP_STATUS_ERROR;
-  }
+static struct cp_cli_create_session_result create_session_result_failure(
+    const enum cp_cli_create_session_status status) {
+  return (struct cp_cli_create_session_result){
+      .status = status,
+      .session = NULL,
+  };
+}
 
-  coap_context_set_block_mode(
-      *coap_session_context,
-                              CP_CFG_BLOCK_MODE_LIBCOAP_DEFAULT);
+static struct cp_cli_create_session_result create_session_success(
+    coap_session_t* session) {
+  return (struct cp_cli_create_session_result){
+      .status = CP_CLI_CREATE_SESSION_OK,
+      .session = session,
+  };
+}
 
-  const coap_proto_t protocol = client_uri->scheme == COAP_URI_SCHEME_COAP_TCP
+struct cp_cli_create_session_result cp_cli_create_session(
+    coap_context_t* context, const struct cp_cli_session_config config) {
+  const coap_proto_t protocol = config.uri->scheme == COAP_URI_SCHEME_COAP_TCP
                                     ? COAP_PROTO_TCP
                                     : COAP_PROTO_UDP;
   const coap_address_t* local_interface_address = NULL;
-  *coap_session =
-      coap_new_client_session(*coap_session_context, local_interface_address,
-                              destination_address, protocol);
-  if (*coap_session == NULL) {
-    coap_log_err("cannot create client session\n");
-    return CP_STATUS_ERROR;
+  coap_session_t* session = coap_new_client_session(
+      context, local_interface_address, config.address, protocol);
+  if (session == NULL) {
+    return create_session_result_failure(CP_CLI_CREATE_SESSION_ERR);
   }
-
-  if (response_handler != NULL) {
-    coap_register_response_handler(*coap_session_context, response_handler);
-  }
-  return CP_STATUS_SUCCESS;
+  return create_session_success(session);
 }
 
 /**
@@ -99,6 +99,7 @@ static int add_uri_into_optlist(const coap_uri_t* client_uri,
                                 const coap_address_t* destination_address,
                                 coap_optlist_t** optlist) {
   enum { CCU_ADD_PORT_OPTION = 1 };
+
   return coap_uri_into_optlist(client_uri, destination_address, optlist,
                                CCU_ADD_PORT_OPTION);
 }
@@ -118,6 +119,7 @@ static int add_uri_into_pdu(const coap_uri_t* client_uri,
                             coap_optlist_t** options_list,
                             coap_pdu_t* request_pdu) {
   enum { CCU_COAP_ERROR_INDICATOR = 0 };
+
   int result =
       add_uri_into_optlist(client_uri, destination_address, options_list);
   if (result == CCU_COAP_ERROR_INDICATOR) {
@@ -147,7 +149,9 @@ coap_pdu_t* cp_cli_prepare_post_request(
     coap_delete_pdu(request_pdu);
     return NULL;
   }
+
   enum { CCU_ERROR_INDICATOR = 0 };
+
   if (add_uri_into_pdu(client_uri, destination_address, &optlist,
                        request_pdu) == CCU_ERROR_INDICATOR) {
     coap_log_err("cannot add URI options to PDU\n");
@@ -173,6 +177,7 @@ enum cp_status cp_cli_wait_for_coap_response(
     coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };
+
   const u_int16_t maximum_rounded_wait_seconds =
       coap_session_get_default_leisure(coap_session).integer_part + 1;
   int remaining_wait_milliseconds =

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 
 #include "coap/common/status.h"
+#include "coap/config.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
@@ -39,26 +40,32 @@ enum cp_status cp_cli_parse_and_resolve_coap_uri(
     const char* uri_string, coap_uri_t* parsed_uri,
     coap_address_t* destination_address);
 
+struct cp_cli_session_config {
+  const coap_uri_t* uri;
+  const coap_address_t* address;
+};
+
+enum cp_cli_create_session_status {
+  CP_CLI_CREATE_SESSION_OK,
+  CP_CLI_CREATE_SESSION_ERR
+};
+
+struct cp_cli_create_session_result {
+  enum cp_cli_create_session_status status;
+  coap_session_t* session;
+};
+
 /**
- * @brief Create and configure a CoAP client context/session.
+ * @brief Create and configure a CoAP client session.
+ * @param[in] context Active CoAP context.
+ * @param [in] config Session configuration parameters
+ * @return Struct containing session creation status and the created session on
+ * success, NULL session on failure.
  *
- * @param[in] client_uri Parsed URI used to select transport protocol.
- * @param[in] destination_address Remote destination address.
- * @param[in] response_handler Optional response callback used by libcoap.
- * @param[out] coap_session_context Output created CoAP context.
- * @param[out] coap_session Output created CoAP session.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
- * failure.
- *
- * @note If response_handler is NULL, no callback is registered.
- *
- * @note On failure, both output parameters (context and session) are set to
- * NULL and any allocated resources are freed.
+ * @note On failure no memory is allocated.
  */
-enum cp_status cp_cli_create_coap_session(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_response_handler_t response_handler,
-    coap_context_t** coap_session_context, coap_session_t** coap_session);
+struct cp_cli_create_session_result cp_cli_create_session(
+    coap_context_t* context, struct cp_cli_session_config config);
 
 /**
  * @brief Build a POST request PDU and its URI options.

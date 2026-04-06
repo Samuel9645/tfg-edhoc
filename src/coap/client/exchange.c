@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "coap/client/cli_utils.h"
 #include "coap/client/log_error_response.h"
-#include "coap/client/utils.h"
 #include "coap/common/helpers.h"
 #include "coap/common/response.h"
 

@@ -13,6 +13,7 @@ add_subdirectory(externals)
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_create_context.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
@@ -40,7 +41,7 @@ set(MESSAGE_3_HANDLER_SOURCES
 
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builders.c
     ${MESSAGE_1_HANDLER_SOURCES}
@@ -61,7 +62,7 @@ set(SERVER_SOURCES
 set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/client.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cleanup.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/cli_handshake.c

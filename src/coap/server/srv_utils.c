@@ -1,23 +1,8 @@
-#include "coap/server/utils.h"
+#include "coap/server/srv_utils.h"
 
 #include <stdbool.h>
 
 #include "coap/common/status.h"
-#include "coap/config.h"
-
-coap_context_t* cp_srv_create_context(void) {
-  coap_startup();
-  coap_set_log_level(COAP_LOG_WARN);
-
-  coap_context_t* coap_context = coap_new_context(NULL);
-  if (!coap_context) {
-    coap_log_err("cannot create libcoap context\n");
-    return NULL;
-  }
-
-  coap_context_set_block_mode(coap_context, CP_CFG_BLOCK_MODE_LIBCOAP_DEFAULT);
-  return coap_context;
-}
 
 enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
                                       const char* listen_address_string) {
@@ -32,7 +17,9 @@ enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
 
   const coap_str_const_t* listen_address =
       coap_make_str_const(listen_address_string);
+
   enum { USE_DEFAULT_PORT_DATA = 0, NO_AI_HINT_FLAGS = 0 };
+
   coap_addr_info_t* endpoint_info_list = coap_resolve_address_info(
       listen_address, USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA,
       USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA, NO_AI_HINT_FLAGS,
@@ -85,6 +72,7 @@ enum cp_status cp_srv_add_post_resource(
   }
 
   enum { MEMORY_HANDLING_FLAGS = 0 };
+
   coap_resource_t* resource = coap_resource_init(
       coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS);
   if (!resource) {

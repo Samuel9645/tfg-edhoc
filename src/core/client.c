@@ -3,8 +3,9 @@
 #include <coap3/coap.h>
 
 #include "coap/client/cleanup.h"
+#include "coap/client/cli_utils.h"
 #include "coap/client/exchange.h"
-#include "coap/client/utils.h"
+#include "coap/common/cp_create_context.h"
 #include "coap/config.h"
 #include "edhoc/client/cli_handshake.h"
 #include "edhoc/config.h"
@@ -64,6 +65,7 @@ enum com_emulation_status core_run_client(void) {
 
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
+
   coap_uri_t client_uri = {0};
   coap_address_t destination_address = {0};
   if (cp_cli_parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
@@ -73,15 +75,28 @@ enum com_emulation_status core_run_client(void) {
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (cp_cli_create_coap_session(
-          &client_uri, &destination_address, NULL,
-          &client_resources.session_resources.coap_context,
-          &client_resources.session_resources.coap_session) !=
-      CP_STATUS_SUCCESS) {
+  struct cp_com_create_context_result create_context_result =
+      cp_com_create_context();
+  if (create_context_result.status != CP_COM_INIT_OK) {
+    coap_log_err("Failed to create CoAP context\n");
+    cp_cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+  client_resources.session_resources.coap_context =
+      create_context_result.context;
+  struct cp_cli_session_config config = {
+      .address = &destination_address,
+      .uri = &client_uri,
+  };
+  struct cp_cli_create_session_result create_session_result =
+      cp_cli_create_session(create_context_result.context, config);
+  if (create_session_result.status != CP_CLI_CREATE_SESSION_OK) {
     coap_log_err("Failed to create CoAP session\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  client_resources.session_resources.coap_session =
+      create_session_result.session;
 
   struct cp_cli_exchange_session_data exchange_session_data = {
       .context = client_resources.session_resources.coap_context,

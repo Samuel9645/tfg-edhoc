@@ -23,26 +23,38 @@
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
-enum cp_status cp_cli_parse_and_resolve_coap_uri(
-    const char* uri_string, coap_uri_t* parsed_uri,
-    coap_address_t* destination_address) {
+static struct cp_cli_parse_and_resolve_result parse_and_resolve_failure(
+    const enum cp_parse_and_resolve_status status) {
+  return (struct cp_cli_parse_and_resolve_result){.status = status};
+}
+
+static struct cp_cli_parse_and_resolve_result parse_and_resolve_success(
+    const coap_uri_t uri, const coap_address_t address) {
+  return (struct cp_cli_parse_and_resolve_result){
+      .status = CP_PARSE_AND_RESOLVE_OK, .uri = uri, .address = address};
+}
+
+struct cp_cli_parse_and_resolve_result cp_cli_parse_and_resolve_coap_uri(
+    const char* uri_string) {
+  coap_address_t destination_address;
+  coap_uri_t parsed_uri;
   if (coap_split_uri((const uint8_t*)uri_string, strlen(uri_string),
-                     parsed_uri) != 0) {
-    coap_log_warn("cannot parse uri %s\n", uri_string);
-    return CP_STATUS_ERROR;
+                     &parsed_uri) != 0) {
+    coap_log_err("cannot parse uri %s\n", uri_string);
+    return parse_and_resolve_failure(CP_PARSE_AND_RESOLVE_ERR_INVALID_URI);
   }
 
-  const uint32_t masked_protocol = 1 << parsed_uri->scheme;
+  const uint32_t masked_protocol = 1 << parsed_uri.scheme;
   const enum cp_status resolve_status =
-      cp_com_resolve_address(&parsed_uri->host, parsed_uri->port,
-                             (int)masked_protocol, destination_address);
+      cp_com_resolve_address(&parsed_uri.host, parsed_uri.port,
+                             (int)masked_protocol, &destination_address);
   if (resolve_status != CP_STATUS_SUCCESS) {
-    coap_log_warn("cannot resolve address %*.*s\n",
-                  (int)parsed_uri->host.length, (int)parsed_uri->host.length,
-                  (const char*)parsed_uri->host.s);
-    return CP_STATUS_ERROR;
+    coap_log_err("cannot resolve address %*.*s\n", (int)parsed_uri.host.length,
+                 (int)parsed_uri.host.length, (const char*)parsed_uri.host.s);
+    return parse_and_resolve_failure(
+        CP_PARSE_AND_RESOLVE_ERR_ADDRESS_RESOLUTION);
   }
-  return CP_STATUS_SUCCESS;
+  return parse_and_resolve_success(parsed_uri, destination_address);
 }
 
 static struct cp_cli_create_session_result create_session_result_failure(
@@ -70,31 +82,18 @@ struct cp_cli_create_session_result cp_cli_create_session(
   coap_session_t* session = coap_new_client_session(
       context, local_interface_address, config.address, protocol);
   if (session == NULL) {
+    coap_log_err("failed to create CoAP session\n");
     return create_session_result_failure(CP_CLI_CREATE_SESSION_ERR);
   }
   return create_session_success(session);
 }
 
-/**
- * @brief Create a CoAP POST request PDU with the given URI options.
- * @param[in] coap_session Active CoAP session used to create the PDU.
- * @return Pointer to the created PDU, or NULL on error.
- */
 static coap_pdu_t* create_post_request_pdu(coap_session_t* coap_session) {
   return coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
                        coap_new_message_id(coap_session),
                        coap_session_max_pdu_size(coap_session));
 }
 
-/**
- * @brief Adds URI options to the given optlist based on the provided client URI
- * and destination address.
- * @param[in] client_uri Parsed URI containing the options to add.
- * @param[in] destination_address Destination address associated with the URI,
- * used for port option.
- * @param[out] optlist Pointer to the optlist to add options to.
- * @return 1 on success, 0 if error.
- */
 static int add_uri_into_optlist(const coap_uri_t* client_uri,
                                 const coap_address_t* destination_address,
                                 coap_optlist_t** optlist) {
@@ -104,16 +103,6 @@ static int add_uri_into_optlist(const coap_uri_t* client_uri,
                                CCU_ADD_PORT_OPTION);
 }
 
-/**
- * @brief Adds URI options to the given CoAP request PDU based on the provided
- * client URI and destination address.
- * @param[in] client_uri Parsed URI containing the options to add.
- * @param[in] destination_address Destination address associated with the URI,
- * used for port option.
- * @param[in] options_list CoAP optlist containing the URI options to add.
- * @param[out] request_pdu CoAP request PDU to add options to.
- * @return 1 on success, 0 if error.
- */
 static int add_uri_into_pdu(const coap_uri_t* client_uri,
                             const coap_address_t* destination_address,
                             coap_optlist_t** options_list,
@@ -134,33 +123,40 @@ static int add_uri_into_pdu(const coap_uri_t* client_uri,
   return result;
 }
 
-coap_pdu_t* cp_cli_prepare_post_request(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_session_t* coap_session,
+static struct cp_cli_prepare_pdu_result prepare_pdu_result_failure(
+    const enum cp_cli_prepare_pdu_status status) {
+  return (struct cp_cli_prepare_pdu_result){.status = status, .pdu = NULL};
+}
+
+static struct cp_cli_prepare_pdu_result prepare_pdu_ok(coap_pdu_t* pdu) {
+  return (struct cp_cli_prepare_pdu_result){.status = CP_CLI_PREPARE_PDU_OK,
+                                            .pdu = pdu};
+}
+
+struct cp_cli_prepare_pdu_result cp_cli_prepare_post_request(
+    const struct cp_cli_session_config config, coap_session_t* coap_session,
     const enum cp_cfg_content_format_edhoc_values content_format) {
   coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
   if (!request_pdu) {
     coap_log_err("cannot create PDU\n");
-    return NULL;
+    return prepare_pdu_result_failure(CP_CLI_PREPARE_PDU_ERR_CREATE_PDU);
   }
   coap_optlist_t* optlist = cp_com_create_coap_edhoc_optlist(content_format);
   if (!optlist) {
     coap_log_err("cannot create options list\n");
     coap_delete_pdu(request_pdu);
-    return NULL;
+    return prepare_pdu_result_failure(CP_CLI_PREPARE_PDU_ERR_CREATE_OPTLIST);
   }
 
-  enum { CCU_ERROR_INDICATOR = 0 };
-
-  if (add_uri_into_pdu(client_uri, destination_address, &optlist,
-                       request_pdu) == CCU_ERROR_INDICATOR) {
+  if (add_uri_into_pdu(config.uri, config.address, &optlist, request_pdu) ==
+      0) {
     coap_log_err("cannot add URI options to PDU\n");
     coap_delete_pdu(request_pdu);
     coap_delete_optlist(optlist);
-    return NULL;
+    return prepare_pdu_result_failure(CP_CLI_PREPARE_PDU_ERR_ADD_URI_OPTS);
   }
   coap_delete_optlist(optlist);
-  return request_pdu;
+  return prepare_pdu_ok(request_pdu);
 }
 
 enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
@@ -173,7 +169,7 @@ enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
   return CP_STATUS_SUCCESS;
 }
 
-enum cp_status cp_cli_wait_for_coap_response(
+enum cp_cli_wait_status cp_cli_wait_for_coap_response(
     coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response) {
   enum { SECONDS_TO_MS = 1000 };
@@ -189,15 +185,15 @@ enum cp_status cp_cli_wait_for_coap_response(
         coap_io_process(coap_session_context, max_wait_milliseconds);
     if (elapsed_milliseconds < 0) {
       coap_log_err("CoAP I/O process failed\n");
-      return CP_STATUS_ERROR;
+      return CP_CLI_WAIT_IO_ERR;
     }
     if (remaining_wait_milliseconds > 0 &&
         elapsed_milliseconds >= remaining_wait_milliseconds) {
       coap_log_debug("timeout reached\n");
-      break;
+      return CP_CLI_WAIT_TIMEOUT;
     }
     remaining_wait_milliseconds -= elapsed_milliseconds;
   }
 
-  return CP_STATUS_SUCCESS;
+  return CP_CLI_WAIT_OK;
 }

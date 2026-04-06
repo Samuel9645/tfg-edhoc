@@ -66,32 +66,28 @@ enum com_emulation_status core_run_client(void) {
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
 
-  coap_uri_t client_uri = {0};
-  coap_address_t destination_address = {0};
-  if (cp_cli_parse_and_resolve_coap_uri(CLIENT_COAP_URI, &client_uri,
-                                        &destination_address) !=
-      CP_STATUS_SUCCESS) {
-    coap_log_err("Failed to parse or resolve CoAP URI\n");
-    cp_cli_cleanup_resources(&client_resources);
+  struct cp_cli_parse_and_resolve_result parse_and_resolve_uri_result =
+      cp_cli_parse_and_resolve_coap_uri(CLIENT_COAP_URI);
+  if (parse_and_resolve_uri_result.status != CP_PARSE_AND_RESOLVE_OK) {
     return COM_EMULATION_FAILURE;
   }
-  struct cp_com_create_context_result create_context_result =
-      cp_com_create_context();
+  const
+
+      struct cp_com_create_context_result create_context_result =
+          cp_com_create_context();
   if (create_context_result.status != CP_COM_INIT_OK) {
-    coap_log_err("Failed to create CoAP context\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
   client_resources.session_resources.coap_context =
       create_context_result.context;
   struct cp_cli_session_config config = {
-      .address = &destination_address,
-      .uri = &client_uri,
+      .address = &parse_and_resolve_uri_result.address,
+      .uri = &parse_and_resolve_uri_result.uri,
   };
   struct cp_cli_create_session_result create_session_result =
       cp_cli_create_session(create_context_result.context, config);
   if (create_session_result.status != CP_CLI_CREATE_SESSION_OK) {
-    coap_log_err("Failed to create CoAP session\n");
     cp_cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
@@ -101,8 +97,8 @@ enum com_emulation_status core_run_client(void) {
   struct cp_cli_exchange_session_data exchange_session_data = {
       .context = client_resources.session_resources.coap_context,
       .session = client_resources.session_resources.coap_session,
-      .uri = client_uri,
-      .destination = destination_address,
+      .uri = parse_and_resolve_uri_result.uri,
+      .destination = parse_and_resolve_uri_result.address,
   };
 
   if (cp_cli_init_exchange(&exchange_session_data,

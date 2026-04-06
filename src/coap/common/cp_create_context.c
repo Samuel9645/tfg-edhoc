@@ -28,7 +28,7 @@ static struct cp_com_create_context_result initialization_ok(
 struct cp_com_create_context_result cp_com_create_context(void) {
   coap_context_t* context = coap_new_context(NULL);
   if (context == NULL) {
-    coap_log_err("cannot create libcoap context\n");
+    coap_log_err("failed to create CoAP context\n");
     return initialization_failure(CP_COM_INIT_ERR_CONTEXT_CREATION);
   }
   coap_context_set_block_mode(context, CP_CFG_BLOCK_MODE_LIBCOAP_DEFAULT);

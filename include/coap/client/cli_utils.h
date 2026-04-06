@@ -26,19 +26,29 @@
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
+enum cp_parse_and_resolve_status {
+  CP_PARSE_AND_RESOLVE_OK,
+  CP_PARSE_AND_RESOLVE_ERR_INVALID_URI,
+  CP_PARSE_AND_RESOLVE_ERR_ADDRESS_RESOLUTION
+};
+
+struct cp_cli_parse_and_resolve_result {
+  enum cp_parse_and_resolve_status status;
+  coap_address_t address;
+  coap_uri_t uri;
+};
+
 /**
  * @brief Parse a CoAP URI and resolve the destination endpoint.
  *
  * @param[in] uri_string URI string (for example:
  * coap://localhost:5683/hello).
- * @param[out] parsed_uri Output parsed URI structure.
- * @param[out] destination_address Output resolved socket address.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
- * failure.
+ * @return Struct containing the status of the operation, the parsed URI and the
+ * resolved address on success, empty URI and address with the corresponding
+ * error status on failure.
  */
-enum cp_status cp_cli_parse_and_resolve_coap_uri(
-    const char* uri_string, coap_uri_t* parsed_uri,
-    coap_address_t* destination_address);
+struct cp_cli_parse_and_resolve_result cp_cli_parse_and_resolve_coap_uri(
+    const char* uri_string);
 
 struct cp_cli_session_config {
   const coap_uri_t* uri;
@@ -67,27 +77,39 @@ struct cp_cli_create_session_result {
 struct cp_cli_create_session_result cp_cli_create_session(
     coap_context_t* context, struct cp_cli_session_config config);
 
+enum cp_cli_prepare_pdu_status {
+  CP_CLI_PREPARE_PDU_OK,
+  CP_CLI_PREPARE_PDU_ERR_CREATE_PDU,
+  CP_CLI_PREPARE_PDU_ERR_CREATE_OPTLIST,
+  CP_CLI_PREPARE_PDU_ERR_ADD_URI_OPTS
+};
+
+struct cp_cli_prepare_pdu_result {
+  enum cp_cli_prepare_pdu_status status;
+  coap_pdu_t* pdu;
+};
+
 /**
  * @brief Build a POST request PDU and its URI options.
  *
- * @param[in] client_uri Parsed URI.
- * @param[in] destination_address Destination address.
+ * @param[in] config Session configuration parameters containing URI and
+ * destination address.
  * @param[in] coap_session Active CoAP session.
  * @param[in] content_format Content format for the EDHOC message.
  *
  * @see [RFC 9528: The Forward Message
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * for details on option creation.
- * @return Pointer to created PDU on success, NULL on failure.
+ * @return Struct containing the status of the operation and the prepared PDU on
+ * success, NULL pdu pointer on failure
  *
  * @note On failure, only the PDU is freed.
  *
  * @warning Cleanups the optlist on both success and failure paths. Callers
  * should not attempt to use or free the optlist after calling this function.
  */
-coap_pdu_t* cp_cli_prepare_post_request(
-    const coap_uri_t* client_uri, const coap_address_t* destination_address,
-    coap_session_t* coap_session,
+struct cp_cli_prepare_pdu_result cp_cli_prepare_post_request(
+    struct cp_cli_session_config config, coap_session_t* coap_session,
     enum cp_cfg_content_format_edhoc_values content_format);
 
 /**
@@ -101,16 +123,22 @@ coap_pdu_t* cp_cli_prepare_post_request(
 enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
                                         coap_pdu_t* request_pdu);
 
+enum cp_cli_wait_status {
+  CP_CLI_WAIT_OK,
+  CP_CLI_WAIT_TIMEOUT,
+  CP_CLI_WAIT_IO_ERR
+};
+
 /**
  * @brief Process CoAP I/O until response arrives or timeout is reached.
  *
  * @param[in] coap_session_context Active CoAP context.
  * @param[in] coap_session Active CoAP session.
  * @param[in] have_response Pointer to response flag updated by callback.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
- * failure.
+ * @return Status code of the wait operation, indicating success, timeout, or
+ * I/O error.
  */
-enum cp_status cp_cli_wait_for_coap_response(
+enum cp_cli_wait_status cp_cli_wait_for_coap_response(
     coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response);
 

@@ -124,15 +124,19 @@ enum cp_status cp_cli_exchange_send(
     coap_log_err("invalid arguments to exchange_send\n");
     return CP_STATUS_ERROR;
   }
-
-  coap_pdu_t* request_pdu = cp_cli_prepare_post_request(
-      &exchange->session_data.uri, &exchange->session_data.destination,
-      exchange->session_data.session, request_data.content_format);
-  if (!request_pdu) {
+  const struct cp_cli_session_config config = {
+      .uri = &exchange->session_data.uri,
+      .address = &exchange->session_data.destination,
+  };
+  const struct cp_cli_prepare_pdu_result prepare_pdu_result =
+      cp_cli_prepare_post_request(config, exchange->session_data.session,
+                                  request_data.content_format);
+  if (prepare_pdu_result.status != CP_CLI_PREPARE_PDU_OK) {
     coap_log_err("failed to prepare CoAP request\n");
     return CP_STATUS_ERROR;
   }
 
+  coap_pdu_t* request_pdu = prepare_pdu_result.pdu;
   if (cp_com_add_response_payload(request_pdu, request_data.buffer.bytes,
                                   request_data.buffer.length) ==
       CP_STATUS_ERROR) {
@@ -152,10 +156,10 @@ enum cp_status cp_cli_exchange_wait_and_get(
     coap_log_err("invalid arguments to wait_and_get\n");
     return CP_STATUS_ERROR;
   }
-
-  if (cp_cli_wait_for_coap_response(
-          exchange->session_data.context, exchange->session_data.session,
-          &exchange->have_response) != CP_STATUS_SUCCESS) {
+  const enum cp_cli_wait_status wait_status = cp_cli_wait_for_coap_response(
+      exchange->session_data.context, exchange->session_data.session,
+      &exchange->have_response);
+  if (wait_status != CP_CLI_WAIT_OK) {
     coap_log_err("error while waiting for CoAP response\n");
     return CP_STATUS_ERROR;
   }

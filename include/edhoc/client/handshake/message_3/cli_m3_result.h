@@ -19,7 +19,7 @@ enum edh_cli_message_3_compose_status {
   EDH_CLI_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
 };
 
-struct edh_cli_message_3_result {
+struct edh_cli_message_3_compose_result {
   enum edh_cli_message_3_compose_status status;
   struct com_writable_buffer output;
 };

@@ -36,7 +36,7 @@ enum edh_cli_init_status edh_cli_init_handshake(
  * @param[out] message_1 Destination buffer descriptor for Message 1 payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_1_result edh_cli_handshake_compose_message_1(
+struct edh_cli_message_1_compose_result edh_cli_handshake_compose_message_1(
     struct edh_cli_handshake* state, struct com_writable_buffer* message_1);
 
 /**
@@ -48,7 +48,7 @@ struct edh_cli_message_1_result edh_cli_handshake_compose_message_1(
  * payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_2_result edh_cli_handshake_process_message_2(
+struct edh_cli_message_2_process_result edh_cli_handshake_process_message_2(
     struct edh_cli_handshake* state, struct com_readonly_buffer message_2,
     struct com_writable_buffer* message_2_error);
 
@@ -60,7 +60,7 @@ struct edh_cli_message_2_result edh_cli_handshake_process_message_2(
  * success or EDHOC error payload on failure.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_3_result edh_cli_handshake_compose_message_3(
+struct edh_cli_message_3_compose_result edh_cli_handshake_compose_message_3(
     struct edh_cli_handshake* state, struct com_writable_buffer* message_3);
 
 /**
@@ -72,7 +72,7 @@ struct edh_cli_message_3_result edh_cli_handshake_compose_message_3(
  * payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_4_result edh_cli_handshake_process_message_4(
+struct edh_cli_message_4_process_result edh_cli_handshake_process_message_4(
     struct edh_cli_handshake* state, struct com_readonly_buffer message_4,
     struct com_writable_buffer* message_4_error);
 

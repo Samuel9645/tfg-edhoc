@@ -10,10 +10,10 @@
 
 #include "edhoc/common/constants.h"
 
-static struct edh_cli_message_1_result edh_cli_message_1_create_result(
+static struct edh_cli_message_1_compose_result edh_cli_message_1_create_result(
     const enum edh_cli_message_1_compose_status status,
     const struct com_writable_buffer* message_1) {
-  struct edh_cli_message_1_result result = {
+  struct edh_cli_message_1_compose_result result = {
       .status = status,
       .output = {0},
   };
@@ -23,7 +23,7 @@ static struct edh_cli_message_1_result edh_cli_message_1_create_result(
   return result;
 }
 
-struct edh_cli_message_1_result edh_cli_compose_message_1(
+struct edh_cli_message_1_compose_result edh_cli_compose_message_1(
     struct edh_cli_handshake* state, struct com_writable_buffer* message_1) {
   const size_t min_prefix_payload_capacity = 2;
   if (!edh_cli_handshake_is_initialized(state) ||

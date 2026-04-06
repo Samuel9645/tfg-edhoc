@@ -18,7 +18,7 @@ enum edh_cli_message_1_compose_status {
   EDH_CLI_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED,
 };
 
-struct edh_cli_message_1_result {
+struct edh_cli_message_1_compose_result {
   enum edh_cli_message_1_compose_status status;
   struct com_writable_buffer output;
 };

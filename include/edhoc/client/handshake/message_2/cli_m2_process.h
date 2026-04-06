@@ -22,7 +22,7 @@
  * payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_2_result edh_cli_process_message_2(
+struct edh_cli_message_2_process_result edh_cli_process_message_2(
     struct edh_cli_handshake* state, struct com_readonly_buffer message_2,
     struct com_writable_buffer* message_2_error);
 

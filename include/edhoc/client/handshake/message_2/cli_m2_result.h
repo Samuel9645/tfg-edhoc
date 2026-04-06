@@ -17,7 +17,7 @@ enum edh_cli_message_2_process_status {
   EDH_CLI_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,
 };
 
-struct edh_cli_message_2_result {
+struct edh_cli_message_2_process_result {
   enum edh_cli_message_2_process_status status;
   struct com_writable_buffer output;
 };

@@ -139,7 +139,7 @@ enum com_emulation_status core_run_client(void) {
       .length = 0,
   };
 
-  const struct edh_cli_message_1_result message_1_result =
+  const struct edh_cli_message_1_compose_result message_1_result =
       edh_cli_handshake_compose_message_1(&client_resources.handshake,
                                           &request_output);
   if (message_1_result.status != EDH_CLI_MSG1_COMPOSE_OK) {
@@ -168,7 +168,7 @@ enum com_emulation_status core_run_client(void) {
       .length = response_data.length,
   };
   request_output.length = 0;
-  const struct edh_cli_message_2_result message_2_result =
+  const struct edh_cli_message_2_process_result message_2_result =
       edh_cli_handshake_process_message_2(&client_resources.handshake,
                                           message_2_input, &request_output);
   if (message_2_result.status != EDH_CLI_MSG2_PROCESS_OK) {
@@ -183,7 +183,7 @@ enum com_emulation_status core_run_client(void) {
   cp_cli_exchange_reset(&client_resources.exchange);
 
   request_output.length = 0;
-  const struct edh_cli_message_3_result message_3_result =
+  const struct edh_cli_message_3_compose_result message_3_result =
       edh_cli_handshake_compose_message_3(&client_resources.handshake,
                                           &request_output);
   if (message_3_result.status != EDH_CLI_MSG3_COMPOSE_OK) {
@@ -215,7 +215,7 @@ enum com_emulation_status core_run_client(void) {
       .length = response_data.length,
   };
   request_output.length = 0;
-  const struct edh_cli_message_4_result message_4_result =
+  const struct edh_cli_message_4_process_result message_4_result =
       edh_cli_handshake_process_message_4(&client_resources.handshake,
                                           message_4_input, &request_output);
   if (message_4_result.status != EDH_CLI_MSG4_PROCESS_OK) {

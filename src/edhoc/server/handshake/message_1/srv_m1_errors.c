@@ -31,7 +31,8 @@ static void prepare_message_1_error_context(
     const int edhoc_api_result, const struct edhoc_context* context,
     const char* generic_error_message,
     struct edh_srv_message_1_error_context* error_ctx) {
-  if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
+  if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE ||
+      context == NULL) {
     edh_srv_set_error_info(generic_error_message, &error_ctx->info);
     return;
   }

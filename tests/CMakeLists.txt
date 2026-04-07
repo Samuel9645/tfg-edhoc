@@ -88,7 +88,6 @@ add_unity_test(test_message_1_parser
 )
 
 set(COMMON_HANDLER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/tst_srv_handshake_helpers.c
     ${CMAKE_SOURCE_DIR}/src/common/data_models.c
     ${COMMON_SRV_SOURCES}
 )

@@ -12,15 +12,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "common/data_models.h"
+
 void tst_edh_srv_hnd_reset_stub_results(void);
 
-void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len);
+void tst_edh_srv_m1_assert_handler_writes_error_payload(
+    struct com_writable_buffer response);
 
-extern int tst_edh_srv_hnd_stub_edhoc_setup_res;
-extern int tst_edh_srv_hnd_stub_edhoc_process_res;
-extern int tst_edh_srv_hnd_stub_edhoc_compose_res;
-
-extern const uint8_t TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD[];
-extern const size_t TST_EDH_SRV_HND_MOCK_ERROR_LEN;
+extern int tst_edh_srv_stub_context_setup_result;
+extern int tst_edh_srv_stub_message_1_process_result;
+extern int tst_edh_srv_stub_message_2_compose_result;
+extern const uint8_t* tst_edh_srv_stub_message_2_compose_output_buffer;
+extern size_t tst_edh_srv_stub_message_2_compose_written_length;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_STUBS_H_

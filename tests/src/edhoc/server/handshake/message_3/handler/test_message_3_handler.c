@@ -51,29 +51,28 @@ void test_handler_fails_on_invalid_data(void) {
 }
 
 void test_handler_fails_when_message_3_processing_fails(void) {
-  tst_edh_srv_message_3_stub_edhoc_process_result = EDHOC_ERROR_CRYPTO_FAILURE;
+  tst_edh_srv_stub_process_message_3_result = EDHOC_ERROR_CRYPTO_FAILURE;
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED, status);
-  assert_handler_writes_error_payload(env.response);
+  tst_edh_srv_m3_assert_handler_writes_error_payload(env.response);
 }
 
 void test_handler_fails_when_message_4_composition_fails(void) {
-  tst_edh_srv_message_4_stub_edhoc_compose_result =
-      EDHOC_ERROR_BUFFER_TOO_SMALL;
+  tst_edh_srv_stub_message_4_compose_result = EDHOC_ERROR_BUFFER_TOO_SMALL;
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED, status);
-  assert_handler_writes_error_payload(env.response);
+  tst_edh_srv_m3_assert_handler_writes_error_payload(env.response);
 }
 
 void test_handler_fails_when_message_4_composition_produces_empty_buffer(void) {
-  tst_edh_srv_message_4_stub_edhoc_compose_result = EDHOC_SUCCESS;
-  stub_message_4_compose_written_length = 0;
+  tst_edh_srv_stub_message_4_compose_result = EDHOC_SUCCESS;
+  tst_edh_srv_stub_message_4_compose_written_length = 0;
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);

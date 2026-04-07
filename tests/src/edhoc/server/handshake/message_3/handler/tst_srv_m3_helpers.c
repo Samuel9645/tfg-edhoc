@@ -9,7 +9,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/common/tst_srv_m1_helpers.h"
 #include "edhoc/server/handshake/message_3/handler/tst_m3_hdl_helpers.h"
 
 static const uint8_t CLEAN_MESSAGE_3_PAYLOAD[] = {0x21, 0x22, 0x23};

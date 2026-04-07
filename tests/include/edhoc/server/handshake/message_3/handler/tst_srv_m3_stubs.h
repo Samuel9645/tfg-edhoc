@@ -18,10 +18,11 @@ void tst_edh_srv_message_3_reset_stub_results(void);
 
 void tst_edh_srv_message_3_set_stub_error_response(const uint8_t* data,
                                                    size_t length);
-void assert_handler_writes_error_payload(struct com_writable_buffer response);
+void tst_edh_srv_m3_assert_handler_writes_error_payload(
+    struct com_writable_buffer response);
 
-extern int tst_edh_srv_message_3_stub_edhoc_process_result;
-extern int tst_edh_srv_message_4_stub_edhoc_compose_result;
-extern size_t stub_message_4_compose_written_length;
+extern int tst_edh_srv_stub_process_message_3_result;
+extern int tst_edh_srv_stub_message_4_compose_result;
+extern size_t tst_edh_srv_stub_message_4_compose_written_length;
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_

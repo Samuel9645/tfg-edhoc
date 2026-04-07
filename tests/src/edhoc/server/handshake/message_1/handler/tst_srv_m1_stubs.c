@@ -15,30 +15,22 @@
 #include <string.h>
 
 #include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
-/**
- * @brief Global variables to control the behavior of the stubs in tests. Tests
- * can set these variables to simulate different scenarios and verify how the
- * code under test responds to various EDHOC library outcomes.
- */
+#include "unity.h"
+
+// TODO: this is duplicated with m3_stubs
+
 const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;
 
-int tst_edh_srv_hnd_stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
-int tst_edh_srv_hnd_stub_edhoc_process_res = SUCCESS_STUB_RESULT;
-int tst_edh_srv_hnd_stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
-
-static uint8_t stub_error_payload[200] = {0};
-static size_t stub_error_len = 0;
-
-const uint8_t TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD[] = {0xDE, 0xAD, 0xBE, 0xEF};
-const size_t TST_EDH_SRV_HND_MOCK_ERROR_LEN =
-    sizeof(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD);
+int tst_edh_srv_stub_context_setup_result = SUCCESS_STUB_RESULT;
 
 int edh_com_setup_context(struct edhoc_context* context,
                           const struct edhoc_credentials* credentials) {
   (void)context;
   (void)credentials;
-  return tst_edh_srv_hnd_stub_edhoc_setup_res;
+  return tst_edh_srv_stub_context_setup_result;
 }
+
+int tst_edh_srv_stub_message_1_process_result = SUCCESS_STUB_RESULT;
 
 int edhoc_message_1_process(struct edhoc_context* edhoc_context,
                             const uint8_t* message_1,
@@ -46,8 +38,19 @@ int edhoc_message_1_process(struct edhoc_context* edhoc_context,
   (void)edhoc_context;
   (void)message_1;
   (void)message_1_length;
-  return tst_edh_srv_hnd_stub_edhoc_process_res;
+  return tst_edh_srv_stub_message_1_process_result;
 }
+
+static const uint8_t TST_EDH_SRV_MESSAGE_2_MOCK_PAYLOAD[] = {0x01, 0x02, 0x03,
+                                                             0x04};
+static const size_t TST_EDH_SRV_MESSAGE_2_MOCK_LEN =
+    sizeof(TST_EDH_SRV_MESSAGE_2_MOCK_PAYLOAD);
+
+int tst_edh_srv_stub_message_2_compose_result = SUCCESS_STUB_RESULT;
+const uint8_t* tst_edh_srv_stub_message_2_compose_output_buffer =
+    TST_EDH_SRV_MESSAGE_2_MOCK_PAYLOAD;
+size_t tst_edh_srv_stub_message_2_compose_written_length =
+    TST_EDH_SRV_MESSAGE_2_MOCK_LEN;
 
 int edhoc_message_2_compose(
     struct edhoc_context* edhoc_context,
@@ -58,15 +61,29 @@ int edhoc_message_2_compose(
   (void)message_2;
   (void)message_2_size;
   (void)message_2_length;
-  return tst_edh_srv_hnd_stub_edhoc_compose_res;
+  TEST_ASSERT_NOT_NULL_MESSAGE(
+      message_2, "Mock Error: Destination buffer (message_2) is NULL");
+  TEST_ASSERT_NOT_NULL_MESSAGE(message_2_length,
+                               "Mock Error: Output length pointer is NULL");
+  if (tst_edh_srv_stub_message_2_compose_result != SUCCESS_STUB_RESULT) {
+    return tst_edh_srv_stub_message_2_compose_result;
+  }
+  TEST_ASSERT_NOT_NULL_MESSAGE(tst_edh_srv_stub_message_2_compose_output_buffer,
+                               "Mock Error: Internal payload source is NULL");
+
+  if (message_2_size < tst_edh_srv_stub_message_2_compose_written_length) {
+    return EDHOC_ERROR_BUFFER_TOO_SMALL;
+  }
+  memcpy(message_2, tst_edh_srv_stub_message_2_compose_output_buffer,
+         tst_edh_srv_stub_message_2_compose_written_length);
+  *message_2_length = tst_edh_srv_stub_message_2_compose_written_length;
+  return tst_edh_srv_stub_message_2_compose_result;
 }
 
-void tst_edh_srv_hnd_set_stub_error_response(const uint8_t* data, size_t len) {
-  if (len <= sizeof(stub_error_payload)) {
-    memcpy(stub_error_payload, data, len);
-    stub_error_len = len;
-  }
-}
+static const uint8_t TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER[] = {0xDE, 0xAD,
+                                                                  0xBE, 0xEF};
+static const size_t TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN =
+    sizeof(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER);
 
 void edh_srv_message_1_handler_add_error(
     const int edhoc_api_result, const struct edhoc_context* edhoc_context,
@@ -76,24 +93,31 @@ void edh_srv_message_1_handler_add_error(
   (void)edhoc_context;
   (void)generic_error_message;
 
-  if (!response_data || !response_data->bytes)
-    return;
+  TEST_ASSERT_NOT_NULL_MESSAGE(response_data,
+                               "Mock Error: Response buffer pointer is NULL");
+  TEST_ASSERT_LESS_OR_EQUAL_MESSAGE(response_data->capacity,
+                                    TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN,
+                                    "Mock Error: Response buffer capacity is "
+                                    "smaller than error payload length");
+  memcpy(response_data->bytes, TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER,
+         TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN);
+  response_data->length = TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN;
+}
 
-  const size_t len =
-      stub_error_len > 0 ? stub_error_len : TST_EDH_SRV_HND_MOCK_ERROR_LEN;
-  const uint8_t* src = stub_error_len > 0 ? stub_error_payload
-                                          : TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD;
-
-  if (response_data->capacity >= len) {
-    memcpy(response_data->bytes, src, len);
-    response_data->length = len;
-  }
+void tst_edh_srv_m1_assert_handler_writes_error_payload(
+    struct com_writable_buffer response) {
+  TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN, response.length);
+  TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER,
+                           response.bytes,
+                           TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN);
 }
 
 void tst_edh_srv_hnd_reset_stub_results(void) {
-  tst_edh_srv_hnd_stub_edhoc_setup_res = SUCCESS_STUB_RESULT;
-  tst_edh_srv_hnd_stub_edhoc_process_res = SUCCESS_STUB_RESULT;
-  tst_edh_srv_hnd_stub_edhoc_compose_res = SUCCESS_STUB_RESULT;
-  stub_error_len = 0;
-  memset(stub_error_payload, 0, sizeof(stub_error_payload));
+  tst_edh_srv_stub_context_setup_result = SUCCESS_STUB_RESULT;
+  tst_edh_srv_stub_message_1_process_result = SUCCESS_STUB_RESULT;
+  tst_edh_srv_stub_message_2_compose_result = SUCCESS_STUB_RESULT;
+  tst_edh_srv_stub_message_2_compose_output_buffer =
+      TST_EDH_SRV_MESSAGE_2_MOCK_PAYLOAD;
+  tst_edh_srv_stub_message_2_compose_written_length =
+      TST_EDH_SRV_MESSAGE_2_MOCK_LEN;
 }

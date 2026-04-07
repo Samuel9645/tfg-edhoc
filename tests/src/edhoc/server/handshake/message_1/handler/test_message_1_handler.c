@@ -19,7 +19,6 @@
 #include <unity.h>
 
 #include "edhoc/config.h"
-#include "edhoc/server/handshake/common/tst_srv_m1_helpers.h"
 #include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_helpers.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.h"
 
@@ -28,7 +27,7 @@ static struct tst_message_1_handler_env env = {0};
 void setUp(void) {
   tst_edh_srv_hnd_reset_stub_results();
   memset(&env, 0, sizeof(env));
-  tst_edh_setup_message_1_handler_env(&env);
+  tst_edh_clear_message_1_setup_env(&env);
 }
 
 // ============================================================================
@@ -54,7 +53,7 @@ void test_handler_fails_on_invalid_data(void) {
   const struct edhoc_credentials dummy_credentials = {0};
   const struct edh_srv_message_1_request empty_request_with_credentials = {
       .credentials = &dummy_credentials};
-  struct com_writable_buffer empty_response = tst_edh_invalid_response();
+  struct com_writable_buffer empty_response = {0};
 
   const struct {
     const char* description;
@@ -79,67 +78,56 @@ void test_handler_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
     if (test_cases[i].response != NULL) {
-      tst_edh_srv_assert_response_clean(test_cases[i].response);
+      tst_edh_srv_m1_assert_handler_writes_error_payload(env.response);
     }
     ensure_context_is_freed_on_failure(result);
   }
 }
 
-void test_handler_fails_when_context_setup_fails(void) {
-  tst_edh_srv_hnd_stub_edhoc_setup_res = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
-
-  const struct ehd_srv_message_1_handler_result result =
-      edh_srv_handle_message_1(env.valid_request, &env.response);
-
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED,
-                    result.status);
-  ensure_context_is_freed_on_failure(result);
-}
-
-static void assert_m1_failed_with_edhoc_error(
+static void assert_standard_failure(
     const struct ehd_srv_message_1_handler_result result,
     const enum edh_srv_message_1_handler_status expected_status) {
-  TEST_ASSERT_EQUAL_MESSAGE(expected_status, result.status,
-                            "Wrong status code returned");
+  TEST_ASSERT_EQUAL(expected_status, result.status);
+  tst_edh_srv_m1_assert_handler_writes_error_payload(env.response);
   ensure_context_is_freed_on_failure(result);
-  TEST_ASSERT_EQUAL(TST_EDH_SRV_HND_MOCK_ERROR_LEN, env.response.length);
-  TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_HND_MOCK_ERROR_PAYLOAD,
-                           env.response.bytes, TST_EDH_SRV_HND_MOCK_ERROR_LEN);
 }
 
-void test_handler_fails_when_message_1_processing_fails(void) {
-  tst_edh_srv_hnd_stub_edhoc_process_res = EDHOC_ERROR_CRYPTO_FAILURE;
+void test_handler_fails_on_library_errors(void) {
+  const struct {
+    const char* description;
+    int* stub_target;
+    int stub_value;
+    enum edh_srv_message_1_handler_status expected_status;
+  } cases[] = {
+      {"setup fails", &tst_edh_srv_stub_context_setup_result,
+       EDHOC_ERROR_CODE_UNSPECIFIED_ERROR,
+       EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED},
+      {"processing fails", &tst_edh_srv_stub_message_1_process_result,
+       EDHOC_ERROR_CRYPTO_FAILURE,
+       EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED},
+      {"composition fails", &tst_edh_srv_stub_message_2_compose_result,
+       EDHOC_ERROR_BUFFER_TOO_SMALL,
+       EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED},
+  };
+
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    setUp();
+    *cases[i].stub_target = cases[i].stub_value;
+
+    const struct ehd_srv_message_1_handler_result result =
+        edh_srv_handle_message_1(env.valid_request, &env.response);
+
+    assert_standard_failure(result, cases[i].expected_status);
+  }
+}
+
+void test_handler_fails_when_message_2_composition_produces_empty_buffer(void) {
+  tst_edh_srv_stub_message_2_compose_result = EDHOC_SUCCESS;
+  tst_edh_srv_stub_message_2_compose_written_length = 0;
 
   const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
-  assert_m1_failed_with_edhoc_error(
-      result, EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
-}
-
-void test_handler_fails_when_message_2_composition_fails(void) {
-  tst_edh_srv_hnd_stub_edhoc_compose_res = EDHOC_ERROR_BUFFER_TOO_SMALL;
-
-  const struct ehd_srv_message_1_handler_result result =
-      edh_srv_handle_message_1(env.valid_request, &env.response);
-
-  assert_m1_failed_with_edhoc_error(
-      result, EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
-}
-
-void test_handler_propagates_library_error_payload(void) {
-  tst_edh_srv_hnd_stub_edhoc_process_res =
-      EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
-  const uint8_t expected_error_pdu[] = {0x81, 0x82, 0x77};
-  tst_edh_srv_hnd_set_stub_error_response(expected_error_pdu,
-                                          sizeof(expected_error_pdu));
-
-  const struct ehd_srv_message_1_handler_result result =
-      edh_srv_handle_message_1(env.valid_request, &env.response);
-
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED,
-                    result.status);
-  TEST_ASSERT_EQUAL(sizeof(expected_error_pdu), env.response.length);
-  TEST_ASSERT_EQUAL_MEMORY(expected_error_pdu, env.response.bytes,
-                           sizeof(expected_error_pdu));
+  assert_standard_failure(result,
+                          EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_EMPTY);
 }

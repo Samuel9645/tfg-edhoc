@@ -13,8 +13,8 @@
 #include <unity.h>
 
 #include "edhoc/common/tst_mock_add_edhoc_error_info.h"
-#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_hdl_env.h"
-#include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_hdl_deps.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_handler_env.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_handler_deps.h"
 
 static struct tst_edh_srv_message_3_env env = {0};
 

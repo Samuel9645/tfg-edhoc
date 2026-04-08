@@ -9,7 +9,7 @@
 // ReSharper disable CppParameterMayBeConst
 // since the real implementations expects non-const pointers to allow output
 // parameters
-#include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_hdl_deps.h"
+#include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
 
 #include <edhoc.h>
 #include <string.h>
@@ -29,18 +29,23 @@ static int message_2_compose_result = EDHOC_SUCCESS;
 static const uint8_t* compose_buffer = TST_DEFAULT_M2_PAYLOAD;
 static size_t compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
 
-void tst_edh_srv_m1_configure_behavior(int setup_result, int process_result,
-                                       int compose_result) {
-  context_setup_result = setup_result;
-  message_1_process_result = process_result;
-  message_2_compose_result = compose_result;
+void tst_edh_srv_m1_set_setup_failure(void) {
+  context_setup_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_m1_set_compose_length(size_t length) {
-  compose_written_length = length;
+void tst_edh_srv_m1_set_process_failure(void) {
+  message_1_process_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_hnd_reset_stub_results(void) {
+void tst_edh_srv_m1_set_compose_failure(void) {
+  message_2_compose_result = EDHOC_ERROR_GENERIC_ERROR;
+}
+
+void tst_edh_srv_m1_set_compose_empty_length(void) {
+  compose_written_length = 0;
+}
+
+void tst_edh_srv_m1_reset_stub_results(void) {
   context_setup_result = EDHOC_SUCCESS;
   message_1_process_result = EDHOC_SUCCESS;
   message_2_compose_result = EDHOC_SUCCESS;

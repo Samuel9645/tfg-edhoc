@@ -9,18 +9,16 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_STUBS_H_
 #define EDHOC_SERVER_HANDSHAKE_STUBS_H_
 
-#include <stddef.h>
-
 #include "common/data_models.h"
 
-void tst_edh_srv_hnd_reset_stub_results(void);
+void tst_edh_srv_m1_reset_stub_results(void);
 
 void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
     struct com_writable_buffer response);
 
-void tst_edh_srv_m1_configure_behavior(int setup_result, int process_result,
-                                       int compose_result);
-
-void tst_edh_srv_m1_set_compose_length(size_t length);
+void tst_edh_srv_m1_set_setup_failure(void);
+void tst_edh_srv_m1_set_process_failure(void);
+void tst_edh_srv_m1_set_compose_failure(void);
+void tst_edh_srv_m1_set_compose_empty_length(void);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_STUBS_H_

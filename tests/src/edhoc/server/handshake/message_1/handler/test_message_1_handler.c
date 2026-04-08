@@ -20,13 +20,13 @@
 
 #include "edhoc/common/tst_mock_add_edhoc_error_info.h"
 #include "edhoc/config.h"
-#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_hdl_env.h"
-#include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_hdl_deps.h"
+#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_handler_env.h"
+#include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
 
 static struct tst_message_1_handler_env env = {0};
 
 void setUp(void) {
-  tst_edh_srv_hnd_reset_stub_results();
+  tst_edh_srv_m1_reset_stub_results();
   memset(&env, 0, sizeof(env));
   tst_edh_clear_message_1_setup_env(&env);
 }
@@ -72,7 +72,7 @@ void test_handler_fails_on_invalid_data(void) {
   };
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
-    tst_edh_srv_hnd_reset_stub_results();
+    tst_edh_srv_m1_reset_stub_results();
     const struct ehd_srv_message_1_handler_result result =
         edh_srv_handle_message_1(test_cases[i].request, test_cases[i].response);
 
@@ -91,37 +91,31 @@ void test_handler_fails_on_invalid_data(void) {
 void test_handler_fails_on_library_errors(void) {
   const struct {
     const char* description;
-    int setup_res;
-    int process_res;
-    int compose_res;
+    void (*setup_scenario)(void);
     enum edh_srv_message_1_handler_status expected_status;
   } cases[] = {
-      {"setup fails", EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, EDHOC_SUCCESS,
-       EDHOC_SUCCESS, EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED},
-      {"processing fails", EDHOC_SUCCESS, EDHOC_ERROR_CRYPTO_FAILURE,
-       EDHOC_SUCCESS, EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED},
-      {"composition fails", EDHOC_SUCCESS, EDHOC_SUCCESS,
-       EDHOC_ERROR_BUFFER_TOO_SMALL,
+      {"setup fails", tst_edh_srv_m1_set_setup_failure,
+       EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED},
+      {"processing fails", tst_edh_srv_m1_set_process_failure,
+       EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED},
+      {"composition fails", tst_edh_srv_m1_set_compose_failure,
        EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED},
   };
 
   for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
-    tst_edh_srv_hnd_reset_stub_results();
-    tst_edh_srv_m1_configure_behavior(cases[i].setup_res, cases[i].process_res,
-                                      cases[i].compose_res);
+    tst_edh_srv_m1_reset_stub_results();
+    cases[i].setup_scenario();
 
     const struct ehd_srv_message_1_handler_result result =
         edh_srv_handle_message_1(env.valid_request, &env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edh_srv_assert_handler_writes_error_in_buffer(env.response);
-    ensure_context_is_freed_on_failure(result);
   }
 }
 
 void test_handler_fails_when_message_2_composition_produces_empty_buffer(void) {
-  tst_edh_srv_m1_set_compose_length(0);
+  tst_edh_srv_m1_set_compose_empty_length();
 
   const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);

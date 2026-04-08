@@ -7,7 +7,7 @@
  */
 
 // ReSharper disable CppParameterMayBeConst
-#include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_hdl_deps.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_handler_deps.h"
 
 #include <edhoc.h>
 #include <string.h>
@@ -50,10 +50,10 @@ void tst_edh_srv_m3_assert_handler_writes_message_4_in_buffer(
                             "message 4 reported length mismatch");
 }
 
-int edhoc_message_3_process(struct edhoc_context* context,
+int edhoc_message_3_process(struct edhoc_context* edhoc_context,
                             const uint8_t* message_3,
                             const size_t message_3_length) {
-  (void)context;
+  (void)edhoc_context;
   (void)message_3;
   (void)message_3_length;
   return message_3_process_result;

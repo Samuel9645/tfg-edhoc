@@ -6,7 +6,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_hdl_env.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_handler_env.h"
 
 #include <string.h>
 #include <unity.h>

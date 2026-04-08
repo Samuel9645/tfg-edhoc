@@ -11,14 +11,21 @@
 #include <edhoc.h>
 
 #include "edhoc/common/internal/internal_failure_err_code.h"
+#include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 #include "edhoc/server/handshake/message_3/srv_m3_errors.h"
 
-static void add_internal_error(const char* generic_error_message,
-                               struct com_writable_buffer* response) {
-  edh_srv_message_3_handler_add_error(INTERNAL_FAILURE_EDHOC_CODE,
-                                      generic_error_message, response);
+static enum edh_srv_message_3_handler_add_error_status add_internal_error(
+    const char* generic_error_message, struct com_writable_buffer* response) {
+  return edh_srv_message_3_handler_add_error(INTERNAL_FAILURE_EDHOC_CODE,
+                                             generic_error_message, response);
 }
 
+/**
+ * WHY ARE WE CASTING TO VOID THE RETURN?
+ *
+ * Protocol errors are more important than internal errors, so in case something
+ * bad happens, we always want to report the greater failure.
+ */
 enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
     const struct edh_srv_message_3_request request,
     struct com_writable_buffer* response_buffer) {
@@ -26,11 +33,11 @@ enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
     return EDH_MSG3_HDL_ERR_INVALID_RESPONSE_BUFFER;
   }
   if (request.edhoc_ctx == NULL) {
-    add_internal_error("Null EDHOC context", response_buffer);
+    (void)add_internal_error("Null EDHOC context", response_buffer);
     return EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT;
   }
   if (!com_readonly_buffer_is_valid(request.parsed_message_3)) {
-    add_internal_error("Invalid EDHOC parsed message 3", response_buffer);
+    (void)add_internal_error("Invalid EDHOC parsed message 3", response_buffer);
     return EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3;
   }
 
@@ -51,8 +58,8 @@ enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
   if (!com_writable_buffer_has_content(response_buffer)) {
-    add_internal_error("Message 4 compose produced empty buffer",
-                       response_buffer);
+    (void)add_internal_error("Message 4 compose produced empty buffer",
+                             response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_EMPTY;
   }
   return EDH_MSG3_HDL_OK;

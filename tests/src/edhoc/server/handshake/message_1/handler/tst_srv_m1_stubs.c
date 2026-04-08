@@ -14,7 +14,8 @@
 #include <edhoc.h>
 #include <string.h>
 
-#include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
+#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 #include "unity.h"
 
 // TODO: this is duplicated with m3_stubs
@@ -85,10 +86,11 @@ static const uint8_t TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER[] = {0xDE, 0xAD,
 static const size_t TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN =
     sizeof(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER);
 
-void edh_srv_message_1_handler_add_error(
-    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message,
-    struct com_writable_buffer* response_data) {
+enum edh_srv_message_1_handler_add_error_status
+edh_srv_message_1_handler_add_error(const int edhoc_api_result,
+                                    const struct edhoc_context* edhoc_context,
+                                    const char* generic_error_message,
+                                    struct com_writable_buffer* response_data) {
   (void)edhoc_api_result;
   (void)edhoc_context;
   (void)generic_error_message;
@@ -102,6 +104,7 @@ void edh_srv_message_1_handler_add_error(
   memcpy(response_data->bytes, TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER,
          TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN);
   response_data->length = TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN;
+  return EDH_SRV_MSG1_ADD_ERROR_OK;
 }
 
 void tst_edh_srv_m1_assert_handler_writes_error_in_buffer(

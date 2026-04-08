@@ -11,6 +11,12 @@
 
 #include "common/data_models.h"
 
+enum edh_srv_message_3_handler_add_error_status {
+  EDH_SRV_MSG3_ADD_ERROR_OK = 0,
+  EDH_SRV_MSG3_ADD_ERROR_ERR_SET_ERROR_INFO,
+  EDH_SRV_MSG3_ADD_ERROR_ERR_ADD_ERROR_TO_RESPONSE,
+};
+
 /**
  * @brief Compose and write a Message 3 operation-specific EDHOC error message
  * into the response buffer.
@@ -19,8 +25,9 @@
  * @param[in] generic_error_message Generic error text for the operation.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void edh_srv_message_3_handler_add_error(int edhoc_api_result,
-                                     const char* generic_error_message,
-    struct com_writable_buffer* response_data);
+enum edh_srv_message_3_handler_add_error_status
+edh_srv_message_3_handler_add_error(int edhoc_api_result,
+                                    const char* generic_error_message,
+                                    struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_ERRORS_H_

@@ -10,39 +10,103 @@
 // since the real implementations expects non-const pointers to allow output
 // parameters
 // ReSharper disable CppParameterNamesMismatch
+#include "edhoc/server/handshake/message_1/errors/tst_srv_m1_errors_stubs.h"
+
+// TODO: rethink this, now is wrong
+
 #include <edhoc.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
-/* Mock State - The test file will modify these */
+#include "edhoc/common/add_edhoc_error_info.h"
+#include "unity.h"
+
+const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;
+
 bool tst_stub_get_suites_called = false;
-int32_t tst_stub_cipher_suites_to_return[8] = {0};
-size_t tst_stub_cipher_suites_len_to_return = 0;
+
+enum { TST_SRV_M1_ERR_STUB_CIPHER_SUITES_SIZE = 8 };
+
+static const int32_t
+    TST_EDH_SRV_M1_ERROR_MOCK_BUFFER[TST_SRV_M1_ERR_STUB_CIPHER_SUITES_SIZE] = {
+        0};
+size_t tst_stub_get_cipher_suites_length = 0;
+
+void tst_srv_m1_err_reset_stub_results(void) {
+  tst_stub_get_suites_called = false;
+  tst_stub_get_cipher_suites_length = 0;
+  tst_stub_get_cipher_suites = TST_EDH_SRV_M1_ERROR_MOCK_BUFFER;
+}
 
 /* Stubbed version of libedhoc function */
 int edhoc_error_get_cipher_suites(
-    const struct edhoc_context *ctx, int32_t *csuites, size_t csuites_size,
-    size_t *csuites_len,
-    int32_t *peer_csuites,  // NOLINT(*-non-const-parameter)
-    size_t peer_csuites_size,
-    size_t *peer_csuites_len) {  // NOLINT(*-non-const-parameter)
-  (void)ctx;
-  (void)csuites;
-  (void)csuites_size;
-  (void)csuites_len;
-  (void)peer_csuites;
-  (void)peer_csuites_len;
-  (void)peer_csuites_size;
-  tst_stub_get_suites_called = true;
-  if (csuites && csuites_len && tst_stub_cipher_suites_len_to_return > 0) {
-    const size_t count = tst_stub_cipher_suites_len_to_return < csuites_size
-                             ? tst_stub_cipher_suites_len_to_return
-                             : csuites_size;
+    const struct edhoc_context* context, int32_t* cipher_suites,
+    size_t cipher_suites_size, size_t* cipher_suites_length,
+    int32_t* peer_cipher_suites,  // NOLINT(*-non-const-parameter)
+    size_t peer_cipher_suites_size,
+    size_t* peer_cipher_suites_length) {  // NOLINT(*-non-const-parameter)
 
-    memcpy(csuites, tst_stub_cipher_suites_to_return, count * sizeof(int32_t));
-    *csuites_len = count;
+  (void)context;
+  (void)cipher_suites;
+  (void)cipher_suites_size;
+  (void)cipher_suites_length;
+  (void)peer_cipher_suites;
+  (void)peer_cipher_suites_length;
+  (void)peer_cipher_suites_size;
+  TEST_ASSERT_NOT_NULL_MESSAGE(
+      cipher_suites, "Mock Error: Destination cipher suites buffer is NULL");
+  TEST_ASSERT_NOT_NULL_MESSAGE(
+      cipher_suites_length,
+      "Mock Error: Output length pointer (cipher_suites_length) is NULL");
+  if (tst_stub_get_cipher_suites_result != SUCCESS_STUB_RESULT) {
+    return tst_stub_get_cipher_suites_result;
   }
-  return 0;  // EDHOC_SUCCESS
+  if (cipher_suites_size < tst_stub_get_cipher_suites_length) {
+    return EDHOC_ERROR_BUFFER_TOO_SMALL;
+  }
+  memcpy(cipher_suites, tst_stub_get_cipher_suites,
+         tst_stub_get_cipher_suites_length);
+  *peer_cipher_suites_length = tst_stub_get_cipher_suites_length;
+  return tst_stub_get_cipher_suites_result;
+}
+
+struct edhoc_error_info test_stub_captured_error_info = {0};
+
+enum edh_com_add_edhoc_error_to_response_status
+edh_com_add_edhoc_error_to_response(const int edhoc_api_result,
+                                    const struct edhoc_error_info* error_info,
+                                    struct com_writable_buffer* response_data) {
+  (void)edhoc_api_result;
+  (void)response_data;
+
+  /* CAPTURE: Store the data passed by the handler so the test can inspect it */
+  if (error_info != NULL) {
+    test_stub_captured_error_info = *error_info;
+  }
+
+  return EDH_COM_ADD_ERROR_OK;
+}
+
+void tst_srv_m1_err_assert_response_contains_cipher_suites(
+    const int32_t* expected_cipher_suites,
+    const size_t expected_cipher_suites_length) {
+  TEST_ASSERT_EQUAL_size_t_MESSAGE(expected_cipher_suites_length,
+                                   test_stub_captured_error_info.total_entries,
+                                   "The number of cipher suites captured in "
+                                   "the error information is incorrect");
+
+  /* 2. Verify the content of each cipher suite identifier */
+  /* Note: In this context, text_string is being used as a generic pointer
+     to the cipher suite array populated by the handler. */
+  const int32_t* captured_suites =
+      (const int32_t*)test_stub_captured_error_info.text_string;
+
+  TEST_ASSERT_NOT_NULL_MESSAGE(captured_suites,
+                               "The captured error information does not "
+                               "contain a valid cipher suites pointer");
+
+  for (size_t index = 0; index < expected_cipher_suites_length; index++) {
+    TEST_ASSERT_EQUAL_INT32_MESSAGE(
+        expected_cipher_suites[index], captured_suites[index],
+        "A mismatch was detected in the captured cipher suite identifiers");
+  }
 }

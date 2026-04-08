@@ -10,7 +10,7 @@
 
 #include <edhoc_helpers.h>
 
-#include "edhoc/server/handshake/common/handle_libedhoc_errors.h"
+#include "edhoc/common/add_edhoc_error_info.h"
 
 enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
@@ -27,41 +27,63 @@ struct edh_srv_message_1_error_context {
   int32_t suites_buffer[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE];
 };
 
-static void prepare_message_1_error_context(
+enum edh_srv_prep_m1_error_context_status {
+  EDH_SRV_PREP_M1_ERROR_CTX_OK = 0,
+  EDH_SRV_PREP_M1_ERROR_CTX_ERR_SET_INFO,
+  EDH_SRV_PREP_M1_ERROR_CTX_ERR_GET_SUITES
+};
+
+static enum edh_srv_prep_m1_error_context_status
+prepare_message_1_error_context(
     const int edhoc_api_result, const struct edhoc_context* context,
     const char* generic_error_message,
     struct edh_srv_message_1_error_context* error_ctx) {
+  if (edh_com_set_error_info(generic_error_message, &error_ctx->info) !=
+      EDH_COM_SET_ERROR_INFO_OK) {
+    return EDH_SRV_PREP_M1_ERROR_CTX_ERR_SET_INFO;
+  }
   if (edhoc_api_result != EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE ||
       context == NULL) {
-    edh_srv_set_error_info(generic_error_message, &error_ctx->info);
-    return;
+    return EDH_SRV_PREP_M1_ERROR_CTX_OK;
   }
-
   int32_t peer_suites[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE] = {0};
   size_t peer_len = 0;
   size_t own_len = 0;
-  /*
-   TODO: verify this:
-   The variable peer_suites is allocated but its output
-   parameter peer_len is never used after the call to
-   edhoc_error_get_cipher_suites. Consider removing this unused variable and
-   its associated parameter, or document why the peer suites are retrieved but
-   not utilized.
+  /**
+   * TODO: verify this:
+   * The variable peer_suites is allocated but its output
+   * parameter peer_len is never used after the call to
+   * edhoc_error_get_cipher_suites. Consider removing this unused variable and
+   * its associated parameter, or document why the peer suites are retrieved but
+   * not utilized.
+   *
+   * - libedhoc requires peer suites to be valid even though they are not used
    */
-  edhoc_error_get_cipher_suites(
-      context, error_ctx->suites_buffer, EDH_SRV_CIPHER_SUITES_ARRAY_SIZE,
-      &own_len, peer_suites, ARRAY_SIZE(peer_suites), &peer_len);
-
-  edh_srv_set_error_info(generic_error_message, &error_ctx->info);
+  if (edhoc_error_get_cipher_suites(context, error_ctx->suites_buffer,
+                                    EDH_SRV_CIPHER_SUITES_ARRAY_SIZE, &own_len,
+                                    peer_suites, ARRAY_SIZE(peer_suites),
+                                    &peer_len) != EDHOC_SUCCESS) {
+    return EDH_SRV_PREP_M1_ERROR_CTX_ERR_GET_SUITES;
+  }
+  return EDH_SRV_PREP_M1_ERROR_CTX_OK;
 }
 
-void edh_srv_message_1_handler_add_error(
-    const int edhoc_api_result, const struct edhoc_context* edhoc_context,
-    const char* generic_error_message,
-    struct com_writable_buffer* response_data) {
+enum edh_srv_message_1_handler_add_error_status
+edh_srv_message_1_handler_add_error(const int edhoc_api_result,
+                                    const struct edhoc_context* edhoc_context,
+                                    const char* generic_error_message,
+                                    struct com_writable_buffer* response_data) {
   struct edh_srv_message_1_error_context error_ctx = {0};
-  prepare_message_1_error_context(edhoc_api_result, edhoc_context,
-                                  generic_error_message, &error_ctx);
-  edh_srv_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
-                                      response_data);
+
+  if (prepare_message_1_error_context(edhoc_api_result, edhoc_context,
+                                      generic_error_message, &error_ctx) !=
+      EDH_SRV_PREP_M1_ERROR_CTX_OK) {
+    return EDH_SRV_MSG1_ADD_ERROR_ERR_PREPARE_CTX;
+  }
+  if (edh_com_add_edhoc_error_to_response(edhoc_api_result, &error_ctx.info,
+                                          response_data) !=
+      EDH_COM_ADD_ERROR_OK) {
+    return EDH_SRV_MSG1_ADD_ERROR_ERR_ADD_ERROR_TO_RESPONSE;
+  }
+  return EDH_SRV_MSG1_ADD_ERROR_OK;
 }

@@ -24,6 +24,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_get_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
 )
 
 set(MESSAGE_1_HANDLER_SOURCES
@@ -53,7 +54,6 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
 )
 
 set(SERVER_SOURCES
@@ -76,7 +76,6 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_errors.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/common/handle_libedhoc_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )
 

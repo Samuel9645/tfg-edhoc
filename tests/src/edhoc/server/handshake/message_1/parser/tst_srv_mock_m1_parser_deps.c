@@ -6,7 +6,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/server/handshake/message_1/parser/tst_srv_m1_parser_stubs.h"
+#include "edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.h"
 
 #include <edhoc.h>
 #include <edhoc_helpers.h>

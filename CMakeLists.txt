@@ -15,7 +15,6 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/internal/internal_failure_err_code.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
@@ -39,7 +38,6 @@ set(MESSAGE_3_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_errors.c
 )
 
 set(SERVER_SPECIFIC_SOURCES
@@ -71,11 +69,8 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/cli_state.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_compose.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_errors.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )
 

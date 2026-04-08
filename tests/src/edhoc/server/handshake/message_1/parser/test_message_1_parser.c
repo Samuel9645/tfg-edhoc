@@ -13,7 +13,7 @@
 #include <unity.h>
 
 #include "common/data_models.h"
-#include "edhoc/server/handshake/message_1/parser/tst_srv_m1_parser_stubs.h"
+#include "edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 
 void setUp(void) { srv_m1_parser_reset_stubs(); }

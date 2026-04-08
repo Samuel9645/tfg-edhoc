@@ -8,7 +8,7 @@
 
 #include "edhoc/client/handshake/message_4/cli_m4_process.h"
 
-#include "edhoc/client/handshake/message_4/cli_m4_errors.h"
+#include "edhoc/common/add_edhoc_error_info.h"
 
 static struct edh_cli_message_4_process_result message_4_process_ok(
     const struct com_writable_buffer message_4) {
@@ -48,8 +48,8 @@ struct edh_cli_message_4_process_result edh_cli_process_message_4(
   const int edhoc_result = edhoc_message_4_process(
       &state->context, message_4.bytes, message_4.length);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edh_cli_message_4_handler_add_error(
-        edhoc_result, "Failed to process EDHOC message 4", message_4_error);
+    (void)edh_com_add_edhoc_error_to_response_with_description(
+        &state->context, "Failed to process EDHOC message 4", message_4_error);
     return message_4_process_protocol_failure(
         EDH_CLI_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
         *message_4_error);

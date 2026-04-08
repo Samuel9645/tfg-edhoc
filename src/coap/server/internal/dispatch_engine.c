@@ -128,7 +128,7 @@ void cp_srv_dispatch_post_with_dependencies(
       return;
     }
     const struct edh_srv_message_3_request handler_request = {
-        .edhoc_ctx = edhoc_ctx,
+        .edhoc_context = edhoc_ctx,
         .parsed_message_3 = parse_message_3_result.parsed_message_3};
     const enum edh_srv_message_3_handler_status message_3_result =
         deps->handle_message_3(handler_request, &response_data);

@@ -77,26 +77,27 @@ add_unity_test(test_dispatch
 
 set(COMMON_SRV_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_response_buffer_helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
 )
 
 add_unity_test(test_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_message_1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser/tst_srv_m1_parser_stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.c
     ${COMMON_SRV_SOURCES}
 )
 
 set(COMMON_HANDLER_SOURCES
     ${COMMON_SRV_SOURCES}
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/internal/internal_failure_err_code.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_mock_add_edhoc_error_info.c
 )
 
 add_unity_test(test_message_1_handler
     /src/edhoc/server/handshake/message_1/handler/test_message_1_handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_m1_helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_m1_stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_m1_hdl_env.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_hdl_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.c
     ${COMMON_HANDLER_SOURCES}
@@ -112,8 +113,8 @@ add_unity_test(test_message_1_handler
 
 add_unity_test(test_message_3_handler
     /src/edhoc/server/handshake/message_3/handler/test_message_3_handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_m3_helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_m3_stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_m3_hdl_env.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_hdl_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
     ${COMMON_HANDLER_SOURCES}
 )

@@ -20,6 +20,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
 }
 
 enum com_emulation_status core_run_server(void) {
+  coap_startup();
   const struct cp_com_create_context_result initialization_result =
       cp_com_create_context();
   if (initialization_result.status != CP_COM_INIT_OK) {

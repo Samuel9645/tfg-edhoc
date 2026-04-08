@@ -8,7 +8,7 @@
 
 #include "edhoc/client/handshake/message_2/cli_m2_process.h"
 
-#include "edhoc/client/handshake/message_2/cli_m2_errors.h"
+#include "edhoc/common/add_edhoc_error_info.h"
 
 static struct edh_cli_message_2_process_result message_2_process_ok(void) {
   return (struct edh_cli_message_2_process_result){
@@ -47,9 +47,8 @@ struct edh_cli_message_2_process_result edh_cli_process_message_2(
       &state->context, message_2.bytes, message_2.length);
 
   if (edhoc_result != EDHOC_SUCCESS) {
-    edh_cli_message_2_handler_add_error(
-        edhoc_result, "Failed to process EDHOC message 2", message_2_error);
-
+    edh_com_add_edhoc_error_to_response_with_description(
+        &state->context, "Failed to process EDHOC message 2", message_2_error);
     return message_2_process_protocol_failure(
         EDH_CLI_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,
         *message_2_error);

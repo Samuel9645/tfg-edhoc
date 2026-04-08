@@ -11,24 +11,10 @@
 #include <edhoc.h>
 #include <stdlib.h>
 
-#include "edhoc/common/internal/internal_failure_err_code.h"
+#include "edhoc/common/add_edhoc_error_info.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/srv_m1_errors.h"
-
-static enum edh_srv_message_1_handler_add_error_status
-add_error_without_context(const int edhoc_api_result,
-                          const char* generic_error_message,
-                          struct com_writable_buffer* response) {
-  return edh_srv_message_1_handler_add_error(edhoc_api_result, NULL,
-                                             generic_error_message, response);
-}
-
-static enum edh_srv_message_1_handler_add_error_status add_internal_error(
-    const char* generic_error_message, struct com_writable_buffer* response) {
-  return add_error_without_context(INTERNAL_FAILURE_EDHOC_CODE,
-                                   generic_error_message, response);
-}
 
 /**
  * WHY ARE WE CASTING TO VOID THE RETURN?
@@ -44,26 +30,28 @@ struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
         EDH_SRV_MSG1_HDL_ERR_INVALID_RESPONSE_BUFFER);
   }
   if (request.credentials == NULL) {
-    (void)add_internal_error("Null credentials", response);
+    (void)edh_com_add_internal_error_to_response("Null credentials", response);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS);
   }
   if (!com_readonly_buffer_is_valid(request.payload)) {
-    (void)add_internal_error("Invalid request buffer", response);
+    (void)edh_com_add_internal_error_to_response("Invalid request buffer",
+                                                 response);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    (void)add_internal_error("Context calloc failed", response);
+    (void)edh_com_add_internal_error_to_response("Context calloc failed",
+                                                 response);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_CALLOC_FAILED);
   }
   int edhoc_api_result = edh_com_setup_context(edhoc_ctx, request.credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    add_error_without_context(edhoc_api_result, "Context setup failed",
-                              response);
+    (void)edh_com_add_internal_error_to_response("Context setup failed",
+                                                 response);
     free(edhoc_ctx);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
@@ -72,7 +60,7 @@ struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
                                              request.payload.length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
     edh_srv_message_1_handler_add_error(
-        edhoc_api_result, edhoc_ctx, "Message 1 processing failed", response);
+        edhoc_ctx, "Message 1 processing failed", response);
     free(edhoc_ctx);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED);
@@ -80,15 +68,15 @@ struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
   edhoc_api_result = edhoc_message_2_compose(
       edhoc_ctx, response->bytes, response->capacity, &response->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    edh_srv_message_1_handler_add_error(edhoc_api_result, edhoc_ctx,
-                                        "Message 2 composing failed", response);
+    edh_srv_message_1_handler_add_error(edhoc_ctx, "Message 2 composing failed",
+                                        response);
     free(edhoc_ctx);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
   if (!com_writable_buffer_has_content(response)) {
-    (void)add_internal_error("Message 2 compose produced empty buffer",
-                             response);
+    (void)edh_com_add_internal_error_to_response(
+        "Message 2 compose produced empty buffer", response);
     free(edhoc_ctx);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_EMPTY);

@@ -11,42 +11,54 @@
 
 #include <string.h>
 
-enum edh_com_set_error_info_status edh_com_set_error_info(
-    const char* error_message, struct edhoc_error_info* error_info) {
-  if (error_message == NULL) {
-    return EDH_COM_SET_ERROR_INFO_ERR_NULL_MESSAGE;
-  }
-  if (error_info == NULL) {
-    return EDH_COM_SET_ERROR_INFO_ERR_NULL_ERROR_INFO;
-  }
-  memset(error_info, 0, sizeof(struct edhoc_error_info));
-  const size_t len = strlen(error_message);
-  if (len == 0) {
-    return EDH_COM_SET_ERROR_INFO_ERR_EMPTY_MESSAGE;
-  }
-
-  /* WARNING: As of libedhoc v1.0 (2025-04-14), text_string is treated as
-   * read-only. The (char*) cast is required by the struct definition but
-   * is safe for now. If libedhoc is updated, consider strdup() or stack
-   * buffering. */
-  error_info->text_string = (char*)error_message;
-  error_info->total_entries = len;
-  error_info->written_entries = len;
-  return EDH_COM_SET_ERROR_INFO_OK;
-}
+const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_GENERIC_ERROR;
 
 enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response(const int edhoc_api_result,
+edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
                                     const struct edhoc_error_info* error_info,
                                     struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
     return EDH_COM_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
-
+  enum edhoc_error_code error_code;
+  if (edhoc_error_get_code(context, &error_code) != EDHOC_SUCCESS) {
+    return EDH_COM_ADD_ERROR_ERR_GET_ERROR;
+  }
   if (edhoc_message_error_compose(response_data->bytes, response_data->capacity,
-                                  &response_data->length, edhoc_api_result,
+                                  &response_data->length, error_code,
                                   error_info) != EDHOC_SUCCESS) {
     return EDH_COM_ADD_ERROR_ERR_COMPOSE;
-  };
+  }
   return EDH_COM_ADD_ERROR_OK;
+}
+
+enum edh_com_add_internal_error_to_response_status
+edh_com_add_internal_error_to_response(
+    const char* error_message, struct com_writable_buffer* response_data) {
+  if (!com_writable_buffer_is_writable(response_data)) {
+    return EDH_COM_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER;
+  }
+
+  const struct edhoc_error_info error_info = {
+      .text_string = (char*)error_message,
+      .total_entries = strlen(error_message),
+  };
+  if (edhoc_message_error_compose(
+          response_data->bytes, response_data->capacity, &response_data->length,
+          INTERNAL_FAILURE_EDHOC_CODE, &error_info) != EDHOC_SUCCESS) {
+    return EDH_COM_ADD_INTERNAL_ERROR_ERR_COMPOSE;
+  }
+  return EDH_COM_ADD_INTERNAL_ERROR_OK;
+}
+
+enum edh_com_add_edhoc_error_to_response_status
+edh_com_add_edhoc_error_to_response_with_description(
+    const struct edhoc_context* context, const char* error_description,
+    struct com_writable_buffer* response_data) {
+  const struct edhoc_error_info error_info = {
+      .text_string = (char*)error_description,
+      .total_entries = strlen(error_description),
+  };
+  return edh_com_add_edhoc_error_to_response(context, &error_info,
+                                             response_data);
 }

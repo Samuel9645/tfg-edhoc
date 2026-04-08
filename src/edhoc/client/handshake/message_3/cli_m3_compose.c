@@ -10,7 +10,7 @@
 
 #include <edhoc_helpers.h>
 
-#include "edhoc/client/handshake/message_3/cli_m3_errors.h"
+#include "edhoc/common/add_edhoc_error_info.h"
 
 static struct edh_cli_message_3_compose_result message_3_compose_ok(
     const struct com_writable_buffer message_3) {
@@ -58,8 +58,8 @@ struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
   int edhoc_result = edhoc_prepend_connection_id(
       &prepended_fields, &state->context.private_peer_cid);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edh_cli_message_3_handler_add_error(
-        edhoc_result, "Failed to prepend connection id for message 3",
+    (void)edh_com_add_edhoc_error_to_response_with_description(
+        &state->context, "Failed to prepend connection id for message 3",
         message_3_or_error);
     return message_3_compose_protocol_failure(
         EDH_CLI_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
@@ -71,8 +71,9 @@ struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
       &state->context, prepended_fields.edhoc_message_ptr,
       prepended_fields.edhoc_message_size, &message3_len);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edh_cli_message_3_handler_add_error(
-        edhoc_result, "Failed to compose EDHOC message 3", message_3_or_error);
+    (void)edh_com_add_edhoc_error_to_response_with_description(
+        &state->context, "Failed to compose EDHOC message 3",
+        message_3_or_error);
     return message_3_compose_protocol_failure(
         EDH_CLI_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
         *message_3_or_error);
@@ -81,8 +82,8 @@ struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
   prepended_fields.edhoc_message_size = message3_len;
   edhoc_result = edhoc_prepend_recalculate_size(&prepended_fields);
   if (edhoc_result != EDHOC_SUCCESS) {
-    edh_cli_message_3_handler_add_error(
-        edhoc_result, "Failed to recalculate prepended message size",
+    (void)edh_com_add_edhoc_error_to_response_with_description(
+        &state->context, "Failed to recalculate prepended message size",
         message_3_or_error);
     return message_3_compose_protocol_failure(
         EDH_CLI_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,

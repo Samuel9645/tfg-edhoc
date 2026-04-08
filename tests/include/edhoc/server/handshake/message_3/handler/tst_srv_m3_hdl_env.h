@@ -31,17 +31,4 @@ struct tst_edh_srv_message_3_env {
  */
 void tst_edh_srv_message_3_setup_env(struct tst_edh_srv_message_3_env* env);
 
-/**
- * @brief Returns a request struct with a valid context but an invalid/NULL
- * buffer.
- */
-struct edh_srv_message_3_request tst_message_3_request_without_buffer(
-    const struct tst_edh_srv_message_3_env* env);
-
-/**
- * @brief Returns a request struct with a valid buffer but a NULL context.
- */
-struct edh_srv_message_3_request tst_message_3_request_without_context(
-    const struct tst_edh_srv_message_3_env* env);
-
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_HELPERS_H_

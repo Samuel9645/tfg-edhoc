@@ -15,7 +15,7 @@
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
 struct edh_srv_message_3_request {
-  struct edhoc_context* edhoc_ctx;
+  struct edhoc_context* edhoc_context;
   struct com_readonly_buffer parsed_message_3;
 };
 

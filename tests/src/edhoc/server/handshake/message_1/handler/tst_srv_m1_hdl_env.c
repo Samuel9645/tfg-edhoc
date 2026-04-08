@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/message_1/handler/tst_m1_hdl_helpers.h"
+#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_hdl_env.h"
 
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 static const uint8_t DUMMY_MESSAGE_1_PAYLOAD[] = {0x01, 0x02};

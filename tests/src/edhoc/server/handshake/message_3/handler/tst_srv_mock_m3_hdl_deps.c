@@ -7,13 +7,12 @@
  */
 
 // ReSharper disable CppParameterMayBeConst
-#include "edhoc/server/handshake/message_3/handler/tst_srv_m3_stubs.h"
+#include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_hdl_deps.h"
 
 #include <edhoc.h>
 #include <string.h>
 
 #include "edhoc/common/add_edhoc_error_info.h"
-#include "edhoc/server/handshake/message_3/srv_m3_errors.h"
 #include "unity.h"
 
 const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;
@@ -66,44 +65,15 @@ int edhoc_message_4_compose(
   return tst_edh_srv_stub_message_4_compose_result;
 }
 
-const uint8_t TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_BUFFER[] = {0xDE, 0xAD, 0xBE,
-                                                           0xEF};
-const size_t TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN =
-    sizeof(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_BUFFER);
-
-enum edh_srv_message_3_handler_add_error_status
-edh_srv_message_3_handler_add_error(const int edhoc_api_result,
-                                    const char* generic_error_message,
-                                    struct com_writable_buffer* response_data) {
-  (void)edhoc_api_result;
-  (void)generic_error_message;
-  TEST_ASSERT_NOT_NULL_MESSAGE(response_data,
-                               "Mock Error: Response buffer pointer is NULL");
-  TEST_ASSERT_LESS_OR_EQUAL_MESSAGE(response_data->capacity,
-                                    TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN,
-                                    "Mock Error: Response buffer capacity is "
-                                    "smaller than error payload length");
-  memcpy(response_data->bytes, TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_BUFFER,
-         TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN);
-  response_data->length = TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN;
-  return EDH_SRV_MSG3_ADD_ERROR_OK;
-}
-
-void tst_edh_srv_m3_assert_handler_writes_error_payload(
-    struct com_writable_buffer response) {
-  TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN, response.length);
-  TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_BUFFER,
-                           response.bytes,
-                           TST_EDH_SRV_MESSAGE_3_MOCK_ERROR_LEN);
-}
-
 void tst_edh_srv_m1_assert_handler_writes_message_4_in_buffer(
     struct com_writable_buffer response) {
-  TEST_ASSERT_EQUAL(tst_edh_srv_stub_message_4_compose_written_length,
-                    response.length);
-  TEST_ASSERT_EQUAL_MEMORY(tst_edh_srv_stub_message_4_compose_output_buffer,
-                           response.bytes,
-                           tst_edh_srv_stub_message_4_compose_written_length);
+  TEST_ASSERT_EQUAL_MESSAGE(tst_edh_srv_stub_message_4_compose_written_length,
+                            response.length,
+                            "writen length pointer is not the expected length");
+  TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
+      tst_edh_srv_stub_message_4_compose_output_buffer, response.bytes,
+      tst_edh_srv_stub_message_4_compose_written_length,
+      "The composed message 4 payload was not written in the response buffer");
 }
 
 void tst_edh_srv_message_3_reset_stub_results(void) {

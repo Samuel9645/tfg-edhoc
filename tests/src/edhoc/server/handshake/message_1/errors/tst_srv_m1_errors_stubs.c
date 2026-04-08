@@ -40,8 +40,9 @@ void tst_srv_m1_err_reset_stub_results(void) {
 /* Stubbed version of libedhoc function */
 int edhoc_error_get_cipher_suites(
     const struct edhoc_context* context, int32_t* cipher_suites,
-    size_t cipher_suites_size, size_t* cipher_suites_length,
-    int32_t* peer_cipher_suites,  // NOLINT(*-non-const-parameter)
+    size_t cipher_suites_size,
+    size_t* cipher_suites_length,  // NOLINT(*-non-const-parameter)
+    int32_t* peer_cipher_suites,   // NOLINT(*-non-const-parameter)
     size_t peer_cipher_suites_size,
     size_t* peer_cipher_suites_length) {  // NOLINT(*-non-const-parameter)
 
@@ -72,10 +73,10 @@ int edhoc_error_get_cipher_suites(
 struct edhoc_error_info test_stub_captured_error_info = {0};
 
 enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response(const int edhoc_api_result,
+edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
                                     const struct edhoc_error_info* error_info,
                                     struct com_writable_buffer* response_data) {
-  (void)edhoc_api_result;
+  (void)context;
   (void)response_data;
 
   /* CAPTURE: Store the data passed by the handler so the test can inspect it */

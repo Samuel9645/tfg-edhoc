@@ -12,30 +12,18 @@
 #include <edhoc.h>
 
 #include "common/data_models.h"
-
-enum edh_srv_message_1_handler_add_error_status {
-  EDH_SRV_MSG1_ADD_ERROR_OK = 0,
-  EDH_SRV_MSG1_ADD_ERROR_ERR_PREPARE_CTX,
-  EDH_SRV_MSG1_ADD_ERROR_ERR_ADD_ERROR_TO_RESPONSE,
-};
-
 /**
  * @brief Compose and write a Message 1 operation-specific EDHOC error message
  * into the response buffer.
  *
- * Handles both generic errors and wrong-cipher-suite errors with appropriate
- * error info context.
+ * Handles both generic errors and wrong-cipher-suite errors.
  *
- * @param[in] edhoc_api_result Return value from the failing libedhoc API call.
- * @param[in] edhoc_context EDHOC context carrying operation failure details.
+ * @param[in] context EDHOC context to extract the error info.
  * @param[in] generic_error_message Generic error text for non-cipher errors.
  * @param[out] response_data Buffer where the EDHOC error message is written.
- * @return Status code for the error composition operation.
  */
-enum edh_srv_message_1_handler_add_error_status
-edh_srv_message_1_handler_add_error(int edhoc_api_result,
-                                    const struct edhoc_context* edhoc_context,
-                                    const char* generic_error_message,
-                                    struct com_writable_buffer* response_data);
+void edh_srv_message_1_handler_add_error(
+    const struct edhoc_context* context, const char* generic_error_message,
+    struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_

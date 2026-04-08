@@ -96,9 +96,9 @@ void test_handler_fails_on_library_errors(void) {
   } cases[] = {
       {"setup fails", tst_edh_srv_m1_set_setup_failure,
        EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED},
-      {"processing fails", tst_edh_srv_m1_set_process_failure,
+      {"processing fails", tst_edh_srv_m1_set_message_1_process_failure,
        EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED},
-      {"composition fails", tst_edh_srv_m1_set_compose_failure,
+      {"composition fails", tst_edh_srv_m1_set_message_2_compose_failure,
        EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED},
   };
 
@@ -115,7 +115,7 @@ void test_handler_fails_on_library_errors(void) {
 }
 
 void test_handler_fails_when_message_2_composition_produces_empty_buffer(void) {
-  tst_edh_srv_m1_set_compose_empty_length();
+  tst_edh_srv_m1_set_message_2_compose_empty_length();
 
   const struct ehd_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);

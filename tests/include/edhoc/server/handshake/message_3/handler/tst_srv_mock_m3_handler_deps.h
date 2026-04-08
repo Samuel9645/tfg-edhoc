@@ -9,17 +9,14 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_
 
-#include <stddef.h>
-
 #include "common/data_models.h"
-
-void tst_edh_srv_message_3_reset_stub_results(void);
 
 void tst_edh_srv_m3_assert_handler_writes_message_4_in_buffer(
     struct com_writable_buffer response);
 
-void tst_edh_srv_m3_set_message_4_compose_result(int compose_result);
-void tst_edh_srv_m3_set_message_3_process_result(int process_result);
-void tst_edh_srv_m3_set_message_4_compose_written_length(size_t length);
+void tst_edh_srv_m1_set_message_3_process_failure(void);
+void tst_edh_srv_m1_set_message_4_compose_failure(void);
+void tst_edh_srv_m3_set_message_4_compose_empty_length(void);
 
+void tst_edh_srv_message_3_reset_stub_results(void);
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_

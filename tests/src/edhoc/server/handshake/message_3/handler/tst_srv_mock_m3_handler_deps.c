@@ -22,16 +22,16 @@ static int message_3_process_result = EDHOC_SUCCESS;
 static int message_4_compose_result = EDHOC_SUCCESS;
 static size_t message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);
 
-void tst_edh_srv_m3_set_message_3_process_result(int process_result) {
-  message_3_process_result = process_result;
+void tst_edh_srv_m1_set_message_3_process_failure(void) {
+  message_3_process_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_m3_set_message_4_compose_result(int compose_result) {
-  message_4_compose_result = compose_result;
+void tst_edh_srv_m1_set_message_4_compose_failure(void) {
+  message_4_compose_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_m3_set_message_4_compose_written_length(size_t length) {
-  message_4_written_length = length;
+void tst_edh_srv_m3_set_message_4_compose_empty_length(void) {
+  message_4_written_length = 0;
 }
 
 void tst_edh_srv_message_3_reset_stub_results(void) {
@@ -59,10 +59,10 @@ int edhoc_message_3_process(struct edhoc_context* edhoc_context,
   return message_3_process_result;
 }
 
-int edhoc_message_4_compose(struct edhoc_context* context, uint8_t* message_4,
-                            const size_t message_4_size,
+int edhoc_message_4_compose(struct edhoc_context* edhoc_context,
+                            uint8_t* message_4, const size_t message_4_size,
                             size_t* message_4_length) {
-  (void)context;
+  (void)edhoc_context;
   if (message_4 == NULL) {
     tst_report_mock_error("message 4 destination buffer is NULL");
     return EDHOC_ERROR_GENERIC_ERROR;

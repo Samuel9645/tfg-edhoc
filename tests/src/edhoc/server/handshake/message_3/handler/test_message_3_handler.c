@@ -74,7 +74,7 @@ void test_handler_fails_on_invalid_data(void) {
 }
 
 void test_handler_fails_when_message_3_processing_fails(void) {
-  tst_edh_srv_m3_set_message_3_process_result(EDHOC_ERROR_CRYPTO_FAILURE);
+  tst_edh_srv_m1_set_message_3_process_failure();
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
@@ -84,7 +84,7 @@ void test_handler_fails_when_message_3_processing_fails(void) {
 }
 
 void test_handler_fails_when_message_4_composition_fails(void) {
-  tst_edh_srv_m3_set_message_4_compose_result(EDHOC_ERROR_BUFFER_TOO_SMALL);
+  tst_edh_srv_m1_set_message_4_compose_failure();
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);
@@ -94,8 +94,7 @@ void test_handler_fails_when_message_4_composition_fails(void) {
 }
 
 void test_handler_fails_when_message_4_composition_produces_empty_buffer(void) {
-  tst_edh_srv_m3_set_message_4_compose_result(EDHOC_SUCCESS);
-  tst_edh_srv_m3_set_message_4_compose_written_length(0);
+  tst_edh_srv_m3_set_message_4_compose_empty_length();
 
   const enum edh_srv_message_3_handler_status status =
       edh_srv_handle_message_3(env.request, &env.response);

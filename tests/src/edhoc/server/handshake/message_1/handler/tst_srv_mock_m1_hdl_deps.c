@@ -22,18 +22,18 @@
 // TODO: this is duplicated with m3_stubs
 
 static const uint8_t TST_DEFAULT_M2_PAYLOAD[] = {0x01, 0x02, 0x03, 0x04};
-static int setup_result = EDHOC_SUCCESS;
-static int process_result = EDHOC_SUCCESS;
-static int compose_result = EDHOC_SUCCESS;
+static int context_setup_result = EDHOC_SUCCESS;
+static int message_1_process_result = EDHOC_SUCCESS;
+static int message_2_compose_result = EDHOC_SUCCESS;
 
 static const uint8_t* compose_buffer = TST_DEFAULT_M2_PAYLOAD;
 static size_t compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
 
-void tst_edh_srv_m1_configure_behavior(int setup_res, int process_res,
-                                       int compose_res) {
-  setup_result = setup_res;
-  process_result = process_res;
-  compose_result = compose_res;
+void tst_edh_srv_m1_configure_behavior(int setup_result, int process_result,
+                                       int compose_result) {
+  context_setup_result = setup_result;
+  message_1_process_result = process_result;
+  message_2_compose_result = compose_result;
 }
 
 void tst_edh_srv_m1_set_compose_length(size_t length) {
@@ -41,9 +41,9 @@ void tst_edh_srv_m1_set_compose_length(size_t length) {
 }
 
 void tst_edh_srv_hnd_reset_stub_results(void) {
-  setup_result = EDHOC_SUCCESS;
-  process_result = EDHOC_SUCCESS;
-  compose_result = EDHOC_SUCCESS;
+  context_setup_result = EDHOC_SUCCESS;
+  message_1_process_result = EDHOC_SUCCESS;
+  message_2_compose_result = EDHOC_SUCCESS;
   compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
 }
 
@@ -51,8 +51,9 @@ void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
     struct com_writable_buffer response) {
   TEST_ASSERT_EQUAL_HEX8_ARRAY_MESSAGE(compose_buffer, response.bytes,
                                        compose_written_length,
-                                       "Message 2 was not written");
-  TEST_ASSERT_EQUAL(compose_written_length, response.length);
+                                       "message 2 content mismatch");
+  TEST_ASSERT_EQUAL_MESSAGE(compose_written_length, response.length,
+                            "message 2 reported length mismatch");
 }
 
 void edh_srv_message_1_handler_add_error(
@@ -75,7 +76,7 @@ int edh_com_setup_context(struct edhoc_context* context,
                           const struct edhoc_credentials* credentials) {
   (void)context;
   (void)credentials;
-  return setup_result;
+  return context_setup_result;
 }
 
 int edhoc_message_1_process(struct edhoc_context* edhoc_context,
@@ -84,7 +85,7 @@ int edhoc_message_1_process(struct edhoc_context* edhoc_context,
   (void)edhoc_context;
   (void)message_1;
   (void)message_1_length;
-  return process_result;
+  return message_1_process_result;
 }
 
 int edhoc_message_2_compose(struct edhoc_context* edhoc_context,
@@ -99,13 +100,14 @@ int edhoc_message_2_compose(struct edhoc_context* edhoc_context,
     tst_report_mock_error("message 2 length is NULL");
     return EDHOC_ERROR_GENERIC_ERROR;
   }
-  if (compose_result != EDHOC_SUCCESS) {
-    return compose_result;
+
+  if (message_2_compose_result != EDHOC_SUCCESS) {
+    return message_2_compose_result;
   }
   if (message_2_size < compose_written_length) {
     return EDHOC_ERROR_BUFFER_TOO_SMALL;
   }
   memcpy(message_2, compose_buffer, compose_written_length);
   *message_2_length = compose_written_length;
-  return compose_result;
+  return message_2_compose_result;
 }

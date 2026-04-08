@@ -12,75 +12,75 @@
 #include <edhoc.h>
 #include <string.h>
 
+#include "common/tst_report_mock_error.h"
 #include "edhoc/common/add_edhoc_error_info.h"
 #include "unity.h"
 
-const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;
+static const uint8_t TST_DEFAULT_M4_PAYLOAD[] = {0x04, 0x05, 0x06, 0x07};
 
-int tst_edh_srv_stub_process_message_3_result = SUCCESS_STUB_RESULT;
+static int message_3_process_result = EDHOC_SUCCESS;
+static int message_4_compose_result = EDHOC_SUCCESS;
+static size_t message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);
 
-int edhoc_message_3_process(struct edhoc_context* edhoc_context,
-                            const uint8_t* message_3,
-                            const size_t message_3_length) {
-  (void)edhoc_context;
-  (void)message_3;
-  (void)message_3_length;
-  return tst_edh_srv_stub_process_message_3_result;
+void tst_edh_srv_m3_set_message_3_process_result(int process_result) {
+  message_3_process_result = process_result;
 }
 
-static const uint8_t TST_EDH_SRV_MESSAGE_4_MOCK_PAYLOAD[] = {0x01, 0x02, 0x03,
-                                                             0x04};
-static const size_t TST_EDH_SRV_MESSAGE_4_MOCK_LEN =
-    sizeof(TST_EDH_SRV_MESSAGE_4_MOCK_PAYLOAD);
-
-size_t tst_edh_srv_stub_message_4_compose_written_length =
-    TST_EDH_SRV_MESSAGE_4_MOCK_LEN;
-const uint8_t* tst_edh_srv_stub_message_4_compose_output_buffer =
-    TST_EDH_SRV_MESSAGE_4_MOCK_PAYLOAD;
-int tst_edh_srv_stub_message_4_compose_result = SUCCESS_STUB_RESULT;
-
-int edhoc_message_4_compose(
-    struct edhoc_context* edhoc_context,
-    uint8_t* message_4,           // NOLINT(*-non-const-parameter)
-    const size_t message_4_size,  // NOLINT(*-non-const-parameter)
-    size_t* message_4_length) {   // NOLINT(*-non-const-parameter)
-  (void)edhoc_context;
-  (void)message_4_size;
-  TEST_ASSERT_NOT_NULL_MESSAGE(
-      message_4, "Mock Error: Destination buffer (message_4) is NULL");
-  TEST_ASSERT_NOT_NULL_MESSAGE(message_4_length,
-                               "Mock Error: Output length pointer is NULL");
-  if (tst_edh_srv_stub_message_4_compose_result != SUCCESS_STUB_RESULT) {
-    return tst_edh_srv_stub_message_4_compose_result;
-  }
-  TEST_ASSERT_NOT_NULL_MESSAGE(tst_edh_srv_stub_message_4_compose_output_buffer,
-                               "Mock Error: Internal payload source is NULL");
-
-  if (message_4_size < tst_edh_srv_stub_message_4_compose_written_length) {
-    return EDHOC_ERROR_BUFFER_TOO_SMALL;
-  }
-  memcpy(message_4, tst_edh_srv_stub_message_4_compose_output_buffer,
-         tst_edh_srv_stub_message_4_compose_written_length);
-  *message_4_length = tst_edh_srv_stub_message_4_compose_written_length;
-  return tst_edh_srv_stub_message_4_compose_result;
+void tst_edh_srv_m3_set_message_4_compose_result(int compose_result) {
+  message_4_compose_result = compose_result;
 }
 
-void tst_edh_srv_m1_assert_handler_writes_message_4_in_buffer(
-    struct com_writable_buffer response) {
-  TEST_ASSERT_EQUAL_MESSAGE(tst_edh_srv_stub_message_4_compose_written_length,
-                            response.length,
-                            "writen length pointer is not the expected length");
-  TEST_ASSERT_EQUAL_MEMORY_MESSAGE(
-      tst_edh_srv_stub_message_4_compose_output_buffer, response.bytes,
-      tst_edh_srv_stub_message_4_compose_written_length,
-      "The composed message 4 payload was not written in the response buffer");
+void tst_edh_srv_m3_set_message_4_compose_written_length(size_t length) {
+  message_4_written_length = length;
 }
 
 void tst_edh_srv_message_3_reset_stub_results(void) {
-  tst_edh_srv_stub_process_message_3_result = SUCCESS_STUB_RESULT;
-  tst_edh_srv_stub_message_4_compose_result = SUCCESS_STUB_RESULT;
-  tst_edh_srv_stub_message_4_compose_output_buffer =
-      TST_EDH_SRV_MESSAGE_4_MOCK_PAYLOAD;
-  tst_edh_srv_stub_message_4_compose_written_length =
-      TST_EDH_SRV_MESSAGE_4_MOCK_LEN;
+  message_3_process_result = EDHOC_SUCCESS;
+  message_4_compose_result = EDHOC_SUCCESS;
+  message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);
+}
+
+void tst_edh_srv_m3_assert_handler_writes_message_4_in_buffer(
+    struct com_writable_buffer response) {
+  TEST_ASSERT_EQUAL_HEX8_ARRAY_MESSAGE(TST_DEFAULT_M4_PAYLOAD, response.bytes,
+                                       message_4_written_length,
+                                       "message 4 content mismatch");
+
+  TEST_ASSERT_EQUAL_MESSAGE(message_4_written_length, response.length,
+                            "message 4 reported length mismatch");
+}
+
+int edhoc_message_3_process(struct edhoc_context* context,
+                            const uint8_t* message_3,
+                            const size_t message_3_length) {
+  (void)context;
+  (void)message_3;
+  (void)message_3_length;
+  return message_3_process_result;
+}
+
+int edhoc_message_4_compose(struct edhoc_context* context, uint8_t* message_4,
+                            const size_t message_4_size,
+                            size_t* message_4_length) {
+  (void)context;
+  if (message_4 == NULL) {
+    tst_report_mock_error("message 4 destination buffer is NULL");
+    return EDHOC_ERROR_GENERIC_ERROR;
+  }
+  if (message_4_length == NULL) {
+    tst_report_mock_error("message 4 output length pointer is NULL");
+    return EDHOC_ERROR_GENERIC_ERROR;
+  }
+
+  if (message_4_compose_result != EDHOC_SUCCESS) {
+    return message_4_compose_result;
+  }
+  if (message_4_size < message_4_written_length) {
+    return EDHOC_ERROR_BUFFER_TOO_SMALL;
+  }
+  if (message_4_written_length > 0) {
+    memcpy(message_4, TST_DEFAULT_M4_PAYLOAD, message_4_written_length);
+  }
+  *message_4_length = message_4_written_length;
+  return message_4_compose_result;
 }

@@ -18,8 +18,8 @@ void tst_edh_srv_hnd_reset_stub_results(void);
 void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
     struct com_writable_buffer response);
 
-void tst_edh_srv_m1_configure_behavior(int setup_res, int process_res,
-                                       int compose_res);
+void tst_edh_srv_m1_configure_behavior(int setup_result, int process_result,
+                                       int compose_result);
 
 void tst_edh_srv_m1_set_compose_length(size_t length);
 

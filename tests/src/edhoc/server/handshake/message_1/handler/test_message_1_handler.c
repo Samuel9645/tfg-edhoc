@@ -73,7 +73,6 @@ void test_handler_fails_on_invalid_data(void) {
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     tst_edh_srv_hnd_reset_stub_results();
-
     const struct ehd_srv_message_1_handler_result result =
         edh_srv_handle_message_1(test_cases[i].request, test_cases[i].response);
 
@@ -108,8 +107,6 @@ void test_handler_fails_on_library_errors(void) {
 
   for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
     tst_edh_srv_hnd_reset_stub_results();
-
-    /* Atomic Configuration: Set the specific failure for this branch */
     tst_edh_srv_m1_configure_behavior(cases[i].setup_res, cases[i].process_res,
                                       cases[i].compose_res);
 

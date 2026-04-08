@@ -37,15 +37,15 @@ struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
     return cp_srv_internal_parse_message_3_failure(
         EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED);
   }
-  if (edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
-                                &edhoc_ctx->private_cid)) {
-    return cp_srv_internal_parse_message_3_ok((struct com_readonly_buffer){
-        .bytes = extracted_fields.edhoc_message_ptr,
-        .length = extracted_fields.edhoc_message_size,
-    });
+  if (!edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
+                                 &edhoc_ctx->private_cid)) {
+    return cp_srv_internal_parse_message_3_failure(
+        EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID);
   }
-  return cp_srv_internal_parse_message_3_failure(
-      EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID);
+  return cp_srv_internal_parse_message_3_ok((struct com_readonly_buffer){
+      .bytes = extracted_fields.edhoc_message_ptr,
+      .length = extracted_fields.edhoc_message_size,
+  });
 }
 
 const char* edh_srv_parse_message_3_status_to_string(

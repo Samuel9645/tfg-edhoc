@@ -16,7 +16,9 @@
 
 void tst_edh_srv_hnd_reset_stub_results(void);
 
-void tst_edh_srv_m1_assert_handler_writes_error_payload(
+void tst_edh_srv_m1_assert_handler_writes_error_in_buffer(
+    struct com_writable_buffer response);
+void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
     struct com_writable_buffer response);
 
 extern int tst_edh_srv_stub_context_setup_result;

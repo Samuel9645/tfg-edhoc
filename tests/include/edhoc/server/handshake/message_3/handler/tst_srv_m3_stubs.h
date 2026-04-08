@@ -10,15 +10,14 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_
 
 #include <stddef.h>
-#include <stdint.h>
 
 #include "common/data_models.h"
 
 void tst_edh_srv_message_3_reset_stub_results(void);
 
-void tst_edh_srv_message_3_set_stub_error_response(const uint8_t* data,
-                                                   size_t length);
 void tst_edh_srv_m3_assert_handler_writes_error_payload(
+    struct com_writable_buffer response);
+void tst_edh_srv_m1_assert_handler_writes_message_4_in_buffer(
     struct com_writable_buffer response);
 
 extern int tst_edh_srv_stub_process_message_3_result;

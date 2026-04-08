@@ -104,12 +104,21 @@ void edh_srv_message_1_handler_add_error(
   response_data->length = TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN;
 }
 
-void tst_edh_srv_m1_assert_handler_writes_error_payload(
+void tst_edh_srv_m1_assert_handler_writes_error_in_buffer(
     struct com_writable_buffer response) {
   TEST_ASSERT_EQUAL(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN, response.length);
   TEST_ASSERT_EQUAL_MEMORY(TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_BUFFER,
                            response.bytes,
                            TST_EDH_SRV_MESSAGE_1_MOCK_ERROR_LEN);
+}
+
+void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
+    struct com_writable_buffer response) {
+  TEST_ASSERT_EQUAL(tst_edh_srv_stub_message_2_compose_written_length,
+                    response.length);
+  TEST_ASSERT_EQUAL_MEMORY(tst_edh_srv_stub_message_2_compose_output_buffer,
+                           response.bytes,
+                           tst_edh_srv_stub_message_2_compose_written_length);
 }
 
 void tst_edh_srv_hnd_reset_stub_results(void) {

@@ -39,6 +39,7 @@ void test_handler_ok_for_valid_data(void) {
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_OK, result.status);
+  tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(env.response);
   TEST_ASSERT_NOT_NULL(result.edhoc_ctx);
   free(result.edhoc_ctx);
 }
@@ -78,7 +79,7 @@ void test_handler_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
     if (test_cases[i].response != NULL) {
-      tst_edh_srv_m1_assert_handler_writes_error_payload(env.response);
+      tst_edh_srv_m1_assert_handler_writes_error_in_buffer(env.response);
     }
     ensure_context_is_freed_on_failure(result);
   }
@@ -88,7 +89,7 @@ static void assert_standard_failure(
     const struct ehd_srv_message_1_handler_result result,
     const enum edh_srv_message_1_handler_status expected_status) {
   TEST_ASSERT_EQUAL(expected_status, result.status);
-  tst_edh_srv_m1_assert_handler_writes_error_payload(env.response);
+  tst_edh_srv_m1_assert_handler_writes_error_in_buffer(env.response);
   ensure_context_is_freed_on_failure(result);
 }
 

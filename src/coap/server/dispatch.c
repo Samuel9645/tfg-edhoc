@@ -5,11 +5,11 @@
 #include "coap/config.h"
 #include "coap/server/edhoc_mapper/message_1_mapper.h"
 #include "coap/server/edhoc_mapper/message_3_mapper.h"
+#include "coap/server/internal/dispatch_engine.h"
 #include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
-#include "internal/dispatch_engine.h"
 
 static enum cp_status add_edhoc_response_options(
     coap_pdu_t* response,

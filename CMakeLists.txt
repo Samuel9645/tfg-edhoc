@@ -11,18 +11,19 @@ include(cmake_configs/libedhoc_config.cmake)
 add_subdirectory(externals)
 
 set(BASE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_create_context.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_get_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/internal/internal_failure_err_code.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_create_context.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_get_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/response.c
 )
 
 set(MESSAGE_1_HANDLER_SOURCES
@@ -101,7 +102,7 @@ target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
 # Suppress warnings from helpers
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
 
-# Add helper include directories SYSTEM is set to suppress warnings from external 
+# Add helper include directories. SYSTEM is set to suppress warnings from external
 # code
 target_include_directories(server PRIVATE include)
 target_include_directories(server PRIVATE src)

@@ -88,8 +88,8 @@ add_unity_test(test_message_1_parser
 )
 
 set(COMMON_HANDLER_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
     ${COMMON_SRV_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/internal/internal_failure_err_code.c
 )
 
 add_unity_test(test_message_1_handler

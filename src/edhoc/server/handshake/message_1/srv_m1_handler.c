@@ -11,6 +11,7 @@
 #include <edhoc.h>
 #include <stdlib.h>
 
+#include "edhoc/common/internal/internal_failure_err_code.h"
 #include "edhoc/common/setup.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/srv_m1_errors.h"
@@ -21,8 +22,6 @@ void add_error_without_context(const int edhoc_api_result,
   edh_srv_message_1_handler_add_error(edhoc_api_result, NULL,
                                       generic_error_message, response);
 }
-
-static const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_GENERIC_ERROR;
 
 struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
     const struct edh_srv_message_1_request request,
@@ -53,9 +52,9 @@ struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
   }
   int edhoc_api_result = edh_com_setup_context(edhoc_ctx, request.credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    free(edhoc_ctx);
     add_error_without_context(edhoc_api_result, "Context setup failed",
                               response);
+    free(edhoc_ctx);
     return edh_srv_message_1_handler_failure(
         EDH_SRV_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
   }

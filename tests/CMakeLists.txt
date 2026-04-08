@@ -121,7 +121,7 @@ add_unity_test(test_message_3_handler
 
 add_unity_test(test_message_3_parser
     /src/edhoc/server/handshake/message_3/parser/test_message_3_parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser/tst_srv_mock_m3_parser_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${COMMON_SRV_SOURCES}

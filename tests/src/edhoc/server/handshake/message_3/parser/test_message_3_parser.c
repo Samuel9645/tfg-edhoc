@@ -13,7 +13,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/server/handshake/message_3/parser/tst_srv_m3_parser_stubs.h"
+#include "edhoc/server/handshake/message_3/parser/tst_srv_mock_m3_parser_deps.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
 enum { TEST_MSG_3_PAYLOAD_LENGTH = 5 };
@@ -39,9 +39,9 @@ void setUp(void) {
 void test_parser_advances_pointers_on_success(void) {
   const uint8_t* advanced_pointed = env.data + 2;
   const int reduced_length = TEST_MSG_3_PAYLOAD_LENGTH - 2;
-  tst_edh_srv_message_3_extracted_fields_result =
+  tst_srv_m3_parser_set_success_data(
       (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,
-                                      .edhoc_message_size = reduced_length};
+                                      .edhoc_message_size = reduced_length});
 
   const struct edh_srv_parse_message_3_result result =
       edh_srv_parse_message_3(env.request_buffer, &env.context);
@@ -69,8 +69,7 @@ void test_parser_fails_when_context_is_null(void) {
 }
 
 void test_parser_fails_when_connection_id_extraction_fails(void) {
-  tst_edh_srv_message_3_parser_stub_extract_result =
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+  tst_srv_m3_parser_set_extraction_failure();
 
   const struct edh_srv_parse_message_3_result result =
       edh_srv_parse_message_3(env.request_buffer, &env.context);
@@ -80,7 +79,7 @@ void test_parser_fails_when_connection_id_extraction_fails(void) {
 }
 
 void test_parser_fails_on_connection_id_mismatch(void) {
-  tst_edh_srv_message_3_parser_stub_equal_result = false;
+  tst_srv_m3_parser_set_cid_mismatch();
 
   const struct edh_srv_parse_message_3_result result =
       edh_srv_parse_message_3(env.request_buffer, &env.context);

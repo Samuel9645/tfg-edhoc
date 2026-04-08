@@ -44,7 +44,7 @@ static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
     const enum edh_srv_parse_message_1_status status) {
   switch (status) {
   case EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER:
-  case EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING:
+  case EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;

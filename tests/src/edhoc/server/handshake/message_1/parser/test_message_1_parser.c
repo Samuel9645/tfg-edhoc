@@ -12,25 +12,33 @@
 #include <string.h>
 #include <unity.h>
 
+#include "common/data_models.h"
+#include "edhoc/server/handshake/message_1/parser/tst_srv_m1_parser_stubs.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
-#include "edhoc/server/handshake/tst_srv_payload.h"
 
-void test_parser_returns_stripped_message_1_payload(void) {
-  const struct tst_edh_payload_t payload_with_prefix =
-      get_valid_message_1_payload();
+void setUp(void) { srv_m1_parser_reset_stubs(); }
+
+void test_parser_returns_stripped_message_1_buffer(void) {
+  const uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04};
+  const size_t buffer_size = sizeof(buffer);
   const struct com_readonly_buffer request_buffer = {
-      .bytes = payload_with_prefix.data,
-      .length = payload_with_prefix.length,
+      .bytes = buffer,
+      .length = buffer_size,
   };
 
   const struct edh_srv_parse_message_1_result parse_message_1_result =
       edh_srv_parse_message_1(request_buffer);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_OK, parse_message_1_result.status);
-  TEST_ASSERT_EQUAL_PTR(&payload_with_prefix.data[1],
+  TEST_ASSERT_EQUAL_PTR(&buffer[1],
                         parse_message_1_result.parsed_message_1.bytes);
-  TEST_ASSERT_EQUAL(payload_with_prefix.length - 1,
+  TEST_ASSERT_EQUAL(buffer_size - 1,
                     parse_message_1_result.parsed_message_1.length);
+}
+
+static void assert_response_empty(struct com_readonly_buffer parsed_message_1) {
+  TEST_ASSERT_NULL(parsed_message_1.bytes);
+  TEST_ASSERT_EQUAL(0, parsed_message_1.length);
 }
 
 void test_parser_fails_on_invalid_request_buffer(void) {
@@ -41,23 +49,22 @@ void test_parser_fails_on_invalid_request_buffer(void) {
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
                     parse_message_1_result.status);
-  TEST_ASSERT_NULL(parse_message_1_result.parsed_message_1.bytes);
-  TEST_ASSERT_EQUAL(0, parse_message_1_result.parsed_message_1.length);
+  assert_response_empty(parse_message_1_result.parsed_message_1);
 }
 
-void test_parser_fails_when_prefix_is_missing(void) {
-  const struct tst_edh_payload_t payload_without_prefix =
-      get_invalid_prefix_payload();
-  const struct com_readonly_buffer missing_prefix_request = {
-      .bytes = payload_without_prefix.data,
-      .length = payload_without_prefix.length,
+void test_parser_fails_when_prefix_extraction_fails(void) {
+  const uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04};
+  const size_t buffer_size = sizeof(buffer);
+  const struct com_readonly_buffer request_buffer = {
+      .bytes = buffer,
+      .length = buffer_size,
   };
+  tst_stub_extract_flow_set_failed();
 
   const struct edh_srv_parse_message_1_result parse_message_1_result =
-      edh_srv_parse_message_1(missing_prefix_request);
+      edh_srv_parse_message_1(request_buffer);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING,
+  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
                     parse_message_1_result.status);
-  TEST_ASSERT_NULL(parse_message_1_result.parsed_message_1.bytes);
-  TEST_ASSERT_EQUAL(0, parse_message_1_result.parsed_message_1.length);
+  assert_response_empty(parse_message_1_result.parsed_message_1);
 }

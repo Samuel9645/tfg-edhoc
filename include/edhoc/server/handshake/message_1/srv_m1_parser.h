@@ -14,7 +14,7 @@
 enum edh_srv_parse_message_1_status {
   EDH_SRV_MSG1_PARSE_OK = 0,
   EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
-  EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING
+  EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION
 };
 
 struct edh_srv_parse_message_1_result {

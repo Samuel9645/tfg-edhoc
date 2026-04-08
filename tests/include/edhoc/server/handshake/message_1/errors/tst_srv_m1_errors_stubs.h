@@ -2,7 +2,7 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 08/04/2026
- * @brief Message 1 specific EDHOC error-response composition testing.
+ * @brief Message 1 specific EDHOC error-response stubs.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

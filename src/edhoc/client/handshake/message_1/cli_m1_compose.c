@@ -9,8 +9,7 @@
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 
 #include <edhoc.h>
-
-#include "edhoc_helpers.h"
+#include <edhoc_helpers.h>
 
 static struct edh_cli_message_1_compose_result edh_cli_message_1_create_result(
     const enum edh_cli_message_1_compose_status status,

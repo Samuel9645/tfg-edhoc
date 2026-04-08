@@ -80,7 +80,7 @@ struct edh_srv_parse_message_1_result stb_edh_srv_parse_message_1_failure(
     const struct com_readonly_buffer request_buffer) {
   (void)request_buffer;
   return cp_srv_internal_parse_message_1_failure(
-      EDH_SRV_MSG1_PARSE_ERR_PREFIX_MISSING);
+      EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION);
 }
 
 struct edh_srv_parse_message_3_result stb_edh_srv_parse_message_3_ok(

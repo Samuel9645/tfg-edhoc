@@ -2,13 +2,13 @@
 
 #include <coap3/coap.h>
 
-#include "coap/client/cli_cleanup.h"
 #include "coap/client/cli_exchange.h"
+#include "coap/client/cli_resources.h"
 #include "coap/client/cli_utils.h"
 #include "coap/coap_config.h"
 #include "coap/common/coap_context.h"
-#include "common/com_cleanup.h"
 #include "common/com_emulation.h"
+#include "common/com_session_resources.h"
 #include "edhoc/client/cli_handshake.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"

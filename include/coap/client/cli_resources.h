@@ -1,8 +1,8 @@
-#ifndef COAP_CLIENT_CLI_CLEANUP_H_
-#define COAP_CLIENT_CLI_CLEANUP_H_
+#ifndef COAP_CLIENT_CLI_RESOURCES_H_
+#define COAP_CLIENT_CLI_RESOURCES_H_
 
 #include "coap/client/cli_exchange.h"
-#include "common/com_cleanup.h"
+#include "common/com_session_resources.h"
 #include "edhoc/client/handshake/common/cli_state.h"
 
 struct cp_cli_session_resources {
@@ -22,4 +22,4 @@ struct cp_cli_session_resources {
  */
 void cp_cli_cleanup_resources(struct cp_cli_session_resources* resources);
 
-#endif  // COAP_CLIENT_CLI_CLEANUP_H_
+#endif  // COAP_CLIENT_CLI_RESOURCES_H_

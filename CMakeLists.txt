@@ -12,7 +12,7 @@ add_subdirectory(externals)
 
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/edhoc_setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
@@ -61,7 +61,7 @@ set(SERVER_SOURCES
 
 set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_client.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_resources.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_log_error.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_exchange.c

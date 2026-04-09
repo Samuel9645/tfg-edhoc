@@ -5,8 +5,8 @@
 #include "coap/common/coap_context.h"
 #include "coap/server/srv_dispatch.h"
 #include "coap/server/srv_utils.h"
-#include "common/com_cleanup.h"
 #include "common/com_emulation.h"
+#include "common/com_session_resources.h"
 #include "edhoc/credentials/cred_srv.h"
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef

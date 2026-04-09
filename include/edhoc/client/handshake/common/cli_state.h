@@ -6,8 +6,8 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_CLIENT_HANDSHAKE_COMMON_STATE_H_
-#define EDHOC_CLIENT_HANDSHAKE_COMMON_STATE_H_
+#ifndef EDHOC_CLIENT_HANDSHAKE_COMMON_CLI_STATE_H_
+#define EDHOC_CLIENT_HANDSHAKE_COMMON_CLI_STATE_H_
 
 #include <edhoc.h>
 #include <stdbool.h>
@@ -51,4 +51,4 @@ bool edh_cli_handshake_is_initialized(const struct edh_cli_handshake* state);
  */
 void edh_cli_clear_state(struct edh_cli_handshake* state);
 
-#endif  // EDHOC_CLIENT_HANDSHAKE_COMMON_STATE_H_
+#endif  // EDHOC_CLIENT_HANDSHAKE_COMMON_CLI_STATE_H_

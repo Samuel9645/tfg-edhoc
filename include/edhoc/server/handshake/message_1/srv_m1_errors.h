@@ -6,12 +6,12 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_
-#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_ERRORS_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_ERRORS_H_
 
 #include <edhoc.h>
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 /**
  * @brief Compose and write a Message 1 operation-specific EDHOC error message
  * into the response buffer.
@@ -26,4 +26,4 @@ void edh_srv_message_1_handler_add_error(
     const struct edhoc_context* context, const char* generic_error_message,
     struct com_writable_buffer* response_data);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_ERRORS_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_ERRORS_H_

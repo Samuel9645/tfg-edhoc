@@ -6,10 +6,10 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_PROCESS_H_
-#define EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_PROCESS_H_
+#ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_PROCESS_H_
+#define EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_PROCESS_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 #include "edhoc/client/handshake/common/cli_state.h"
 #include "edhoc/client/handshake/message_2/cli_m2_result.h"
 
@@ -26,4 +26,4 @@ struct edh_cli_message_2_process_result edh_cli_process_message_2(
     struct edh_cli_handshake* state, struct com_readonly_buffer message_2,
     struct com_writable_buffer* message_2_error);
 
-#endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_PROCESS_H_
+#endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_PROCESS_H_

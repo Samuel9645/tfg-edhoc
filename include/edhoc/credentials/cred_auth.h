@@ -10,8 +10,8 @@
  * redundant at first glance.
  */
 
-#ifndef EDHOC_CREDENTIALS_AUTHENTICATION_H_
-#define EDHOC_CREDENTIALS_AUTHENTICATION_H_
+#ifndef EDHOC_CREDENTIALS_CRED_AUTH_H_
+#define EDHOC_CREDENTIALS_CRED_AUTH_H_
 
 #include <edhoc_context.h>
 
@@ -53,4 +53,4 @@ int edh_cred_auth_verify(const void* user_context,
                          const uint8_t** public_key_reference,
                          size_t* public_key_length);
 
-#endif  // EDHOC_CREDENTIALS_AUTHENTICATION_H_
+#endif  // EDHOC_CREDENTIALS_CRED_AUTH_H_

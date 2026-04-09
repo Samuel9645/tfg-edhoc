@@ -9,7 +9,7 @@
 #ifndef COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_
 #define COAP_SERVER_DISPATCH_CREATE_BASE_DEPENDENCIES_H_
 
-#include "coap/server/internal/dispatch_engine.h"
+#include "coap/server/internal/srv_dispatch_engine.h"
 
 /**
  * @brief Creates default dependency table backed by local test stubs.

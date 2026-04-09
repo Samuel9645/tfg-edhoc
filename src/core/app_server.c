@@ -1,12 +1,12 @@
-#include "core/app_server.h"
+#include "app/app_server.h"
 
 #include <coap3/coap.h>
 
 #include "coap/common/coap_context.h"
 #include "coap/server/srv_dispatch.h"
 #include "coap/server/srv_utils.h"
-#include "common/sys_cleanup.h"
-#include "common/sys_emulation.h"
+#include "common/com_cleanup.h"
+#include "common/com_emulation.h"
 #include "edhoc/credentials/cred_srv.h"
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef

@@ -38,7 +38,7 @@ function(add_unity_test TARGET_NAME TEST_FILE)
 
   # C. Standard Include Directories for all tests
   target_include_directories(${TARGET_NAME} PRIVATE
-      ${CMAKE_SOURCE_DIR}/include                      # For "core/server.h"
+      ${CMAKE_SOURCE_DIR}/include                      # For "app/server.h"
       ${CMAKE_SOURCE_DIR}/src                          # For "coap/server/internal/..."
       ${CMAKE_CURRENT_SOURCE_DIR}/include              # For test headers / stubs
       ${CMAKE_SOURCE_DIR}/externals/libedhoc/include
@@ -76,7 +76,7 @@ add_unity_test(test_dispatch
 )
 
 set(COMMON_SRV_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/common/sys_data_models.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_response_buffer_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
 )

@@ -1,5 +1,5 @@
-#ifndef EDHOC_CREDENTIALS_SERVER_PRIVATE_KEY_H_
-#define EDHOC_CREDENTIALS_SERVER_PRIVATE_KEY_H_
+#ifndef EDHOC_CREDENTIALS_CRED_SRV_KEY_H_
+#define EDHOC_CREDENTIALS_CRED_SRV_KEY_H_
 
 #include <stdint.h>
 
@@ -8,4 +8,4 @@ static const uint8_t EDH_CRED_SRV_PRIVATE_KEY[] = {
     0xf5, 0x0b, 0xbe, 0x12, 0x92, 0xbd, 0xda, 0x1a, 0x8a, 0x92, 0xb1,
     0xcd, 0x75, 0xff, 0x42, 0x0d, 0x72, 0x0f, 0xc1, 0x94, 0xff};
 
-#endif  // EDHOC_CREDENTIALS_SERVER_PRIVATE_KEY_H_
+#endif  // EDHOC_CREDENTIALS_CRED_SRV_KEY_H_

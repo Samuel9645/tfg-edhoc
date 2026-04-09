@@ -6,10 +6,10 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_RESULT_H_
-#define EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_RESULT_H_
+#ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_CLI_M1_RESULT_H_
+#define EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_CLI_M1_RESULT_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum edh_cli_message_1_compose_status {
   EDH_CLI_MSG1_COMPOSE_OK = 0,
@@ -25,4 +25,4 @@ struct edh_cli_message_1_compose_result {
   struct com_writable_buffer output;
 };
 
-#endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_RESULT_H_
+#endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_CLI_M1_RESULT_H_

@@ -11,8 +11,8 @@ include(cmake_configs/libedhoc_config.cmake)
 add_subdirectory(externals)
 
 set(BASE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/sys_data_models.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/sys_cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_cleanup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/edhoc_setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
@@ -44,13 +44,13 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_parse_edhoc_request_builders.c
     ${MESSAGE_1_HANDLER_SOURCES}
     ${MESSAGE_3_HANDLER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m1_mapper.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m3_mapper.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_dispatch.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_srv.c
 )
 

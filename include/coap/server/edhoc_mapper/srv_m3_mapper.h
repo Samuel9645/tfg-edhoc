@@ -7,8 +7,8 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef COAP_SERVER_EDHOC_MAPPER_MESSAGE_3_MAPPER_H_
-#define COAP_SERVER_EDHOC_MAPPER_MESSAGE_3_MAPPER_H_
+#ifndef COAP_SERVER_EDHOC_MAPPER_SRV_M3_MAPPER_H_
+#define COAP_SERVER_EDHOC_MAPPER_SRV_M3_MAPPER_H_
 
 #include <coap3/coap.h>
 
@@ -29,4 +29,4 @@
 coap_pdu_code_t cp_srv_map_message_3_result_to_coap(
     enum edh_srv_message_3_handler_status message_3_result);
 
-#endif  // COAP_SERVER_EDHOC_MAPPER_MESSAGE_3_MAPPER_H_
+#endif  // COAP_SERVER_EDHOC_MAPPER_SRV_M3_MAPPER_H_

@@ -6,12 +6,12 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_PARSER_H_
-#define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_PARSER_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PARSER_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PARSER_H_
 
 #include <edhoc.h>
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum edh_srv_parse_message_3_status {
   EDH_SRV_MSG3_PARSE_OK = 0,
@@ -43,4 +43,4 @@ struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
 const char* edh_srv_parse_message_3_status_to_string(
     enum edh_srv_parse_message_3_status status);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_PARSER_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PARSER_H_

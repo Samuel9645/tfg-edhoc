@@ -1,13 +1,13 @@
-#ifndef COAP_CLIENT_EXCHANGE_H_
-#define COAP_CLIENT_EXCHANGE_H_
+#ifndef COAP_CLIENT_CLI_EXCHANGE_H_
+#define COAP_CLIENT_CLI_EXCHANGE_H_
 
 #include <coap3/coap.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "coap/common/coap_status.h"
 #include "coap/coap_config.h"
-#include "common/sys_data_models.h"
+#include "coap/common/coap_status.h"
+#include "common/com_data_models.h"
 
 struct cp_cli_exchange_session_data {
   coap_context_t* context;
@@ -93,4 +93,4 @@ enum cp_status cp_cli_exchange_wait_and_get(
  */
 void cp_cli_exchange_reset(struct cp_cli_exchange* exchange);
 
-#endif  // COAP_CLIENT_EXCHANGE_H_
+#endif  // COAP_CLIENT_CLI_EXCHANGE_H_

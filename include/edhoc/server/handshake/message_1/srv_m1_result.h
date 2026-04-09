@@ -7,8 +7,8 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_MESSAGE_1_RESULT_H
-#define EDHOC_SERVER_MESSAGE_1_RESULT_H
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_
 
 enum edh_srv_message_1_handler_status {
   EDH_SRV_MSG1_HDL_OK = 0,
@@ -33,4 +33,4 @@ struct edh_srv_message_1_handler_result {
   struct edhoc_context* edhoc_ctx;
 };
 
-#endif  // EDHOC_SERVER_MESSAGE_1_RESULT_H
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_

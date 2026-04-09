@@ -1,5 +1,5 @@
-#ifndef COMMON_CLEANUP_H_
-#define COMMON_CLEANUP_H_
+#ifndef COMMON_COM_CLEANUP_H_
+#define COMMON_COM_CLEANUP_H_
 
 #include <coap3/coap.h>
 #include <edhoc.h>
@@ -24,4 +24,4 @@ struct com_session_resources {
  */
 void com_cleanup_resources(struct com_session_resources* resources);
 
-#endif  // COMMON_CLEANUP_H_
+#endif  // COMMON_COM_CLEANUP_H_

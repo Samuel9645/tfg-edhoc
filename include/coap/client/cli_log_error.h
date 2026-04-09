@@ -1,5 +1,5 @@
-#ifndef COAP_CLIENT_LOG_ERROR_RESPONSE_H_
-#define COAP_CLIENT_LOG_ERROR_RESPONSE_H_
+#ifndef COAP_CLIENT_CLI_LOG_ERROR_H_
+#define COAP_CLIENT_CLI_LOG_ERROR_H_
 
 #include <coap3/coap.h>
 #include <stdint.h>
@@ -15,4 +15,4 @@ void cp_cli_log_received_edhoc_error_response(coap_pdu_code_t response_code,
                                               const uint8_t* payload,
                                               size_t payload_len);
 
-#endif  // COAP_CLIENT_LOG_ERROR_RESPONSE_H_
+#endif  // COAP_CLIENT_CLI_LOG_ERROR_H_

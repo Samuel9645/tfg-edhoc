@@ -1,5 +1,5 @@
-#ifndef COAP_COMMON_RESPONSE_H_
-#define COAP_COMMON_RESPONSE_H_
+#ifndef COAP_COMMON_COAP_RESPONSE_H_
+#define COAP_COMMON_COAP_RESPONSE_H_
 
 #include <coap3/coap.h>
 
@@ -17,4 +17,4 @@ enum cp_status cp_com_add_response_payload(coap_pdu_t* response,
                                            const uint8_t* payload,
                                            size_t payload_len);
 
-#endif  // COAP_COMMON_RESPONSE_H_
+#endif  // COAP_COMMON_COAP_RESPONSE_H_

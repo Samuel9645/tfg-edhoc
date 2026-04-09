@@ -15,8 +15,8 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#ifndef COAP_COMMON_HELPERS_H_
-#define COAP_COMMON_HELPERS_H_
+#ifndef COAP_COMMON_COAP_HELPERS_H_
+#define COAP_COMMON_COAP_HELPERS_H_
 
 #include <coap3/coap.h>
 #include <stdbool.h>
@@ -77,4 +77,4 @@ coap_optlist_t* cp_com_create_coap_edhoc_optlist(
  */
 bool cp_com_coap_response_indicates_success(coap_pdu_code_t response_code);
 
-#endif  // COAP_COMMON_HELPERS_H_
+#endif  // COAP_COMMON_COAP_HELPERS_H_

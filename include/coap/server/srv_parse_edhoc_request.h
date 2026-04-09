@@ -6,13 +6,13 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef COAP_SERVER_REQUEST_H_
-#define COAP_SERVER_REQUEST_H_
+#ifndef COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_
+#define COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_
 
 #include <coap3/coap.h>
 
 #include "coap/coap_config.h"
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum cp_srv_parse_edhoc_request_status {
   CP_SRV_EDH_REQ_OK = 0,
@@ -48,4 +48,4 @@ struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
 const char* cp_srv_parse_edhoc_request_status_to_string(
     enum cp_srv_parse_edhoc_request_status status);
 
-#endif  // COAP_SERVER_REQUEST_H_
+#endif  // COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_

@@ -1,4 +1,4 @@
-#include "dispatch_engine.h"
+#include "srv_dispatch_engine.h"
 
 #include "coap/coap_config.h"
 #include "coap/server/srv_parse_edhoc_request.h"

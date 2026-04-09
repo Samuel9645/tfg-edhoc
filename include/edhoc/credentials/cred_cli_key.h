@@ -1,5 +1,5 @@
-#ifndef EDHOC_CREDENTIALS_CLIENT_PRIVATE_KEY_H_
-#define EDHOC_CREDENTIALS_CLIENT_PRIVATE_KEY_H_
+#ifndef EDHOC_CREDENTIALS_CRED_CLI_KEY_H_
+#define EDHOC_CREDENTIALS_CRED_CLI_KEY_H_
 
 #include <stdint.h>
 
@@ -8,4 +8,4 @@ static const uint8_t EDH_CRED_CLI_PRIVATE_KEY[] = {
     0x69, 0xf8, 0xc0, 0xb1, 0x80, 0xf8, 0xe3, 0xd8, 0x12, 0x3f, 0xf7,
     0xd0, 0x92, 0x3f, 0x34, 0x77, 0xb6, 0x9a, 0xea, 0x21, 0x0f};
 
-#endif  // EDHOC_CREDENTIALS_CLIENT_PRIVATE_KEY_H_
+#endif  // EDHOC_CREDENTIALS_CRED_CLI_KEY_H_

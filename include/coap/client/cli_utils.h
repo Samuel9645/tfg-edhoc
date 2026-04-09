@@ -15,14 +15,14 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#ifndef COAP_CLIENT_UTILS_H_
-#define COAP_CLIENT_UTILS_H_
+#ifndef COAP_CLIENT_CLI_UTILS_H_
+#define COAP_CLIENT_CLI_UTILS_H_
 
 #include <coap3/coap.h>
 #include <stdbool.h>
 
-#include "coap/common/coap_status.h"
 #include "coap/coap_config.h"
+#include "coap/common/coap_status.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
@@ -142,4 +142,4 @@ enum cp_cli_wait_status cp_cli_wait_for_coap_response(
     coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response);
 
-#endif  // COAP_CLIENT_UTILS_H_
+#endif  // COAP_CLIENT_CLI_UTILS_H_

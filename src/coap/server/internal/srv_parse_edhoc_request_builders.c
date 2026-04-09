@@ -5,7 +5,7 @@
  * @brief Helper functions to build results of parsing EDHOC requests
  */
 
-#include "parse_edhoc_result_builders.h"
+#include "srv_parse_edhoc_request_builders.h"
 
 struct cp_srv_parse_edhoc_request_result cp_srv_internal_parse_edhoc_failure(
     const enum cp_srv_parse_edhoc_request_status status) {

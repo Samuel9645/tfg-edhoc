@@ -9,7 +9,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_STUBS_H_
 #define EDHOC_SERVER_HANDSHAKE_STUBS_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 void tst_edh_srv_m1_assert_handler_writes_message_2_in_buffer(
     struct com_writable_buffer response);

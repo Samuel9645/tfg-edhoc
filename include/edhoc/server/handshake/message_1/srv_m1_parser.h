@@ -9,7 +9,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum edh_srv_parse_message_1_status {
   EDH_SRV_MSG1_PARSE_OK = 0,

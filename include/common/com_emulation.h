@@ -1,0 +1,9 @@
+#ifndef COMMON_COM_EMULATION_H_
+#define COMMON_COM_EMULATION_H_
+
+enum com_emulation_status {
+  COM_EMULATION_SUCCESS = 0,
+  COM_EMULATION_FAILURE = -1,
+};
+
+#endif  // COMMON_COM_EMULATION_H_

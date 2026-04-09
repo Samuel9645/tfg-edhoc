@@ -1,5 +1,5 @@
-#ifndef EDHOC_CREDENTIALS_PUBLIC_DATA_H_
-#define EDHOC_CREDENTIALS_PUBLIC_DATA_H_
+#ifndef EDHOC_CREDENTIALS_CRED_PUB_DATA_H_
+#define EDHOC_CREDENTIALS_CRED_PUB_DATA_H_
 
 #include <stdint.h>
 
@@ -12,4 +12,4 @@ extern const int32_t EDH_CRED_PUB_CLI_KID;
 extern const uint16_t EDH_CRED_PUB_SRV_PORT;
 extern const char EDH_CRED_PUB_SRV_URI[];
 
-#endif // EDHOC_CREDENTIALS_PUBLIC_DATA_H_
+#endif  // EDHOC_CREDENTIALS_CRED_PUB_DATA_H_

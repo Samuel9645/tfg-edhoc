@@ -1,5 +1,5 @@
-#ifndef COAP_SERVER_UTILS_H_
-#define COAP_SERVER_UTILS_H_
+#ifndef COAP_SERVER_SRV_UTILS_H_
+#define COAP_SERVER_SRV_UTILS_H_
 
 #include <coap3/coap.h>
 
@@ -49,4 +49,4 @@ enum cp_status cp_srv_add_post_resource(coap_context_t* coap_context,
  */
 enum cp_status cp_srv_run_input_output_loop(coap_context_t* coap_context);
 
-#endif  // COAP_SERVER_UTILS_H_
+#endif  // COAP_SERVER_SRV_UTILS_H_

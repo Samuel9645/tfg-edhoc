@@ -1,5 +1,5 @@
-#ifndef EDHOC_COMMON_SETUP_H_
-#define EDHOC_COMMON_SETUP_H_
+#ifndef EDHOC_COMMON_EDHOC_SETUP_H_
+#define EDHOC_COMMON_EDHOC_SETUP_H_
 
 #include <edhoc.h>
 
@@ -26,4 +26,4 @@ void edh_com_initialize_credential_key(struct edhoc_auth_creds* credentials,
                                        size_t public_key_length,
                                        int32_t key_id_integer);
 
-#endif  // EDHOC_COMMON_SETUP_H_
+#endif  // EDHOC_COMMON_EDHOC_SETUP_H_

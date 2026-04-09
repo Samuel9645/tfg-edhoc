@@ -4,8 +4,8 @@
  * @since 06/04/2026
  * @brief CoAP context initialization for both server and client.
  */
-#ifndef COAP_COMMON_CP_INITIALIZE_CONTEXT_H_
-#define COAP_COMMON_CP_INITIALIZE_CONTEXT_H_
+#ifndef COAP_COMMON_COAP_CONTEXT_H_
+#define COAP_COMMON_COAP_CONTEXT_H_
 #include <coap3/coap.h>
 
 enum cp_com_create_context_status {
@@ -25,4 +25,4 @@ struct cp_com_create_context_result {
  */
 struct cp_com_create_context_result cp_com_create_context(void);
 
-#endif  // COAP_COMMON_CP_INITIALIZE_CONTEXT_H_
+#endif  // COAP_COMMON_COAP_CONTEXT_H_

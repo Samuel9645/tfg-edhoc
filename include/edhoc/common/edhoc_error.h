@@ -7,12 +7,12 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_COMMON_ADD_EDHOC_ERROR_INFO_H_
-#define EDHOC_COMMON_ADD_EDHOC_ERROR_INFO_H_
+#ifndef EDHOC_COMMON_EDHOC_ERROR_H_
+#define EDHOC_COMMON_EDHOC_ERROR_H_
 
 #include <edhoc.h>
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum edh_com_add_edhoc_error_to_response_status {
   EDH_COM_ADD_ERROR_OK = 0,
@@ -76,4 +76,4 @@ enum edh_com_add_internal_error_to_response_status
 edh_com_add_internal_error_to_response(
     const char* error_message, struct com_writable_buffer* response_data);
 
-#endif  // EDHOC_COMMON_ADD_EDHOC_ERROR_INFO_H_
+#endif  // EDHOC_COMMON_EDHOC_ERROR_H_

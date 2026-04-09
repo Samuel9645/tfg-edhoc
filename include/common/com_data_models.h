@@ -4,8 +4,8 @@
  * @brief Data models for EDHOC handshake and CoAP exchange state.
  */
 
-#ifndef COMMON_DATA_MODELS_H_
-#define COMMON_DATA_MODELS_H_
+#ifndef COMMON_COM_DATA_MODELS_H_
+#define COMMON_COM_DATA_MODELS_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -29,4 +29,4 @@ bool com_writable_buffer_is_writable(const struct com_writable_buffer* buffer);
 
 bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer);
 
-#endif  // COMMON_DATA_MODELS_H_
+#endif  // COMMON_COM_DATA_MODELS_H_

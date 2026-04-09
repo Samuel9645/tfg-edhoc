@@ -7,11 +7,11 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_CREDENTIALS_SERVER_CREDENTIALS_H_
-#define EDHOC_CREDENTIALS_SERVER_CREDENTIALS_H_
+#ifndef EDHOC_CREDENTIALS_CRED_SRV_H_
+#define EDHOC_CREDENTIALS_CRED_SRV_H_
 
 #include <edhoc.h>
 
 extern const struct edhoc_credentials EDH_CRED_SRV_CRED;
 
-#endif  // EDHOC_CREDENTIALS_SERVER_CREDENTIALS_H_
+#endif  // EDHOC_CREDENTIALS_CRED_SRV_H_

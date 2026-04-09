@@ -5,10 +5,10 @@
  * @brief Logic for handling EDHOC Message 1 on the server side
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
-#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
-#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_result.h"
 
 struct edh_srv_message_1_request {
@@ -36,4 +36,4 @@ struct edh_srv_message_1_handler_result edh_srv_handle_message_1(
 const char* edh_srv_handle_message_1_status_code_to_string(
     enum edh_srv_message_1_handler_status status);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_

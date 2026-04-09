@@ -1,5 +1,5 @@
-#ifndef COAP_SERVER_DISPATCH_H_
-#define COAP_SERVER_DISPATCH_H_
+#ifndef COAP_SERVER_SRV_DISPATCH_H_
+#define COAP_SERVER_SRV_DISPATCH_H_
 
 #include <coap3/coap.h>
 #include <edhoc.h>
@@ -21,4 +21,4 @@ void cp_srv_dispatch_edhoc_post(coap_session_t* session,
                                 const struct edhoc_credentials* credentials,
                                 coap_pdu_t* response);
 
-#endif  // COAP_SERVER_DISPATCH_H_
+#endif  // COAP_SERVER_SRV_DISPATCH_H_

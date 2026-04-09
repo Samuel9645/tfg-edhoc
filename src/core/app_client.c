@@ -1,4 +1,4 @@
-#include "core/app_client.h"
+#include "app/app_client.h"
 
 #include <coap3/coap.h>
 
@@ -7,8 +7,8 @@
 #include "coap/client/cli_utils.h"
 #include "coap/coap_config.h"
 #include "coap/common/coap_context.h"
-#include "common/sys_cleanup.h"
-#include "common/sys_emulation.h"
+#include "common/com_cleanup.h"
+#include "common/com_emulation.h"
 #include "edhoc/client/cli_handshake.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"

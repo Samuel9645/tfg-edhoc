@@ -4,11 +4,11 @@
  * @since 06/04/2026
  * @brief Header for common data retrieval functions for CoAP server and client.
  */
-#ifndef COAP_COMMON_CP_GET_DATA_H_
-#define COAP_COMMON_CP_GET_DATA_H_
+#ifndef COAP_COMMON_COAP_GET_DATA_H_
+#define COAP_COMMON_COAP_GET_DATA_H_
 #include <coap3/coap.h>
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 
 enum cp_com_get_data_status {
   CP_COM_GET_DATA_OK = 0,
@@ -31,4 +31,4 @@ struct cp_com_get_data_result {
  */
 struct cp_com_get_data_result cp_com_get_data(const coap_pdu_t* pdu);
 
-#endif  // COAP_COMMON_CP_GET_DATA_H_
+#endif  // COAP_COMMON_COAP_GET_DATA_H_

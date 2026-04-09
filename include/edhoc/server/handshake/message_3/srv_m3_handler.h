@@ -6,10 +6,10 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
-#define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
+#ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_HANDLER_H_
+#define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_HANDLER_H_
 
-#include "common/sys_data_models.h"
+#include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
 struct edh_srv_message_3_request {
@@ -33,4 +33,4 @@ enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
 const char* edh_srv_handle_message_3_status_code_to_string(
     enum edh_srv_message_3_handler_status status);
 
-#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
+#endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_HANDLER_H_

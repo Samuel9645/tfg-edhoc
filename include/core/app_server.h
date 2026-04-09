@@ -1,7 +1,7 @@
 #ifndef CORE_SERVER_H_
 #define CORE_SERVER_H_
 
-#include "common/emulation_status.h"
+#include "common/sys_emulation.h"
 
 /**
  * @brief Execute EDHOC server handshake and receive encrypted message from

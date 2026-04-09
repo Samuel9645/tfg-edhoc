@@ -18,8 +18,8 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/tst_mock_add_edhoc_error_info.h"
-#include "edhoc/config.h"
+#include "edhoc/common/tst_mock_edhoc_error.h"
+#include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_m1_handler_env.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
 

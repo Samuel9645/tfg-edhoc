@@ -8,7 +8,7 @@
 #define COAP_COMMON_CP_GET_DATA_H_
 #include <coap3/coap.h>
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 enum cp_com_get_data_status {
   CP_COM_GET_DATA_OK = 0,

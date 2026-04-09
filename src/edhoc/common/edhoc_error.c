@@ -7,9 +7,9 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/common/add_edhoc_error_info.h"
-
 #include <string.h>
+
+#include "edhoc/common/edhoc_error.h"
 
 const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_GENERIC_ERROR;
 

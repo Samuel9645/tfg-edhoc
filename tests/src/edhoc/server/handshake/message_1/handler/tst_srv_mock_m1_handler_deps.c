@@ -15,7 +15,7 @@
 #include <string.h>
 
 #include "common/tst_report_mock_error.h"
-#include "edhoc/common/tst_mock_add_edhoc_error_info.h"
+#include "edhoc/common/tst_mock_edhoc_error.h"
 #include "edhoc/common/tst_response_buffer_helpers.h"
 #include "unity.h"
 

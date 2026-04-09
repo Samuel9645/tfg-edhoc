@@ -10,7 +10,7 @@
 
 #include <edhoc.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
 
 /**
  * WHY ARE WE CASTING TO VOID THE RETURN?

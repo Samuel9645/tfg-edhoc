@@ -11,19 +11,19 @@ include(cmake_configs/libedhoc_config.cmake)
 add_subdirectory(externals)
 
 set(BASE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/cleanup.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/setup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/sys_data_models.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/sys_cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/edhoc_setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/public_data.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/authentication.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_create_context.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/cp_get_data.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/response.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/coap_context.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/coap_get_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/coap_helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/coap_response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/edhoc_error.c
 )
 
 set(MESSAGE_1_HANDLER_SOURCES
@@ -41,17 +41,17 @@ set(MESSAGE_3_HANDLER_SOURCES
 )
 
 set(SERVER_SPECIFIC_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/server.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/parse_edhoc_result_builders.c
     ${MESSAGE_1_HANDLER_SOURCES}
     ${MESSAGE_3_HANDLER_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_1_mapper.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/message_3_mapper.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m1_mapper.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m3_mapper.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/dispatch_engine.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/server_credentials.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_srv.c
 )
 
 set(SERVER_SOURCES
@@ -60,18 +60,17 @@ set(SERVER_SOURCES
 )
 
 set(CLIENT_SPECIFIC_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/client.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cleanup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_client.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_cleanup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/log_error_response.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/exchange.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_log_error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_exchange.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/cli_handshake.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/common/cli_state.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/data_models.c
 )
 
 set(CLIENT_SOURCES

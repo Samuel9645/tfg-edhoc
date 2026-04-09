@@ -21,8 +21,8 @@
 #include <coap3/coap.h>
 #include <stdbool.h>
 
-#include "coap/common/status.h"
-#include "coap/config.h"
+#include "coap/common/coap_status.h"
+#include "coap/coap_config.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
@@ -117,7 +117,7 @@ struct cp_cli_prepare_pdu_result cp_cli_prepare_post_request(
  *
  * @param[in] coap_session Active CoAP session.
  * @param[in] request_pdu Prepared request PDU.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
  */
 enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,

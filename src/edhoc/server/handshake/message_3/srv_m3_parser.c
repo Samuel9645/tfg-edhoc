@@ -8,9 +8,7 @@
 
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
-#include <edhoc.h>
 #include <edhoc_helpers.h>
-#include <edhoc_values.h>
 
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 

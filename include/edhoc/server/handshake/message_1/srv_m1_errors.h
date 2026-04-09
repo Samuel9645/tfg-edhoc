@@ -11,7 +11,7 @@
 
 #include <edhoc.h>
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 /**
  * @brief Compose and write a Message 1 operation-specific EDHOC error message
  * into the response buffer.

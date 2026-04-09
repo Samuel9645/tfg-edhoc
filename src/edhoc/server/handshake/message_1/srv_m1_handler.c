@@ -11,8 +11,8 @@
 #include <edhoc.h>
 #include <stdlib.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
-#include "edhoc/common/setup.h"
+#include "edhoc/common/edhoc_error.h"
+#include "edhoc/common/edhoc_setup.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 

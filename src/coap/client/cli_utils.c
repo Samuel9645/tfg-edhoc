@@ -17,9 +17,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "coap/common/helpers.h"
-#include "coap/common/status.h"
-#include "coap/config.h"
+#include "coap/common/coap_helpers.h"
+#include "coap/common/coap_status.h"
+#include "coap/coap_config.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 

@@ -7,10 +7,9 @@
 #define COAP_SERVER_DISPATCH_STUBS_H_
 
 #include <coap3/coap.h>
-#include <edhoc_helpers.h>
 
-#include "coap/common/status.h"
-#include "coap/config.h"
+#include "coap/coap_config.h"
+#include "coap/common/coap_status.h"
 #include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"

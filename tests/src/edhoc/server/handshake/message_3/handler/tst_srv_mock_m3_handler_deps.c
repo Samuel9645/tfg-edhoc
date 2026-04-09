@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "common/tst_report_mock_error.h"
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
 #include "unity.h"
 
 static const uint8_t TST_DEFAULT_M4_PAYLOAD[] = {0x04, 0x05, 0x06, 0x07};

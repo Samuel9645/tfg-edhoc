@@ -1,7 +1,8 @@
 #include "dispatch_engine.h"
 
-#include "coap/config.h"
-#include "edhoc/config.h"
+#include "coap/coap_config.h"
+#include "coap/server/srv_parse_edhoc_request.h"
+#include "edhoc/edhoc_config.h"
 
 /**
  * @brief Validate all required dependency function pointers are non-NULL.
@@ -21,7 +22,7 @@ static bool dispatch_deps_are_valid(const struct cp_srv_dispatch_deps* deps) {
          deps->get_session_app_data != NULL;
 }
 
-static bool dispatch_has_invalid_deps_or_args(
+static bool srv_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
     const coap_pdu_t* response, const struct cp_srv_dispatch_deps* deps) {
   return !session || !request || !response || !dispatch_deps_are_valid(deps);
@@ -67,7 +68,7 @@ void cp_srv_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
     const struct cp_srv_dispatch_deps* deps) {
-  if (dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
+  if (srv_dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
     if (response) {
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);

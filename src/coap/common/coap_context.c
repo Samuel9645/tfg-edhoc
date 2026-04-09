@@ -5,9 +5,9 @@
  * @brief CoAP context initialization for both server and client.
  */
 
-#include "coap/common/cp_create_context.h"
+#include "coap/common/coap_context.h"
 
-#include "coap/config.h"
+#include "coap/coap_config.h"
 
 static struct cp_com_create_context_result initialization_failure(
     const enum cp_com_create_context_status status) {

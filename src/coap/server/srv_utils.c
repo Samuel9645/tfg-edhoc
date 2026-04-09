@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-#include "coap/common/status.h"
+#include "coap/common/coap_status.h"
 
 enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
                                       const char* listen_address_string) {

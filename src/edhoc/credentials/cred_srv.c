@@ -1,8 +1,8 @@
-#include "edhoc/credentials/server_credentials.h"
+#include "edhoc/credentials/cred_srv.h"
 
-#include "edhoc/credentials/authentication.h"
-#include "edhoc/credentials/public_data.h"
-#include "edhoc/credentials/server_private_key.h"
+#include "edhoc/credentials/cred_auth.h"
+#include "edhoc/credentials/cred_pub_data.h"
+#include "edhoc/credentials/cred_srv_key.h"
 
 static int server_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {

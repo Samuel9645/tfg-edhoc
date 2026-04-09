@@ -9,7 +9,7 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_RESULT_H_
 #define EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_RESULT_H_
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 enum edh_cli_message_4_process_status {
   EDH_CLI_MSG4_PROCESS_OK = 0,

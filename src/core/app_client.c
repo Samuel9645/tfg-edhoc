@@ -1,17 +1,19 @@
-#include "core/client.h"
+#include "core/app_client.h"
 
 #include <coap3/coap.h>
 
-#include "coap/client/cleanup.h"
+#include "coap/client/cli_cleanup.h"
+#include "coap/client/cli_exchange.h"
 #include "coap/client/cli_utils.h"
-#include "coap/client/exchange.h"
-#include "coap/common/cp_create_context.h"
-#include "coap/config.h"
+#include "coap/coap_config.h"
+#include "coap/common/coap_context.h"
+#include "common/sys_cleanup.h"
+#include "common/sys_emulation.h"
 #include "edhoc/client/cli_handshake.h"
-#include "edhoc/config.h"
-#include "edhoc/credentials/authentication.h"
-#include "edhoc/credentials/client_private_key.h"
-#include "edhoc/credentials/public_data.h"
+#include "edhoc/credentials/cred_auth.h"
+#include "edhoc/credentials/cred_cli_key.h"
+#include "edhoc/credentials/cred_pub_data.h"
+#include "edhoc/edhoc_config.h"
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {

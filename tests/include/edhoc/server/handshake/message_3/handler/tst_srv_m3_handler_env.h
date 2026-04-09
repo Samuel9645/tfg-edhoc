@@ -9,6 +9,8 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_HELPERS_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_HELPERS_H_
 
+#include <edhoc.h>
+
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 
 enum { TST_EDH_SRV_MESSAGE_3_BUFFER_LENGTH = 256 };

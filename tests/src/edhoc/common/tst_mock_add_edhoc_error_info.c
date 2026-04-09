@@ -7,12 +7,11 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/common/tst_mock_add_edhoc_error_info.h"
-
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
+#include "edhoc/common/tst_mock_edhoc_error.h"
 #include "edhoc/common/tst_response_buffer_helpers.h"
 
 static const uint8_t MOCK_ERR_DATA[] = {0xFF};

@@ -1,4 +1,4 @@
-#include "coap/common/response.h"
+#include "coap/common/coap_response.h"
 
 #include <stdbool.h>
 

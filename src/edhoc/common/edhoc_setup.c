@@ -1,5 +1,5 @@
 
-#include "edhoc/common/setup.h"
+#include "edhoc/common/edhoc_setup.h"
 
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>
@@ -20,6 +20,7 @@ int edh_com_setup_context(struct edhoc_context* context,
   }
 
   const enum edhoc_method methods[] = {EDHOC_METHOD_0};
+
   ret = edhoc_set_methods(context, methods, ARRAY_SIZE(methods));
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot set methods: %d\n", ret);

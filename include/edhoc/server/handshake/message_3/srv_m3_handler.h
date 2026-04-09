@@ -9,9 +9,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_H_
 
-#include <edhoc_helpers.h>
-
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
 struct edh_srv_message_3_request {

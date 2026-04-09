@@ -1,16 +1,16 @@
-#include "coap/client/exchange.h"
+#include "coap/client/cli_exchange.h"
 
 #include <edhoc.h>
 #include <stdbool.h>
 #include <string.h>
 
+#include "coap/client/cli_log_error.h"
 #include "coap/client/cli_utils.h"
-#include "coap/client/log_error_response.h"
-#include "coap/common/cp_get_data.h"
-#include "coap/common/helpers.h"
-#include "coap/common/response.h"
+#include "coap/common/coap_get_data.h"
+#include "coap/common/coap_helpers.h"
+#include "coap/common/coap_response.h"
 
-static bool client_response_has_edhoc_content_format(
+static bool client_coap_response_has_edhoc_content_format(
     const coap_pdu_t* response) {
   coap_opt_iterator_t option_iterator = {0};
   coap_opt_t* content_format_option =
@@ -26,16 +26,15 @@ static bool client_response_has_edhoc_content_format(
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
-static coap_response_t coap_client_response_handler(coap_session_t* session,
-                                                    const coap_pdu_t* sent,
-                                                    const coap_pdu_t* received,
-                                                    const coap_mid_t id) {
+static coap_response_t coap_client_coap_response_handler(
+    coap_session_t* session, const coap_pdu_t* sent, const coap_pdu_t* received,
+    const coap_mid_t id) {
   (void)sent;
   (void)id;
 
   struct cp_cli_exchange* exchange = coap_session_get_app_data(session);
   if (!exchange) {
-    coap_log_err("missing client exchange state in response handler\n");
+    coap_log_err("missing client exchange state in coap_response.handler\n");
     return COAP_RESPONSE_FAIL;
   }
 
@@ -49,7 +48,7 @@ static coap_response_t coap_client_response_handler(coap_session_t* session,
     return COAP_RESPONSE_OK;
   }
 
-  if (!client_response_has_edhoc_content_format(received)) {
+  if (!client_coap_response_has_edhoc_content_format(received)) {
     coap_log_err("missing or invalid EDHOC content format in response\n");
     return COAP_RESPONSE_OK;
   }
@@ -103,7 +102,7 @@ enum cp_status cp_cli_init_exchange(
   }
 
   coap_register_response_handler(session_data->context,
-                                 coap_client_response_handler);
+                                 coap_client_coap_response_handler);
 
   return CP_STATUS_SUCCESS;
 }

@@ -10,7 +10,7 @@
 #ifndef EDHOC_COMMON_TST_MOCK_ADD_EDHOC_ERROR_INFO_H_
 #define EDHOC_COMMON_TST_MOCK_ADD_EDHOC_ERROR_INFO_H_
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 void write_mock_buffer_to_response(struct com_writable_buffer* response_data);
 

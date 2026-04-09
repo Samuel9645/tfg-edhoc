@@ -76,7 +76,7 @@ add_unity_test(test_dispatch
 )
 
 set(COMMON_SRV_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/common/data_models.c
+    ${CMAKE_SOURCE_DIR}/src/common/sys_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_response_buffer_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
 )

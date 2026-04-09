@@ -1,7 +1,7 @@
 #ifndef CORE_CLIENT_H_
 #define CORE_CLIENT_H_
 
-#include "common/emulation_status.h"
+#include "common/sys_emulation.h"
 
 /**
  * @brief Executes EDHOC client handshake and send encrypted message to server

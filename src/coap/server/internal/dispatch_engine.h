@@ -2,12 +2,10 @@
 #define COAP_SERVER_INTERNAL_dispatch_engine_H_
 
 #include <coap3/coap.h>
-#include <edhoc_helpers.h>
 
-#include "coap/common/status.h"
-#include "coap/config.h"
-#include "coap/server/srv_parse_edhoc_request.h"
-#include "common/data_models.h"
+#include "coap/coap_config.h"
+#include "coap/common/coap_status.h"
+#include "common/sys_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"

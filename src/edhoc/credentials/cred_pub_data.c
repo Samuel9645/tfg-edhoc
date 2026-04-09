@@ -1,4 +1,4 @@
-#include "edhoc/credentials/public_data.h"
+#include "edhoc/credentials/cred_pub_data.h"
 
 const uint8_t EDH_CRED_PUB_CLI_PK[EDH_CRED_PUB_PK_LENGTH] = {
     0x04, 0x8d, 0x26, 0x81, 0xba, 0xc7, 0x3b, 0xa5, 0xcf, 0x68, 0xd8,

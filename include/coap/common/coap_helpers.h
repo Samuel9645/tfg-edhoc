@@ -21,8 +21,8 @@
 #include <coap3/coap.h>
 #include <stdbool.h>
 
-#include "coap/common/status.h"
-#include "coap/config.h"
+#include "coap/coap_config.h"
+#include "coap/common/coap_status.h"
 
 /**
  * @brief Resolve a host and port to a CoAP address structure, using scheme
@@ -32,7 +32,7 @@
  * @param[in] port Port number to resolve.
  * @param[in] scheme_hint_bits Scheme hint bits for protocol selection.
  * @param[out] destination_address Output resolved socket address.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
  *
  * @note On failure, the output destination_address is not modified.

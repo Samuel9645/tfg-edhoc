@@ -10,7 +10,7 @@
 
 #include <edhoc_helpers.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
 
 void edh_srv_message_1_handler_add_error(
     const struct edhoc_context* context, const char* generic_error_message,

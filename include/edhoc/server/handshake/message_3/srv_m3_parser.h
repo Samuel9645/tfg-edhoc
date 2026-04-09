@@ -9,9 +9,9 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_PARSER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_PARSER_H_
 
-#include <edhoc_helpers.h>
+#include <edhoc.h>
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 enum edh_srv_parse_message_3_status {
   EDH_SRV_MSG3_PARSE_OK = 0,

@@ -1,4 +1,4 @@
-#include "coap/client/cleanup.h"
+#include "coap/client/cli_cleanup.h"
 
 void cp_cli_cleanup_resources(struct cp_cli_session_resources* resources) {
   if (resources == NULL) {

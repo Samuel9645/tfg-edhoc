@@ -8,7 +8,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_HANDLER_H_
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_result.h"
 
 struct edh_srv_message_1_request {

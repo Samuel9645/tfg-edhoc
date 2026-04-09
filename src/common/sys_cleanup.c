@@ -1,4 +1,4 @@
-#include "common/cleanup.h"
+#include "common/sys_cleanup.h"
 
 void com_cleanup_resources(struct com_session_resources* resources) {
   if (resources == NULL) {

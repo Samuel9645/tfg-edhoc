@@ -9,7 +9,7 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_H_
 #define EDHOC_CLIENT_HANDSHAKE_H_
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 #include "edhoc/client/handshake/common/cli_state.h"
 #include "edhoc/client/handshake/message_1/cli_m1_result.h"
 #include "edhoc/client/handshake/message_2/cli_m2_result.h"

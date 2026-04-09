@@ -11,8 +11,8 @@
 
 #include <coap3/coap.h>
 
-#include "coap/config.h"
-#include "common/data_models.h"
+#include "coap/coap_config.h"
+#include "common/sys_data_models.h"
 
 enum cp_srv_parse_edhoc_request_status {
   CP_SRV_EDH_REQ_OK = 0,

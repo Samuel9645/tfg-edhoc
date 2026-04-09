@@ -7,7 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "coap/server/edhoc_mapper/message_3_mapper.h"
+#include "coap/server/edhoc_mapper/srv_m3_mapper.h"
 
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 

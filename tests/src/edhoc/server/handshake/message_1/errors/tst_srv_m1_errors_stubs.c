@@ -17,7 +17,7 @@
 #include <edhoc.h>
 #include <string.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
 #include "unity.h"
 
 const int SUCCESS_STUB_RESULT = EDHOC_SUCCESS;

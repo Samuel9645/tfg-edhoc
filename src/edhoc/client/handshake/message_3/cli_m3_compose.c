@@ -10,7 +10,7 @@
 
 #include <edhoc_helpers.h>
 
-#include "edhoc/common/add_edhoc_error_info.h"
+#include "edhoc/common/edhoc_error.h"
 
 static struct edh_cli_message_3_compose_result message_3_compose_ok(
     const struct com_writable_buffer message_3) {

@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 #include "edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 
@@ -36,7 +36,8 @@ void test_parser_returns_stripped_message_1_buffer(void) {
                     parse_message_1_result.parsed_message_1.length);
 }
 
-static void assert_response_empty(struct com_readonly_buffer parsed_message_1) {
+static void assert_response_empty(
+    const struct com_readonly_buffer parsed_message_1) {
   TEST_ASSERT_NULL(parsed_message_1.bytes);
   TEST_ASSERT_EQUAL(0, parsed_message_1.length);
 }

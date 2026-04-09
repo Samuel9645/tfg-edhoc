@@ -12,7 +12,7 @@
 
 #include <edhoc.h>
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 enum edh_com_add_edhoc_error_to_response_status {
   EDH_COM_ADD_ERROR_OK = 0,

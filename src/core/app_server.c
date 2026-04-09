@@ -1,12 +1,13 @@
-#include "core/server.h"
+#include "core/app_server.h"
 
 #include <coap3/coap.h>
 
-#include "coap/common/cp_create_context.h"
-#include "coap/server/dispatch.h"
+#include "coap/common/coap_context.h"
+#include "coap/server/srv_dispatch.h"
 #include "coap/server/srv_utils.h"
-#include "common/cleanup.h"
-#include "edhoc/credentials/server_credentials.h"
+#include "common/sys_cleanup.h"
+#include "common/sys_emulation.h"
+#include "edhoc/credentials/cred_srv.h"
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void edhoc_post_handler(coap_resource_t* resource,

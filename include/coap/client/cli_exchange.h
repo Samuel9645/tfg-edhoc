@@ -5,9 +5,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "coap/common/status.h"
-#include "coap/config.h"
-#include "common/data_models.h"
+#include "coap/common/coap_status.h"
+#include "coap/coap_config.h"
+#include "common/sys_data_models.h"
 
 struct cp_cli_exchange_session_data {
   coap_context_t* context;
@@ -48,11 +48,11 @@ bool cp_cli_exchange_request_data_is_valid(
     struct cp_cli_exchange_request request_data);
 
 /**
- * @brief Initialize exchange state and register response handler.
+ * @brief Initialize exchange state and register coap_response.handler.
  *
  * @param[in] session_data Session and endpoint data required for init.
  * @param[out] exchange Exchange state storage provided by caller.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
  */
 enum cp_status cp_cli_init_exchange(
@@ -64,7 +64,7 @@ enum cp_status cp_cli_init_exchange(
  *
  * @param[in] exchange Initialized exchange state.
  * @param[in] request_data EDHOC request payload and content format.
- * @return CCOM_STATUS_SUCCESS on success, CCOM_ERROR on
+ * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
  */
 enum cp_status cp_cli_exchange_send(

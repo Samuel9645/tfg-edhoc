@@ -7,7 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "coap/server/edhoc_mapper/message_1_mapper.h"
+#include "coap/server/edhoc_mapper/srv_m1_mapper.h"
 
 #include <stdlib.h>
 

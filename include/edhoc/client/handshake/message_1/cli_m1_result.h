@@ -9,7 +9,7 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_RESULT_H_
 #define EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_RESULT_H_
 
-#include "common/data_models.h"
+#include "common/sys_data_models.h"
 
 enum edh_cli_message_1_compose_status {
   EDH_CLI_MSG1_COMPOSE_OK = 0,

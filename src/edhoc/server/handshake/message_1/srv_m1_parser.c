@@ -8,7 +8,6 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 
-#include <edhoc.h>
 #include <edhoc_helpers.h>
 
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"

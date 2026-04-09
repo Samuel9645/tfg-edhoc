@@ -22,7 +22,7 @@ enum edh_srv_message_1_handler_status {
   EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_EMPTY,
 };
 
-struct ehd_srv_message_1_handler_result {
+struct edh_srv_message_1_handler_result {
   enum edh_srv_message_1_handler_status status;
   /**
    * Pointer to the allocated EDHOC context on success, NULL on failure.

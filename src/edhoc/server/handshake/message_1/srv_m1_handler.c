@@ -22,7 +22,7 @@
  * Protocol errors are more important than internal errors, so in case something
  * bad happens, we always want to report the greater failure.
  */
-struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
+struct edh_srv_message_1_handler_result edh_srv_handle_message_1(
     const struct edh_srv_message_1_request request,
     struct com_writable_buffer* response) {
   if (!com_writable_buffer_is_writable(response)) {

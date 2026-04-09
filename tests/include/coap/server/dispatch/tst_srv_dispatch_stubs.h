@@ -51,24 +51,24 @@ struct edh_srv_parse_message_3_result stb_edh_srv_parse_message_3_failure(
     struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx);
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data);
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data);
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data);
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    struct ehd_srv_message_1_handler_result message_1_result,
+    struct edh_srv_message_1_handler_result message_1_result,
     coap_session_t* session);
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    struct ehd_srv_message_1_handler_result message_1_result,
+    struct edh_srv_message_1_handler_result message_1_result,
     coap_session_t* session);
 
 enum edh_srv_message_3_handler_status stb_edh_srv_handle_m3_ok(

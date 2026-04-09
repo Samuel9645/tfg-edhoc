@@ -49,13 +49,13 @@ struct cp_srv_dispatch_deps {
       const struct edhoc_context* edhoc_ctx);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  struct ehd_srv_message_1_handler_result (*handle_message_1)(
+  struct edh_srv_message_1_handler_result (*handle_message_1)(
       struct edh_srv_message_1_request request_data,
       struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      struct ehd_srv_message_1_handler_result message_1_result,
+      struct edh_srv_message_1_handler_result message_1_result,
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */

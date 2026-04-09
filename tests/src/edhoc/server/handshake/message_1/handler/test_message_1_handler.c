@@ -32,7 +32,7 @@ void setUp(void) {
 }
 
 void test_handler_ok_for_valid_data(void) {
-  const struct ehd_srv_message_1_handler_result result =
+  const struct edh_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_OK, result.status);
@@ -43,7 +43,7 @@ void test_handler_ok_for_valid_data(void) {
 }
 
 static void ensure_context_is_freed_on_failure(
-    const struct ehd_srv_message_1_handler_result result) {
+    const struct edh_srv_message_1_handler_result result) {
   TEST_ASSERT_NULL_MESSAGE(result.edhoc_ctx,
                            "Memory Leak: edhoc_ctx was not NULL on failure");
 }
@@ -73,7 +73,7 @@ void test_handler_fails_on_invalid_data(void) {
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     tst_edh_srv_m1_reset_stub_results();
-    const struct ehd_srv_message_1_handler_result result =
+    const struct edh_srv_message_1_handler_result result =
         edh_srv_handle_message_1(test_cases[i].request, test_cases[i].response);
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
@@ -106,7 +106,7 @@ void test_handler_fails_on_library_errors(void) {
     tst_edh_srv_m1_reset_stub_results();
     cases[i].setup_scenario();
 
-    const struct ehd_srv_message_1_handler_result result =
+    const struct edh_srv_message_1_handler_result result =
         edh_srv_handle_message_1(env.valid_request, &env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
@@ -117,7 +117,7 @@ void test_handler_fails_on_library_errors(void) {
 void test_handler_fails_when_message_2_composition_produces_empty_buffer(void) {
   tst_edh_srv_m1_set_message_2_compose_empty_length();
 
-  const struct ehd_srv_message_1_handler_result result =
+  const struct edh_srv_message_1_handler_result result =
       edh_srv_handle_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_SRV_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_EMPTY,

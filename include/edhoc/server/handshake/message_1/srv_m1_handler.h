@@ -29,7 +29,7 @@ struct edh_srv_message_1_request {
  * responsible for freeing it. On failure, the function safely cleans up after
  * itself and returns a NULL pointer.
  */
-struct ehd_srv_message_1_handler_result edh_srv_handle_message_1(
+struct edh_srv_message_1_handler_result edh_srv_handle_message_1(
     struct edh_srv_message_1_request request,
     struct com_writable_buffer* response);
 

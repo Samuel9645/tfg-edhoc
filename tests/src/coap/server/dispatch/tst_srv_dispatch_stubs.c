@@ -103,7 +103,7 @@ struct edh_srv_parse_message_3_result stb_edh_srv_parse_message_3_failure(
       EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
 }
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
@@ -112,7 +112,7 @@ struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_fail(
       EDH_SRV_MSG1_HDL_ERR_NULL_CREDENTIALS);
 }
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
@@ -120,7 +120,7 @@ struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok(
   return edh_srv_message_1_handler_ok(&dummy_edhoc_context_for_stub);
 }
 
-struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
+struct edh_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
     struct edh_srv_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
@@ -129,7 +129,7 @@ struct ehd_srv_message_1_handler_result stb_edh_srv_handle_m1_ok_valid_len(
 }
 
 coap_pdu_code_t stb_cp_srv_process_m1_ok(
-    const struct ehd_srv_message_1_handler_result message_1_result,
+    const struct edh_srv_message_1_handler_result message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;
@@ -137,7 +137,7 @@ coap_pdu_code_t stb_cp_srv_process_m1_ok(
 }
 
 coap_pdu_code_t stb_cp_srv_process_m1_fail(
-    const struct ehd_srv_message_1_handler_result message_1_result,
+    const struct edh_srv_message_1_handler_result message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;

@@ -22,8 +22,8 @@
  * payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_4_process_result edh_cli_process_message_4(
-    struct edh_cli_handshake* state, struct com_readonly_buffer message_4,
+struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
+    struct cli_edhoc_handshake* state, struct com_readonly_buffer message_4,
     struct com_writable_buffer* message_4_error);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_CLI_M4_PROCESS_H_

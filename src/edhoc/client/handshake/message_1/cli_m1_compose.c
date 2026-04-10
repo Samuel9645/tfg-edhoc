@@ -13,31 +13,32 @@
 
 // TODO: Write errors into response buffer.
 
-static struct edh_cli_message_1_compose_result message_1_compose_ok(
+static struct cli_edhoc_message_1_compose_result message_1_compose_ok(
     const struct com_writable_buffer message_1) {
-  return (struct edh_cli_message_1_compose_result){
-      .status = EDH_CLI_MSG1_COMPOSE_OK, .output = message_1};
+  return (struct cli_edhoc_message_1_compose_result){
+      .status = CLI_EDHOC_MSG1_COMPOSE_OK, .output = message_1};
 }
 
-static struct edh_cli_message_1_compose_result
+static struct cli_edhoc_message_1_compose_result
 message_1_compose_protocol_failure(
-    const enum edh_cli_message_1_compose_status status,
+    const enum cli_edhoc_message_1_compose_status status,
     const struct com_writable_buffer error_buffer) {
-  return (struct edh_cli_message_1_compose_result){.status = status,
-                                                   .output = error_buffer};
+  return (struct cli_edhoc_message_1_compose_result){.status = status,
+                                                     .output = error_buffer};
 }
 
-static struct edh_cli_message_1_compose_result message_1_compose_local_failure(
-    const enum edh_cli_message_1_compose_status status) {
-  return (struct edh_cli_message_1_compose_result){.status = status};
+static struct cli_edhoc_message_1_compose_result
+message_1_compose_local_failure(
+    const enum cli_edhoc_message_1_compose_status status) {
+  return (struct cli_edhoc_message_1_compose_result){.status = status};
 }
 
-struct edh_cli_message_1_compose_result edh_cli_compose_message_1(
-    struct edh_cli_handshake* state, struct com_writable_buffer* message_1) {
-  if (!edh_cli_handshake_is_initialized(state) ||
+struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
+    struct cli_edhoc_handshake* state, struct com_writable_buffer* message_1) {
+  if (!cli_edhoc_handshake_is_initialized(state) ||
       !com_writable_buffer_is_writable(message_1)) {
     return message_1_compose_local_failure(
-        EDH_CLI_MSG1_COMPOSE_ERR_INVALID_ARGS);
+        CLI_EDHOC_MSG1_COMPOSE_ERR_INVALID_ARGS);
   }
 
   struct edhoc_prepended_fields prepended_fields = {
@@ -47,14 +48,14 @@ struct edh_cli_message_1_compose_result edh_cli_compose_message_1(
       .edhoc_message_size = message_1->capacity};
   if (edhoc_prepend_flow(&prepended_fields) != EDHOC_SUCCESS) {
     return message_1_compose_protocol_failure(
-        EDH_CLI_MSG1_COMPOSE_ERR_EDHOC_PREPEND_FAILED, *message_1);
+        CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_FAILED, *message_1);
   }
   if (edhoc_message_1_compose(
           &state->context, prepended_fields.edhoc_message_ptr,
           prepended_fields.edhoc_message_size,
           &prepended_fields.edhoc_message_size) != EDHOC_SUCCESS) {
     return message_1_compose_protocol_failure(
-        EDH_CLI_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED, *message_1);
+        CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED, *message_1);
   }
   if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
     return message_1_compose_protocol_failure(

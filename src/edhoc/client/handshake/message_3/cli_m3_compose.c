@@ -12,40 +12,41 @@
 
 #include "edhoc/common/edhoc_error.h"
 
-static struct edh_cli_message_3_compose_result message_3_compose_ok(
+static struct cli_edhoc_message_3_compose_result message_3_compose_ok(
     const struct com_writable_buffer message_3) {
-  return (struct edh_cli_message_3_compose_result){
-      .status = EDH_CLI_MSG3_COMPOSE_OK,
+  return (struct cli_edhoc_message_3_compose_result){
+      .status = CLI_EDHOC_MSG3_COMPOSE_OK,
       .output = message_3,
   };
 }
 
-static struct edh_cli_message_3_compose_result
+static struct cli_edhoc_message_3_compose_result
 message_3_compose_protocol_failure(
-    const enum edh_cli_message_3_compose_status status,
+    const enum cli_edhoc_message_3_compose_status status,
     const struct com_writable_buffer error_buffer) {
-  return (struct edh_cli_message_3_compose_result){
+  return (struct cli_edhoc_message_3_compose_result){
       .status = status,
       .output = error_buffer,
   };
 }
 
-static struct edh_cli_message_3_compose_result message_3_compose_local_failure(
-    const enum edh_cli_message_3_compose_status status) {
-  return (struct edh_cli_message_3_compose_result){
+static struct cli_edhoc_message_3_compose_result
+message_3_compose_local_failure(
+    const enum cli_edhoc_message_3_compose_status status) {
+  return (struct cli_edhoc_message_3_compose_result){
       .status = status,
   };
 }
 
-struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
-    struct edh_cli_handshake* state,
+struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
+    struct cli_edhoc_handshake* state,
     struct com_writable_buffer* message_3_or_error) {
   const size_t min_payload_capacity = 1;
-  if (!edh_cli_handshake_is_initialized(state) ||
+  if (!cli_edhoc_handshake_is_initialized(state) ||
       !com_writable_buffer_is_writable(message_3_or_error) ||
       message_3_or_error->capacity < min_payload_capacity) {
     return message_3_compose_local_failure(
-        EDH_CLI_MSG3_COMPOSE_ERR_INVALID_ARGS);
+        CLI_EDHOC_MSG3_COMPOSE_ERR_INVALID_ARGS);
   }
 
   struct edhoc_prepended_fields prepended_fields = {
@@ -58,11 +59,11 @@ struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
   int edhoc_result = edhoc_prepend_connection_id(
       &prepended_fields, &state->context.private_peer_cid);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)edh_com_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_edhoc_error_to_response_with_description(
         &state->context, "Failed to prepend connection id for message 3",
         message_3_or_error);
     return message_3_compose_protocol_failure(
-        EDH_CLI_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
+        CLI_EDHOC_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
         *message_3_or_error);
   }
 
@@ -71,22 +72,22 @@ struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
       &state->context, prepended_fields.edhoc_message_ptr,
       prepended_fields.edhoc_message_size, &message3_len);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)edh_com_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_edhoc_error_to_response_with_description(
         &state->context, "Failed to compose EDHOC message 3",
         message_3_or_error);
     return message_3_compose_protocol_failure(
-        EDH_CLI_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
+        CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
         *message_3_or_error);
   }
 
   prepended_fields.edhoc_message_size = message3_len;
   edhoc_result = edhoc_prepend_recalculate_size(&prepended_fields);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)edh_com_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_edhoc_error_to_response_with_description(
         &state->context, "Failed to recalculate prepended message size",
         message_3_or_error);
     return message_3_compose_protocol_failure(
-        EDH_CLI_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
+        CLI_EDHOC_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
         *message_3_or_error);
   }
 

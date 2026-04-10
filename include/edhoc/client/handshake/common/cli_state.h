@@ -12,15 +12,15 @@
 #include <edhoc.h>
 #include <stdbool.h>
 
-struct edh_cli_handshake {
+struct cli_edhoc_handshake {
   struct edhoc_context context;
   bool initialized;
 };
 
-enum edh_cli_init_status {
-  EDH_CLI_INIT_OK = 0,
-  EDH_CLI_INIT_ERR_INVALID_ARGS,
-  EDH_CLI_INIT_ERR_EDHOC_CONTEXT_SETUP_FAILED,
+enum cli_edhoc_init_status {
+  CLI_EDHOC_INIT_OK = 0,
+  CLI_EDHOC_INIT_ERR_INVALID_ARGS,
+  CLI_EDHOC_INIT_ERR_EDHOC_CONTEXT_SETUP_FAILED,
 };
 
 /**
@@ -32,8 +32,8 @@ enum edh_cli_init_status {
  *
  * @note This function does not allocate memory with calloc.
  */
-enum edh_cli_init_status edh_cli_init(
-    struct edh_cli_handshake* state,
+enum cli_edhoc_init_status cli_edhoc_init(
+    struct cli_edhoc_handshake* state,
     const struct edhoc_credentials* credentials);
 
 /**
@@ -42,13 +42,14 @@ enum edh_cli_init_status edh_cli_init(
  * @param[in] state Handshake state to inspect.
  * @return true when handshake context is initialized, false otherwise.
  */
-bool edh_cli_handshake_is_initialized(const struct edh_cli_handshake* state);
+bool cli_edhoc_handshake_is_initialized(
+    const struct cli_edhoc_handshake* state);
 
 /**
  * @brief Deinitialize handshake context and clear state.
  *
  * @param[out] state Handshake state to clear.
  */
-void edh_cli_clear_state(struct edh_cli_handshake* state);
+void cli_edhoc_clear_state(struct cli_edhoc_handshake* state);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_COMMON_CLI_STATE_H_

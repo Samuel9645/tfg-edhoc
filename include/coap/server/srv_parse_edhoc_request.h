@@ -14,17 +14,17 @@
 #include "coap/coap_config.h"
 #include "common/com_data_models.h"
 
-enum cp_srv_parse_edhoc_request_status {
-  CP_SRV_EDH_REQ_OK = 0,
-  CP_SRV_EDH_REQ_ERR_INVALID_ARGS,
-  CP_SRV_EDH_REQ_ERR_MISSING_FORMAT,
-  CP_SRV_EDH_REQ_ERR_UNSUPPORTED_FORMAT,
-  CP_SRV_EDH_REQ_ERR_NO_PAYLOAD,
-  CP_SRV_EDH_REQ_ERR_MALFORMED_PDU
+enum srv_coap_parse_edhoc_request_status {
+  SRV_COAP_EDH_REQ_OK = 0,
+  SRV_COAP_EDH_REQ_ERR_INVALID_ARGS,
+  SRV_COAP_EDH_REQ_ERR_MISSING_FORMAT,
+  SRV_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT,
+  SRV_COAP_EDH_REQ_ERR_NO_PAYLOAD,
+  SRV_COAP_EDH_REQ_ERR_MALFORMED_PDU
 };
 
-struct cp_srv_parse_edhoc_request_result {
-  enum cp_srv_parse_edhoc_request_status status;
+struct srv_coap_parse_edhoc_request_result {
+  enum srv_coap_parse_edhoc_request_status status;
   const struct com_readonly_buffer parsed_request;
 };
 
@@ -35,9 +35,9 @@ struct cp_srv_parse_edhoc_request_result {
  * @return Struct containing the status and the parsed response on success,
  * empty response on failure
  */
-struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
+struct srv_coap_parse_edhoc_request_result srv_coap_parse_edhoc_request(
     const coap_pdu_t* request,
-    enum cp_cfg_content_format_edhoc_values expected_format);
+    enum config_coap_content_format_edhoc_values expected_format);
 
 /**
  * @brief Convert a parsing status code into a human-readable string.
@@ -45,7 +45,7 @@ struct cp_srv_parse_edhoc_request_result cp_srv_parse_edhoc_request(
  * @return human-readable string describing the parsing status, useful for
  * logging and debugging.
  */
-const char* cp_srv_parse_edhoc_request_status_to_string(
-    enum cp_srv_parse_edhoc_request_status status);
+const char* srv_coap_parse_edhoc_request_status_to_string(
+    enum srv_coap_parse_edhoc_request_status status);
 
 #endif  // COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_

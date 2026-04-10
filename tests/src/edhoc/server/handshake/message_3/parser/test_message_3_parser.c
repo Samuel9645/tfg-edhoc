@@ -28,7 +28,7 @@ static const struct {
                       .length = TEST_MSG_3_PAYLOAD_LENGTH},
 };
 
-void setUp(void) { tst_edh_srv_message_3_parser_reset_stub_results(); }
+void setUp(void) { tst_srv_edhoc_message_3_parser_reset_stub_results(); }
 
 void test_parser_advances_pointers_on_success(void) {
   const uint8_t* advanced_pointed = env.request_buffer + 2;
@@ -37,10 +37,10 @@ void test_parser_advances_pointers_on_success(void) {
       (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,
                                       .edhoc_message_size = reduced_length});
 
-  const struct edh_srv_parse_message_3_result result =
-      edh_srv_parse_message_3(env.valid_request, &env.context);
+  const struct srv_edhoc_parse_message_3_result result =
+      srv_edhoc_parse_message_3(env.valid_request, &env.context);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_OK, result.status);
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_OK, result.status);
   TEST_ASSERT_EQUAL_PTR(advanced_pointed, result.parsed_message_3.bytes);
   TEST_ASSERT_EQUAL(reduced_length, result.parsed_message_3.length);
 }
@@ -48,36 +48,36 @@ void test_parser_advances_pointers_on_success(void) {
 void test_parser_fails_when_buffer_is_invalid(void) {
   const struct com_readonly_buffer invalid_buf = {.bytes = NULL, .length = 5};
 
-  const struct edh_srv_parse_message_3_result result =
-      edh_srv_parse_message_3(invalid_buf, &env.context);
+  const struct srv_edhoc_parse_message_3_result result =
+      srv_edhoc_parse_message_3(invalid_buf, &env.context);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
                     result.status);
 }
 
 void test_parser_fails_when_context_is_null(void) {
-  const struct edh_srv_parse_message_3_result result =
-      edh_srv_parse_message_3(env.valid_request, NULL);
+  const struct srv_edhoc_parse_message_3_result result =
+      srv_edhoc_parse_message_3(env.valid_request, NULL);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT, result.status);
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT, result.status);
 }
 
 void test_parser_fails_when_connection_id_extraction_fails(void) {
   tst_srv_m3_parser_set_extraction_failure();
 
-  const struct edh_srv_parse_message_3_result result =
-      edh_srv_parse_message_3(env.valid_request, &env.context);
+  const struct srv_edhoc_parse_message_3_result result =
+      srv_edhoc_parse_message_3(env.valid_request, &env.context);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
                     result.status);
 }
 
 void test_parser_fails_on_connection_id_mismatch(void) {
   tst_srv_m3_parser_set_cid_mismatch();
 
-  const struct edh_srv_parse_message_3_result result =
-      edh_srv_parse_message_3(env.valid_request, &env.context);
+  const struct srv_edhoc_parse_message_3_result result =
+      srv_edhoc_parse_message_3(env.valid_request, &env.context);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
                     result.status);
 }

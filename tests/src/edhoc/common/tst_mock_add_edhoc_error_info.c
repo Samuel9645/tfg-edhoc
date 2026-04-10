@@ -21,7 +21,7 @@ void write_mock_buffer_to_response(struct com_writable_buffer* response_data) {
   response_data->length = sizeof(MOCK_ERR_DATA);
 }
 
-void tst_edh_srv_assert_handler_writes_error_in_buffer(
+void tst_srv_edhoc_assert_handler_writes_error_in_buffer(
     const struct com_writable_buffer response) {
   TEST_ASSERT_EQUAL_MEMORY_MESSAGE(MOCK_ERR_DATA, response.bytes,
                                    sizeof(MOCK_ERR_DATA),
@@ -30,24 +30,24 @@ void tst_edh_srv_assert_handler_writes_error_in_buffer(
                             "Error buffer length was not set correctly");
 }
 
-enum edh_com_add_internal_error_to_response_status
-edh_com_add_internal_error_to_response(
+enum com_edhoc_add_internal_error_to_response_status
+com_edhoc_add_internal_error_to_response(
     const char* error_message, struct com_writable_buffer* response_data) {
   (void)error_message;
   TEST_ASSERT_NOT_NULL_MESSAGE(error_message, "error message is NULL");
 
   write_mock_buffer_to_response(response_data);
-  return EDH_COM_ADD_INTERNAL_ERROR_OK;
+  return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
 }
 
-enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response_with_description(
+enum com_edhoc_add_edhoc_error_to_response_status
+com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   (void)context;
   (void)error_description;
   TEST_ASSERT_NOT_NULL_MESSAGE(context, "context is NULL");
-  edh_com_response_buffer_is_null(response_data);
+  com_edhoc_response_buffer_is_null(response_data);
   write_mock_buffer_to_response(response_data);
-  return EDH_COM_ADD_ERROR_OK;
+  return COM_EDHOC_ADD_ERROR_OK;
 }

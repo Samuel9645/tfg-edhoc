@@ -13,8 +13,8 @@
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
-                                      const char* listen_address_string);
+enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
+                                          const char* listen_address_string);
 
 /**
  * @brief Join a multicast group for discovery traffic.
@@ -24,7 +24,7 @@ enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-enum cp_status cp_srv_join_multicast_group(
+enum status_coap srv_coap_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string);
 
 /**
@@ -36,9 +36,9 @@ enum cp_status cp_srv_join_multicast_group(
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-enum cp_status cp_srv_add_post_resource(coap_context_t* coap_context,
-                                        const char* resource_path,
-                                        coap_method_handler_t resource_handler);
+enum status_coap srv_coap_add_post_resource(
+    coap_context_t* coap_context, const char* resource_path,
+    coap_method_handler_t resource_handler);
 
 /**
  * @brief Run the server I/O loop.
@@ -47,6 +47,6 @@ enum cp_status cp_srv_add_post_resource(coap_context_t* coap_context,
  * @return CP_STATUS_SUCCESS on graceful stop, CP_STATUS_ERROR
  * on I/O failure.
  */
-enum cp_status cp_srv_run_input_output_loop(coap_context_t* coap_context);
+enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context);
 
 #endif  // COAP_SERVER_SRV_UTILS_H_

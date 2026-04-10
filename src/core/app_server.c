@@ -17,35 +17,36 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                coap_pdu_t* response) {
   (void)resource;
   (void)query;
-  cp_srv_dispatch_edhoc_post(session, request, &EDH_CRED_SRV_CRED, response);
+  srv_coap_dispatch_edhoc_post(session, request, &CRED_EDHOC_SRV_CRED,
+                               response);
 }
 
 enum com_emulation_status core_run_server(void) {
   coap_startup();
-  const struct cp_com_create_context_result initialization_result =
-      cp_com_create_context();
-  if (initialization_result.status != CP_COM_INIT_OK) {
+  const struct com_coap_create_context_result initialization_result =
+      com_coap_create_context();
+  if (initialization_result.status != COM_COAP_INIT_OK) {
     return COM_EMULATION_FAILURE;
   }
   struct com_session_resources server_resources = {
       .coap_context = initialization_result.context,
   };
   static const char COAP_LISTEN_UCAST_IP[] = "::";
-  if (cp_srv_setup_endpoints(server_resources.coap_context,
-                             COAP_LISTEN_UCAST_IP) != CP_STATUS_SUCCESS) {
+  if (srv_coap_setup_endpoints(server_resources.coap_context,
+                               COAP_LISTEN_UCAST_IP) != STATUS_COAP_OK) {
     com_cleanup_resources(&server_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  if (cp_srv_add_post_resource(server_resources.coap_context,
-                               ".well-known/edhoc",
-                               edhoc_post_handler) != CP_STATUS_SUCCESS) {
+  if (srv_coap_add_post_resource(server_resources.coap_context,
+                                 ".well-known/edhoc",
+                                 edhoc_post_handler) != STATUS_COAP_OK) {
     com_cleanup_resources(&server_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  if (cp_srv_run_input_output_loop(server_resources.coap_context) !=
-      CP_STATUS_SUCCESS) {
+  if (srv_coap_run_input_output_loop(server_resources.coap_context) !=
+      STATUS_COAP_OK) {
     com_cleanup_resources(&server_resources);
     return COM_EMULATION_FAILURE;
   }

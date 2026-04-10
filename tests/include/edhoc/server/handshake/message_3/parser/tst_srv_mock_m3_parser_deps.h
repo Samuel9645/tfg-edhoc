@@ -11,7 +11,7 @@
 
 #include <edhoc_helpers.h>
 
-void tst_edh_srv_message_3_parser_reset_stub_results(void);
+void tst_srv_edhoc_message_3_parser_reset_stub_results(void);
 
 void tst_srv_m3_parser_set_extraction_failure(void);
 void tst_srv_m3_parser_set_cid_mismatch(void);

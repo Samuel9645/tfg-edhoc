@@ -14,7 +14,7 @@
 
 void write_mock_buffer_to_response(struct com_writable_buffer* response_data);
 
-void tst_edh_srv_assert_handler_writes_error_in_buffer(
+void tst_srv_edhoc_assert_handler_writes_error_in_buffer(
     struct com_writable_buffer response);
 
 #endif  // EDHOC_COMMON_TST_MOCK_ADD_EDHOC_ERROR_INFO_H_

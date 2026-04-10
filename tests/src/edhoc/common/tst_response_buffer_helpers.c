@@ -10,7 +10,8 @@
 #include "common/tst_report_mock_error.h"
 #include "unity.h"
 
-bool edh_com_response_buffer_is_null(const struct com_writable_buffer* buffer) {
+bool com_edhoc_response_buffer_is_null(
+    const struct com_writable_buffer* buffer) {
   if (buffer == NULL) {
     tst_report_mock_error("response buffer is NULL");
     return true;

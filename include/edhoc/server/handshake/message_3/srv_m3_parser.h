@@ -13,16 +13,16 @@
 
 #include "common/com_data_models.h"
 
-enum edh_srv_parse_message_3_status {
-  EDH_SRV_MSG3_PARSE_OK = 0,
-  EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
-  EDH_SRV_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT,
-  EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
-  EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
+enum srv_edhoc_parse_message_3_status {
+  SRV_EDHOC_MSG3_PARSE_OK = 0,
+  SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT,
+  SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
+  SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
 };
 
-struct edh_srv_parse_message_3_result {
-  enum edh_srv_parse_message_3_status status;
+struct srv_edhoc_parse_message_3_result {
+  enum srv_edhoc_parse_message_3_status status;
   struct com_readonly_buffer parsed_message_3;
 };
 
@@ -36,11 +36,11 @@ struct edh_srv_parse_message_3_result {
  * parsed Message 3 payload (excluding the connection ID) on success, or an
  * empty view with error code on failure.
  */
-struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
+struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx);
 
-const char* edh_srv_parse_message_3_status_to_string(
-    enum edh_srv_parse_message_3_status status);
+const char* srv_edhoc_parse_message_3_status_to_string(
+    enum srv_edhoc_parse_message_3_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PARSER_H_

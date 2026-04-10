@@ -11,17 +11,17 @@
 
 #include "common/com_data_models.h"
 
-enum edh_cli_message_1_compose_status {
-  EDH_CLI_MSG1_COMPOSE_OK = 0,
-  EDH_CLI_MSG1_COMPOSE_ERR_INVALID_ARGS,
-  EDH_CLI_MSG1_COMPOSE_ERR_PAYLOAD_TOO_SMALL,
-  EDH_CLI_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED,
-  EDH_CLI_MSG1_COMPOSE_ERR_EDHOC_PREPEND_FAILED,
+enum cli_edhoc_message_1_compose_status {
+  CLI_EDHOC_MSG1_COMPOSE_OK = 0,
+  CLI_EDHOC_MSG1_COMPOSE_ERR_INVALID_ARGS,
+  CLI_EDHOC_MSG1_COMPOSE_ERR_PAYLOAD_TOO_SMALL,
+  CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED,
+  CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_FAILED,
   EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_SIZE_CALC_FAILED,
 };
 
-struct edh_cli_message_1_compose_result {
-  enum edh_cli_message_1_compose_status status;
+struct cli_edhoc_message_1_compose_result {
+  enum cli_edhoc_message_1_compose_status status;
   struct com_writable_buffer output;
 };
 

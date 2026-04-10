@@ -11,14 +11,14 @@
 
 #include "common/com_data_models.h"
 
-enum edh_cli_message_4_process_status {
-  EDH_CLI_MSG4_PROCESS_OK = 0,
-  EDH_CLI_MSG4_PROCESS_ERR_INVALID_ARGS,
-  EDH_CLI_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
+enum cli_edhoc_message_4_process_status {
+  CLI_EDHOC_MSG4_PROCESS_OK = 0,
+  CLI_EDHOC_MSG4_PROCESS_ERR_INVALID_ARGS,
+  CLI_EDHOC_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
 };
 
-struct edh_cli_message_4_process_result {
-  enum edh_cli_message_4_process_status status;
+struct cli_edhoc_message_4_process_result {
+  enum cli_edhoc_message_4_process_status status;
   struct com_writable_buffer output;
 };
 

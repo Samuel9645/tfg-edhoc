@@ -14,11 +14,11 @@
 
 #include "common/com_data_models.h"
 
-enum edh_com_add_edhoc_error_to_response_status {
-  EDH_COM_ADD_ERROR_OK = 0,
-  EDH_COM_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
-  EDH_COM_ADD_ERROR_ERR_GET_ERROR,
-  EDH_COM_ADD_ERROR_ERR_COMPOSE,
+enum com_edhoc_add_edhoc_error_to_response_status {
+  COM_EDHOC_ADD_ERROR_OK = 0,
+  COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
+  COM_EDHOC_ADD_ERROR_ERR_GET_ERROR,
+  COM_EDHOC_ADD_ERROR_ERR_COMPOSE,
 };
 
 /**
@@ -35,10 +35,11 @@ enum edh_com_add_edhoc_error_to_response_status {
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
-                                    const struct edhoc_error_info* error_info,
-                                    struct com_writable_buffer* response_data);
+enum com_edhoc_add_edhoc_error_to_response_status
+com_edhoc_add_edhoc_error_to_response(
+    const struct edhoc_context* context,
+    const struct edhoc_error_info* error_info,
+    struct com_writable_buffer* response_data);
 /**
  * @brief Compose and write an EDHOC error message payload into the response
  * buffer.
@@ -54,15 +55,15 @@ edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response_with_description(
+enum com_edhoc_add_edhoc_error_to_response_status
+com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 
-enum edh_com_add_internal_error_to_response_status {
-  EDH_COM_ADD_INTERNAL_ERROR_OK = 0,
-  EDH_COM_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
-  EDH_COM_ADD_INTERNAL_ERROR_ERR_COMPOSE,
+enum com_edhoc_add_internal_error_to_response_status {
+  COM_EDHOC_ADD_INTERNAL_ERROR_OK = 0,
+  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
+  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE,
 };
 /**
  * @brief Compose and write an EDHOC error message payload into the response
@@ -72,8 +73,8 @@ enum edh_com_add_internal_error_to_response_status {
  * @param response_data Buffer where the error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum edh_com_add_internal_error_to_response_status
-edh_com_add_internal_error_to_response(
+enum com_edhoc_add_internal_error_to_response_status
+com_edhoc_add_internal_error_to_response(
     const char* error_message, struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_COMMON_EDHOC_ERROR_H_

@@ -11,7 +11,7 @@
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_result.h"
 
-struct edh_srv_message_1_request {
+struct srv_edhoc_message_1_request {
   struct com_readonly_buffer payload;
   const struct edhoc_credentials* credentials;
 };
@@ -29,11 +29,11 @@ struct edh_srv_message_1_request {
  * responsible for freeing it. On failure, the function safely cleans up after
  * itself and returns a NULL pointer.
  */
-struct edh_srv_message_1_handler_result edh_srv_handle_message_1(
-    struct edh_srv_message_1_request request,
+struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
+    struct srv_edhoc_message_1_request request,
     struct com_writable_buffer* response);
 
-const char* edh_srv_handle_message_1_status_code_to_string(
-    enum edh_srv_message_1_handler_status status);
+const char* srv_edhoc_handle_message_1_status_code_to_string(
+    enum srv_edhoc_message_1_handler_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_

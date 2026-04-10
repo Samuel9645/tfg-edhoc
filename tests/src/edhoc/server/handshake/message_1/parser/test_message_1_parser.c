@@ -26,10 +26,10 @@ void test_parser_returns_stripped_message_1_buffer(void) {
       .length = buffer_size,
   };
 
-  const struct edh_srv_parse_message_1_result parse_message_1_result =
-      edh_srv_parse_message_1(request_buffer);
+  const struct srv_edhoc_parse_message_1_result parse_message_1_result =
+      srv_edhoc_parse_message_1(request_buffer);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_OK, parse_message_1_result.status);
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_OK, parse_message_1_result.status);
   TEST_ASSERT_EQUAL_PTR(&buffer[1],
                         parse_message_1_result.parsed_message_1.bytes);
   TEST_ASSERT_EQUAL(buffer_size - 1,
@@ -45,10 +45,10 @@ static void assert_response_empty(
 void test_parser_fails_on_invalid_request_buffer(void) {
   const struct com_readonly_buffer empty_request = {0};
 
-  const struct edh_srv_parse_message_1_result parse_message_1_result =
-      edh_srv_parse_message_1(empty_request);
+  const struct srv_edhoc_parse_message_1_result parse_message_1_result =
+      srv_edhoc_parse_message_1(empty_request);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
                     parse_message_1_result.status);
   assert_response_empty(parse_message_1_result.parsed_message_1);
 }
@@ -62,10 +62,10 @@ void test_parser_fails_when_prefix_extraction_fails(void) {
   };
   tst_stub_extract_flow_set_failed();
 
-  const struct edh_srv_parse_message_1_result parse_message_1_result =
-      edh_srv_parse_message_1(request_buffer);
+  const struct srv_edhoc_parse_message_1_result parse_message_1_result =
+      srv_edhoc_parse_message_1(request_buffer);
 
-  TEST_ASSERT_EQUAL(EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
                     parse_message_1_result.status);
   assert_response_empty(parse_message_1_result.parsed_message_1);
 }

@@ -12,7 +12,7 @@
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 
 static coap_pdu_code_t map_message_3_status_to_response(
-    const enum edh_srv_message_3_handler_status result) {
+    const enum srv_edhoc_message_3_handler_status result) {
   switch (result) {
   case EDH_MSG3_HDL_OK:
     return COAP_RESPONSE_CODE_CHANGED;
@@ -29,11 +29,11 @@ static coap_pdu_code_t map_message_3_status_to_response(
   }
 }
 
-coap_pdu_code_t cp_srv_map_message_3_result_to_coap(
-    const enum edh_srv_message_3_handler_status message_3_result) {
+coap_pdu_code_t srv_coap_map_message_3_result_to_coap(
+    const enum srv_edhoc_message_3_handler_status message_3_result) {
   if (message_3_result != EDH_MSG3_HDL_OK) {
     const char* error_message =
-        edh_srv_handle_message_3_status_code_to_string(message_3_result);
+        srv_edhoc_handle_message_3_status_code_to_string(message_3_result);
     coap_log_err("Message 3 processing failed: %s\n", error_message);
   }
   return map_message_3_status_to_response(message_3_result);

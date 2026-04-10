@@ -16,9 +16,9 @@
  * error responses (4.00 Bad Request, 5.00 Internal Server Error) per RFC 9528
  * A.2.3. For errors, the payload contains the EDHOC error message.
  */
-void cp_srv_dispatch_edhoc_post(coap_session_t* session,
-                                const coap_pdu_t* request,
-                                const struct edhoc_credentials* credentials,
-                                coap_pdu_t* response);
+void srv_coap_dispatch_edhoc_post(coap_session_t* session,
+                                  const coap_pdu_t* request,
+                                  const struct edhoc_credentials* credentials,
+                                  coap_pdu_t* response);
 
 #endif  // COAP_SERVER_SRV_DISPATCH_H_

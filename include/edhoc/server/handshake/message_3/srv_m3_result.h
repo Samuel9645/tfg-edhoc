@@ -10,7 +10,7 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESULT_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESULT_H_
 
-enum edh_srv_message_3_handler_status {
+enum srv_edhoc_message_3_handler_status {
   EDH_MSG3_HDL_OK = 0,
   EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT,
   EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3,

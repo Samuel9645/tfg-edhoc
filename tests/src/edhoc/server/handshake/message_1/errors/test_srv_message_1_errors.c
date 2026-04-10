@@ -35,12 +35,12 @@
 // }
 //
 // void test_add_error_ignores_cipher_suites_with_generic_errors(void) {
-//   const enum edh_srv_message_1_handler_add_error_status status =
-//       edh_srv_message_1_handler_add_error(
+//   const enum srv_edhoc_message_1_handler_add_error_status status =
+//       srv_edhoc_message_1_handler_add_error(
 //           EDHOC_ERROR_GENERIC_ERROR, &env.dummy_context,
 //           "Generic Failure Message", &env.response_buffer);
 //
-//   TEST_ASSERT_EQUAL_MESSAGE(EDH_SRV_MSG1_ADD_ERROR_OK, status,
+//   TEST_ASSERT_EQUAL_MESSAGE(SRV_EDHOC_MSG1_ADD_ERROR_OK, status,
 //                             "The error reporter should return a successful "
 //                             "status for generic errors");
 //
@@ -57,12 +57,12 @@
 //   tst_stub_get_cipher_suites_length =
 //       sizeof(CIPHER_SUITES) / sizeof(CIPHER_SUITES[0]);
 //
-//   const enum edh_srv_message_1_handler_add_error_status status =
-//       edh_srv_message_1_handler_add_error(
+//   const enum srv_edhoc_message_1_handler_add_error_status status =
+//       srv_edhoc_message_1_handler_add_error(
 //           EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE, &env.dummy_context,
 //           "Cipher Suite Mismatch", &env.response_buffer);
 //
-//   TEST_ASSERT_EQUAL_MESSAGE(EDH_SRV_MSG1_ADD_ERROR_OK, status,
+//   TEST_ASSERT_EQUAL_MESSAGE(SRV_EDHOC_MSG1_ADD_ERROR_OK, status,
 //                             "The error reporter should succeed when preparing
 //                             " "a cipher suite mismatch payload");
 //   TEST_ASSERT_EQUAL_

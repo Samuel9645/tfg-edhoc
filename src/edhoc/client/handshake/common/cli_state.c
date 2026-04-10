@@ -12,32 +12,33 @@
 
 #include "edhoc/common/edhoc_setup.h"
 
-enum edh_cli_init_status edh_cli_init(
-    struct edh_cli_handshake* state,
+enum cli_edhoc_init_status cli_edhoc_init(
+    struct cli_edhoc_handshake* state,
     const struct edhoc_credentials* credentials) {
   if (state == NULL) {
-    return EDH_CLI_INIT_ERR_INVALID_ARGS;
+    return CLI_EDHOC_INIT_ERR_INVALID_ARGS;
   }
 
   memset(state, 0, sizeof(*state));
 
-  if (edh_com_setup_context(&state->context, credentials) != EDHOC_SUCCESS) {
-    return EDH_CLI_INIT_ERR_EDHOC_CONTEXT_SETUP_FAILED;
+  if (com_edhoc_setup_context(&state->context, credentials) != EDHOC_SUCCESS) {
+    return CLI_EDHOC_INIT_ERR_EDHOC_CONTEXT_SETUP_FAILED;
   }
 
   state->initialized = true;
-  return EDH_CLI_INIT_OK;
+  return CLI_EDHOC_INIT_OK;
 }
 
-bool edh_cli_handshake_is_initialized(const struct edh_cli_handshake* state) {
+bool cli_edhoc_handshake_is_initialized(
+    const struct cli_edhoc_handshake* state) {
   if (state == NULL) {
     return false;
   }
   return state->initialized;
 }
 
-void edh_cli_clear_state(struct edh_cli_handshake* state) {
-  if (!edh_cli_handshake_is_initialized(state)) {
+void cli_edhoc_clear_state(struct cli_edhoc_handshake* state) {
+  if (!cli_edhoc_handshake_is_initialized(state)) {
     return;
   }
 

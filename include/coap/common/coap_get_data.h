@@ -10,16 +10,16 @@
 
 #include "common/com_data_models.h"
 
-enum cp_com_get_data_status {
-  CP_COM_GET_DATA_OK = 0,
-  CP_COM_GET_DATA_ERR_INVALID_ARGS,
-  CP_COM_GET_DATA_ERR_NO_PAYLOAD,
-  CP_COM_GET_DATA_ERR_INCOMPLETE_BODY,
-  CP_COM_GET_DATA_ERR_INVALID_BUFFER
+enum com_coap_get_data_status {
+  COM_COAP_GET_DATA_OK = 0,
+  COM_COAP_GET_DATA_ERR_INVALID_ARGS,
+  COM_COAP_GET_DATA_ERR_NO_PAYLOAD,
+  COM_COAP_GET_DATA_ERR_INCOMPLETE_BODY,
+  COM_COAP_GET_DATA_ERR_INVALID_BUFFER
 };
 
-struct cp_com_get_data_result {
-  enum cp_com_get_data_status status;
+struct com_coap_get_data_result {
+  enum com_coap_get_data_status status;
   struct com_readonly_buffer output;
 };
 
@@ -29,6 +29,6 @@ struct cp_com_get_data_result {
  * @return Struct containing the status code and the data buffer if the
  * operation was successful, empty buffer and error status code otherwise.
  */
-struct cp_com_get_data_result cp_com_get_data(const coap_pdu_t* pdu);
+struct com_coap_get_data_result com_coap_get_data(const coap_pdu_t* pdu);
 
 #endif  // COAP_COMMON_COAP_GET_DATA_H_

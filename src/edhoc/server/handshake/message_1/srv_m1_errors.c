@@ -12,7 +12,7 @@
 
 #include "edhoc/common/edhoc_error.h"
 
-void edh_srv_message_1_handler_add_error(
+void srv_edhoc_message_1_handler_add_error(
     const struct edhoc_context* context, const char* generic_error_message,
     struct com_writable_buffer* response_data) {
   enum edhoc_error_code error;
@@ -20,15 +20,15 @@ void edh_srv_message_1_handler_add_error(
     return;
   }
   if (error == EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
-    enum { EDH_SRV_CIPHER_SUITES_ARRAY_SIZE = 8 };
+    enum { SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE = 8 };
 
-    int32_t peer_suites[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE] = {0};
+    int32_t peer_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
     size_t peer_len = 0;
-    int32_t own_suites[EDH_SRV_CIPHER_SUITES_ARRAY_SIZE] = {0};
+    int32_t own_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
     size_t own_len = 0;
     if (edhoc_error_get_cipher_suites(
-            context, own_suites, EDH_SRV_CIPHER_SUITES_ARRAY_SIZE, &own_len,
-            peer_suites, EDH_SRV_CIPHER_SUITES_ARRAY_SIZE,
+            context, own_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE, &own_len,
+            peer_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE,
             &peer_len) != EDHOC_SUCCESS) {
       return;
     }
@@ -39,6 +39,6 @@ void edh_srv_message_1_handler_add_error(
      */
     return;
   }
-  (void)edh_com_add_internal_error_to_response(generic_error_message,
-                                               response_data);
+  (void)com_edhoc_add_internal_error_to_response(generic_error_message,
+                                                 response_data);
 }

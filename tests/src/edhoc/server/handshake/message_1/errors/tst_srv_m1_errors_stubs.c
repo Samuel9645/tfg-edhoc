@@ -27,14 +27,14 @@ bool tst_stub_get_suites_called = false;
 enum { TST_SRV_M1_ERR_STUB_CIPHER_SUITES_SIZE = 8 };
 
 static const int32_t
-    TST_EDH_SRV_M1_ERROR_MOCK_BUFFER[TST_SRV_M1_ERR_STUB_CIPHER_SUITES_SIZE] = {
-        0};
+    TST_SRV_EDHOC_M1_ERROR_MOCK_BUFFER[TST_SRV_M1_ERR_STUB_CIPHER_SUITES_SIZE] =
+        {0};
 size_t tst_stub_get_cipher_suites_length = 0;
 
 void tst_srv_m1_err_reset_stub_results(void) {
   tst_stub_get_suites_called = false;
   tst_stub_get_cipher_suites_length = 0;
-  tst_stub_get_cipher_suites = TST_EDH_SRV_M1_ERROR_MOCK_BUFFER;
+  tst_stub_get_cipher_suites = TST_SRV_EDHOC_M1_ERROR_MOCK_BUFFER;
 }
 
 /* Stubbed version of libedhoc function */
@@ -72,10 +72,11 @@ int edhoc_error_get_cipher_suites(
 
 struct edhoc_error_info test_stub_captured_error_info = {0};
 
-enum edh_com_add_edhoc_error_to_response_status
-edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
-                                    const struct edhoc_error_info* error_info,
-                                    struct com_writable_buffer* response_data) {
+enum com_edhoc_add_edhoc_error_to_response_status
+com_edhoc_add_edhoc_error_to_response(
+    const struct edhoc_context* context,
+    const struct edhoc_error_info* error_info,
+    struct com_writable_buffer* response_data) {
   (void)context;
   (void)response_data;
 
@@ -84,7 +85,7 @@ edh_com_add_edhoc_error_to_response(const struct edhoc_context* context,
     test_stub_captured_error_info = *error_info;
   }
 
-  return EDH_COM_ADD_ERROR_OK;
+  return COM_EDHOC_ADD_ERROR_OK;
 }
 
 void tst_srv_m1_err_assert_response_contains_cipher_suites(

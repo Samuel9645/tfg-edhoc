@@ -23,51 +23,51 @@
  *
  * @see coap_server_dispatch_post_with_dependencies for usage.
  */
-struct cp_srv_dispatch_deps {
+struct srv_coap_dispatch_deps {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
-  struct cp_srv_parse_edhoc_request_result (*parse_edhoc_request)(
+  struct srv_coap_parse_edhoc_request_result (*parse_edhoc_request)(
       const coap_pdu_t* request,
-      enum cp_cfg_content_format_edhoc_values expected_format);
+      enum config_coap_content_format_edhoc_values expected_format);
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
-  enum cp_status (*add_edhoc_response_options)(
+  enum status_coap (*add_edhoc_response_options)(
       coap_pdu_t* response,
-      enum cp_cfg_content_format_edhoc_values content_format);
+      enum config_coap_content_format_edhoc_values content_format);
 
   /** Parses EDHOC Message 1 and returns the stripped payload view. */
-  struct edh_srv_parse_message_1_result (*parse_message_1)(
+  struct srv_edhoc_parse_message_1_result (*parse_message_1)(
       struct com_readonly_buffer readonly_buffer);
 
   /**
    * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
    * Message 3 fields for handler processing.
    */
-  struct edh_srv_parse_message_3_result (*parse_message_3)(
+  struct srv_edhoc_parse_message_3_result (*parse_message_3)(
       struct com_readonly_buffer request_buffer,
       const struct edhoc_context* edhoc_ctx);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  struct edh_srv_message_1_handler_result (*handle_message_1)(
-      struct edh_srv_message_1_request request_data,
+  struct srv_edhoc_message_1_handler_result (*handle_message_1)(
+      struct srv_edhoc_message_1_request request_data,
       struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      struct edh_srv_message_1_handler_result message_1_result,
+      struct srv_edhoc_message_1_handler_result message_1_result,
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  enum edh_srv_message_3_handler_status (*handle_message_3)(
-      struct edh_srv_message_3_request request_data,
+  enum srv_edhoc_message_3_handler_status (*handle_message_3)(
+      struct srv_edhoc_message_3_request request_data,
       struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
   coap_pdu_code_t (*process_message_3_result)(
-      enum edh_srv_message_3_handler_status message_3_result);
+      enum srv_edhoc_message_3_handler_status message_3_result);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
-  enum cp_status (*add_response_payload)(coap_pdu_t* response,
-                                         const uint8_t* payload,
+  enum status_coap (*add_response_payload)(coap_pdu_t* response,
+                                           const uint8_t* payload,
                                          size_t payload_len);
 
   /** Retrieves application context data associated with a CoAP session. */
@@ -102,9 +102,9 @@ struct cp_srv_dispatch_deps {
  * Flow](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * for protocol details on Message 1 and Message 3 handling.
  */
-void cp_srv_dispatch_post_with_dependencies(
+void srv_coap_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
-    const struct cp_srv_dispatch_deps* deps);
+    const struct srv_coap_dispatch_deps* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

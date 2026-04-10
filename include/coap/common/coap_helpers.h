@@ -45,9 +45,9 @@
  * @note Inspired by libcoap-minimal common.cc and common.hh files:
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>.
  */
-enum cp_status cp_com_resolve_address(const coap_str_const_t* host,
-                                      uint16_t port, int scheme_hint_bits,
-                                      coap_address_t* destination_address);
+enum status_coap com_coap_resolve_address(const coap_str_const_t* host,
+                                          uint16_t port, int scheme_hint_bits,
+                                          coap_address_t* destination_address);
 
 /**
  * @brief Create a CoAP options list with EDHOC-specific options.
@@ -66,8 +66,8 @@ enum cp_status cp_com_resolve_address(const coap_str_const_t* host,
  *
  * @note On failure, any allocated resources are freed.
  */
-coap_optlist_t* cp_com_create_coap_edhoc_optlist(
-    enum cp_cfg_content_format_edhoc_values content_format);
+coap_optlist_t* com_coap_create_coap_edhoc_optlist(
+    enum config_coap_content_format_edhoc_values content_format);
 
 /**
  * @brief Check if CoAP response code indicates success.
@@ -75,6 +75,6 @@ coap_optlist_t* cp_com_create_coap_edhoc_optlist(
  * @param[in] response_code The CoAP response code to check.
  * @return true if response indicates success (2.04 Changed), false otherwise.
  */
-bool cp_com_coap_response_indicates_success(coap_pdu_code_t response_code);
+bool com_coap_coap_response_indicates_success(coap_pdu_code_t response_code);
 
 #endif  // COAP_COMMON_COAP_HELPERS_H_

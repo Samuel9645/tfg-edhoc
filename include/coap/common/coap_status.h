@@ -1,6 +1,6 @@
 #ifndef COAP_COMMON_COAP_STATUS_H_
 #define COAP_COMMON_COAP_STATUS_H_
 
-enum cp_status { CP_STATUS_SUCCESS = 0, CP_STATUS_ERROR };
+enum status_coap { STATUS_COAP_OK = 0, STATUS_COAP_ERR };
 
 #endif  // COAP_COMMON_COAP_STATUS_H_

@@ -4,10 +4,10 @@
 
 #include "coap/common/coap_status.h"
 
-enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
-                                      const char* listen_address_string) {
+enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
+                                          const char* listen_address_string) {
   if (!coap_context || !listen_address_string) {
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
   const bool has_pki_psk_info = false;
@@ -42,33 +42,33 @@ enum cp_status cp_srv_setup_endpoints(coap_context_t* coap_context,
   if (!has_endpoint) {
     coap_log_err("No context available for interface '%s'\n",
                  (const char*)listen_address->s);
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
-  return CP_STATUS_SUCCESS;
+  return STATUS_COAP_OK;
 }
 
-enum cp_status cp_srv_join_multicast_group(
+enum status_coap srv_coap_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string) {
   if (!coap_context || !multicast_address_string) {
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
   const int join_result =
       coap_join_mcast_group_intf(coap_context, multicast_address_string, NULL);
   if (join_result < 0) {
     coap_log_warn("cannot join multicast group %s\n", multicast_address_string);
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
-  return CP_STATUS_SUCCESS;
+  return STATUS_COAP_OK;
 }
 
-enum cp_status cp_srv_add_post_resource(
+enum status_coap srv_coap_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     const coap_method_handler_t resource_handler) {
   if (!coap_context || !resource_path || !resource_handler) {
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
   enum { MEMORY_HANDLING_FLAGS = 0 };
@@ -77,23 +77,23 @@ enum cp_status cp_srv_add_post_resource(
       coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS);
   if (!resource) {
     coap_log_err("cannot create resource\n");
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
   coap_register_request_handler(resource, COAP_REQUEST_POST, resource_handler);
   coap_add_resource(coap_context, resource);
-  return CP_STATUS_SUCCESS;
+  return STATUS_COAP_OK;
 }
 
-enum cp_status cp_srv_run_input_output_loop(coap_context_t* coap_context) {
+enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context) {
   if (!coap_context) {
-    return CP_STATUS_ERROR;
+    return STATUS_COAP_ERR;
   }
 
   while (true) {
     if (coap_io_process(coap_context, COAP_IO_WAIT) < 0) {
       coap_log_err("CoAP I/O process failed\n");
-      return CP_STATUS_ERROR;
+      return STATUS_COAP_ERR;
     }
   }
 }

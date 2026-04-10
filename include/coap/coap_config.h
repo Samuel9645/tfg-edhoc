@@ -6,15 +6,15 @@
  * request and single body data handling.
  */
 enum {
-  CP_CFG_BLOCK_MODE_LIBCOAP_DEFAULT =
+  CONFIG_COAP_BLOCK_MODE_LIBCOAP_DEFAULT =
       COAP_BLOCK_USE_LIBCOAP | COAP_BLOCK_SINGLE_BODY
 };
 
-enum { CP_CFG_MAX_PDU_SIZE = 1024 };
+enum { CONFIG_COAP_MAX_PDU_SIZE = 1024 };
 
-enum cp_cfg_content_format_edhoc_values {
-  CP_CFG_CONTENT_CID_EDHOC = 65,
-  CP_CFG_CONTENT_EDHOC = 64
+enum config_coap_content_format_edhoc_values {
+  CONFIG_COAP_CONTENT_CID_EDHOC = 65,
+  CONFIG_COAP_CONTENT_EDHOC = 64
 };
 
 #endif  // COAP_COAP_CONFIG_H_

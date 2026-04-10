@@ -5,10 +5,10 @@
 #include "common/com_session_resources.h"
 #include "edhoc/client/handshake/common/cli_state.h"
 
-struct cp_cli_session_resources {
+struct cli_coap_session_resources {
   struct com_session_resources session_resources;
-  struct edh_cli_handshake handshake;
-  struct cp_cli_exchange exchange;
+  struct cli_edhoc_handshake handshake;
+  struct cli_coap_exchange exchange;
 };
 
 /**
@@ -20,6 +20,6 @@ struct cp_cli_session_resources {
  * @note Preferred single cleanup entry point for client handshake/exchange
  * state.
  */
-void cp_cli_cleanup_resources(struct cp_cli_session_resources* resources);
+void cli_coap_cleanup_resources(struct cli_coap_session_resources* resources);
 
 #endif  // COAP_CLIENT_CLI_RESOURCES_H_

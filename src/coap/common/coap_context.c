@@ -9,28 +9,28 @@
 
 #include "coap/coap_config.h"
 
-static struct cp_com_create_context_result initialization_failure(
-    const enum cp_com_create_context_status status) {
-  return (struct cp_com_create_context_result){
+static struct com_coap_create_context_result initialization_failure(
+    const enum com_coap_create_context_status status) {
+  return (struct com_coap_create_context_result){
       .status = status,
       .context = NULL,
   };
 }
 
-static struct cp_com_create_context_result initialization_ok(
+static struct com_coap_create_context_result initialization_ok(
     coap_context_t* context) {
-  return (struct cp_com_create_context_result){
-      .status = CP_COM_INIT_OK,
+  return (struct com_coap_create_context_result){
+      .status = COM_COAP_INIT_OK,
       .context = context,
   };
 }
 
-struct cp_com_create_context_result cp_com_create_context(void) {
+struct com_coap_create_context_result com_coap_create_context(void) {
   coap_context_t* context = coap_new_context(NULL);
   if (context == NULL) {
     coap_log_err("failed to create CoAP context\n");
-    return initialization_failure(CP_COM_INIT_ERR_CONTEXT_CREATION);
+    return initialization_failure(COM_COAP_INIT_ERR_CONTEXT_CREATION);
   }
-  coap_context_set_block_mode(context, CP_CFG_BLOCK_MODE_LIBCOAP_DEFAULT);
+  coap_context_set_block_mode(context, CONFIG_COAP_BLOCK_MODE_LIBCOAP_DEFAULT);
   return initialization_ok(context);
 }

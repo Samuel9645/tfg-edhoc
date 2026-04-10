@@ -11,8 +11,8 @@
  * @param[in] payload Raw response payload bytes.
  * @param[in] payload_len Number of payload bytes.
  */
-void cp_cli_log_received_edhoc_error_response(coap_pdu_code_t response_code,
-                                              const uint8_t* payload,
-                                              size_t payload_len);
+void cli_coap_log_received_edhoc_error_response(coap_pdu_code_t response_code,
+                                                const uint8_t* payload,
+                                                size_t payload_len);
 
 #endif  // COAP_CLIENT_CLI_LOG_ERROR_H_

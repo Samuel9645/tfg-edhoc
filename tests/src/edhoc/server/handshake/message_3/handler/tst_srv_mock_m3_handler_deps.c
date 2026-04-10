@@ -22,25 +22,25 @@ static int message_3_process_result = EDHOC_SUCCESS;
 static int message_4_compose_result = EDHOC_SUCCESS;
 static size_t message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);
 
-void tst_edh_srv_m1_set_message_3_process_failure(void) {
+void tst_srv_edhoc_m1_set_message_3_process_failure(void) {
   message_3_process_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_m1_set_message_4_compose_failure(void) {
+void tst_srv_edhoc_m1_set_message_4_compose_failure(void) {
   message_4_compose_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
-void tst_edh_srv_m3_set_message_4_compose_empty_length(void) {
+void tst_srv_edhoc_m3_set_message_4_compose_empty_length(void) {
   message_4_written_length = 0;
 }
 
-void tst_edh_srv_m3_reset_stub_results(void) {
+void tst_srv_edhoc_m3_reset_stub_results(void) {
   message_3_process_result = EDHOC_SUCCESS;
   message_4_compose_result = EDHOC_SUCCESS;
   message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);
 }
 
-void tst_edh_srv_m3_assert_handler_writes_message_4_in_buffer(
+void tst_srv_edhoc_m3_assert_handler_writes_message_4_in_buffer(
     struct com_writable_buffer response) {
   TEST_ASSERT_EQUAL_HEX8_ARRAY_MESSAGE(TST_DEFAULT_M4_PAYLOAD, response.bytes,
                                        message_4_written_length,

@@ -12,7 +12,7 @@
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
 
-struct edh_srv_message_3_request {
+struct srv_edhoc_message_3_request {
   struct edhoc_context* edhoc_context;
   struct com_readonly_buffer parsed_message_3;
 };
@@ -26,11 +26,11 @@ struct edh_srv_message_3_request {
  * @note request_data->base_data.edhoc_ctx is a borrowed pointer provided by
  * the dispatcher.
  */
-enum edh_srv_message_3_handler_status edh_srv_handle_message_3(
-    struct edh_srv_message_3_request request,
+enum srv_edhoc_message_3_handler_status srv_edhoc_handle_message_3(
+    struct srv_edhoc_message_3_request request,
     struct com_writable_buffer* response_buffer);
 
-const char* edh_srv_handle_message_3_status_code_to_string(
-    enum edh_srv_message_3_handler_status status);
+const char* srv_edhoc_handle_message_3_status_code_to_string(
+    enum srv_edhoc_message_3_handler_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_HANDLER_H_

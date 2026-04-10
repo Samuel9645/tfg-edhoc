@@ -12,16 +12,16 @@
 
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
-struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
+struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     const struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx) {
   if (!com_readonly_buffer_is_valid(request_buffer)) {
-    return cp_srv_internal_parse_message_3_failure(
-        EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
+    return srv_coap_internal_parse_message_3_failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
   }
   if (edhoc_ctx == NULL) {
-    return cp_srv_internal_parse_message_3_failure(
-        EDH_SRV_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT);
+    return srv_coap_internal_parse_message_3_failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT);
   }
 
   struct edhoc_extracted_fields extracted_fields =
@@ -32,32 +32,32 @@ struct edh_srv_parse_message_3_result edh_srv_parse_message_3(
           .edhoc_message_size = request_buffer.length,
       };
   if (edhoc_extract_connection_id(&extracted_fields) != EDHOC_SUCCESS) {
-    return cp_srv_internal_parse_message_3_failure(
-        EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED);
+    return srv_coap_internal_parse_message_3_failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED);
   }
   if (!edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
                                  &edhoc_ctx->private_cid)) {
-    return cp_srv_internal_parse_message_3_failure(
-        EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID);
+    return srv_coap_internal_parse_message_3_failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID);
   }
-  return cp_srv_internal_parse_message_3_ok((struct com_readonly_buffer){
+  return srv_coap_internal_parse_message_3_ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,
       .length = extracted_fields.edhoc_message_size,
   });
 }
 
-const char* edh_srv_parse_message_3_status_to_string(
-    const enum edh_srv_parse_message_3_status status) {
+const char* srv_edhoc_parse_message_3_status_to_string(
+    const enum srv_edhoc_parse_message_3_status status) {
   switch (status) {
-  case EDH_SRV_MSG3_PARSE_OK:
+  case SRV_EDHOC_MSG3_PARSE_OK:
     return "ok";
-  case EDH_SRV_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
+  case SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
     return "invalid request buffer";
-  case EDH_SRV_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT:
+  case SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT:
     return "null EDHOC context";
-  case EDH_SRV_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
+  case SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
     return "connection ID extraction failed";
-  case EDH_SRV_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
+  case SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
     return "unexpected connection ID";
   default:
     return "unknown";

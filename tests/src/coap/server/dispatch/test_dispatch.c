@@ -47,33 +47,33 @@ void tearDown(void) {
 }
 
 void test_server_sends_changed_response_for_valid_message_1(void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.get_session_app_data = stb_cp_srv_get_session_null;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.get_session_app_data = stb_srv_coap_get_session_null;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_edhoc_request = stb_cp_srv_parse_edhoc_request_fail;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.parse_edhoc_request = stb_srv_coap_parse_edhoc_request_fail;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_internal_error_on_server_side_failure(void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.add_edhoc_response_options = stb_cp_srv_add_options_fail;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.add_edhoc_response_options = stb_srv_coap_add_options_fail;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
@@ -81,23 +81,23 @@ void test_server_responds_with_internal_error_on_server_side_failure(void) {
 
 void test_server_responds_with_bad_request_if_context_already_exists_for_message_1(
     void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.get_session_app_data = stb_cp_srv_get_session_valid;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_responds_with_error_when_message_1_processing_fails(void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.get_session_app_data = stb_cp_srv_get_session_null;
-  deps.process_message_1_result = stb_cp_srv_process_m1_fail;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.get_session_app_data = stb_srv_coap_get_session_null;
+  deps.process_message_1_result = stb_srv_coap_process_m1_fail;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
@@ -106,13 +106,13 @@ void test_server_responds_with_error_when_message_1_processing_fails(void) {
 
 void test_server_responds_with_internal_error_if_adding_response_payload_fails(
     void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.get_session_app_data = stb_cp_srv_get_session_null;
-  deps.handle_message_1 = stb_edh_srv_handle_m1_ok_valid_len;
-  deps.add_response_payload = stb_cp_srv_add_payload_fail;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.get_session_app_data = stb_srv_coap_get_session_null;
+  deps.handle_message_1 = stb_srv_edhoc_handle_m1_ok_valid_len;
+  deps.add_response_payload = stb_srv_coap_add_payload_fail;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
@@ -120,26 +120,26 @@ void test_server_responds_with_internal_error_if_adding_response_payload_fails(
 
 void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
-  deps.parse_message_3 = stb_edh_srv_parse_message_3_ok;
-  deps.get_session_app_data = stb_cp_srv_get_session_null;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
+  deps.parse_message_3 = stb_srv_edhoc_parse_message_3_ok;
+  deps.get_session_app_data = stb_srv_coap_get_session_null;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
 
 void test_server_sends_changed_response_for_valid_message_3(void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
-  deps.parse_message_3 = stb_edh_srv_parse_message_3_ok;
-  deps.get_session_app_data = stb_cp_srv_get_session_valid;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
+  deps.parse_message_3 = stb_srv_edhoc_parse_message_3_ok;
+  deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
@@ -147,13 +147,13 @@ void test_server_sends_changed_response_for_valid_message_3(void) {
 
 void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
-  struct cp_srv_dispatch_deps deps =
-      test_cp_srv_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_edh_srv_parse_message_1_failure;
-  deps.parse_message_3 = stb_edh_srv_parse_message_3_failure;
-  deps.get_session_app_data = stb_cp_srv_get_session_valid;
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
+  deps.parse_message_3 = stb_srv_edhoc_parse_message_3_failure;
+  deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
-  cp_srv_dispatch_post_with_dependencies(
+  srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));

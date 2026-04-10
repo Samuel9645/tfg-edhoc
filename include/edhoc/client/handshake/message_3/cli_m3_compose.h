@@ -21,8 +21,8 @@
  * EDHOC error payload.
  * @return Result wrapper containing status and output view.
  */
-struct edh_cli_message_3_compose_result edh_cli_compose_message_3(
-    struct edh_cli_handshake* state,
+struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
+    struct cli_edhoc_handshake* state,
     struct com_writable_buffer* message_3_or_error);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_CLI_M3_COMPOSE_H_

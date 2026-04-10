@@ -11,14 +11,14 @@
 
 #include "common/com_data_models.h"
 
-enum edh_srv_parse_message_1_status {
-  EDH_SRV_MSG1_PARSE_OK = 0,
-  EDH_SRV_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
-  EDH_SRV_MSG1_PARSE_ERR_PREFIX_EXTRACTION
+enum srv_edhoc_parse_message_1_status {
+  SRV_EDHOC_MSG1_PARSE_OK = 0,
+  SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION
 };
 
-struct edh_srv_parse_message_1_result {
-  enum edh_srv_parse_message_1_status status;
+struct srv_edhoc_parse_message_1_result {
+  enum srv_edhoc_parse_message_1_status status;
   struct com_readonly_buffer parsed_message_1;
 };
 
@@ -30,7 +30,7 @@ struct edh_srv_parse_message_1_result {
  * without the CBOR prefix on success, empty parse result with the corresponding
  * error status on failure.
  */
-struct edh_srv_parse_message_1_result edh_srv_parse_message_1(
+struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
     struct com_readonly_buffer request_buffer);
 
 /**
@@ -39,7 +39,7 @@ struct edh_srv_parse_message_1_result edh_srv_parse_message_1(
  * @return human-readable string describing the parsing status, useful for
  * logging and debugging.
  */
-const char* edh_srv_parse_message_1_status_to_string(
-    enum edh_srv_parse_message_1_status status);
+const char* srv_edhoc_parse_message_1_status_to_string(
+    enum srv_edhoc_parse_message_1_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_

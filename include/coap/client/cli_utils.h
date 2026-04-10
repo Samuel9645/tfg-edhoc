@@ -26,14 +26,14 @@
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
-enum cp_parse_and_resolve_status {
-  CP_PARSE_AND_RESOLVE_OK,
-  CP_PARSE_AND_RESOLVE_ERR_INVALID_URI,
-  CP_PARSE_AND_RESOLVE_ERR_ADDRESS_RESOLUTION
+enum cli_coap_parse_and_resolve_status {
+  CLI_COAP_PARSE_AND_RESOLVE_OK,
+  CLI_COAP_PARSE_AND_RESOLVE_ERR_INVALID_URI,
+  CLI_COAP_PARSE_AND_RESOLVE_ERR_ADDRESS_RESOLUTION
 };
 
-struct cp_cli_parse_and_resolve_result {
-  enum cp_parse_and_resolve_status status;
+struct cli_coap_parse_and_resolve_result {
+  enum cli_coap_parse_and_resolve_status status;
   coap_address_t address;
   coap_uri_t uri;
 };
@@ -47,21 +47,21 @@ struct cp_cli_parse_and_resolve_result {
  * resolved address on success, empty URI and address with the corresponding
  * error status on failure.
  */
-struct cp_cli_parse_and_resolve_result cp_cli_parse_and_resolve_coap_uri(
+struct cli_coap_parse_and_resolve_result cli_coap_parse_and_resolve_coap_uri(
     const char* uri_string);
 
-struct cp_cli_session_config {
+struct cli_coap_session_config {
   const coap_uri_t* uri;
   const coap_address_t* address;
 };
 
-enum cp_cli_create_session_status {
-  CP_CLI_CREATE_SESSION_OK,
-  CP_CLI_CREATE_SESSION_ERR
+enum cli_coap_create_session_status {
+  CLI_COAP_CREATE_SESSION_OK,
+  CLI_COAP_CREATE_SESSION_ERR
 };
 
-struct cp_cli_create_session_result {
-  enum cp_cli_create_session_status status;
+struct cli_coap_create_session_result {
+  enum cli_coap_create_session_status status;
   coap_session_t* session;
 };
 
@@ -74,18 +74,18 @@ struct cp_cli_create_session_result {
  *
  * @note On failure no memory is allocated.
  */
-struct cp_cli_create_session_result cp_cli_create_session(
-    coap_context_t* context, struct cp_cli_session_config config);
+struct cli_coap_create_session_result cli_coap_create_session(
+    coap_context_t* context, struct cli_coap_session_config config);
 
-enum cp_cli_prepare_pdu_status {
-  CP_CLI_PREPARE_PDU_OK,
-  CP_CLI_PREPARE_PDU_ERR_CREATE_PDU,
-  CP_CLI_PREPARE_PDU_ERR_CREATE_OPTLIST,
-  CP_CLI_PREPARE_PDU_ERR_ADD_URI_OPTS
+enum cli_coap_prepare_pdu_status {
+  CLI_COAP_PREPARE_PDU_OK,
+  CLI_COAP_PREPARE_PDU_ERR_CREATE_PDU,
+  CLI_COAP_PREPARE_PDU_ERR_CREATE_OPTLIST,
+  CLI_COAP_PREPARE_PDU_ERR_ADD_URI_OPTS
 };
 
-struct cp_cli_prepare_pdu_result {
-  enum cp_cli_prepare_pdu_status status;
+struct cli_coap_prepare_pdu_result {
+  enum cli_coap_prepare_pdu_status status;
   coap_pdu_t* pdu;
 };
 
@@ -108,9 +108,9 @@ struct cp_cli_prepare_pdu_result {
  * @warning Cleanups the optlist on both success and failure paths. Callers
  * should not attempt to use or free the optlist after calling this function.
  */
-struct cp_cli_prepare_pdu_result cp_cli_prepare_post_request(
-    struct cp_cli_session_config config, coap_session_t* coap_session,
-    enum cp_cfg_content_format_edhoc_values content_format);
+struct cli_coap_prepare_pdu_result cli_coap_prepare_post_request(
+    struct cli_coap_session_config config, coap_session_t* coap_session,
+    enum config_coap_content_format_edhoc_values content_format);
 
 /**
  * @brief Send a prepared CoAP request.
@@ -120,13 +120,13 @@ struct cp_cli_prepare_pdu_result cp_cli_prepare_post_request(
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
  */
-enum cp_status cp_cli_send_coap_request(coap_session_t* coap_session,
-                                        coap_pdu_t* request_pdu);
+enum status_coap cli_coap_send_coap_request(coap_session_t* coap_session,
+                                            coap_pdu_t* request_pdu);
 
-enum cp_cli_wait_status {
-  CP_CLI_WAIT_OK,
-  CP_CLI_WAIT_TIMEOUT,
-  CP_CLI_WAIT_IO_ERR
+enum cli_coap_wait_status {
+  CLI_COAP_WAIT_OK,
+  CLI_COAP_WAIT_TIMEOUT,
+  CLI_COAP_WAIT_IO_ERR
 };
 
 /**
@@ -138,7 +138,7 @@ enum cp_cli_wait_status {
  * @return Status code of the wait operation, indicating success, timeout, or
  * I/O error.
  */
-enum cp_cli_wait_status cp_cli_wait_for_coap_response(
+enum cli_coap_wait_status cli_coap_wait_for_coap_response(
     coap_context_t* coap_session_context, const coap_session_t* coap_session,
     const bool* have_response);
 

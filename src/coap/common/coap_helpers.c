@@ -17,17 +17,17 @@
 
 #include "coap/common/coap_helpers.h"
 
-enum cp_status cp_com_resolve_address(const coap_str_const_t* host,
-                                      const uint16_t port,
+enum status_coap com_coap_resolve_address(const coap_str_const_t* host,
+                                          const uint16_t port,
                                           const int scheme_hint_bits,
                                           coap_address_t* destination_address) {
-  enum cp_status result = CP_STATUS_ERROR;
+  enum status_coap result = STATUS_COAP_ERR;
 
   coap_addr_info_t* addr_info =
       coap_resolve_address_info(host, port, port, port, port, AF_UNSPEC,
                                 scheme_hint_bits, COAP_RESOLVE_TYPE_REMOTE);
   if (addr_info) {
-    result = CP_STATUS_SUCCESS;
+    result = STATUS_COAP_OK;
     *destination_address = addr_info->addr;
   }
 
@@ -35,8 +35,8 @@ enum cp_status cp_com_resolve_address(const coap_str_const_t* host,
   return result;
 }
 
-coap_optlist_t* cp_com_create_coap_edhoc_optlist(
-    const enum cp_cfg_content_format_edhoc_values content_format) {
+coap_optlist_t* com_coap_create_coap_edhoc_optlist(
+    const enum config_coap_content_format_edhoc_values content_format) {
   enum { CREATE_PORT_HOST_OPTION = 1 };
   coap_optlist_t* optlist = NULL;
   enum { ENCODE_BUFFER_SIZE = 4 };
@@ -60,7 +60,7 @@ coap_optlist_t* cp_com_create_coap_edhoc_optlist(
   }
   return optlist;
 }
-bool cp_com_coap_response_indicates_success(
+bool com_coap_coap_response_indicates_success(
     const coap_pdu_code_t response_code) {
   return response_code == COAP_RESPONSE_CODE_CHANGED;
 }

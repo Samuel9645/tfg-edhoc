@@ -8,13 +8,13 @@
 #define COAP_COMMON_COAP_CONTEXT_H_
 #include <coap3/coap.h>
 
-enum cp_com_create_context_status {
-  CP_COM_INIT_OK,
-  CP_COM_INIT_ERR_CONTEXT_CREATION
+enum com_coap_create_context_status {
+  COM_COAP_INIT_OK,
+  COM_COAP_INIT_ERR_CONTEXT_CREATION
 };
 
-struct cp_com_create_context_result {
-  enum cp_com_create_context_status status;
+struct com_coap_create_context_result {
+  enum com_coap_create_context_status status;
   coap_context_t *context;
 };
 
@@ -23,6 +23,6 @@ struct cp_com_create_context_result {
  * @return Struct containing the status of the operation and the created context
  * on success, NULL context on failure.
  */
-struct cp_com_create_context_result cp_com_create_context(void);
+struct com_coap_create_context_result com_coap_create_context(void);
 
 #endif  // COAP_COMMON_COAP_CONTEXT_H_

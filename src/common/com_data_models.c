@@ -22,3 +22,17 @@ bool com_writable_buffer_is_writable(const struct com_writable_buffer* buffer) {
 bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer) {
   return com_writable_buffer_is_writable(buffer) && buffer->length > 0;
 }
+
+struct com_readonly_conversion_result com_writable_as_readonly(
+    const struct com_writable_buffer writable) {
+  if (!com_writable_buffer_has_content(&writable)) {
+    return (struct com_readonly_conversion_result){
+        .status = COM_RDONLY_CONV_ERR_EMPTY_BUFFER,
+        .buffer = {0},
+    };
+  }
+  return (struct com_readonly_conversion_result){
+      .status = COM_RDONLY_CONV_OK,
+      .buffer = {.bytes = writable.bytes, .length = writable.length},
+  };
+}

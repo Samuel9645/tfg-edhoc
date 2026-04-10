@@ -55,8 +55,9 @@ void test_handler_fails_on_invalid_data(void) {
       .parsed_message_3 = env.valid_request.parsed_message_3};
   const struct edh_srv_message_3_request no_buffer = {.edhoc_context =
                                                           &env.context};
-  struct edh_srv_message_3_request empty_request = env.valid_request;
-  empty_request.parsed_message_3.length = 0;
+  const struct edh_srv_message_3_request empty_request = {
+      .edhoc_context = &env.context,
+      .parsed_message_3 = {.bytes = env.request_buffer, .length = 0}};
   struct com_writable_buffer unwritable_response = {
       .bytes = env.response.bytes,
       .capacity = 0,

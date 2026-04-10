@@ -11,12 +11,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// TODO: make length const
 struct com_readonly_buffer {
   const uint8_t* bytes;
-  size_t length;
+  const size_t length;
 };
 
+// TODO: maybe create a has_content and is valid to be more explicit
 bool com_readonly_buffer_is_valid(struct com_readonly_buffer buffer);
 
 struct com_writable_buffer {
@@ -28,5 +28,18 @@ struct com_writable_buffer {
 bool com_writable_buffer_is_writable(const struct com_writable_buffer* buffer);
 
 bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer);
+
+enum com_conversion_status {
+  COM_RDONLY_CONV_OK = 0,
+  COM_RDONLY_CONV_ERR_EMPTY_BUFFER
+};
+
+struct com_readonly_conversion_result {
+  enum com_conversion_status status;
+  struct com_readonly_buffer buffer;
+};
+
+struct com_readonly_conversion_result com_writable_as_readonly(
+    struct com_writable_buffer writable);
 
 #endif  // COMMON_COM_DATA_MODELS_H_

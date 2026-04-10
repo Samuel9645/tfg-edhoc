@@ -16,11 +16,11 @@
 
 enum srv_coap_parse_edhoc_request_status {
   SRV_COAP_EDH_REQ_OK = 0,
-  SRV_COAP_EDH_REQ_ERR_INVALID_ARGS,
+  SRV_COAP_EDH_REQ_ERR_PDU,
+  SRV_COAP_EDH_REQ_ERR_DATA_BUFFER,
   SRV_COAP_EDH_REQ_ERR_MISSING_FORMAT,
   SRV_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT,
   SRV_COAP_EDH_REQ_ERR_NO_PAYLOAD,
-  SRV_COAP_EDH_REQ_ERR_MALFORMED_PDU
 };
 
 struct srv_coap_parse_edhoc_request_result {
@@ -32,20 +32,15 @@ struct srv_coap_parse_edhoc_request_result {
  * @brief Validate EDHOC CoAP request content format and extract payload.
  * @param[in] request Incoming CoAP request.
  * @param[in] expected_format Expected content format value.
- * @return Struct containing the status and the parsed response on success,
- * empty response on failure
+ * @param[out] data_buffer View of the buffer to write the data into
+ * @return Struct containing a status code and a view of the parsed request
  */
 struct srv_coap_parse_edhoc_request_result srv_coap_parse_edhoc_request(
     const coap_pdu_t* request,
-    enum config_coap_content_format_edhoc_values expected_format);
+    enum config_coap_content_format_edhoc_values expected_format,
+    struct com_writable_buffer* data_buffer);
 
-/**
- * @brief Convert a parsing status code into a human-readable string.
- * @param status status of the parsing operation
- * @return human-readable string describing the parsing status, useful for
- * logging and debugging.
- */
-const char* srv_coap_parse_edhoc_request_status_to_string(
+coap_pdu_code_t srv_coap_map_parse_result_to_pdu_code(
     enum srv_coap_parse_edhoc_request_status status);
 
 #endif  // COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_

@@ -28,25 +28,12 @@ static bool srv_dispatch_has_invalid_deps_or_args(
   return !session || !request || !response || !dispatch_deps_are_valid(deps);
 }
 
-static coap_pdu_code_t map_parse_result_to_pdu_code(
-    const enum srv_coap_parse_edhoc_request_status status) {
-  switch (status) {
-  case SRV_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT:
-    return COAP_RESPONSE_CODE_UNSUPPORTED_CONTENT_FORMAT;
-  case SRV_COAP_EDH_REQ_ERR_NO_PAYLOAD:
-  case SRV_COAP_EDH_REQ_ERR_MALFORMED_PDU:
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
-  default:
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  }
-}
-
 static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
     const enum srv_edhoc_parse_message_1_status status) {
   switch (status) {
-  case SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER:
   case SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
+  case SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER:
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
@@ -55,10 +42,10 @@ static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
 coap_pdu_code_t map_parse_message_3_status_to_pdu_code(
     const enum srv_edhoc_parse_message_3_status status) {
   switch (status) {
-  case SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
   case SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
   case SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
+  case SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
@@ -76,15 +63,19 @@ void srv_coap_dispatch_post_with_dependencies(
     return;
   }
 
+  uint8_t pdu_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
+  struct com_writable_buffer pdu_data = {
+      .bytes = pdu_buffer,
+      .capacity = CONFIG_COAP_MAX_PDU_SIZE,
+      .length = 0,
+  };
   const struct srv_coap_parse_edhoc_request_result parse_edhoc_result =
-      deps->parse_edhoc_request(request, CONFIG_COAP_CONTENT_CID_EDHOC);
+      deps->parse_edhoc_request(request, CONFIG_COAP_CONTENT_CID_EDHOC,
+                                &pdu_data);
   if (parse_edhoc_result.status != SRV_COAP_EDH_REQ_OK) {
-    coap_log_err(
-        "failed to parse EDHOC message %s\n",
-                 srv_coap_parse_edhoc_request_status_to_string(
-                     parse_edhoc_result.status));
-    coap_pdu_set_code(response,
-                      map_parse_result_to_pdu_code(parse_edhoc_result.status));
+    coap_log_err("failed to parse EDHOC message\n");
+    coap_pdu_set_code(response, srv_coap_map_parse_result_to_pdu_code(
+                                    parse_edhoc_result.status));
     return;
   }
   if (deps->add_edhoc_response_options(response, CONFIG_COAP_CONTENT_EDHOC) !=

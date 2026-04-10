@@ -5,6 +5,7 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/coap_status.h"
+#include "coap/server/srv_parse_edhoc_request.h"
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
@@ -27,7 +28,8 @@ struct srv_coap_dispatch_deps {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
   struct srv_coap_parse_edhoc_request_result (*parse_edhoc_request)(
       const coap_pdu_t* request,
-      enum config_coap_content_format_edhoc_values expected_format);
+      enum config_coap_content_format_edhoc_values expected_format,
+      struct com_writable_buffer* data_buffer);
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
   enum status_coap (*add_edhoc_response_options)(
@@ -68,7 +70,7 @@ struct srv_coap_dispatch_deps {
   /** Adds response payload bytes to outgoing CoAP PDU. */
   enum status_coap (*add_response_payload)(coap_pdu_t* response,
                                            const uint8_t* payload,
-                                         size_t payload_len);
+                                           size_t payload_len);
 
   /** Retrieves application context data associated with a CoAP session. */
   void* (*get_session_app_data)(const coap_session_t* session);

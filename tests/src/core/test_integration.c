@@ -41,5 +41,9 @@ void test_standalone_binaries_handshake(void) {
   kill(server_pid, SIGTERM);
   waitpid(server_pid, NULL, 0);
 
-  TEST_ASSERT_EQUAL(0, WEXITSTATUS(client_status));
+  if (WIFEXITED(client_status)) {
+    TEST_ASSERT_EQUAL(0, WEXITSTATUS(client_status));
+  } else {
+    TEST_FAIL_MESSAGE("Client crashed or was signaled");
+  }
 }

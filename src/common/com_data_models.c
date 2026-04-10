@@ -24,8 +24,8 @@ bool com_writable_buffer_has_content(const struct com_writable_buffer* buffer) {
 }
 
 struct com_readonly_conversion_result com_writable_as_readonly(
-    const struct com_writable_buffer writable) {
-  if (!com_writable_buffer_has_content(&writable)) {
+    const struct com_writable_buffer* writable) {
+  if (!com_writable_buffer_has_content(writable)) {
     return (struct com_readonly_conversion_result){
         .status = COM_RDONLY_CONV_ERR_EMPTY_BUFFER,
         .buffer = {0},
@@ -33,6 +33,6 @@ struct com_readonly_conversion_result com_writable_as_readonly(
   }
   return (struct com_readonly_conversion_result){
       .status = COM_RDONLY_CONV_OK,
-      .buffer = {.bytes = writable.bytes, .length = writable.length},
+      .buffer = {.bytes = writable->bytes, .length = writable->length},
   };
 }

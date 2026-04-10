@@ -12,23 +12,27 @@
 
 enum com_coap_get_data_status {
   COM_COAP_GET_DATA_OK = 0,
-  COM_COAP_GET_DATA_ERR_INVALID_ARGS,
+  COM_COAP_GET_DATA_ERR_PDU,
+  COM_COAP_GET_DATA_ERR_DATA_BUFFER,
   COM_COAP_GET_DATA_ERR_NO_PAYLOAD,
   COM_COAP_GET_DATA_ERR_INCOMPLETE_BODY,
-  COM_COAP_GET_DATA_ERR_INVALID_BUFFER
+  COM_COAP_GET_DATA_ERR_DATA_BUFFER_TOO_SMALL,
+  COM_COAP_GET_DATA_ERR_EMPTY_DATA,
 };
 
 struct com_coap_get_data_result {
-  enum com_coap_get_data_status status;
-  struct com_readonly_buffer output;
+  const enum com_coap_get_data_status status;
+  const struct com_readonly_buffer data;
 };
 
 /**
  * @brief Gets the data from the given pdu
- * @param pdu Protocol data unit to get the data from
- * @return Struct containing the status code and the data buffer if the
- * operation was successful, empty buffer and error status code otherwise.
+ * @param[in] pdu Protocol data unit to get the data from
+ * @param[out] data_buffer View of the buffer to write the data into.
+ * @return Result struct containing the status of the operation and a view over
+ * the data on success, or an empty view with error code on failure.
  */
-struct com_coap_get_data_result com_coap_get_data(const coap_pdu_t* pdu);
+struct com_coap_get_data_result com_coap_get_data(
+    const coap_pdu_t* pdu, struct com_writable_buffer* data_buffer);
 
 #endif  // COAP_COMMON_COAP_GET_DATA_H_

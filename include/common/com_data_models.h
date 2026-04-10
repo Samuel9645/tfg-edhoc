@@ -40,6 +40,6 @@ struct com_readonly_conversion_result {
 };
 
 struct com_readonly_conversion_result com_writable_as_readonly(
-    struct com_writable_buffer writable);
+    const struct com_writable_buffer* writable);
 
 #endif  // COMMON_COM_DATA_MODELS_H_

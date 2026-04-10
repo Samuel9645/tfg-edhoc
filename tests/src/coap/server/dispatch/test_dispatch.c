@@ -95,7 +95,7 @@ void test_server_responds_with_error_when_message_1_processing_fails(void) {
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_null;
-  deps.process_message_1_result = stb_srv_coap_process_m1_fail;
+  deps.process_message_1_result = stb_srv_coap_process_m1_protocol_failure;
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
@@ -109,8 +109,8 @@ void test_server_responds_with_internal_error_if_adding_response_payload_fails(
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_null;
-  deps.handle_message_1 = stb_srv_edhoc_handle_m1_ok_valid_len;
-  deps.add_response_payload = stb_srv_coap_add_payload_fail;
+  deps.handle_message_1 = stb_srv_edhoc_handle_m1_ok;
+  deps.add_response_payload = stb_srv_coap_add_payload_failure;
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, &DUMMY_TEST_CREDS, dummy_response, &deps);
@@ -122,7 +122,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
     void) {
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
+  deps.parse_message_1 = stb_srv_edhoc_parse_m1_protocol_failure;
   deps.parse_message_3 = stb_srv_edhoc_parse_message_3_ok;
   deps.get_session_app_data = stb_srv_coap_get_session_null;
 
@@ -135,7 +135,7 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
 void test_server_sends_changed_response_for_valid_message_3(void) {
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
+  deps.parse_message_1 = stb_srv_edhoc_parse_m1_protocol_failure;
   deps.parse_message_3 = stb_srv_edhoc_parse_message_3_ok;
   deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
@@ -149,8 +149,8 @@ void test_server_responds_with_bad_request_for_unrecognized_message_format(
     void) {
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
-  deps.parse_message_1 = stb_srv_edhoc_parse_message_1_failure;
-  deps.parse_message_3 = stb_srv_edhoc_parse_message_3_failure;
+  deps.parse_message_1 = stb_srv_edhoc_parse_m1_protocol_failure;
+  deps.parse_message_3 = stb_srv_edhoc_parse_m3_protocol_failure;
   deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
   srv_coap_dispatch_post_with_dependencies(

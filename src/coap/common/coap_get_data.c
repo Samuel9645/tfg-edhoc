@@ -8,24 +8,33 @@
 
 #include "coap/common/coap_get_data.h"
 
+#include <string.h>
+
 #include "coap3/coap_debug.h"
 #include "coap3/coap_pdu.h"
 
 static struct com_coap_get_data_result get_data_ok(
-    const struct com_readonly_buffer buffer) {
-  return (struct com_coap_get_data_result){.status = COM_COAP_GET_DATA_OK,
-                                           .output = buffer};
+    const struct com_readonly_buffer data) {
+  return (struct com_coap_get_data_result){
+      .status = COM_COAP_GET_DATA_OK,
+      .data = data,
+  };
 }
 
 static struct com_coap_get_data_result get_data_failure(
-    const enum com_coap_get_data_status error_status) {
-  return (struct com_coap_get_data_result){.status = error_status};
+    const enum com_coap_get_data_status status) {
+  return (struct com_coap_get_data_result){.status = status};
 }
 
-struct com_coap_get_data_result com_coap_get_data(const coap_pdu_t* pdu) {
+struct com_coap_get_data_result com_coap_get_data(
+    const coap_pdu_t* pdu, struct com_writable_buffer* data_buffer) {
   if (pdu == NULL) {
-    coap_log_err("invalid arguments to com_coap_get_data\n");
-    return get_data_failure(COM_COAP_GET_DATA_ERR_INVALID_ARGS);
+    coap_log_err("pdu is NULL\n");
+    return get_data_failure(COM_COAP_GET_DATA_ERR_PDU);
+  }
+  if (!com_writable_buffer_is_writable(data_buffer)) {
+    coap_log_err("data buffer is not writable\n");
+    return get_data_failure(COM_COAP_GET_DATA_ERR_DATA_BUFFER);
   }
 
   size_t length = 0;
@@ -41,10 +50,17 @@ struct com_coap_get_data_result com_coap_get_data(const coap_pdu_t* pdu) {
     coap_log_err("incomplete body");
     return get_data_failure(COM_COAP_GET_DATA_ERR_INCOMPLETE_BODY);
   }
-  const struct com_readonly_buffer buffer = {.bytes = data, .length = length};
-  if (!com_readonly_buffer_is_valid(buffer)) {
-    coap_log_err("invalid buffer retrieved from coap_get_data\n");
-    return get_data_failure(COM_COAP_GET_DATA_ERR_INVALID_BUFFER);
+  if (length > data_buffer->capacity) {
+    coap_log_err("data buffer is too small\n");
+    return get_data_failure(COM_COAP_GET_DATA_ERR_DATA_BUFFER_TOO_SMALL);
   }
-  return get_data_ok(buffer);
+  memcpy(data_buffer->bytes, data, length);
+  data_buffer->length = length;
+  const struct com_readonly_conversion_result conversion_result =
+      com_writable_as_readonly(data_buffer);
+  // SHOULD NEVER HAPPEN
+  if (conversion_result.status != COM_RDONLY_CONV_OK) {
+    return get_data_failure(COM_COAP_GET_DATA_ERR_NO_PAYLOAD);
+  }
+  return get_data_ok(conversion_result.buffer);
 }

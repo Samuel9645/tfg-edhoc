@@ -31,7 +31,6 @@ static coap_response_t coap_client_coap_response_handler(
     const coap_mid_t id) {
   (void)sent;
   (void)id;
-
   struct cli_coap_exchange* exchange = coap_session_get_app_data(session);
   if (!exchange) {
     coap_log_err("missing client exchange state in coap_response.handler\n");
@@ -40,31 +39,31 @@ static coap_response_t coap_client_coap_response_handler(
 
   exchange->have_response = true;
   exchange->incoming_message_length = 0;
-
   const coap_pdu_code_t response_code = coap_pdu_get_code(received);
   exchange->last_response_code = response_code;
   if (response_code == COAP_EMPTY_CODE) {
     coap_log_info("received empty response\n");
     return COAP_RESPONSE_OK;
   }
-
   if (!client_coap_response_has_edhoc_content_format(received)) {
     coap_log_err("missing or invalid EDHOC content format in response\n");
     return COAP_RESPONSE_OK;
   }
 
+  struct com_writable_buffer request_data = {
+      .bytes = exchange->incoming_message,
+      .capacity = sizeof(exchange->incoming_message),
+      .length = 0};
   const struct com_coap_get_data_result get_data_result =
-      com_coap_get_data(received);
+      com_coap_get_data(received, &request_data);
   if (get_data_result.status != COM_COAP_GET_DATA_OK) {
     coap_log_err("cannot get response pdu data\n");
     return COAP_RESPONSE_OK;
   }
-  const struct com_readonly_buffer data = get_data_result.output;
-  memcpy(exchange->incoming_message, data.bytes, data.length);
-  exchange->incoming_message_length = data.length;
+  exchange->incoming_message_length = get_data_result.data.length;
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
-    cli_coap_log_received_edhoc_error_response(response_code, data.bytes,
-                                               data.length);
+    cli_coap_log_received_edhoc_error_response(response_code,
+                                               get_data_result.data);
   }
   return COAP_RESPONSE_OK;
 }

@@ -25,9 +25,7 @@ struct cli_coap_exchange_session_data {
 bool cli_coap_exchange_session_data_is_valid(
     const struct cli_coap_exchange_session_data* session_data);
 
-/**
- * @brief CoAP exchange state for EDHOC client messages.
- */
+// TODO: maybe use com_data_models?
 struct cli_coap_exchange {
   struct cli_coap_exchange_session_data session_data;
   bool have_response;

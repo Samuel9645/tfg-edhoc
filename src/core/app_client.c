@@ -124,7 +124,7 @@ enum com_emulation_status core_run_client(void) {
   }
 
   struct com_readonly_conversion_result message_1_conversion_result =
-      com_writable_as_readonly(request_output);
+      com_writable_as_readonly(&request_output);
   if (message_1_conversion_result.status != COM_RDONLY_CONV_OK) {
     coap_log_err("Failed to convert composed message 1 to readonly buffer\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -171,7 +171,7 @@ enum com_emulation_status core_run_client(void) {
   if (message_2_result.status != CLI_EDHOC_MSG2_PROCESS_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
     struct com_readonly_conversion_result message_2_conversion_result =
-        com_writable_as_readonly(request_output);
+        com_writable_as_readonly(&request_output);
     // TODO: this is duplicated
     if (message_2_conversion_result.status != COM_RDONLY_CONV_OK) {
       coap_log_err(
@@ -195,7 +195,7 @@ enum com_emulation_status core_run_client(void) {
       cli_edhoc_handshake_compose_message_3(&client_resources.handshake,
                                             &request_output);
   struct com_readonly_conversion_result message_3_conversion_result =
-      com_writable_as_readonly(request_output);
+      com_writable_as_readonly(&request_output);
   if (message_3_conversion_result.status != COM_RDONLY_CONV_OK) {
     coap_log_err("Failed to convert composed message 3 to readonly buffer\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -238,7 +238,7 @@ enum com_emulation_status core_run_client(void) {
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
     struct com_readonly_conversion_result message_4_conversion_result =
-        com_writable_as_readonly(request_output);
+        com_writable_as_readonly(&request_output);
     // TODO: this is duplicated
     if (message_4_conversion_result.status != COM_RDONLY_CONV_OK) {
       coap_log_err(

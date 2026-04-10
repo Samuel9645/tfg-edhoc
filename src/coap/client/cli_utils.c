@@ -17,9 +17,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "coap/coap_config.h"
 #include "coap/common/coap_helpers.h"
 #include "coap/common/coap_status.h"
-#include "coap/coap_config.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 
@@ -90,9 +90,21 @@ struct cli_coap_create_session_result cli_coap_create_session(
 }
 
 static coap_pdu_t* create_post_request_pdu(coap_session_t* coap_session) {
-  return coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
-                       coap_new_message_id(coap_session),
-                       coap_session_max_pdu_size(coap_session));
+  coap_pdu_t* pdu = coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
+                                  coap_new_message_id(coap_session),
+                                  coap_session_max_pdu_size(coap_session));
+  if (pdu == NULL) {
+    return NULL;
+  }
+  uint8_t token[8];
+  size_t token_len;
+  coap_session_new_token(coap_session, &token_len, token);
+  if (!coap_add_token(pdu, token_len, token)) {
+    coap_log_err("Failed to add token to PDU\n");
+    coap_delete_pdu(pdu);
+    return NULL;
+  }
+  return pdu;
 }
 
 static int add_uri_into_optlist(const coap_uri_t* client_uri,

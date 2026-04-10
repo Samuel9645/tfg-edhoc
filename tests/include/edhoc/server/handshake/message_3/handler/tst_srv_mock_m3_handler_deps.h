@@ -18,5 +18,5 @@ void tst_edh_srv_m1_set_message_3_process_failure(void);
 void tst_edh_srv_m1_set_message_4_compose_failure(void);
 void tst_edh_srv_m3_set_message_4_compose_empty_length(void);
 
-void tst_edh_srv_message_3_reset_stub_results(void);
+void tst_edh_srv_m3_reset_stub_results(void);
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_HANDLER_STUBS_H_

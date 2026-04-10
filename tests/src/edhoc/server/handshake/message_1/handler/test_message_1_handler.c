@@ -20,15 +20,32 @@
 
 #include "edhoc/common/tst_mock_edhoc_error.h"
 #include "edhoc/edhoc_config.h"
-#include "edhoc/server/handshake/message_1/handler/tst_srv_m1_handler_env.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
+#include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 
-static struct tst_message_1_handler_env env = {0};
+enum { TST_EDH_SRV_HND_BUF_LEN = 256 };
+
+static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
+
+static struct tst_message_1_handler_env {
+  const uint8_t request_buffer[TST_EDH_SRV_HND_BUF_LEN];
+  uint8_t response_buffer[TST_EDH_SRV_HND_BUF_LEN];
+  const struct edh_srv_message_1_request valid_request;
+  struct com_writable_buffer response;
+} env = {.response = {.bytes = env.response_buffer,
+                      .capacity = sizeof(env.response_buffer)},
+         .valid_request = {.payload =
+                               {
+                                   .bytes = env.request_buffer,
+                                   .length = sizeof(env.request_buffer),
+                               },
+                           .credentials = &DUMMY_TEST_CREDS}};
 
 void setUp(void) {
   tst_edh_srv_m1_reset_stub_results();
-  memset(&env, 0, sizeof(env));
-  tst_edh_clear_message_1_setup_env(&env);
+  memset(env.response_buffer, 0, sizeof(env.response_buffer));
+  env.response.bytes = env.response_buffer;
+  env.response.length = 0;
 }
 
 void test_handler_ok_for_valid_data(void) {

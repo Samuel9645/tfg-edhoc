@@ -21,7 +21,7 @@ bool com_readonly_buffer_is_valid(struct com_readonly_buffer buffer);
 
 struct com_writable_buffer {
   uint8_t* bytes;
-  size_t capacity;
+  const size_t capacity;
   size_t length;
 };
 

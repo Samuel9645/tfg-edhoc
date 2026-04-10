@@ -34,7 +34,7 @@ void tst_edh_srv_m3_set_message_4_compose_empty_length(void) {
   message_4_written_length = 0;
 }
 
-void tst_edh_srv_message_3_reset_stub_results(void) {
+void tst_edh_srv_m3_reset_stub_results(void) {
   message_3_process_result = EDHOC_SUCCESS;
   message_4_compose_result = EDHOC_SUCCESS;
   message_4_written_length = sizeof(TST_DEFAULT_M4_PAYLOAD);

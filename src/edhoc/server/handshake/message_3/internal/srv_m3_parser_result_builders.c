@@ -5,7 +5,7 @@
  * @brief Helper functions to build results of parsing message 3 EDHOC requests
  */
 
-#include "srv_m3_parser_result_builders.h"
+#include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
 struct srv_edhoc_parse_message_3_result
 srv_coap_internal_parse_message_3_failure(

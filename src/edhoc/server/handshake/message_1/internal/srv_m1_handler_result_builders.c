@@ -5,7 +5,7 @@
  * @brief Helper functions to build results of handling message 1 EDHOC requests
  */
 
-#include "srv_m1_handler_result_builders.h"
+#include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 
 #include <stddef.h>
 

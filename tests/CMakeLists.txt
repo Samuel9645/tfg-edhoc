@@ -87,14 +87,14 @@ set(COMMON_SRV_SOURCES
 )
 
 add_unity_test(test_edhoc_happy_path_add_protocol_error
-    /src/edhoc/common/add_error/test_edhoc_happy_path_add_protocol_error.c
+    /src/edhoc/common/add_error/happy_path/test_edhoc_happy_path_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SOURCES}
 )
 
 add_unity_test(test_edhoc_happy_path_add_internal_error
-    /src/edhoc/common/add_error/test_edhoc_happy_path_add_internal_error.c
+    /src/edhoc/common/add_error/happy_path/test_edhoc_happy_path_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SOURCES}

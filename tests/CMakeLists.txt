@@ -92,6 +92,13 @@ add_unity_test(test_edhoc_add_protocol_error
     ${COMMON_SOURCES}
 )
 
+add_unity_test(test_edhoc_add_internal_error
+    /src/edhoc/common/add_error/test_edhoc_happy_path_add_internal_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${COMMON_SOURCES}
+)
+
+
 add_unity_test(test_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_message_1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c

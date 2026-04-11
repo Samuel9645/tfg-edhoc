@@ -27,6 +27,8 @@ enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
 
+// TODO: fix undefined behaviour
+
 static struct tst_message_1_handler_env {
   const uint8_t request_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];

@@ -93,6 +93,19 @@ add_unity_test(test_edhoc_happy_path_add_protocol_error
     ${COMMON_SOURCES}
 )
 
+set(ADD_EDHOC_ERROR_SAD_PATH_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/sad_path/tst_mock_edhoc_error_compose.c
+)
+
+add_unity_test(test_edhoc_sad_path_add_protocol_error
+    /src/edhoc/common/add_error/sad_path/test_edhoc_sad_path_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/sad_path/tst_mock_edhoc_error_get_code.c
+    ${ADD_EDHOC_ERROR_SAD_PATH_SOURCES}
+    ${COMMON_SOURCES}
+)
+
 add_unity_test(test_edhoc_happy_path_add_internal_error
     /src/edhoc/common/add_error/happy_path/test_edhoc_happy_path_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
@@ -104,7 +117,7 @@ add_unity_test(test_edhoc_sad_path_add_internal_error
     /src/edhoc/common/add_error/sad_path/test_edhoc_sad_path_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/sad_path/tst_mock_edhoc_error_compose.c
+    ${ADD_EDHOC_ERROR_SAD_PATH_SOURCES}
     ${COMMON_SOURCES}
 )
 

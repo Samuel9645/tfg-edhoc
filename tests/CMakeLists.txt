@@ -21,7 +21,18 @@ function(add_unity_test TARGET_NAME TEST_FILE)
   set(TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_FILE}")
   set(TEST_RUNNER "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_Runner.c")
 
-  # A. Generate the Unity Runner
+  # 1. Separate sources from linker flags (ARGN)
+  set(EXTRA_SOURCES "")
+  set(LINKER_FLAGS "")
+  foreach (arg ${ARGN})
+    if (${arg} MATCHES "^-Wl,")
+      list(APPEND LINKER_FLAGS ${arg})
+    else ()
+      list(APPEND EXTRA_SOURCES ${arg})
+    endif ()
+  endforeach ()
+
+  # 2. Generate the Unity Runner
   add_custom_command(
       OUTPUT ${TEST_RUNNER}
       COMMAND ruby ${UNITY_SCRIPT_DIR}/generate_test_runner.rb ${TEST_SRC} ${TEST_RUNNER}
@@ -29,23 +40,23 @@ function(add_unity_test TARGET_NAME TEST_FILE)
       COMMENT "Generating Unity runner for ${TARGET_NAME}"
   )
 
-  # B. Create the executable using the test, runner, and extra args (${ARGN})
+  # 3. Create the executable
   add_executable(${TARGET_NAME}
       ${TEST_SRC}
       ${TEST_RUNNER}
-      ${ARGN}
+      ${EXTRA_SOURCES}
   )
 
-  # C. Standard Include Directories for all tests
+  # 4. RESTORED INCLUDE DIRECTORIES
   target_include_directories(${TARGET_NAME} PRIVATE
       ${CMAKE_SOURCE_DIR}/include                      # For "app/server.h"
-      ${CMAKE_SOURCE_DIR}/src                          # For "coap/server/internal/..."
+      ${CMAKE_SOURCE_DIR}/src                          # For "edhoc/common/..." and "common/..."
       ${CMAKE_CURRENT_SOURCE_DIR}/include              # For test headers / stubs
       ${CMAKE_SOURCE_DIR}/externals/libedhoc/include
       ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/include
   )
 
-  # D. Standard Link Libraries for all tests
+  # 5. Link Libraries
   target_link_libraries(${TARGET_NAME} PRIVATE
       libedhoc
       libcoap::coap-3
@@ -53,10 +64,14 @@ function(add_unity_test TARGET_NAME TEST_FILE)
       Threads::Threads
   )
 
+  # 6. Apply Linker Options (The --wrap logic)
+  if (LINKER_FLAGS)
+    target_link_options(${TARGET_NAME} PRIVATE ${LINKER_FLAGS})
+  endif ()
+
+  # 7. Standard Options
   target_compile_options(${TARGET_NAME} PRIVATE ${CUSTOM_COMPILE_FLAGS})
   target_link_options(${TARGET_NAME} PRIVATE ${MEMORY_CHECK_FLAGS})
-
-  # E. Register with CTest
   add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
 
   set_property(TEST ${TARGET_NAME} APPEND PROPERTY ENVIRONMENT "ASAN_OPTIONS=halt_on_error=1:abort_on_error=1")
@@ -104,6 +119,7 @@ add_unity_test(test_edhoc_unit_add_protocol_error
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/unit/tst_mock_edhoc_error_get_code.c
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
     ${COMMON_SOURCES}
+    "-Wl,--wrap=edhoc_message_error_compose"
 )
 
 add_unity_test(test_edhoc_integration_add_internal_error
@@ -119,6 +135,7 @@ add_unity_test(test_edhoc_unit_add_internal_error
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
     ${COMMON_SOURCES}
+    "-Wl,--wrap=edhoc_message_error_compose"
 )
 
 add_unity_test(test_edhoc_message_1_parser

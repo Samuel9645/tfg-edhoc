@@ -12,25 +12,39 @@
 #include <edhoc.h>
 
 static int compose_result = EDHOC_SUCCESS;
+static bool use_real_compose = true;
+
+extern int __real_edhoc_message_error_compose(  // NOLINT(*-reserved-identifier)
+                                                // we need this
+    uint8_t *message_error, size_t message_error_size,
+    size_t *message_error_length, enum edhoc_error_code error_code,
+    const struct edhoc_error_info *error_info);
 
 void srv_edhoc_reset_error_compose_mock(void) {
   compose_result = EDHOC_SUCCESS;
+  use_real_compose = false;
 }
+
+void srv_edhoc_use_real_compose(void) { use_real_compose = true; }
 
 void srv_edhoc_set_error_compose_failed(void) {
   compose_result = EDHOC_ERROR_BAD_STATE;
+  use_real_compose = false;
 }
 
-int edhoc_message_error_compose(
-    uint8_t *message_error,            // NOLINT(*-non-const-parameter)
-    size_t message_error_size,         // NOLINT(*-non-const-parameter)
-    size_t *message_error_length,      // NOLINT(*-non-const-parameter)
-    enum edhoc_error_code error_code,  // NOLINT(*-non-const-parameter)
+int __wrap_edhoc_message_error_compose(  // NOLINT(*-reserved-identifier)
+                                         // we need this
+    uint8_t *message_error, size_t message_error_size,
+    size_t *message_error_length, enum edhoc_error_code error_code,
     const struct edhoc_error_info *error_info) {
-  (void)message_error;
-  (void)message_error_length;
-  (void)message_error_size;
-  (void)error_code;
-  (void)error_info;
+  if (use_real_compose) {
+    return __real_edhoc_message_error_compose(message_error, message_error_size,
+                                              message_error_length, error_code,
+                                              error_info);
+  }
+
+  if (compose_result == EDHOC_SUCCESS && message_error_length != NULL) {
+    *message_error_length = 1;
+  }
   return compose_result;
 }

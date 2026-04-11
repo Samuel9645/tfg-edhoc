@@ -68,6 +68,11 @@ endfunction()
 # 4. REGISTER TESTS WITH GRANULAR CONTROL
 # ==============================================================================
 
+
+set(COMMON_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
+)
+
 add_unity_test(test_dispatch
     /src/coap/server/dispatch/test_dispatch.c
     ${SERVER_SOURCES}
@@ -76,9 +81,15 @@ add_unity_test(test_dispatch
 )
 
 set(COMMON_SRV_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_response_buffer_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
+    ${COMMON_SOURCES}
+)
+
+add_unity_test(test_edhoc_add_protocol_error
+    /src/edhoc/common/add_error/test_edhoc_happy_path_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${COMMON_SOURCES}
 )
 
 add_unity_test(test_message_1_parser

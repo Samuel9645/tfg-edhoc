@@ -10,6 +10,11 @@ include(cmake_configs/libedhoc_config.cmake)
 # Third-party dependencies are managed in externals/.
 add_subdirectory(externals)
 
+set(LIBEDHOC_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
+)
+
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
@@ -17,14 +22,13 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${LIBEDHOC_SOURCES}
 )
 
 set(MESSAGE_1_HANDLER_SOURCES

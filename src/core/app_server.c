@@ -2,7 +2,7 @@
 
 #include <coap3/coap.h>
 
-#include "coap/common/coap_context.h"
+#include "coap/common/com_coap_context.h"
 #include "coap/server/srv_dispatch.h"
 #include "coap/server/srv_utils.h"
 #include "common/com_emulation.h"

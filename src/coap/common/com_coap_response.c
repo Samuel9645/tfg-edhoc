@@ -1,6 +1,6 @@
-#include "coap/common/coap_response.h"
-
 #include <stdbool.h>
+
+#include "coap/common/com_coap_response.h"
 
 static bool coap_common_response_payload_is_valid(const coap_pdu_t* response,
                                                   const uint8_t* payload,

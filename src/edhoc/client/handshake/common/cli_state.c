@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include "edhoc/common/edhoc_setup.h"
+#include "edhoc/common/com_edhoc_setup.h"
 
 enum cli_edhoc_init_status cli_edhoc_init(
     struct cli_edhoc_handshake* state,

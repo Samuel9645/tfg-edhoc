@@ -7,7 +7,7 @@
 #include "coap/client/cli_resources.h"
 #include "coap/client/cli_utils.h"
 #include "coap/coap_config.h"
-#include "coap/common/coap_context.h"
+#include "coap/common/com_coap_context.h"
 #include "common/com_emulation.h"
 #include "common/com_session_resources.h"
 #include "edhoc/client/cli_handshake.h"

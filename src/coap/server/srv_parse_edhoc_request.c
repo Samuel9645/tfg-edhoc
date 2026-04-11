@@ -8,7 +8,7 @@
 
 #include "coap/server/srv_parse_edhoc_request.h"
 
-#include "coap/common/coap_get_data.h"
+#include "coap/common/com_coap_get_data.h"
 #include "coap/server/internal/srv_parse_edhoc_request_builders.h"
 
 struct srv_coap_parse_edhoc_request_result srv_coap_parse_edhoc_request(

@@ -3,7 +3,7 @@
 #include <edhoc_cipher_suite_2.h>
 #include <edhoc_values.h>
 
-#include "edhoc/common/edhoc_setup.h"
+#include "edhoc/common/com_edhoc_setup.h"
 
 int cred_edhoc_auth_fetch(void* user_context,
                           struct edhoc_auth_creds* credentials,

@@ -91,7 +91,7 @@ add_unity_test(test_message_1_parser
 
 set(COMMON_HANDLER_SOURCES
     ${COMMON_SRV_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_mock_add_edhoc_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_mock_edhoc_error.c
 )
 
 add_unity_test(test_message_1_handler

@@ -1,8 +1,8 @@
 #include "coap/server/srv_dispatch.h"
 
 #include "coap/coap_config.h"
-#include "coap/common/coap_helpers.h"
-#include "coap/common/coap_response.h"
+#include "coap/common/com_coap_helpers.h"
+#include "coap/common/com_coap_response.h"
 #include "coap/server/edhoc_mapper/srv_m1_mapper.h"
 #include "coap/server/edhoc_mapper/srv_m3_mapper.h"
 #include "coap/server/internal/srv_dispatch_engine.h"

@@ -4,7 +4,7 @@
 #include <coap3/coap.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/coap_status.h"
+#include "coap/common/com_coap_status.h"
 #include "coap/server/srv_parse_edhoc_request.h"
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"

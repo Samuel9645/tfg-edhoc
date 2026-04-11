@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/coap_status.h"
+#include "coap/common/com_coap_status.h"
 #include "common/com_data_models.h"
 
 struct cli_coap_exchange_session_data {

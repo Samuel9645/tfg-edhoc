@@ -15,7 +15,7 @@
  * Copyright (C) 2018-2024 Olaf Bergmann <bergmann@tzi.org>
  */
 
-#include "coap/common/coap_helpers.h"
+#include "coap/common/com_coap_helpers.h"
 
 enum status_coap com_coap_resolve_address(const coap_str_const_t* host,
                                           const uint16_t port,

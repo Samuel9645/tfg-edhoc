@@ -3,7 +3,7 @@
 
 #include <coap3/coap.h>
 
-#include "coap/common/coap_status.h"
+#include "coap/common/com_coap_status.h"
 
 /**
  * @brief Resolve local interfaces and create server endpoints.

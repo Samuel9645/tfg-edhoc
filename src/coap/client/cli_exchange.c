@@ -6,9 +6,9 @@
 
 #include "coap/client/cli_log_error.h"
 #include "coap/client/cli_utils.h"
-#include "coap/common/coap_get_data.h"
-#include "coap/common/coap_helpers.h"
-#include "coap/common/coap_response.h"
+#include "coap/common/com_coap_get_data.h"
+#include "coap/common/com_coap_helpers.h"
+#include "coap/common/com_coap_response.h"
 
 static bool client_coap_response_has_edhoc_content_format(
     const coap_pdu_t* response) {

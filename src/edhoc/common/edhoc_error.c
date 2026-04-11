@@ -7,7 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/common/edhoc_error.h"
+#include "../../../include/edhoc/common/add_error/edhoc_error.h"
 
 #include <string.h>
 
@@ -33,6 +33,18 @@ com_edhoc_add_edhoc_error_to_response(
   return COM_EDHOC_ADD_ERROR_OK;
 }
 
+enum com_edhoc_add_edhoc_error_to_response_status
+com_edhoc_add_edhoc_error_to_response_with_description(
+    const struct edhoc_context* context, const char* error_description,
+    struct com_writable_buffer* response_data) {
+  const struct edhoc_error_info error_info = {
+      .text_string = (char*)error_description,
+      .total_entries = strlen(error_description),
+  };
+  return com_edhoc_add_edhoc_error_to_response(context, &error_info,
+                                               response_data);
+}
+
 enum com_edhoc_add_internal_error_to_response_status
 com_edhoc_add_internal_error_to_response(
     const char* error_message, struct com_writable_buffer* response_data) {
@@ -50,16 +62,4 @@ com_edhoc_add_internal_error_to_response(
     return COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE;
   }
   return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
-}
-
-enum com_edhoc_add_edhoc_error_to_response_status
-com_edhoc_add_edhoc_error_to_response_with_description(
-    const struct edhoc_context* context, const char* error_description,
-    struct com_writable_buffer* response_data) {
-  const struct edhoc_error_info error_info = {
-      .text_string = (char*)error_description,
-      .total_entries = strlen(error_description),
-  };
-  return com_edhoc_add_edhoc_error_to_response(context, &error_info,
-                                               response_data);
 }

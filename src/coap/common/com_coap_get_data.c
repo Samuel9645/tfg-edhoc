@@ -6,10 +6,9 @@
  * client.
  */
 
-#include "coap/common/coap_get_data.h"
-
 #include <string.h>
 
+#include "coap/common/com_coap_get_data.h"
 #include "coap3/coap_debug.h"
 #include "coap3/coap_pdu.h"
 

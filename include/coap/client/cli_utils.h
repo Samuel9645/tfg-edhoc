@@ -22,7 +22,7 @@
 #include <stdbool.h>
 
 #include "coap/coap_config.h"
-#include "coap/common/coap_status.h"
+#include "coap/common/com_coap_status.h"
 
 // TODO: PARAMETER VALIDATION AND ERROR HANDLING
 

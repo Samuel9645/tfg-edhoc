@@ -32,10 +32,12 @@ com_edhoc_add_edhoc_error_to_response(
         &default_error_info,
         "Fatal Internal Error: invalid error info provided");
   }
-  enum edhoc_error_code error_code = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+  const enum edhoc_error_code fallback_error_code =
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+  enum edhoc_error_code error_code = fallback_error_code;
   if (context != NULL &&
       edhoc_error_get_code(context, &error_code) != EDHOC_SUCCESS) {
-    return COM_EDHOC_ADD_ERROR_ERR_GET_ERROR;
+    error_code = fallback_error_code;
   }
   if (edhoc_message_error_compose(response_data->bytes, response_data->capacity,
                                   &response_data->length, error_code,

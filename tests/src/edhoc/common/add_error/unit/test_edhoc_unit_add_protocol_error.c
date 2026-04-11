@@ -14,7 +14,7 @@
 #include "edhoc/common/add_error/tst_mock_edhoc_error_compose.h"
 #include "edhoc/common/add_error/tst_mock_edhoc_get_code.h"
 
-enum { TST_UNIT_PROTOCOL_ERROR_BUFFER_SIZE = 5 };
+enum { TST_UNIT_PROTOCOL_ERROR_BUFFER_SIZE = 128 };
 
 static const char DESCRIPTION[] = "RANDOM DESCRIPTION";
 // -1 to remove the null terminator

@@ -100,6 +100,13 @@ add_unity_test(test_edhoc_happy_path_add_internal_error
     ${COMMON_SOURCES}
 )
 
+add_unity_test(test_edhoc_sad_path_add_internal_error
+    /src/edhoc/common/add_error/sad_path/test_edhoc_sad_path_add_internal_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/sad_path/tst_mock_edhoc_error_compose.c
+    ${COMMON_SOURCES}
+)
 
 add_unity_test(test_edhoc_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_edhoc_message_1_parser.c

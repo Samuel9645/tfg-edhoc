@@ -18,7 +18,8 @@
 
 static const uint8_t MOCK_ERR_DATA[] = {0xFF};
 
-void write_mock_buffer_to_response(struct com_writable_buffer* response_data) {
+void tst_srv_edhoc_write_mock_buffer_to_response(
+    struct com_writable_buffer* response_data) {
   memcpy(response_data->bytes, MOCK_ERR_DATA, sizeof(MOCK_ERR_DATA));
   response_data->length = sizeof(MOCK_ERR_DATA);
 }
@@ -38,7 +39,7 @@ com_edhoc_add_internal_error_to_response(
   (void)error_message;
   TEST_ASSERT_NOT_NULL_MESSAGE(error_message, "error message is NULL");
 
-  write_mock_buffer_to_response(response_data);
+  tst_srv_edhoc_write_mock_buffer_to_response(response_data);
   return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
 }
 
@@ -50,6 +51,6 @@ com_edhoc_add_edhoc_error_to_response_with_description(
   (void)error_description;
   TEST_ASSERT_NOT_NULL_MESSAGE(context, "context is NULL");
   com_edhoc_response_buffer_is_null(response_data);
-  write_mock_buffer_to_response(response_data);
+  tst_srv_edhoc_write_mock_buffer_to_response(response_data);
   return COM_EDHOC_ADD_ERROR_OK;
 }

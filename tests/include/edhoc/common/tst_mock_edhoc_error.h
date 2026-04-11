@@ -12,7 +12,8 @@
 
 #include "common/com_data_models.h"
 
-void write_mock_buffer_to_response(struct com_writable_buffer* response_data);
+void tst_srv_edhoc_write_mock_buffer_to_response(
+    struct com_writable_buffer* response_data);
 
 void tst_srv_edhoc_assert_handler_writes_error_in_buffer(
     struct com_writable_buffer response);

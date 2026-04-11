@@ -74,7 +74,7 @@ void srv_edhoc_message_1_handler_add_error(
   if (com_edhoc_response_buffer_is_null(response_data)) {
     return;
   }
-  write_mock_buffer_to_response(response_data);
+  tst_srv_edhoc_write_mock_buffer_to_response(response_data);
 }
 
 int com_edhoc_setup_context(struct edhoc_context* context,

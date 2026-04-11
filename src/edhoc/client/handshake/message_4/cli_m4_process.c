@@ -8,7 +8,7 @@
 
 #include "edhoc/client/handshake/message_4/cli_m4_process.h"
 
-#include "../../../../../include/edhoc/common/add_error/edhoc_error.h"
+#include "../../../../../include/edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
 static struct cli_edhoc_message_4_process_result message_4_process_ok(
     const struct com_writable_buffer message_4) {

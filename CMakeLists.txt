@@ -23,7 +23,8 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/edhoc_error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
 )
 
 set(MESSAGE_1_HANDLER_SOURCES

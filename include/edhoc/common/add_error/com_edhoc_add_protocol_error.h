@@ -7,14 +7,14 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#ifndef EDHOC_COMMON_EDHOC_ERROR_H_
-#define EDHOC_COMMON_EDHOC_ERROR_H_
+#ifndef EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_PROTOCOL_ERROR_H_
+#define EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_PROTOCOL_ERROR_H_
 
 #include <edhoc.h>
 
 #include "common/com_data_models.h"
 
-enum com_edhoc_add_edhoc_error_to_response_status {
+enum com_edhoc_add_protocol_error_to_response_status {
   COM_EDHOC_ADD_ERROR_OK = 0,
   COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
   COM_EDHOC_ADD_ERROR_ERR_GET_ERROR,
@@ -35,7 +35,7 @@ enum com_edhoc_add_edhoc_error_to_response_status {
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_edhoc_error_to_response_status
+enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response(
     const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
@@ -55,26 +55,9 @@ com_edhoc_add_edhoc_error_to_response(
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_edhoc_error_to_response_status
+enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 
-enum com_edhoc_add_internal_error_to_response_status {
-  COM_EDHOC_ADD_INTERNAL_ERROR_OK = 0,
-  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
-  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE,
-};
-/**
- * @brief Compose and write an EDHOC error message payload into the response
- * buffer for internal errors that are not directly related to a specific
- * libedhoc error code.
- * @param[in] error_message Description of the error
- * @param[out] response_data Buffer where the error message is written.
- * @return Status code indicating success or failure of the operation.
- */
-enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error_to_response(
-    const char* error_message, struct com_writable_buffer* response_data);
-
-#endif  // EDHOC_COMMON_EDHOC_ERROR_H_
+#endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_PROTOCOL_ERROR_H_

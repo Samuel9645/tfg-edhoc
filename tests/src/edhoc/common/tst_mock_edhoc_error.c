@@ -12,7 +12,8 @@
 #include <string.h>
 #include <unity.h>
 
-#include "../../../../include/edhoc/common/add_error/edhoc_error.h"
+#include "../../../../include/edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/tst_response_buffer_helpers.h"
 
 static const uint8_t MOCK_ERR_DATA[] = {0xFF};
@@ -41,7 +42,7 @@ com_edhoc_add_internal_error_to_response(
   return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
 }
 
-enum com_edhoc_add_edhoc_error_to_response_status
+enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {

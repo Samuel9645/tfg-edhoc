@@ -2,8 +2,8 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 11/04/2026
- * @brief Testing for the sad path of functions to add protocol errors to
- * buffer
+ * @brief Testing with mocked libedhoc of the functions to add protocol errors
+ * to buffer
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

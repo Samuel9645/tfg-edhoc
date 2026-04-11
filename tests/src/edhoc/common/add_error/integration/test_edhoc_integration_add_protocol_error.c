@@ -2,8 +2,8 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 11/04/2026
- * @brief Testing for the happy path of functions to add edhoc related errors to
- * buffer
+ * @brief Testing for the happy path with the real libedhoc of functions to add
+ * edhoc related errors to buffer
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

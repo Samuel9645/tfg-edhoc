@@ -20,26 +20,25 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
+static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
+
 static struct tst_message_3_handler_env {
-  const uint8_t request_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   struct edhoc_context context;
-  const struct srv_edhoc_message_3_request valid_request;
+  struct srv_edhoc_message_3_request valid_request;
   struct com_writable_buffer response;
-} env = {.response = {.bytes = env.response_buffer,
-                      .capacity = sizeof(env.response_buffer)},
-         .valid_request = {.parsed_message_3 =
-                               {
-                                   .bytes = env.request_buffer,
-                                   .length = sizeof(env.request_buffer),
-                               },
-                           .edhoc_context = &env.context}};
+} env = {
+    .response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
+    .valid_request = {.parsed_message_3 = {.bytes = REQUEST_BUFFER,
+                                           .length = sizeof(REQUEST_BUFFER)}}};
 
 void setUp(void) {
   tst_srv_edhoc_m3_reset_stub_results();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.response.bytes = env.response_buffer;
   env.response.length = 0;
+  env.valid_request.edhoc_context = &env.context;
+  env.context = (struct edhoc_context){0};
 }
 
 void test_handler_ok_on_valid_data(void) {
@@ -57,7 +56,7 @@ void test_handler_fails_on_invalid_data(void) {
                                                             &env.context};
   const struct srv_edhoc_message_3_request empty_request = {
       .edhoc_context = &env.context,
-      .parsed_message_3 = {.bytes = env.request_buffer, .length = 0}};
+      .parsed_message_3 = {.bytes = REQUEST_BUFFER, .length = 0}};
   struct com_writable_buffer unwritable_response = {
       .bytes = env.response.bytes,
       .capacity = 0,

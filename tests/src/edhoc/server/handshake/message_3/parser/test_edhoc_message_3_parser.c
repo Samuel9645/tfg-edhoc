@@ -18,20 +18,20 @@
 
 enum { TEST_MSG_3_PAYLOAD_LENGTH = 5 };
 
+static const uint8_t REQUEST_BUFFER[TEST_MSG_3_PAYLOAD_LENGTH] = {0};
+
 static const struct {
-  const uint8_t request_buffer[TEST_MSG_3_PAYLOAD_LENGTH];
-  const struct com_readonly_buffer valid_request;
+  struct com_readonly_buffer valid_request;
   struct edhoc_context context;
 } env = {
-    .request_buffer = {0x01, 0x02, 0x03, 0x04, 0x05},
-    .valid_request = {.bytes = env.request_buffer,
+    .valid_request = {.bytes = REQUEST_BUFFER,
                       .length = TEST_MSG_3_PAYLOAD_LENGTH},
 };
 
 void setUp(void) { tst_srv_edhoc_message_3_parser_reset_stub_results(); }
 
 void test_parser_advances_pointers_on_success(void) {
-  const uint8_t* advanced_pointed = env.request_buffer + 2;
+  const uint8_t* advanced_pointed = REQUEST_BUFFER + 2;
   const int reduced_length = TEST_MSG_3_PAYLOAD_LENGTH - 2;
   tst_srv_m3_parser_set_success_data(
       (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,

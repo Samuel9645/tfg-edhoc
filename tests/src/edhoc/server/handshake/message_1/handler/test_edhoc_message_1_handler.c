@@ -26,21 +26,15 @@
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
-
-// TODO: fix undefined behaviour
+static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
 static struct tst_message_1_handler_env {
-  const uint8_t request_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   const struct srv_edhoc_message_1_request valid_request;
   struct com_writable_buffer response;
-} env = {.response = {.bytes = env.response_buffer,
-                      .capacity = sizeof(env.response_buffer)},
-         .valid_request = {.payload =
-                               {
-                                   .bytes = env.request_buffer,
-                                   .length = sizeof(env.request_buffer),
-                               },
+} env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
+         .valid_request = {.payload = {.length = TST_SRV_EDHOC_HND_BUF_LEN,
+                                       .bytes = REQUEST_BUFFER},
                            .credentials = &DUMMY_TEST_CREDS}};
 
 void setUp(void) {

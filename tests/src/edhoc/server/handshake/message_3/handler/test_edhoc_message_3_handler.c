@@ -22,7 +22,7 @@ enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
 static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
-static struct tst_message_3_handler_env {
+static struct {
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   struct edhoc_context context;
   struct srv_edhoc_message_3_request valid_request;

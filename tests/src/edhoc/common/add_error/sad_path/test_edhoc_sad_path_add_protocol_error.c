@@ -26,7 +26,7 @@ static const struct edhoc_error_info VALID_INFO = {
 };
 static const uint8_t zeros[TST_SAD_PATH_PROTOCOL_ERROR_BUFFER_SIZE] = {0};
 
-static struct tst_edhoc_sad_protocol_error_valid_env {
+static struct {
   uint8_t error_buffer[TST_SAD_PATH_PROTOCOL_ERROR_BUFFER_SIZE];
   struct com_writable_buffer error_buffer_view;
   const struct edhoc_context dummy_context;

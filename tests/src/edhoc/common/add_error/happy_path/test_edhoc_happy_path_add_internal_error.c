@@ -19,7 +19,7 @@ enum {
   TST_EDHOC_ADD_INTERNAL_ERROR_CAPACITY = 256,
 };
 
-static struct tst_edhoc_add_internal_error_env {
+static struct {
   uint8_t error_message[TST_EDHOC_ADD_INTERNAL_ERROR_CAPACITY];
   struct com_writable_buffer error_buffer_view;
 } env = {

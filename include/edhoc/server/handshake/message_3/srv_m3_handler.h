@@ -14,7 +14,7 @@
 
 struct srv_edhoc_message_3_request {
   struct edhoc_context* edhoc_context;
-  struct com_readonly_buffer parsed_message_3;
+  const struct com_readonly_buffer parsed_message_3;
 };
 
 /**

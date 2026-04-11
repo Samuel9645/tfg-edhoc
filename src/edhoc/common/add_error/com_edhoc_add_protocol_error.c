@@ -7,7 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "../../../../include/edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
 #include <string.h>
 
@@ -35,9 +35,11 @@ enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
+  const size_t error_description_length = strlen(error_description);
   const struct edhoc_error_info error_info = {
       .text_string = (char*)error_description,
-      .total_entries = strlen(error_description),
+      .total_entries = error_description_length,
+      .written_entries = error_description_length,
   };
   return com_edhoc_add_edhoc_error_to_response(context, &error_info,
                                                response_data);

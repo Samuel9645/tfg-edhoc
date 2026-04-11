@@ -7,8 +7,9 @@
  */
 #include "edhoc/common/tst_response_buffer_helpers.h"
 
+#include <unity.h>
+
 #include "common/tst_report_mock_error.h"
-#include "unity.h"
 
 bool com_edhoc_response_buffer_is_null(
     const struct com_writable_buffer* buffer) {

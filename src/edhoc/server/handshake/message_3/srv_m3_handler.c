@@ -10,8 +10,8 @@
 
 #include <edhoc.h>
 
-#include "../../../../../include/edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
+#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
 /**
  * WHY ARE WE CASTING TO VOID THE RETURN?

@@ -8,7 +8,7 @@
 
 #include "edhoc/client/handshake/message_2/cli_m2_process.h"
 
-#include "../../../../../include/edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
 static struct cli_edhoc_message_2_process_result message_2_process_ok(void) {
   return (struct cli_edhoc_message_2_process_result){

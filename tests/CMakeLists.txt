@@ -73,8 +73,8 @@ set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
 )
 
-add_unity_test(test_dispatch
-    /src/coap/server/dispatch/test_dispatch.c
+add_unity_test(test_coap_server_dispatch
+    /src/coap/server/dispatch/test_coap_server_dispatch.c
     ${SERVER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_srv_dispatch_stubs.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_create_base_dependencies.c
@@ -86,14 +86,14 @@ set(COMMON_SRV_SOURCES
     ${COMMON_SOURCES}
 )
 
-add_unity_test(test_edhoc_add_protocol_error
+add_unity_test(test_edhoc_happy_path_add_protocol_error
     /src/edhoc/common/add_error/test_edhoc_happy_path_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SOURCES}
 )
 
-add_unity_test(test_edhoc_add_internal_error
+add_unity_test(test_edhoc_happy_path_add_internal_error
     /src/edhoc/common/add_error/test_edhoc_happy_path_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
@@ -101,8 +101,8 @@ add_unity_test(test_edhoc_add_internal_error
 )
 
 
-add_unity_test(test_message_1_parser
-    /src/edhoc/server/handshake/message_1/parser/test_message_1_parser.c
+add_unity_test(test_edhoc_message_1_parser
+    /src/edhoc/server/handshake/message_1/parser/test_edhoc_message_1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.c
@@ -114,31 +114,31 @@ set(COMMON_HANDLER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_mock_edhoc_error.c
 )
 
-add_unity_test(test_message_1_handler
-    /src/edhoc/server/handshake/message_1/handler/test_message_1_handler.c
+add_unity_test(test_edhoc_message_1_handler
+    /src/edhoc/server/handshake/message_1/handler/test_edhoc_message_1_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.c
     ${COMMON_HANDLER_SOURCES}
 )
 
-#add_unity_test(test_message_1_errors
-#    /src/edhoc/server/handshake/message_1/errors/test_srv_message_1_errors.c
+#add_unity_test(test_edhoc_message_1_errors
+#    /src/edhoc/server/handshake/message_1/errors/test_edhoc_edhoc_message_1_errors.c
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors/tst_srv_m1_errors_stubs.c
 #    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
 #    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
 #    ${COMMON_SRV_SOURCES}
 #)
 
-add_unity_test(test_message_3_handler
-    /src/edhoc/server/handshake/message_3/handler/test_message_3_handler.c
+add_unity_test(test_edhoc_message_3_handler
+    /src/edhoc/server/handshake/message_3/handler/test_edhoc_message_3_handler.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_handler_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
     ${COMMON_HANDLER_SOURCES}
 )
 
-add_unity_test(test_message_3_parser
-    /src/edhoc/server/handshake/message_3/parser/test_message_3_parser.c
+add_unity_test(test_edhoc_message_3_parser
+    /src/edhoc/server/handshake/message_3/parser/test_edhoc_message_3_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser/tst_srv_mock_m3_parser_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c

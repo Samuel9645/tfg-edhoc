@@ -11,6 +11,11 @@
 
 #include "edhoc/common/add_error/internal/com_edhoc_set_error_info.h"
 
+static bool error_info_is_invalid(const struct edhoc_error_info* error_info) {
+  return error_info == NULL || error_info->written_entries == 0 ||
+         error_info->text_string == NULL || error_info->total_entries == 0;
+}
+
 enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response(
     const struct edhoc_context* context,
@@ -19,8 +24,17 @@ com_edhoc_add_edhoc_error_to_response(
   if (!com_writable_buffer_is_writable(response_data)) {
     return COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
-  enum edhoc_error_code error_code;
-  if (edhoc_error_get_code(context, &error_code) != EDHOC_SUCCESS) {
+
+  struct edhoc_error_info default_error_info = {0};
+  if (error_info_is_invalid(error_info)) {
+    error_info = &default_error_info;
+    com_edhoc_set_error_info(
+        &default_error_info,
+        "Fatal Internal Error: invalid error info provided");
+  }
+  enum edhoc_error_code error_code = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+  if (context != NULL &&
+      edhoc_error_get_code(context, &error_code) != EDHOC_SUCCESS) {
     return COM_EDHOC_ADD_ERROR_ERR_GET_ERROR;
   }
   if (edhoc_message_error_compose(response_data->bytes, response_data->capacity,
@@ -35,6 +49,9 @@ enum com_edhoc_add_protocol_error_to_response_status
 com_edhoc_add_edhoc_error_to_response_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
+  if (error_description == NULL) {
+    error_description = "Fatal Internal Error: error description was NULL";
+  }
   struct edhoc_error_info error_info = {0};
   com_edhoc_set_error_info(&error_info, error_description);
   return com_edhoc_add_edhoc_error_to_response(context, &error_info,

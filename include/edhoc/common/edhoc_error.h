@@ -69,8 +69,8 @@ enum com_edhoc_add_internal_error_to_response_status {
  * @brief Compose and write an EDHOC error message payload into the response
  * buffer for internal errors that are not directly related to a specific
  * libedhoc error code.
- * @param error_message Description of the error
- * @param response_data Buffer where the error message is written.
+ * @param[in] error_message Description of the error
+ * @param[out] response_data Buffer where the error message is written.
  * @return Status code indicating success or failure of the operation.
  */
 enum com_edhoc_add_internal_error_to_response_status

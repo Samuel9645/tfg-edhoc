@@ -15,6 +15,12 @@ set(LIBEDHOC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
 )
 
+set(ADD_EDHOC_ERROR_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+)
+
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
@@ -26,8 +32,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${ADD_EDHOC_ERROR_SOURCES}
     ${LIBEDHOC_SOURCES}
 )
 
@@ -106,7 +111,7 @@ target_include_directories(server PRIVATE include)
 target_include_directories(server PRIVATE src)
 target_include_directories(server SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 target_include_directories(client PRIVATE include)
-target_include_directories(server PRIVATE src)
+target_include_directories(client PRIVATE src)
 target_include_directories(client SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include)
 
 # Set output directory for executables

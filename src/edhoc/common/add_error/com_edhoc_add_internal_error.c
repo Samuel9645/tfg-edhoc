@@ -8,7 +8,8 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 
 #include <edhoc.h>
-#include <string.h>
+
+#include "edhoc/common/add_error/internal/com_edhoc_set_error_info.h"
 
 const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
@@ -19,12 +20,8 @@ com_edhoc_add_internal_error_to_response(
     return COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
 
-  const size_t error_message_length = strlen(error_message);
-  const struct edhoc_error_info error_info = {
-      .text_string = (char*)error_message,
-      .total_entries = error_message_length,
-      .written_entries = error_message_length,
-  };
+  struct edhoc_error_info error_info = {0};
+  com_edhoc_set_error_info(&error_info, error_message);
   if (edhoc_message_error_compose(
           response_data->bytes, response_data->capacity, &response_data->length,
           INTERNAL_FAILURE_EDHOC_CODE, &error_info) != EDHOC_SUCCESS) {

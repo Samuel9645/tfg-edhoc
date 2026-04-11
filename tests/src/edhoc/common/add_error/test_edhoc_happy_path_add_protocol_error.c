@@ -30,7 +30,7 @@ void setUp(void) {
   env.context = (struct edhoc_context){0};
   if (edhoc_context_init(&env.context) != EDHOC_SUCCESS) {
     TEST_FAIL_MESSAGE("Failed to initialize EDHOC context");
-  };
+  }
   memset(env.error_message, 0, sizeof(env.error_message));
   env.error_buffer_view.length = 0;
   env.error_buffer_view.bytes = env.error_message;

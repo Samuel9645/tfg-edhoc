@@ -60,6 +60,22 @@ static void assert_encoded_error_matches(
       "Error buffer length should be greater than 0");
 }
 
+static void assert_error_contains_data(void) {
+  enum edhoc_error_code received_code = -1;
+  char decoded_error[TST_EDHOC_ADD_INTERNAL_ERROR_CAPACITY] = {0};
+  struct edhoc_error_info received_info = {
+      .text_string = decoded_error, .total_entries = sizeof(decoded_error)};
+  const int process_status = edhoc_message_error_process(
+      env.error_buffer_view.bytes, env.error_buffer_view.length, &received_code,
+      &received_info);
+  TEST_ASSERT_EQUAL_INT_MESSAGE(EDHOC_SUCCESS, process_status,
+                                "CBOR Decode Failed");
+  TEST_ASSERT_EQUAL(EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, received_code);
+  TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
+      0, received_info.written_entries,
+      "Error buffer length should be greater than 0");
+}
+
 void test_add_internal_error(void) {
   const char* expected_error_description = "RANDOM DESCRIPTION";
 
@@ -70,4 +86,12 @@ void test_add_internal_error(void) {
   assert_add_error_status_ok(add_error_status);
   assert_encoded_error_matches(expected_error_description,
                                EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+}
+
+void test_add_internal_error_creates_valid_error_on_null_message(void) {
+  const enum com_edhoc_add_internal_error_to_response_status add_error_status =
+      com_edhoc_add_internal_error_to_response(NULL, &env.error_buffer_view);
+
+  assert_add_error_status_ok(add_error_status);
+  assert_error_contains_data();
 }

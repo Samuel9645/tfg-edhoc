@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 struct com_readonly_buffer {
-  const uint8_t* bytes;
+  const uint8_t* const bytes;
   const size_t length;
 };
 

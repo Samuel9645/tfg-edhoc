@@ -20,6 +20,9 @@ com_edhoc_add_internal_error_to_response(
     return COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
 
+  if (error_message == NULL) {
+    error_message = "Fatal Internal Failure: error message was NULL";
+  }
   struct edhoc_error_info error_info = {0};
   com_edhoc_set_error_info(&error_info, error_message);
   if (edhoc_message_error_compose(

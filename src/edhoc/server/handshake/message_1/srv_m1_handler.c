@@ -30,30 +30,26 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
         SRV_EDHOC_MSG1_HDL_ERR_INVALID_RESPONSE_BUFFER);
   }
   if (request.credentials == NULL) {
-    (void)com_edhoc_add_internal_error_to_response("Null credentials",
-                                                   response);
+    (void)com_edhoc_add_internal_error("Null credentials", response);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_NULL_CREDENTIALS);
   }
   if (!com_readonly_buffer_is_valid(request.payload)) {
-    (void)com_edhoc_add_internal_error_to_response("Invalid request buffer",
-                                                   response);
+    (void)com_edhoc_add_internal_error("Invalid request buffer", response);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER);
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
   if (!edhoc_ctx) {
-    (void)com_edhoc_add_internal_error_to_response("Context calloc failed",
-                                                   response);
+    (void)com_edhoc_add_internal_error("Context calloc failed", response);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_CALLOC_FAILED);
   }
   int edhoc_api_result =
       com_edhoc_setup_context(edhoc_ctx, request.credentials);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_internal_error_to_response("Context setup failed",
-                                                   response);
+    (void)com_edhoc_add_internal_error("Context setup failed", response);
     free(edhoc_ctx);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED);
@@ -77,7 +73,7 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
         SRV_EDHOC_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED);
   }
   if (!com_writable_buffer_has_content(response)) {
-    (void)com_edhoc_add_internal_error_to_response(
+    (void)com_edhoc_add_internal_error(
         "Message 2 compose produced empty buffer", response);
     free(edhoc_ctx);
     return srv_edhoc_message_1_handler_failure(

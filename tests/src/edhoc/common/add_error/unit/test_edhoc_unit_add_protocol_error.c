@@ -68,8 +68,8 @@ void test_add_protocol_error_recovers_get_code_fail(void) {
   srv_edhoc_use_real_compose();
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response(&env.dummy_context, env.valid_info,
-                                            &env.error_buffer_view);
+      com_edhoc_add_protocol_error(&env.dummy_context, env.valid_info,
+                                   &env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, status);
   assert_encoded_error_matches(DESCRIPTION);
@@ -79,8 +79,8 @@ void test_add_protocol_error_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response(&env.dummy_context, env.valid_info,
-                                            &invalid_buffer);
+      com_edhoc_add_protocol_error(&env.dummy_context, env.valid_info,
+                                   &invalid_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
 }
@@ -97,8 +97,8 @@ void test_add_protocol_error_fails_on_error_compose_fail(void) {
   srv_edhoc_set_error_compose_failed();
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response(&env.dummy_context, env.valid_info,
-                                            &env.error_buffer_view);
+      com_edhoc_add_protocol_error(&env.dummy_context, env.valid_info,
+                                   &env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);
   assert_response_untouched();
@@ -109,7 +109,7 @@ void test_add_protocol_error_with_description_recovers_get_code_fail(void) {
   srv_edhoc_use_real_compose();
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response_with_description(
+      com_edhoc_add_protocol_error_with_description(
           &env.dummy_context, DESCRIPTION, &env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, status);
@@ -120,7 +120,7 @@ void test_add_protocol_error_with_description_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response_with_description(
+      com_edhoc_add_protocol_error_with_description(
           &env.dummy_context, DESCRIPTION, &invalid_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
@@ -131,7 +131,7 @@ void test_add_protocol_error_with_description_fails_on_error_compose_fail(
   srv_edhoc_set_error_compose_failed();
 
   const enum com_edhoc_add_protocol_error_to_response_status status =
-      com_edhoc_add_edhoc_error_to_response_with_description(
+      com_edhoc_add_protocol_error_with_description(
           &env.dummy_context, DESCRIPTION, &env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);

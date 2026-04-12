@@ -36,10 +36,9 @@ enum com_edhoc_add_protocol_error_to_response_status {
  * @return Status code indicating success or failure of the operation.
  */
 enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_edhoc_error_to_response(
-    const struct edhoc_context* context,
-    const struct edhoc_error_info* error_info,
-    struct com_writable_buffer* response_data);
+com_edhoc_add_protocol_error(const struct edhoc_context* context,
+                             const struct edhoc_error_info* error_info,
+                             struct com_writable_buffer* response_data);
 /**
  * @brief Compose and write an EDHOC error message payload into the response
  * buffer.
@@ -56,7 +55,7 @@ com_edhoc_add_edhoc_error_to_response(
  * @return Status code indicating success or failure of the operation.
  */
 enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_edhoc_error_to_response_with_description(
+com_edhoc_add_protocol_error_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 

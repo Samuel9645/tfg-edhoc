@@ -50,7 +50,7 @@ struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
   const int edhoc_result = edhoc_message_4_process(
       &state->context, message_4.bytes, message_4.length);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         &state->context, "Failed to process EDHOC message 4", message_4_error);
     return message_4_process_protocol_failure(
         CLI_EDHOC_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,

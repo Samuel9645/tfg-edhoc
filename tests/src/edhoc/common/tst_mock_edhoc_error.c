@@ -34,8 +34,8 @@ void tst_srv_edhoc_assert_handler_writes_error_in_buffer(
 }
 
 enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error_to_response(
-    const char* error_message, struct com_writable_buffer* response_data) {
+com_edhoc_add_internal_error(const char* error_message,
+                             struct com_writable_buffer* response_data) {
   (void)error_message;
   TEST_ASSERT_NOT_NULL_MESSAGE(error_message, "error message is NULL");
 
@@ -44,7 +44,7 @@ com_edhoc_add_internal_error_to_response(
 }
 
 enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_edhoc_error_to_response_with_description(
+com_edhoc_add_protocol_error_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   (void)context;

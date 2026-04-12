@@ -49,7 +49,7 @@ struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
       &state->context, message_2.bytes, message_2.length);
 
   if (edhoc_result != EDHOC_SUCCESS) {
-    com_edhoc_add_edhoc_error_to_response_with_description(
+    com_edhoc_add_protocol_error_with_description(
         &state->context, "Failed to process EDHOC message 2", message_2_error);
     return message_2_process_protocol_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,

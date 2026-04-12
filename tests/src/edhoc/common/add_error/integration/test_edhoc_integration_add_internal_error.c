@@ -65,8 +65,8 @@ void test_add_internal_error(void) {
   const char* expected_error_description = "RANDOM DESCRIPTION";
 
   const enum com_edhoc_add_internal_error_to_response_status add_error_status =
-      com_edhoc_add_internal_error_to_response(expected_error_description,
-                                               &env.error_buffer_view);
+      com_edhoc_add_internal_error(expected_error_description,
+                                   &env.error_buffer_view);
 
   assert_add_error_status_ok(add_error_status);
   assert_encoded_error_matches(expected_error_description);
@@ -74,7 +74,7 @@ void test_add_internal_error(void) {
 
 void test_add_internal_error_creates_valid_error_on_null_message(void) {
   const enum com_edhoc_add_internal_error_to_response_status add_error_status =
-      com_edhoc_add_internal_error_to_response(NULL, &env.error_buffer_view);
+      com_edhoc_add_internal_error(NULL, &env.error_buffer_view);
 
   assert_add_error_status_ok(add_error_status);
   assert_encoded_error_matches(NULL);

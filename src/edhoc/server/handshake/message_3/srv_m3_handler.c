@@ -27,13 +27,11 @@ enum srv_edhoc_message_3_handler_status srv_edhoc_handle_message_3(
   }
 
   if (request.edhoc_context == NULL) {
-    (void)com_edhoc_add_internal_error_to_response("Null EDHOC context",
-                                                   response_buffer);
+    (void)com_edhoc_add_internal_error("Null EDHOC context", response_buffer);
     return EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT;
   }
   if (!com_readonly_buffer_is_valid(request.parsed_message_3)) {
-    (void)com_edhoc_add_internal_error_to_response(
-        "Invalid EDHOC parsed message 3", response_buffer);
+    (void)com_edhoc_add_internal_error("Invalid EDHOC parsed message 3", response_buffer);
     return EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3;
   }
 
@@ -41,7 +39,7 @@ enum srv_edhoc_message_3_handler_status srv_edhoc_handle_message_3(
       request.edhoc_context, request.parsed_message_3.bytes,
       request.parsed_message_3.length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         request.edhoc_context, "Message 3 processing failed", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED;
   }
@@ -49,12 +47,12 @@ enum srv_edhoc_message_3_handler_status srv_edhoc_handle_message_3(
       request.edhoc_context, response_buffer->bytes, response_buffer->capacity,
       &response_buffer->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         request.edhoc_context, "Message 4 composing failed", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
   }
   if (!com_writable_buffer_has_content(response_buffer)) {
-    (void)com_edhoc_add_internal_error_to_response(
+    (void)com_edhoc_add_internal_error(
         "Message 4 compose produced empty buffer", response_buffer);
     return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_EMPTY;
   }

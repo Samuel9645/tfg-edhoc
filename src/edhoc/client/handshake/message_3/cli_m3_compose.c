@@ -59,7 +59,7 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
   int edhoc_result = edhoc_prepend_connection_id(
       &prepended_fields, &state->context.private_peer_cid);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         &state->context, "Failed to prepend connection id for message 3",
         message_3_or_error);
     return message_3_compose_protocol_failure(
@@ -72,7 +72,7 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
       &state->context, prepended_fields.edhoc_message_ptr,
       prepended_fields.edhoc_message_size, &message3_len);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         &state->context, "Failed to compose EDHOC message 3",
         message_3_or_error);
     return message_3_compose_protocol_failure(
@@ -83,7 +83,7 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
   prepended_fields.edhoc_message_size = message3_len;
   edhoc_result = edhoc_prepend_recalculate_size(&prepended_fields);
   if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_edhoc_error_to_response_with_description(
+    (void)com_edhoc_add_protocol_error_with_description(
         &state->context, "Failed to recalculate prepended message size",
         message_3_or_error);
     return message_3_compose_protocol_failure(

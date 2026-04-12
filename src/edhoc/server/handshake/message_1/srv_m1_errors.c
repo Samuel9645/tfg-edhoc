@@ -40,6 +40,5 @@ void srv_edhoc_message_1_handler_add_error(
      */
     return;
   }
-  (void)com_edhoc_add_internal_error_to_response(generic_error_message,
-                                                 response_data);
+  (void)com_edhoc_add_internal_error(generic_error_message, response_data);
 }

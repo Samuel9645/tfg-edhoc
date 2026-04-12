@@ -19,7 +19,7 @@ void test_add_internal_error_fails_on_invalid_buffer(void) {
   const char* description = "RANDOM DESCRIPTION";
 
   const enum com_edhoc_add_internal_error_to_response_status status =
-      com_edhoc_add_internal_error_to_response(description, &invalid_buffer);
+      com_edhoc_add_internal_error(description, &invalid_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
                     status);
@@ -33,7 +33,7 @@ void test_add_internal_error_fails_on_error_compose_fail(void) {
   srv_edhoc_set_error_compose_failed();
 
   const enum com_edhoc_add_internal_error_to_response_status status =
-      com_edhoc_add_internal_error_to_response(description, &response_buffer);
+      com_edhoc_add_internal_error(description, &response_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE, status);
 }

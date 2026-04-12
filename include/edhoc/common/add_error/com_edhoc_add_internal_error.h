@@ -26,7 +26,7 @@ enum com_edhoc_add_internal_error_to_response_status {
  * @return Status code indicating success or failure of the operation.
  */
 enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error_to_response(
-    const char* error_message, struct com_writable_buffer* response_data);
+com_edhoc_add_internal_error(const char* error_message,
+                             struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_INTERNAL_ERROR_H_

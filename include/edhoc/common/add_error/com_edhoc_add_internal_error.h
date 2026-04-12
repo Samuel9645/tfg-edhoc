@@ -11,12 +11,8 @@
 #define EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_INTERNAL_ERROR_H_
 
 #include "common/com_data_models.h"
+#include "edhoc/common/add_error/com_edhoc_add_error_status.h"
 
-enum com_edhoc_add_internal_error_to_response_status {
-  COM_EDHOC_ADD_INTERNAL_ERROR_OK = 0,
-  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
-  COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE,
-};
 /**
  * @brief Compose and write an EDHOC error message payload into the response
  * buffer for internal errors that are not directly related to a specific
@@ -25,8 +21,7 @@ enum com_edhoc_add_internal_error_to_response_status {
  * @param[out] response_data Buffer where the error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error(const char* error_message,
-                             struct com_writable_buffer* response_data);
+enum com_edhoc_add_error_status com_edhoc_add_internal_error(
+    const char* error_message, struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_INTERNAL_ERROR_H_

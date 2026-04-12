@@ -18,11 +18,10 @@ void test_add_internal_error_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
   const char* description = "RANDOM DESCRIPTION";
 
-  const enum com_edhoc_add_internal_error_to_response_status status =
+  const enum com_edhoc_add_error_status status =
       com_edhoc_add_internal_error(description, &invalid_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER,
-                    status);
+  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
 }
 
 void test_add_internal_error_fails_on_error_compose_fail(void) {
@@ -32,8 +31,8 @@ void test_add_internal_error_fails_on_error_compose_fail(void) {
       .bytes = error_buffer, .capacity = sizeof(error_buffer)};
   srv_edhoc_set_error_compose_failed();
 
-  const enum com_edhoc_add_internal_error_to_response_status status =
+  const enum com_edhoc_add_error_status status =
       com_edhoc_add_internal_error(description, &response_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE, status);
+  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);
 }

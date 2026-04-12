@@ -32,9 +32,8 @@ void setUp(void) {
 }
 
 static void assert_add_error_status_ok(
-    const enum com_edhoc_add_internal_error_to_response_status
-        add_error_status) {
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_INTERNAL_ERROR_OK, add_error_status);
+    const enum com_edhoc_add_error_status add_error_status) {
+  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, add_error_status);
   TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
       0, env.error_buffer_view.length,
       "Error buffer length should be greater than 0");
@@ -64,7 +63,7 @@ static void assert_encoded_error_matches(
 void test_add_internal_error(void) {
   const char* expected_error_description = "RANDOM DESCRIPTION";
 
-  const enum com_edhoc_add_internal_error_to_response_status add_error_status =
+  const enum com_edhoc_add_error_status add_error_status =
       com_edhoc_add_internal_error(expected_error_description,
                                    &env.error_buffer_view);
 
@@ -73,7 +72,7 @@ void test_add_internal_error(void) {
 }
 
 void test_add_internal_error_creates_valid_error_on_null_message(void) {
-  const enum com_edhoc_add_internal_error_to_response_status add_error_status =
+  const enum com_edhoc_add_error_status add_error_status =
       com_edhoc_add_internal_error(NULL, &env.error_buffer_view);
 
   assert_add_error_status_ok(add_error_status);

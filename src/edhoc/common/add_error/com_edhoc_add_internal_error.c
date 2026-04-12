@@ -13,11 +13,10 @@
 
 const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
-enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error(const char* error_message,
-                             struct com_writable_buffer* response_data) {
+enum com_edhoc_add_error_status com_edhoc_add_internal_error(
+    const char* error_message, struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
-    return COM_EDHOC_ADD_INTERNAL_ERROR_ERR_INVALID_RESPONSE_BUFFER;
+    return COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
 
   if (error_message == NULL) {
@@ -28,7 +27,7 @@ com_edhoc_add_internal_error(const char* error_message,
   if (edhoc_message_error_compose(
           response_data->bytes, response_data->capacity, &response_data->length,
           INTERNAL_FAILURE_EDHOC_CODE, &error_info) != EDHOC_SUCCESS) {
-    return COM_EDHOC_ADD_INTERNAL_ERROR_ERR_COMPOSE;
+    return COM_EDHOC_ADD_ERROR_ERR_COMPOSE;
   }
-  return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
+  return COM_EDHOC_ADD_ERROR_OK;
 }

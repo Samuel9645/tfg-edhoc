@@ -58,8 +58,7 @@ void setUp(void) {
 }
 
 static void assert_add_error_status_ok(
-    const enum com_edhoc_add_protocol_error_to_response_status
-        add_error_status) {
+    const enum com_edhoc_add_error_status add_error_status) {
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, add_error_status);
   TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
       0, env.error_buffer_view.length,
@@ -67,7 +66,7 @@ static void assert_add_error_status_ok(
 }
 
 static void assert_add_error_status_ok_with_message(
-    const enum com_edhoc_add_protocol_error_to_response_status add_error_status,
+    const enum com_edhoc_add_error_status add_error_status,
     const char* expected_error_description) {
   TEST_ASSERT_EQUAL_MESSAGE(COM_EDHOC_ADD_ERROR_OK, add_error_status,
                             expected_error_description);
@@ -101,7 +100,7 @@ static void assert_encoded_error_matches(
 void test_add_error_with_description_on_invalid_library_state(void) {
   const char* expected_description = "RANDOM DESCRIPTION";
 
-  const enum com_edhoc_add_protocol_error_to_response_status add_error_status =
+  const enum com_edhoc_add_error_status add_error_status =
       com_edhoc_add_protocol_error_with_description(
           &env.context, expected_description, &env.error_buffer_view);
 
@@ -125,7 +124,7 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
       trigger_invalid_context_error();
     }
 
-    const enum com_edhoc_add_protocol_error_to_response_status status =
+    const enum com_edhoc_add_error_status status =
         com_edhoc_add_protocol_error_with_description(
             test_cases[i].context, test_cases[i].error_description,
             &env.error_buffer_view);
@@ -144,7 +143,7 @@ void test_add_error_with_error_info_on_invalid_library_state(void) {
       .total_entries = error_description_length,
       .written_entries = error_description_length};
 
-  const enum com_edhoc_add_protocol_error_to_response_status add_error_status =
+  const enum com_edhoc_add_error_status add_error_status =
       com_edhoc_add_protocol_error(&env.context, &expected_error_info,
                                    &env.error_buffer_view);
 
@@ -192,8 +191,8 @@ void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
       trigger_invalid_context_error();
     }
 
-    const enum com_edhoc_add_protocol_error_to_response_status status =
-        com_edhoc_add_protocol_error(test_cases[i].context, test_cases[i].info, &env.error_buffer_view);
+    const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(
+        test_cases[i].context, test_cases[i].info, &env.error_buffer_view);
 
     assert_add_error_status_ok_with_message(status, test_cases[i].description);
     assert_encoded_error_matches(NULL, EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);

@@ -16,8 +16,8 @@ static bool error_info_is_invalid(const struct edhoc_error_info* error_info) {
          error_info->text_string == NULL || error_info->total_entries == 0;
 }
 
-enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_protocol_error(const struct edhoc_context* context,
+enum com_edhoc_add_error_status com_edhoc_add_protocol_error(
+    const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
     struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
@@ -46,8 +46,7 @@ com_edhoc_add_protocol_error(const struct edhoc_context* context,
   return COM_EDHOC_ADD_ERROR_OK;
 }
 
-enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_protocol_error_with_description(
+enum com_edhoc_add_error_status com_edhoc_add_protocol_error_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   if (error_description == NULL) {

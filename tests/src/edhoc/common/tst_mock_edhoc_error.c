@@ -33,18 +33,16 @@ void tst_srv_edhoc_assert_handler_writes_error_in_buffer(
                             "Error buffer length was not set correctly");
 }
 
-enum com_edhoc_add_internal_error_to_response_status
-com_edhoc_add_internal_error(const char* error_message,
-                             struct com_writable_buffer* response_data) {
+enum com_edhoc_add_error_status com_edhoc_add_internal_error(
+    const char* error_message, struct com_writable_buffer* response_data) {
   (void)error_message;
   TEST_ASSERT_NOT_NULL_MESSAGE(error_message, "error message is NULL");
 
   tst_srv_edhoc_write_mock_buffer_to_response(response_data);
-  return COM_EDHOC_ADD_INTERNAL_ERROR_OK;
+  return COM_EDHOC_ADD_ERROR_OK;
 }
 
-enum com_edhoc_add_protocol_error_to_response_status
-com_edhoc_add_protocol_error_with_description(
+enum com_edhoc_add_error_status com_edhoc_add_protocol_error_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   (void)context;

@@ -9,7 +9,7 @@
 // ReSharper disable CppParameterMayBeConst
 #include <edhoc.h>
 
-#include "edhoc/common/add_error/tst_mock_edhoc_get_code.h"
+#include "edhoc/common/add_error/mocks/tst_mock_edhoc_get_code.h"
 
 static int get_code_result = EDHOC_SUCCESS;
 

@@ -7,7 +7,7 @@
  */
 
 // ReSharper disable CppParameterMayBeConst
-#include "edhoc/common/add_error/tst_mock_edhoc_error_compose.h"
+#include "edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.h"
 
 #include <edhoc.h>
 

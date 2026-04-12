@@ -109,14 +109,14 @@ add_unity_test(test_edhoc_integration_add_protocol_error
 )
 
 set(ADD_EDHOC_ERROR_UNIT_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/unit/tst_mock_edhoc_error_compose.c
+    src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.c
 )
 
 add_unity_test(test_edhoc_unit_add_protocol_error
     /src/edhoc/common/add_error/unit/test_edhoc_unit_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/unit/tst_mock_edhoc_error_get_code.c
+    src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_get_code.c
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
     ${COMMON_SOURCES}
     "-Wl,--wrap=edhoc_message_error_compose"

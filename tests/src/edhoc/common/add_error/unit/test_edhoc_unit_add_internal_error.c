@@ -10,7 +10,7 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/tst_mock_edhoc_error_compose.h"
+#include "edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.h"
 
 void setUp(void) { srv_edhoc_reset_error_compose_mock(); }
 

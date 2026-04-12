@@ -11,8 +11,8 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
-#include "edhoc/common/add_error/tst_mock_edhoc_error_compose.h"
-#include "edhoc/common/add_error/tst_mock_edhoc_get_code.h"
+#include "edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.h"
+#include "edhoc/common/add_error/mocks/tst_mock_edhoc_get_code.h"
 
 enum { TST_UNIT_PROTOCOL_ERROR_BUFFER_SIZE = 128 };
 

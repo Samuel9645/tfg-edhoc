@@ -13,9 +13,11 @@
 
 static int get_code_result = EDHOC_SUCCESS;
 
-void srv_edhoc_reset_get_code_mock(void) { get_code_result = EDHOC_SUCCESS; }
+void tst_com_edhoc_reset_get_code_mock(void) {
+  get_code_result = EDHOC_SUCCESS;
+}
 
-void srv_edhoc_set_get_code_failed(void) {
+void tst_com_edhoc_set_get_code_failed(void) {
   get_code_result = EDHOC_ERROR_BAD_STATE;
 }
 

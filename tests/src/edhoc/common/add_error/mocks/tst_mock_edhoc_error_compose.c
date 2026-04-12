@@ -20,14 +20,14 @@ extern int __real_edhoc_message_error_compose(  // NOLINT(*-reserved-identifier)
     size_t *message_error_length, enum edhoc_error_code error_code,
     const struct edhoc_error_info *error_info);
 
-void srv_edhoc_reset_error_compose_mock(void) {
+void tst_com_edhoc_reset_error_compose_mock(void) {
   compose_result = EDHOC_SUCCESS;
   use_real_compose = false;
 }
 
-void srv_edhoc_use_real_compose(void) { use_real_compose = true; }
+void tst_com_edhoc_use_real_compose(void) { use_real_compose = true; }
 
-void srv_edhoc_set_error_compose_failed(void) {
+void tst_com_edhoc_set_error_compose_failed(void) {
   compose_result = EDHOC_ERROR_BAD_STATE;
   use_real_compose = false;
 }

@@ -12,7 +12,7 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.h"
 
-void setUp(void) { srv_edhoc_reset_error_compose_mock(); }
+void setUp(void) { tst_com_edhoc_reset_error_compose_mock(); }
 
 void test_add_internal_error_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
@@ -29,7 +29,7 @@ void test_add_internal_error_fails_on_error_compose_fail(void) {
   const char* description = "RANDOM DESCRIPTION";
   struct com_writable_buffer response_buffer = {
       .bytes = error_buffer, .capacity = sizeof(error_buffer)};
-  srv_edhoc_set_error_compose_failed();
+  tst_com_edhoc_set_error_compose_failed();
 
   const enum com_edhoc_add_error_status status =
       com_edhoc_add_internal_error(description, &response_buffer);

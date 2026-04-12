@@ -9,8 +9,8 @@
 #ifndef EDHOC_COMMON_ADD_ERROR_TST_MOCK_EDHOC_GET_CODE_H_
 #define EDHOC_COMMON_ADD_ERROR_TST_MOCK_EDHOC_GET_CODE_H_
 
-void srv_edhoc_reset_get_code_mock(void);
+void tst_com_edhoc_reset_get_code_mock(void);
 
-void srv_edhoc_set_get_code_failed(void);
+void tst_com_edhoc_set_get_code_failed(void);
 
 #endif  // EDHOC_COMMON_ADD_ERROR_TST_MOCK_EDHOC_GET_CODE_H_

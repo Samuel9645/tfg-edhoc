@@ -14,87 +14,58 @@
 
 #include "common/com_data_models.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
+#include "edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.h"
 
-enum {
-  TST_EDHOC_ADD_PROTOCOL_ERROR_CAPACITY = 256,
-};
+static struct tst_edhoc_add_protocol_error_env env = {
+    .error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
 
-static struct tst_edhoc_add_protocol_error_env {
-  uint8_t error_message[TST_EDHOC_ADD_PROTOCOL_ERROR_CAPACITY];
-  struct com_writable_buffer error_buffer_view;
-  enum edhoc_error_code expected_error_code;
-  struct edhoc_context context;
-} env = {
-    .error_buffer_view = {.capacity = TST_EDHOC_ADD_PROTOCOL_ERROR_CAPACITY}};
+static enum edhoc_error_code expected_error_code = -1;
+
+static void try_to_get_error_code(void) {
+  expected_error_code = -1;
+  if (edhoc_error_get_code(&env.context, &expected_error_code) !=
+      EDHOC_SUCCESS) {
+    TEST_FAIL_MESSAGE("Failed to get error code from context");
+  }
+}
 
 static void trigger_invalid_context_error(void) {
   const uint8_t garbage[] = {0xFF, 0x00, 0xAA};
   edhoc_message_1_process(&env.context, garbage, sizeof(garbage));
 }
 
-static enum edhoc_error_code try_to_get_error_code(void) {
-  enum edhoc_error_code expected_error_code = -1;
-  if (edhoc_error_get_code(&env.context, &expected_error_code) !=
-      EDHOC_SUCCESS) {
-    TEST_FAIL_MESSAGE("Failed to get error code from context");
-  }
-  return expected_error_code;
-}
-
 void reset_env(void) {
-  env.context = (struct edhoc_context){0};
+  tst_edhoc_add_protocol_error_reset_env(&env);
   if (edhoc_context_init(&env.context) != EDHOC_SUCCESS) {
     TEST_FAIL_MESSAGE("Failed to initialize EDHOC context");
   }
-  memset(env.error_message, 0, sizeof(env.error_message));
-  env.error_buffer_view.length = 0;
-  env.error_buffer_view.bytes = env.error_message;
 }
 
 void setUp(void) {
   reset_env();
   trigger_invalid_context_error();
-  env.expected_error_code = try_to_get_error_code();
+  try_to_get_error_code();
 }
 
-static void assert_add_error_status_ok(
+static void assert_status_ok(
     const enum com_edhoc_add_error_status add_error_status) {
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, add_error_status);
-  TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
-      0, env.error_buffer_view.length,
-      "Error buffer length should be greater than 0");
+  tst_edhoc_assert_add_error_status_ok(add_error_status,
+                                       env.error_buffer_view.length);
 }
 
-static void assert_add_error_status_ok_with_message(
+static void assert_status_ok_with_message(
     const enum com_edhoc_add_error_status add_error_status,
-    const char* expected_error_description) {
-  TEST_ASSERT_EQUAL_MESSAGE(COM_EDHOC_ADD_ERROR_OK, add_error_status,
-                            expected_error_description);
-  TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
-      0, env.error_buffer_view.length,
-      "Error buffer length should be greater than 0");
+    const char* message) {
+  tst_edhoc_assert_add_error_status_ok_with_message(
+      add_error_status, env.error_buffer_view.length, message);
 }
 
 static void assert_encoded_error_matches(
     const char* expected_error_description,
-    const enum edhoc_error_code expected_error_code) {
-  enum edhoc_error_code received_code = -1;
-  char decoded_error[TST_EDHOC_ADD_PROTOCOL_ERROR_CAPACITY] = {0};
-  struct edhoc_error_info received_info = {
-      .text_string = decoded_error, .total_entries = sizeof(decoded_error)};
-  const int process_status = edhoc_message_error_process(
-      env.error_buffer_view.bytes, env.error_buffer_view.length, &received_code,
-      &received_info);
-  TEST_ASSERT_EQUAL_INT_MESSAGE(EDHOC_SUCCESS, process_status,
-                                "CBOR Decode Failed");
-  TEST_ASSERT_EQUAL(expected_error_code, received_code);
-  if (expected_error_description != NULL) {
-    TEST_ASSERT_EQUAL_STRING(expected_error_description,
-                             received_info.text_string);
-  }
-  TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
-      0, received_info.written_entries,
-      "Error buffer length should be greater than 0");
+    const enum edhoc_error_code error_code) {
+  tst_edhoc_assert_encoded_error_matches(
+      env.error_buffer_view, expected_error_description, error_code);
 }
 
 void test_add_error_with_description_on_invalid_library_state(void) {
@@ -104,8 +75,8 @@ void test_add_error_with_description_on_invalid_library_state(void) {
       com_edhoc_add_protocol_error_with_description(
           &env.context, expected_description, &env.error_buffer_view);
 
-  assert_add_error_status_ok(add_error_status);
-  assert_encoded_error_matches(expected_description, env.expected_error_code);
+  assert_status_ok(add_error_status);
+  assert_encoded_error_matches(expected_description, expected_error_code);
 }
 
 void test_add_error_with_description_creates_valid_error_with_null_parameters(
@@ -129,8 +100,8 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
             test_cases[i].context, test_cases[i].error_description,
             &env.error_buffer_view);
 
-    assert_add_error_status_ok_with_message(status, test_cases[i].description);
-    assert_encoded_error_matches(NULL, EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+    assert_status_ok_with_message(status, test_cases[i].description);
+    tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
   }
 }
 
@@ -147,8 +118,8 @@ void test_add_error_with_error_info_on_invalid_library_state(void) {
       com_edhoc_add_protocol_error(&env.context, &expected_error_info,
                                    &env.error_buffer_view);
 
-  assert_add_error_status_ok(add_error_status);
-  assert_encoded_error_matches(expected_description, env.expected_error_code);
+  assert_status_ok(add_error_status);
+  assert_encoded_error_matches(expected_description, expected_error_code);
 }
 
 void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
@@ -194,7 +165,7 @@ void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
     const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(
         test_cases[i].context, test_cases[i].info, &env.error_buffer_view);
 
-    assert_add_error_status_ok_with_message(status, test_cases[i].description);
-    assert_encoded_error_matches(NULL, EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+    assert_status_ok_with_message(status, test_cases[i].description);
+    tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
   }
 }

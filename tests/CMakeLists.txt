@@ -101,40 +101,56 @@ set(COMMON_SRV_SOURCES
     ${COMMON_SOURCES}
 )
 
-add_unity_test(test_edhoc_integration_add_protocol_error
-    /src/edhoc/common/add_error/integration/test_edhoc_integration_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+set(ADD_EDHOC_ERROR_COMMON_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/common/tst_edhoc_add_error_assertions.c
     ${COMMON_SOURCES}
 )
 
 set(ADD_EDHOC_ERROR_UNIT_SOURCES
-    src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.c
+    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
+)
+
+set(ADD_EDHOC_ERROR_INTEGRATION_SOURCES
+    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
+)
+
+set(ADD_PROTOCOL_ERROR_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.c
+)
+
+add_unity_test(test_edhoc_integration_add_protocol_error
+    /src/edhoc/common/add_error/integration/test_edhoc_integration_add_protocol_error.c
+    ${ADD_PROTOCOL_ERROR_SOURCES}
+    ${ADD_EDHOC_ERROR_INTEGRATION_SOURCES}
 )
 
 add_unity_test(test_edhoc_unit_add_protocol_error
     /src/edhoc/common/add_error/unit/test_edhoc_unit_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_get_code.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/mocks/tst_mock_edhoc_error_get_code.c
+    ${ADD_PROTOCOL_ERROR_SOURCES}
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
-    ${COMMON_SOURCES}
     "-Wl,--wrap=edhoc_message_error_compose"
+)
+
+set(ADD_INTERNAL_ERROR_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.c
 )
 
 add_unity_test(test_edhoc_integration_add_internal_error
     /src/edhoc/common/add_error/integration/test_edhoc_integration_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    ${COMMON_SOURCES}
+    ${ADD_EDHOC_ERROR_INTEGRATION_SOURCES}
+    ${ADD_INTERNAL_ERROR_SOURCES}
 )
 
 add_unity_test(test_edhoc_unit_add_internal_error
     /src/edhoc/common/add_error/unit/test_edhoc_unit_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
-    ${COMMON_SOURCES}
+    ${ADD_INTERNAL_ERROR_SOURCES}
     "-Wl,--wrap=edhoc_message_error_compose"
 )
 

@@ -14,7 +14,6 @@
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
-#include "edhoc/common/tst_response_buffer_helpers.h"
 
 static const uint8_t MOCK_ERR_DATA[] = {0xFF};
 
@@ -48,7 +47,7 @@ enum com_edhoc_add_error_status com_edhoc_add_protocol_error_with_description(
   (void)context;
   (void)error_description;
   TEST_ASSERT_NOT_NULL_MESSAGE(context, "context is NULL");
-  com_edhoc_response_buffer_is_null(response_data);
+  com_writable_buffer_is_writable(response_data);
   tst_srv_edhoc_write_mock_buffer_to_response(response_data);
   return COM_EDHOC_ADD_ERROR_OK;
 }

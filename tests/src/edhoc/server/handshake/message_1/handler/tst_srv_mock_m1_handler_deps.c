@@ -17,7 +17,6 @@
 
 #include "common/tst_report_mock_error.h"
 #include "edhoc/common/tst_mock_edhoc_error.h"
-#include "edhoc/common/tst_response_buffer_helpers.h"
 
 // TODO: this is duplicated with m3_stubs
 
@@ -71,7 +70,7 @@ void srv_edhoc_message_1_handler_add_error(
   if (context == NULL) {
     tst_report_mock_error("context is NULL");
   }
-  if (com_edhoc_response_buffer_is_null(response_data)) {
+  if (com_writable_buffer_is_writable(response_data)) {
     return;
   }
   tst_srv_edhoc_write_mock_buffer_to_response(response_data);

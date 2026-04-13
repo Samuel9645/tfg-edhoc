@@ -96,7 +96,6 @@ add_unity_test(test_coap_server_dispatch
 )
 
 set(COMMON_SRV_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_response_buffer_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
     ${COMMON_SOURCES}
 )

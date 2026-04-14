@@ -18,7 +18,7 @@ void srv_edhoc_message_1_handler_add_protocol_error(
     struct com_writable_buffer* response_data) {
   enum edhoc_error_code error;
   if (edhoc_error_get_code(context, &error) != EDHOC_SUCCESS) {
-    return;
+    error = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
   }
   if (error == EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE) {
     enum { SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE = 8 };

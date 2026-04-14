@@ -52,7 +52,8 @@ void test_add_protocol_error_recovers_get_code_fail(void) {
       &env.context, &VALID_INFO, &env.error_buffer_view);
 
   assert_status_ok(status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
+  tst_edhoc_assert_encoded_error_matches(env.error_buffer_view, DESCRIPTION,
+                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_add_protocol_error_fails_on_invalid_buffer(void) {
@@ -91,7 +92,8 @@ void test_add_protocol_error_with_description_recovers_get_code_fail(void) {
                                                     &env.error_buffer_view);
 
   assert_status_ok(status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
+  tst_edhoc_assert_encoded_error_matches(env.error_buffer_view, DESCRIPTION,
+                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_add_protocol_error_with_description_fails_on_invalid_buffer(void) {

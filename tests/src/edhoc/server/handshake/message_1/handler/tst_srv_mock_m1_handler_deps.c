@@ -24,19 +24,24 @@ static const uint8_t TST_DEFAULT_M2_PAYLOAD[] = {0x01, 0x02, 0x03, 0x04};
 static int context_setup_result = EDHOC_SUCCESS;
 static int message_1_process_result = EDHOC_SUCCESS;
 static int message_2_compose_result = EDHOC_SUCCESS;
+static bool use_real_context_setup = false;
 
 static const uint8_t* compose_buffer = TST_DEFAULT_M2_PAYLOAD;
 static size_t compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
+
+static void use_real_setup_context(void) { use_real_context_setup = true; }
 
 void tst_srv_edhoc_m1_set_setup_failure(void) {
   context_setup_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
 void tst_srv_edhoc_m1_set_message_1_process_failure(void) {
+  use_real_setup_context();
   message_1_process_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
 void tst_srv_edhoc_m1_set_message_2_compose_failure(void) {
+  use_real_setup_context();
   message_2_compose_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
@@ -49,6 +54,7 @@ void tst_srv_edhoc_m1_reset_stub_results(void) {
   message_1_process_result = EDHOC_SUCCESS;
   message_2_compose_result = EDHOC_SUCCESS;
   compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
+  use_real_context_setup = false;
 }
 
 void tst_srv_edhoc_m1_assert_handler_writes_message_2_in_buffer(
@@ -60,26 +66,17 @@ void tst_srv_edhoc_m1_assert_handler_writes_message_2_in_buffer(
                             "message 2 reported length mismatch");
 }
 
-void srv_edhoc_message_1_handler_add_protocol_error(
-    const struct edhoc_context* context, const char* generic_error_message,
-    struct com_writable_buffer* response_data) {
-  (void)context;
-  if (generic_error_message == NULL) {
-    tst_report_mock_error("generic error message is NULL");
-  }
-  if (context == NULL) {
-    tst_report_mock_error("context is NULL");
-  }
-  if (com_writable_buffer_is_writable(response_data)) {
-    return;
-  }
-  tst_srv_edhoc_write_mock_buffer_to_response(response_data);
-}
+extern int __real_com_edhoc_setup_context(  // NOLINT(*-reserved-identifier)
+                                            // we need this
+    struct edhoc_context* context, const struct edhoc_credentials* credentials);
 
-int com_edhoc_setup_context(struct edhoc_context* context,
-                            const struct edhoc_credentials* credentials) {
-  (void)context;
-  (void)credentials;
+int __wrap_com_edhoc_setup_context(  // NOLINT(*-reserved-identifier)
+                                     // we need this
+    struct edhoc_context* context,
+    const struct edhoc_credentials* credentials) {
+  if (use_real_context_setup) {
+    return __real_com_edhoc_setup_context(context, credentials);
+  }
   return context_setup_result;
 }
 

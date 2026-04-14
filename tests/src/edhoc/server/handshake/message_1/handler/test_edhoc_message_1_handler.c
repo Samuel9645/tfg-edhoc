@@ -12,12 +12,14 @@
  * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
  */
 
+// ReSharper disable CppParameterMayBeConstPtrOrRef
 #include <coap3/coap.h>
 #include <edhoc.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unity.h>
 
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/tst_mock_edhoc_error.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
@@ -25,7 +27,28 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
-static const struct edhoc_credentials DUMMY_TEST_CREDS = {0};
+static int dummy_fetch_credentials(void* user_context,
+                                   struct edhoc_auth_creds* credentials) {
+  (void)user_context;
+  (void)credentials;
+
+  // Now returning an integer (0) makes perfect sense to the compiler
+  return EDHOC_SUCCESS;
+}
+
+static int dummy_verify_credentials(
+    void* user_context, struct edhoc_auth_creds* credentials,
+    const uint8_t** public_key_reference,
+    size_t* public_key_length) {  // NOLINT(*-non-const-parameter)
+  (void)user_context;
+  (void)credentials;
+  (void)public_key_reference;
+  (void)public_key_length;
+  return EDHOC_SUCCESS;
+}
+
+static const struct edhoc_credentials DUMMY_TEST_CREDS = {
+    .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
 static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
 static struct {
@@ -95,13 +118,20 @@ void test_handler_fails_on_invalid_data(void) {
 
     if (test_cases[i].response != NULL &&
         test_cases[i].response->bytes != NULL) {
-      tst_srv_edhoc_assert_handler_writes_error_in_buffer(
-          *test_cases[i].response);
+      tst_edhoc_assert_encoded_error_is_not_empty(*test_cases[i].response);
     }
     ensure_context_is_freed_on_failure(result);
   }
 }
 
+/**
+ * WHY DON'T WE CHECK THE REPORTED ERROR?
+ *
+ * RFC only defines specific errors for other scenarios, so most of the RFC
+ * level codes are UNSPECIFIED_ERROR.
+ * @see [RFC 9528, Section
+ * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
+ */
 void test_handler_fails_on_library_errors(void) {
   const struct {
     const char* description;
@@ -125,6 +155,7 @@ void test_handler_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
+    tst_edhoc_assert_encoded_error_is_not_empty(env.response);
   }
 }
 
@@ -136,6 +167,6 @@ void test_handler_fails_when_message_2_composition_produces_empty_buffer(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_EMPTY,
                     result.status);
-  tst_srv_edhoc_assert_handler_writes_error_in_buffer(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
   ensure_context_is_freed_on_failure(result);
 }

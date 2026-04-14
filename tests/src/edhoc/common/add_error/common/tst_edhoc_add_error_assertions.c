@@ -58,3 +58,9 @@ void tst_edhoc_assert_encoded_error_is_not_empty(
   tst_edhoc_assert_encoded_error_matches(encoded_error_buffer, NULL,
                                          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
+
+void tst_edhoc_assert_encoded_error_is_not_empty_with_code(
+    const struct com_writable_buffer encoded_error_buffer,
+    const enum edhoc_error_code status) {
+  tst_edhoc_assert_encoded_error_matches(encoded_error_buffer, NULL, status);
+}

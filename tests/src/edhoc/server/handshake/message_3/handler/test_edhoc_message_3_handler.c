@@ -13,7 +13,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/tst_mock_edhoc_error.h"
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_handler_deps.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_result.h"
@@ -90,7 +90,7 @@ void test_handler_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected, status,
                               test_cases[i].description);
     if (test_cases[i].should_check_error_payload) {
-      tst_srv_edhoc_assert_handler_writes_error_in_buffer(env.response);
+      tst_edhoc_assert_encoded_error_is_not_empty(env.response);
     }
   }
 }
@@ -102,7 +102,7 @@ void test_handler_fails_when_message_3_processing_fails(void) {
       srv_edhoc_handle_message_3(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_3_PROCESS_FAILED, status);
-  tst_srv_edhoc_assert_handler_writes_error_in_buffer(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
 }
 
 void test_handler_fails_when_message_4_composition_fails(void) {
@@ -112,7 +112,7 @@ void test_handler_fails_when_message_4_composition_fails(void) {
       srv_edhoc_handle_message_3(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED, status);
-  tst_srv_edhoc_assert_handler_writes_error_in_buffer(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
 }
 
 void test_handler_fails_when_message_4_composition_produces_empty_buffer(void) {
@@ -122,5 +122,5 @@ void test_handler_fails_when_message_4_composition_produces_empty_buffer(void) {
       srv_edhoc_handle_message_3(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_EMPTY, status);
-  tst_srv_edhoc_assert_handler_writes_error_in_buffer(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
 }

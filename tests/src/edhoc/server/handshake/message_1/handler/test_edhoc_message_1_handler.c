@@ -20,7 +20,6 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
-#include "edhoc/common/tst_mock_edhoc_error.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.h"
 #include "edhoc/server/handshake/message_1/srv_m1_handler.h"
@@ -31,8 +30,6 @@ static int dummy_fetch_credentials(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
   (void)user_context;
   (void)credentials;
-
-  // Now returning an integer (0) makes perfect sense to the compiler
   return EDHOC_SUCCESS;
 }
 

@@ -16,7 +16,6 @@
 #include <unity.h>
 
 #include "common/tst_report_mock_error.h"
-#include "edhoc/common/tst_mock_edhoc_error.h"
 
 // TODO: this is duplicated with m3_stubs
 

@@ -22,7 +22,7 @@
  * @param[in] generic_error_message Generic error text for non-cipher errors.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void srv_edhoc_message_1_handler_add_error(
+void srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* generic_error_message,
     struct com_writable_buffer* response_data);
 

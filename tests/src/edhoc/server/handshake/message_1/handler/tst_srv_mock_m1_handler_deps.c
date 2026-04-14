@@ -60,7 +60,7 @@ void tst_srv_edhoc_m1_assert_handler_writes_message_2_in_buffer(
                             "message 2 reported length mismatch");
 }
 
-void srv_edhoc_message_1_handler_add_error(
+void srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* generic_error_message,
     struct com_writable_buffer* response_data) {
   (void)context;

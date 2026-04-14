@@ -13,7 +13,7 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
-void srv_edhoc_message_1_handler_add_error(
+void srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* generic_error_message,
     struct com_writable_buffer* response_data) {
   enum edhoc_error_code error;
@@ -40,5 +40,6 @@ void srv_edhoc_message_1_handler_add_error(
      */
     return;
   }
-  (void)com_edhoc_add_internal_error(generic_error_message, response_data);
+  (void)com_edhoc_add_protocol_error_with_description(
+      context, generic_error_message, response_data);
 }

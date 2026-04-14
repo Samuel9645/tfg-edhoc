@@ -57,7 +57,7 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
   edhoc_api_result = edhoc_message_1_process(edhoc_ctx, request.payload.bytes,
                                              request.payload.length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    srv_edhoc_message_1_handler_add_error(
+    srv_edhoc_message_1_handler_add_protocol_error(
         edhoc_ctx, "Message 1 processing failed", response);
     free(edhoc_ctx);
     return srv_edhoc_message_1_handler_failure(
@@ -66,7 +66,7 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
   edhoc_api_result = edhoc_message_2_compose(
       edhoc_ctx, response->bytes, response->capacity, &response->length);
   if (edhoc_api_result != EDHOC_SUCCESS) {
-    srv_edhoc_message_1_handler_add_error(
+    srv_edhoc_message_1_handler_add_protocol_error(
         edhoc_ctx, "Message 2 composing failed", response);
     free(edhoc_ctx);
     return srv_edhoc_message_1_handler_failure(

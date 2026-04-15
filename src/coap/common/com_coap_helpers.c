@@ -26,7 +26,7 @@ enum status_coap com_coap_resolve_address(const coap_str_const_t* host,
   coap_addr_info_t* addr_info =
       coap_resolve_address_info(host, port, port, port, port, AF_UNSPEC,
                                 scheme_hint_bits, COAP_RESOLVE_TYPE_REMOTE);
-  if (addr_info) {
+  if (addr_info != NULL) {
     result = STATUS_COAP_OK;
     *destination_address = addr_info->addr;
   }

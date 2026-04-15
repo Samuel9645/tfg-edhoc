@@ -58,7 +58,7 @@ void srv_coap_dispatch_post_with_dependencies(
     const struct srv_coap_dispatch_deps* deps) {
   if (srv_dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
-    if (response) {
+    if (response != NULL) {
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     }
     return;

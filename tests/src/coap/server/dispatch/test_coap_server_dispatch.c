@@ -34,11 +34,11 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-  if (dummy_request) {
+  if (dummy_request != NULL) {
     coap_delete_pdu(dummy_request);
     dummy_request = NULL;
   }
-  if (dummy_response) {
+  if (dummy_response != NULL) {
     coap_delete_pdu(dummy_response);
     dummy_response = NULL;
   }

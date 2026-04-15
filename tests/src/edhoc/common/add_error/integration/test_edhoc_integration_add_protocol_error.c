@@ -30,7 +30,7 @@ static void try_to_get_error_code(void) {
   }
 }
 
-static void trigger_invalid_context_error(void) {
+static void trigger_library_error(void) {
   const uint8_t garbage[] = {0xFF, 0x00, 0xAA};
   edhoc_message_1_process(&env.context, garbage, sizeof(garbage));
 }
@@ -44,7 +44,7 @@ void reset_env(void) {
 
 void setUp(void) {
   reset_env();
-  trigger_invalid_context_error();
+  trigger_library_error();
   try_to_get_error_code();
 }
 
@@ -92,7 +92,7 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     reset_env();
     if (test_cases[i].context != NULL) {
-      trigger_invalid_context_error();
+      trigger_library_error();
     }
 
     const enum com_edhoc_add_error_status status =
@@ -106,7 +106,7 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
 }
 
 void test_add_error_with_error_info_on_invalid_library_state(void) {
-  trigger_invalid_context_error();
+  trigger_library_error();
   const char* expected_description = "RANDOM DESCRIPTION";
   const size_t error_description_length = strlen(expected_description);
   const struct edhoc_error_info expected_error_info = {
@@ -159,7 +159,7 @@ void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     reset_env();
     if (test_cases[i].context != NULL) {
-      trigger_invalid_context_error();
+      trigger_library_error();
     }
 
     const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(

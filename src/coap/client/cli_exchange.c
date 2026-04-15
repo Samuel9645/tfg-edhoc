@@ -76,7 +76,7 @@ bool cli_coap_exchange_session_data_is_valid(
 
 bool cli_coap_exchange_request_data_is_valid(
     const struct cli_coap_exchange_request request_data) {
-  return com_readonly_buffer_is_valid(request_data.buffer);
+  return com_readonly_buffer_has_content(request_data.buffer);
 }
 
 enum status_coap cli_coap_init_exchange(

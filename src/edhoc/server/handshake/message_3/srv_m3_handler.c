@@ -30,7 +30,7 @@ enum srv_edhoc_message_3_handler_status srv_edhoc_handle_message_3(
     (void)com_edhoc_add_internal_error("Null EDHOC context", response_buffer);
     return EDH_MSG3_HDL_ERR_NULL_EDHOC_CONTEXT;
   }
-  if (!com_readonly_buffer_is_valid(request.parsed_message_3)) {
+  if (!com_readonly_buffer_has_content(request.parsed_message_3)) {
     (void)com_edhoc_add_internal_error("Invalid EDHOC parsed message 3", response_buffer);
     return EDH_MSG3_HDL_ERR_INVALID_PARSED_MESSAGE_3;
   }

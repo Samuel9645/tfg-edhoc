@@ -44,7 +44,8 @@ static const struct edhoc_credentials credentials = {
 static void cli_coap_try_send_edhoc_error_message(
     struct cli_coap_exchange* exchange,
     const struct com_readonly_buffer error_payload_data) {
-  if (exchange == NULL || !com_readonly_buffer_is_valid(error_payload_data)) {
+  if (exchange == NULL ||
+      !com_readonly_buffer_has_content(error_payload_data)) {
     return;
   }
 

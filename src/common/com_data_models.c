@@ -7,7 +7,7 @@
  */
 #include "common/com_data_models.h"
 
-bool com_readonly_buffer_is_valid(const struct com_readonly_buffer buffer) {
+bool com_readonly_buffer_has_content(const struct com_readonly_buffer buffer) {
   return buffer.bytes != NULL && buffer.length > 0;
 }
 

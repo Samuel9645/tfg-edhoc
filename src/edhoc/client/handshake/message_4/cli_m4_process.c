@@ -41,7 +41,7 @@ struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
     const struct com_readonly_buffer message_4,
     struct com_writable_buffer* message_4_error) {
   if (!cli_edhoc_handshake_is_initialized(state) ||
-      !com_readonly_buffer_is_valid(message_4) ||
+      !com_readonly_buffer_has_content(message_4) ||
       !com_writable_buffer_is_writable(message_4_error)) {
     return message_4_process_local_failure(
         CLI_EDHOC_MSG4_PROCESS_ERR_INVALID_ARGS);

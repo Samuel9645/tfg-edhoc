@@ -34,7 +34,7 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_NULL_CREDENTIALS);
   }
-  if (!com_readonly_buffer_is_valid(request.payload)) {
+  if (!com_readonly_buffer_has_content(request.payload)) {
     (void)com_edhoc_add_internal_error("Invalid request buffer", response);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER);

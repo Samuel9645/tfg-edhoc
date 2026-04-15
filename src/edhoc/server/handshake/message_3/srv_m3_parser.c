@@ -15,7 +15,7 @@
 struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     const struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx) {
-  if (!com_readonly_buffer_is_valid(request_buffer)) {
+  if (!com_readonly_buffer_has_content(request_buffer)) {
     return srv_coap_internal_parse_message_3_failure(
         SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
   }

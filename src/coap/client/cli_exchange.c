@@ -13,9 +13,9 @@
 static bool client_coap_response_has_edhoc_content_format(
     const coap_pdu_t* response) {
   coap_opt_iterator_t option_iterator = {0};
-  coap_opt_t* content_format_option =
+  const coap_opt_t* content_format_option =
       coap_check_option(response, COAP_OPTION_CONTENT_FORMAT, &option_iterator);
-  if (!content_format_option) {
+  if (content_format_option == NULL) {
     return false;
   }
 
@@ -32,7 +32,7 @@ static coap_response_t coap_client_coap_response_handler(
   (void)sent;
   (void)id;
   struct cli_coap_exchange* exchange = coap_session_get_app_data(session);
-  if (!exchange) {
+  if (exchange == NULL) {
     coap_log_err("missing client exchange state in coap_response.handler\n");
     return COAP_RESPONSE_FAIL;
   }
@@ -82,7 +82,8 @@ bool cli_coap_exchange_request_data_is_valid(
 enum status_coap cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
     struct cli_coap_exchange* exchange) {
-  if (!exchange || !cli_coap_exchange_session_data_is_valid(session_data)) {
+  if (exchange == NULL ||
+      !cli_coap_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
     return STATUS_COAP_ERR;
   }

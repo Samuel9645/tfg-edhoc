@@ -25,7 +25,8 @@ static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
 static bool srv_dispatch_has_invalid_deps_or_args(
     const coap_session_t* session, const coap_pdu_t* request,
     const coap_pdu_t* response, const struct srv_coap_dispatch_deps* deps) {
-  return !session || !request || !response || !dispatch_deps_are_valid(deps);
+  return session == NULL || request == NULL || response == NULL ||
+         !dispatch_deps_are_valid(deps);
 }
 
 static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(

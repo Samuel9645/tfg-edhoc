@@ -41,7 +41,7 @@ struct srv_edhoc_message_1_handler_result srv_edhoc_handle_message_1(
   }
 
   struct edhoc_context* edhoc_ctx = calloc(1, sizeof(struct edhoc_context));
-  if (!edhoc_ctx) {
+  if (edhoc_ctx == NULL) {
     (void)com_edhoc_add_internal_error("Context calloc failed", response);
     return srv_edhoc_message_1_handler_failure(
         SRV_EDHOC_MSG1_HDL_ERR_CALLOC_FAILED);

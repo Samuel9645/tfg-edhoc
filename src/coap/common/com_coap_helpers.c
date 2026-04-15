@@ -38,8 +38,11 @@ enum status_coap com_coap_resolve_address(const coap_str_const_t* host,
 coap_optlist_t* com_coap_create_coap_edhoc_optlist(
     const enum config_coap_content_format_edhoc_values content_format) {
   enum { CREATE_PORT_HOST_OPTION = 1 };
+
   coap_optlist_t* optlist = NULL;
+
   enum { ENCODE_BUFFER_SIZE = 4 };
+
   uint8_t content_format_value[ENCODE_BUFFER_SIZE];
   const unsigned int compressed_length = coap_encode_var_safe(
       content_format_value, sizeof(content_format_value), content_format);
@@ -49,7 +52,7 @@ coap_optlist_t* com_coap_create_coap_edhoc_optlist(
   }
   coap_optlist_t* edhoc_optlist = coap_new_optlist(
       COAP_OPTION_CONTENT_FORMAT, compressed_length, content_format_value);
-  if (!edhoc_optlist) {
+  if (edhoc_optlist == NULL) {
     coap_log_err("cannot create EDHOC options\n");
     return NULL;
   }
@@ -60,6 +63,7 @@ coap_optlist_t* com_coap_create_coap_edhoc_optlist(
   }
   return optlist;
 }
+
 bool com_coap_coap_response_indicates_success(
     const coap_pdu_code_t response_code) {
   return response_code == COAP_RESPONSE_CODE_CHANGED;

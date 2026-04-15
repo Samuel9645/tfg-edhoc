@@ -150,12 +150,12 @@ struct cli_coap_prepare_pdu_result cli_coap_prepare_post_request(
     const struct cli_coap_session_config config, coap_session_t* coap_session,
     const enum config_coap_content_format_edhoc_values content_format) {
   coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
-  if (!request_pdu) {
+  if (request_pdu == NULL) {
     coap_log_err("cannot create PDU\n");
     return prepare_pdu_result_failure(CLI_COAP_PREPARE_PDU_ERR_CREATE_PDU);
   }
   coap_optlist_t* optlist = com_coap_create_coap_edhoc_optlist(content_format);
-  if (!optlist) {
+  if (optlist == NULL) {
     coap_log_err("cannot create options list\n");
     coap_delete_pdu(request_pdu);
     return prepare_pdu_result_failure(CLI_COAP_PREPARE_PDU_ERR_CREATE_OPTLIST);

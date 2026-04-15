@@ -6,7 +6,7 @@
 
 enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
                                           const char* listen_address_string) {
-  if (!coap_context || !listen_address_string) {
+  if (coap_context == NULL || listen_address_string == NULL) {
     return STATUS_COAP_ERR;
   }
 
@@ -28,9 +28,9 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
   bool has_endpoint = false;
   for (const coap_addr_info_t* endpoint_info = endpoint_info_list;
        endpoint_info != NULL; endpoint_info = endpoint_info->next) {
-    coap_endpoint_t* endpoint = coap_new_endpoint(
+    const coap_endpoint_t* endpoint = coap_new_endpoint(
         coap_context, &endpoint_info->addr, endpoint_info->proto);
-    if (!endpoint) {
+    if (endpoint == NULL) {
       coap_log_warn("cannot create endpoint for CoAP proto %u\n",
                     endpoint_info->proto);
     } else {
@@ -50,7 +50,7 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
 
 enum status_coap srv_coap_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string) {
-  if (!coap_context || !multicast_address_string) {
+  if (coap_context == NULL || multicast_address_string == NULL) {
     return STATUS_COAP_ERR;
   }
 
@@ -67,7 +67,8 @@ enum status_coap srv_coap_join_multicast_group(
 enum status_coap srv_coap_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     const coap_method_handler_t resource_handler) {
-  if (!coap_context || !resource_path || !resource_handler) {
+  if (coap_context == NULL || resource_path == NULL ||
+      resource_handler == NULL) {
     return STATUS_COAP_ERR;
   }
 
@@ -75,7 +76,7 @@ enum status_coap srv_coap_add_post_resource(
 
   coap_resource_t* resource = coap_resource_init(
       coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS);
-  if (!resource) {
+  if (resource == NULL) {
     coap_log_err("cannot create resource\n");
     return STATUS_COAP_ERR;
   }
@@ -86,7 +87,7 @@ enum status_coap srv_coap_add_post_resource(
 }
 
 enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context) {
-  if (!coap_context) {
+  if (coap_context == NULL) {
     return STATUS_COAP_ERR;
   }
 

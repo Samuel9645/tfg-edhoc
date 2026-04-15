@@ -14,7 +14,7 @@
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
 void srv_edhoc_message_1_handler_add_protocol_error(
-    const struct edhoc_context* context, const char* generic_error_message,
+    const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   enum edhoc_error_code error;
   if (edhoc_error_get_code(context, &error) != EDHOC_SUCCESS) {
@@ -41,5 +41,5 @@ void srv_edhoc_message_1_handler_add_protocol_error(
     return;
   }
   (void)com_edhoc_add_protocol_error_with_description(
-      context, generic_error_message, response_data);
+      context, error_description, response_data);
 }

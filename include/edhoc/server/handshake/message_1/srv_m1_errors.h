@@ -19,11 +19,11 @@
  * Handles both generic errors and wrong-cipher-suite errors.
  *
  * @param[in] context EDHOC context to extract the error info.
- * @param[in] generic_error_message Generic error text for non-cipher errors.
+ * @param[in] error_description Generic error text for non-cipher errors.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
 void srv_edhoc_message_1_handler_add_protocol_error(
-    const struct edhoc_context* context, const char* generic_error_message,
+    const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_ERRORS_H_

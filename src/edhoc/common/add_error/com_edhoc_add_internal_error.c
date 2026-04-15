@@ -14,16 +14,16 @@
 const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
 
 enum com_edhoc_add_error_status com_edhoc_add_internal_error(
-    const char* error_message, struct com_writable_buffer* response_data) {
+    const char* error_description, struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
     return COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER;
   }
 
-  if (error_message == NULL) {
-    error_message = "Fatal Internal Failure: error message was NULL";
+  if (error_description == NULL) {
+    error_description = "Fatal Internal Failure: error description was NULL";
   }
   struct edhoc_error_info error_info = {0};
-  com_edhoc_set_error_info(&error_info, error_message);
+  com_edhoc_set_error_info(&error_info, error_description);
   if (edhoc_message_error_compose(
           response_data->bytes, response_data->capacity, &response_data->length,
           INTERNAL_FAILURE_EDHOC_CODE, &error_info) != EDHOC_SUCCESS) {

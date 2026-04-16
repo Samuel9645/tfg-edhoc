@@ -28,19 +28,19 @@ static bool use_real_context_setup = false;
 static const uint8_t* compose_buffer = TST_DEFAULT_M2_PAYLOAD;
 static size_t compose_written_length = sizeof(TST_DEFAULT_M2_PAYLOAD);
 
-static void use_real_setup_context(void) { use_real_context_setup = true; }
+static void use_real_edhoc_context_init(void) { use_real_context_setup = true; }
 
 void tst_srv_edhoc_m1_set_setup_failure(void) {
   context_setup_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
 void tst_srv_edhoc_m1_set_message_1_process_failure(void) {
-  use_real_setup_context();
+  use_real_edhoc_context_init();
   message_1_process_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 
 void tst_srv_edhoc_m1_set_message_2_compose_failure(void) {
-  use_real_setup_context();
+  use_real_edhoc_context_init();
   message_2_compose_result = EDHOC_ERROR_GENERIC_ERROR;
 }
 

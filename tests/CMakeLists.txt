@@ -184,23 +184,39 @@ set(MOCK_EDHOC_M1_HANDLER_DEPS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.c
 )
 
-set(IN_PROGRESS_MESSAGE_1_PROCESSING_MOCKS
+set(MESSAGE_1_PROCESS_MOCKS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/process/tst_srv_mock_m1_process_deps.c
     "-Wl,--wrap=edhoc_context_init"
 )
 
-set(IN_PROGRESS_MESSAGE_1_PROCESSING_SOURCES
+set(MESSAGE_1_PROCESS_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
     ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup.c
-    ${IN_PROGRESS_MESSAGE_1_PROCESSING_MOCKS}
+    ${MESSAGE_1_PROCESS_MOCKS}
 )
 
 add_unity_test(test_edhoc_message_1_process
     /src/edhoc/server/handshake/message_1/process/test_edhoc_message_1_process.c
-    ${IN_PROGRESS_MESSAGE_1_PROCESSING_SOURCES}
+    ${MESSAGE_1_PROCESS_SOURCES}
+    ${COMMON_HANDLER_SOURCES}
+)
+
+set(MESSAGE_2_COMPOSE_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_2/srv_m2_compose.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_2/internal/srv_m2_compose_result_builders.c
+)
+
+set(MESSAGE_2_COMPOSE_MOCKS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_2/tst_srv_mock_m2_compose_deps.c
+)
+
+add_unity_test(test_edhoc_message_2_compose
+    /src/edhoc/server/handshake/message_2/test_edhoc_message_2_compose.c
+    ${MESSAGE_2_COMPOSE_SOURCES}
+    ${MESSAGE_2_COMPOSE_MOCKS}
     ${COMMON_HANDLER_SOURCES}
 )
 

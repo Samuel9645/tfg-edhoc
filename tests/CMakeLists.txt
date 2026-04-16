@@ -192,6 +192,7 @@ set(IN_PROGRESS_MESSAGE_1_PROCESSING_MOCKS
 set(IN_PROGRESS_MESSAGE_1_PROCESSING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
     ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup.c
     ${IN_PROGRESS_MESSAGE_1_PROCESSING_MOCKS}

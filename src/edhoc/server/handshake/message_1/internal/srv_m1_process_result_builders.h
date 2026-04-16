@@ -11,12 +11,12 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_process_result.h"
 
+struct srv_edhoc_message_1_process_result
+srv_edhoc_message_1_process_invalid_error_buffer_failure(void);
+
 struct srv_edhoc_message_1_process_result srv_edhoc_message_1_process_failure(
     enum srv_edhoc_message_1_process_status status,
     struct com_readonly_buffer error_buffer);
-
-struct srv_edhoc_message_1_process_result
-srv_edhoc_message_1_process_invalid_error_buffer_failure(void);
 
 struct srv_edhoc_message_1_process_result srv_edhoc_message_1_process_ok(
     struct edhoc_context* context);

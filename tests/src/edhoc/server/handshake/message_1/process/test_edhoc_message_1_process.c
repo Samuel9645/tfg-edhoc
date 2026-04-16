@@ -134,9 +134,9 @@ void test_m1_process_fails_on_library_errors(void) {
     enum srv_edhoc_message_1_process_status expected_status;
   } cases[] = {
       {"setup fails", tst_srv_edhoc_m1_process_set_setup_failure,
-       SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP_FAILED},
+       SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP},
       {"processing fails", tst_srv_edhoc_m1_process_set_process_failure,
-       SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED},
+       SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS},
   };
 
   for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {

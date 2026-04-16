@@ -14,8 +14,8 @@
 #include <string.h>
 
 #include "coap/server/internal/srv_parse_edhoc_request_builders.h"
-#include "edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
+#include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
@@ -109,26 +109,26 @@ struct srv_edhoc_parse_message_3_result stb_srv_edhoc_parse_m3_protocol_failure(
       SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED);
 }
 
-struct srv_edhoc_message_1_handler_result
+struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_handle_m1_protocol_failure(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   (void)response_data;
-  return srv_edhoc_message_1_handler_failure(
-      SRV_EDHOC_MSG1_HDL_ERR_NULL_CREDENTIALS);
+  return srv_edhoc_message_1_responder_failure(
+      SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER);
 }
 
-struct srv_edhoc_message_1_handler_result stb_srv_edhoc_handle_m1_ok(
+struct srv_edhoc_message_1_responder_result stb_srv_edhoc_handle_m1_ok(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   response_data->length = 10;
-  return srv_edhoc_message_1_handler_ok(&dummy_edhoc_context_for_stub);
+  return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub);
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(
-    const struct srv_edhoc_message_1_handler_result message_1_result,
+    const struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;
@@ -136,7 +136,7 @@ coap_pdu_code_t stb_srv_coap_process_m1_ok(
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
-    const struct srv_edhoc_message_1_handler_result message_1_result,
+    const struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session) {
   (void)message_1_result;
   (void)session;

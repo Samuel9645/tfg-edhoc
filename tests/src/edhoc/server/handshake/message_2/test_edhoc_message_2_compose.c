@@ -20,7 +20,7 @@
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
-#include "edhoc/server/handshake/message_2/tst_srv_mock_m2_compose_deps.h"
+#include "edhoc/server/handshake/mocks/message_2/tst_srv_mock_edhoc_message_2_compose.h"
 
 enum { TST_SRV_EDHOC_COMPOSE_BUF_LEN = 256 };
 
@@ -31,7 +31,7 @@ static struct {
 } env = {.response = {.capacity = TST_SRV_EDHOC_COMPOSE_BUF_LEN}};
 
 void setUp(void) {
-  tst_srv_edhoc_m2_compose_reset_mock_results();
+  tst_srv_edhoc_m2_reset_compose_mock();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.response.bytes = env.response_buffer;
   env.response.length = 0;
@@ -39,6 +39,8 @@ void setUp(void) {
 }
 
 void test_compose_ok_on_valid_data(void) {
+  tst_srv_edhoc_m2_set_compose_ok();
+
   const struct srv_edhoc_message_2_compose_result result =
       srv_edhoc_compose_message_2(&env.context, &env.response);
 
@@ -76,7 +78,7 @@ void test_compose_fails_on_invalid_data(void) {
         test_cases[i].response->bytes != NULL) {
       tst_edhoc_assert_encoded_error_is_not_empty(*test_cases[i].response);
     }
-    tst_srv_edhoc_m2_compose_reset_mock_results();
+    tst_srv_edhoc_m2_reset_compose_mock();
   }
 }
 
@@ -89,7 +91,7 @@ void test_compose_fails_on_invalid_data(void) {
  * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
  */
 void test_compose_fails_on_library_compose_failure(void) {
-  tst_srv_edhoc_m2_compose_set_compose_failure();
+  tst_srv_edhoc_m2_reset_compose_mock();
 
   const struct srv_edhoc_message_2_compose_result result =
       srv_edhoc_compose_message_2(&env.context, &env.response);

@@ -7,12 +7,13 @@
 
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_INTERNAL_SRV_M1_HANDLER_RESULT_BUILDERS_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_INTERNAL_SRV_M1_HANDLER_RESULT_BUILDERS_H_
-#include "edhoc/server/handshake/message_1/srv_m1_result.h"
+#include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
-struct srv_edhoc_message_1_handler_result srv_edhoc_message_1_handler_ok(
+struct srv_edhoc_message_1_responder_result srv_edhoc_message_1_responder_ok(
     struct edhoc_context* edhoc_ctx);
 
-struct srv_edhoc_message_1_handler_result srv_edhoc_message_1_handler_failure(
-    enum srv_edhoc_message_1_handler_status status);
+struct srv_edhoc_message_1_responder_result
+srv_edhoc_message_1_responder_failure(
+    enum srv_edhoc_message_1_responder_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_INTERNAL_SRV_M1_HANDLER_RESULT_BUILDERS_H_

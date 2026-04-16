@@ -11,32 +11,28 @@
 
 #include <stdlib.h>
 
-#include "edhoc/server/handshake/message_1/srv_m1_handler.h"
+#include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 
 static coap_pdu_code_t map_message_1_status_to_response(
-    const enum srv_edhoc_message_1_handler_status status) {
+    const enum srv_edhoc_message_1_responder_status status) {
   switch (status) {
-  case SRV_EDHOC_MSG1_HDL_OK:
+  case SRV_EDHOC_MSG1_RESPONDER_OK:
     return COAP_RESPONSE_CODE_CHANGED;
 
-  case SRV_EDHOC_MSG1_HDL_ERR_INVALID_REQUEST_BUFFER:
-  case SRV_EDHOC_MSG1_HDL_ERR_EDHOC_MESSAGE_1_PROCESS_FAILED:
+  case SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED:
     return COAP_RESPONSE_CODE_BAD_REQUEST;
 
-  case SRV_EDHOC_MSG1_HDL_ERR_NULL_CREDENTIALS:
-  case SRV_EDHOC_MSG1_HDL_ERR_INVALID_RESPONSE_BUFFER:
-  case SRV_EDHOC_MSG1_HDL_ERR_CALLOC_FAILED:
-  case SRV_EDHOC_MSG1_HDL_ERR_EDHOC_CONTEXT_SETUP_FAILED:
-  case SRV_EDHOC_MSG1_HDL_ERR_EDHOC_MESSAGE_2_COMPOSE_FAILED:
+  case SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER:
+  case SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED:
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 }
 
 coap_pdu_code_t srv_coap_map_message_1_result_to_coap(
-    const struct srv_edhoc_message_1_handler_result message_1_result,
+    const struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session) {
-  if (message_1_result.status != SRV_EDHOC_MSG1_HDL_OK) {
+  if (message_1_result.status != SRV_EDHOC_MSG1_RESPONDER_OK) {
     const char* error_message =
         srv_edhoc_handle_message_1_status_code_to_string(
             message_1_result.status);

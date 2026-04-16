@@ -13,10 +13,10 @@
 #include <unity.h>
 
 #include "common/com_data_models.h"
-#include "edhoc/server/handshake/message_1/parser/tst_srv_mock_m1_parser_deps.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.h"
 
-void setUp(void) { srv_m1_parser_reset_stubs(); }
+void setUp(void) { tst_srv_edhoc_m1_reset_parse_mock(); }
 
 void test_parser_returns_stripped_message_1_buffer(void) {
   const uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04};
@@ -60,7 +60,7 @@ void test_parser_fails_when_prefix_extraction_fails(void) {
       .bytes = buffer,
       .length = buffer_size,
   };
-  tst_stub_extract_flow_set_failed();
+  tst_srv_edhoc_m1_set_extract_failed();
 
   const struct srv_edhoc_parse_message_1_result parse_message_1_result =
       srv_edhoc_parse_message_1(request_buffer);

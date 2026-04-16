@@ -19,8 +19,9 @@
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/edhoc_config.h"
-#include "edhoc/server/handshake/message_1/process/tst_srv_mock_m1_process_deps.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
+#include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_context_init.h"
+#include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_message_1_process.h"
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
@@ -55,8 +56,13 @@ static struct {
                                        .bytes = REQUEST_BUFFER},
                            .credentials = &DUMMY_TEST_CREDS}};
 
+static void reset_mock_results(void) {
+  tst_srv_edhoc_m1_reset_process_mock();
+  tst_srv_edhoc_m1_reset_context_init_mock();
+}
+
 void setUp(void) {
-  tst_srv_edhoc_m1_process_reset_mock_results();
+  reset_mock_results();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.error.bytes = env.response_buffer;
   env.error.length = 0;
@@ -67,6 +73,8 @@ static void ensure_context_is_null(struct edhoc_context* context) {
 }
 
 void test_m1_process_ok_for_valid_data(void) {
+  tst_srv_edhoc_m1_set_process_ok();
+
   struct srv_edhoc_message_1_process_result result =
       srv_edhoc_process_message_1(env.valid_request, &env.error);
 
@@ -103,7 +111,7 @@ void test_m1_process_fails_on_invalid_data(void) {
   };
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
-    tst_srv_edhoc_m1_process_reset_mock_results();
+    reset_mock_results();
     const struct srv_edhoc_message_1_process_result result =
         srv_edhoc_process_message_1(test_cases[i].request,
                                     test_cases[i].response);
@@ -133,14 +141,14 @@ void test_m1_process_fails_on_library_errors(void) {
     void (*setup_scenario)(void);
     enum srv_edhoc_message_1_process_status expected_status;
   } cases[] = {
-      {"setup fails", tst_srv_edhoc_m1_process_set_setup_failure,
+      {"setup fails", tst_srv_edhoc_m1_set_context_init_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP},
-      {"processing fails", tst_srv_edhoc_m1_process_set_process_failure,
+      {"processing fails", tst_srv_edhoc_m1_set_process_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS},
   };
 
   for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
-    tst_srv_edhoc_m1_process_reset_mock_results();
+    reset_mock_results();
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_process_result result =

@@ -107,7 +107,7 @@ void srv_coap_dispatch_post_with_dependencies(
     const struct srv_edhoc_message_1_request request_data = {
         .payload = parse_message_1_result.parsed_message_1,
         .credentials = credentials};
-    const struct srv_edhoc_message_1_handler_result message_1_result =
+    const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->handle_message_1(request_data, &response_data);
     response_code = deps->process_message_1_result(message_1_result, session);
   } else {

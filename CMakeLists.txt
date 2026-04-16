@@ -36,12 +36,27 @@ set(BASE_SOURCES
     ${LIBEDHOC_SOURCES}
 )
 
-set(MESSAGE_1_HANDLER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_handler.c
+set(MESSAGE_1_PROCESS_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+    ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup.c
+)
+
+set(MESSAGE_2_COMPOSE_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_2/srv_m2_compose.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_2/internal/srv_m2_compose_result_builders.c
+)
+
+set(MESSAGE_1_RESPONDER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_handler_result_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+    ${MESSAGE_1_PROCESS_SOURCES}
+    ${MESSAGE_2_COMPOSE_SOURCES}
 )
 
 set(MESSAGE_3_HANDLER_SOURCES
@@ -55,7 +70,7 @@ set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_parse_edhoc_request.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_parse_edhoc_request_builders.c
-    ${MESSAGE_1_HANDLER_SOURCES}
+    ${MESSAGE_1_RESPONDER_SOURCES}
     ${MESSAGE_3_HANDLER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m1_mapper.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m3_mapper.c

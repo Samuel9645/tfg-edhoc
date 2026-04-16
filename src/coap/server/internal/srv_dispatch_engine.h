@@ -7,8 +7,8 @@
 #include "coap/common/com_coap_status.h"
 #include "coap/server/srv_parse_edhoc_request.h"
 #include "common/com_data_models.h"
-#include "edhoc/server/handshake/message_1/srv_m1_handler.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 
@@ -49,13 +49,13 @@ struct srv_coap_dispatch_deps {
       const struct edhoc_context* edhoc_ctx);
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  struct srv_edhoc_message_1_handler_result (*handle_message_1)(
+  struct srv_edhoc_message_1_responder_result (*handle_message_1)(
       struct srv_edhoc_message_1_request request_data,
       struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
   coap_pdu_code_t (*process_message_1_result)(
-      struct srv_edhoc_message_1_handler_result message_1_result,
+      struct srv_edhoc_message_1_responder_result message_1_result,
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */

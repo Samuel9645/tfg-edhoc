@@ -13,10 +13,9 @@
 static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
   return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
-         deps->parse_message_1 != NULL &&
+         deps->respond_to_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
-         deps->parse_message_3 != NULL && deps->handle_message_1 != NULL &&
-         deps->handle_message_3 != NULL &&
+         deps->respond_to_message_3 != NULL &&
          deps->process_message_3_result != NULL &&
          deps->add_response_payload != NULL &&
          deps->get_session_app_data != NULL;
@@ -29,27 +28,58 @@ static bool srv_dispatch_has_invalid_deps_or_args(
          !dispatch_deps_are_valid(deps);
 }
 
-static coap_pdu_code_t map_parse_message_1_status_to_pdu_code(
-    const enum srv_edhoc_parse_message_1_status status) {
-  switch (status) {
-  case SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION:
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
-  case SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER:
-  default:
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+static bool add_payload_if_present(
+    coap_pdu_t* response, const struct com_readonly_buffer payload,
+    const srv_coap_add_response_payload_fn add_payload_fn) {
+  if (payload.length > 0 && add_payload_fn(response, payload.bytes,
+                                           payload.length) != STATUS_COAP_OK) {
+    coap_log_err("failed to add response payload\n");
+    return false;
   }
+  return true;
 }
 
-coap_pdu_code_t map_parse_message_3_status_to_pdu_code(
-    const enum srv_edhoc_parse_message_3_status status) {
-  switch (status) {
-  case SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
-  case SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
-    return COAP_RESPONSE_CODE_BAD_REQUEST;
-  case SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER:
-  default:
+static coap_pdu_code_t route_and_process_edhoc_message(
+    coap_session_t* session,
+    const struct srv_coap_parse_edhoc_request_result* parse_result,
+    const struct edhoc_credentials* credentials, coap_pdu_t* response,
+    const struct srv_coap_dispatch_deps* deps) {
+  uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
+  struct com_writable_buffer response_data = {
+      .bytes = response_payload,
+      .capacity = CONFIG_COAP_MAX_PDU_SIZE,
+      .length = 0,
+  };
+  struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
+
+  if (edhoc_ctx == NULL) {
+    const struct srv_edhoc_message_1_responder_request request_data = {
+        .raw_coap_payload = parse_result->parsed_request,
+        .credentials = credentials};
+
+    const struct srv_edhoc_message_1_responder_result message_1_result =
+        deps->respond_to_message_1(request_data, &response_data);
+
+    if (!add_payload_if_present(response, message_1_result.response,
+                                deps->add_response_payload)) {
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    }
+
+    return deps->process_message_1_result(message_1_result, session);
+  }
+
+  const struct srv_edhoc_message_3_responder_request handler_request = {
+      .edhoc_context = edhoc_ctx,
+      .raw_coap_payload = parse_result->parsed_request};
+
+  const struct srv_edhoc_message_3_responder_result message_3_result =
+      deps->respond_to_message_3(handler_request, &response_data);
+
+  if (!add_payload_if_present(response, message_3_result.response,
+                              deps->add_response_payload)) {
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
+  return deps->process_message_3_result(message_3_result);
 }
 
 void srv_coap_dispatch_post_with_dependencies(
@@ -85,56 +115,7 @@ void srv_coap_dispatch_post_with_dependencies(
     coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     return;
   }
-  uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  struct com_writable_buffer response_data = {
-      .bytes = response_payload,
-      .capacity = CONFIG_COAP_MAX_PDU_SIZE,
-      .length = 0,
-  };
-  coap_pdu_code_t response_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
-  if (edhoc_ctx == NULL) {
-    const struct srv_edhoc_parse_message_1_result parse_message_1_result =
-        deps->parse_message_1(parse_edhoc_result.parsed_request);
-    if (parse_message_1_result.status != SRV_EDHOC_MSG1_PARSE_OK) {
-      coap_log_err("failed to parse Message 1: %s\n",
-                   srv_edhoc_parse_message_1_status_to_string(
-                       parse_message_1_result.status));
-      coap_pdu_set_code(response, map_parse_message_1_status_to_pdu_code(
-                                      parse_message_1_result.status));
-      return;
-    }
-    const struct srv_edhoc_message_1_request request_data = {
-        .payload = parse_message_1_result.parsed_message_1,
-        .credentials = credentials};
-    const struct srv_edhoc_message_1_responder_result message_1_result =
-        deps->handle_message_1(request_data, &response_data);
-    response_code = deps->process_message_1_result(message_1_result, session);
-  } else {
-    const struct srv_edhoc_parse_message_3_result parse_message_3_result =
-        deps->parse_message_3(parse_edhoc_result.parsed_request, edhoc_ctx);
-    if (parse_message_3_result.status != SRV_EDHOC_MSG3_PARSE_OK) {
-      coap_log_err("failed to parse Message 3: %s\n",
-                   srv_edhoc_parse_message_3_status_to_string(
-                       parse_message_3_result.status));
-      coap_pdu_set_code(response, map_parse_message_3_status_to_pdu_code(
-                                      parse_message_3_result.status));
-      return;
-    }
-    const struct srv_edhoc_message_3_request handler_request = {
-        .edhoc_context = edhoc_ctx,
-        .parsed_message_3 = parse_message_3_result.parsed_message_3};
-    const struct srv_edhoc_message_3_responder_result message_3_result =
-        deps->handle_message_3(handler_request, &response_data);
-    response_code = deps->process_message_3_result(message_3_result);
-  }
-  if (response_data.length > 0 &&
-      deps->add_response_payload(response, response_payload,
-                                 response_data.length) != STATUS_COAP_OK) {
-    coap_log_err("failed to add response payload\n");
-    coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
-    return;
-  }
-
-  coap_pdu_set_code(response, response_code);
+  coap_pdu_set_code(
+      response, route_and_process_edhoc_message(session, &parse_edhoc_result,
+                                                credentials, response, deps));
 }

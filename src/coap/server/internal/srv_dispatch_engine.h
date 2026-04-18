@@ -12,6 +12,39 @@
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
+typedef struct srv_coap_parse_edhoc_request_result (
+    *srv_coap_parse_edhoc_request_fn)(
+    const coap_pdu_t* request,
+    enum config_coap_content_format_edhoc_values expected_format,
+    struct com_writable_buffer* data_buffer);
+
+typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
+    coap_pdu_t* response,
+    enum config_coap_content_format_edhoc_values content_format);
+
+typedef struct srv_edhoc_message_1_responder_result (
+    *srv_edhoc_m1_responder_fn)(
+    struct srv_edhoc_message_1_responder_request request_data,
+    struct com_writable_buffer* response_data);
+
+typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(
+    struct srv_edhoc_message_1_responder_result message_1_result,
+    coap_session_t* session);
+
+typedef struct srv_edhoc_message_3_responder_result (
+    *srv_edhoc_m3_responder_fn)(
+    struct srv_edhoc_message_3_responder_request request_data,
+    struct com_writable_buffer* response_data);
+
+typedef coap_pdu_code_t (*srv_edhoc_m3_process_result_fn)(
+    struct srv_edhoc_message_3_responder_result message_3_result);
+
+typedef enum status_coap (*srv_coap_add_response_payload_fn)(
+    coap_pdu_t* response, const uint8_t* payload, size_t payload_len);
+
+typedef void* (*srv_coap_get_session_app_data_fn)(
+    const coap_session_t* session);
+
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.
  *
@@ -26,54 +59,30 @@
  */
 struct srv_coap_dispatch_deps {
   /** Validates incoming CoAP PDU and extracts EDHOC message payload. */
-  struct srv_coap_parse_edhoc_request_result (*parse_edhoc_request)(
-      const coap_pdu_t* request,
-      enum config_coap_content_format_edhoc_values expected_format,
-      struct com_writable_buffer* data_buffer);
+  srv_coap_parse_edhoc_request_fn parse_edhoc_request;
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
-  enum status_coap (*add_edhoc_response_options)(
-      coap_pdu_t* response,
-      enum config_coap_content_format_edhoc_values content_format);
-
-  /** Parses EDHOC Message 1 and returns the stripped payload view. */
-  struct srv_edhoc_parse_message_1_result (*parse_message_1)(
-      struct com_readonly_buffer readonly_buffer);
-
-  /**
-   * Parses EDHOC Message 3 payload (with prepended connection ID) and extracts
-   * Message 3 fields for handler processing.
-   */
-  struct srv_edhoc_parse_message_3_result (*parse_message_3)(
-      struct com_readonly_buffer request_buffer,
-      const struct edhoc_context* edhoc_ctx);
+  srv_coap_add_edhoc_response_options_fn add_edhoc_response_options;
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
-  struct srv_edhoc_message_1_responder_result (*handle_message_1)(
-      struct srv_edhoc_message_1_request request_data,
-      struct com_writable_buffer* response_data);
+  srv_edhoc_m1_responder_fn respond_to_message_1;
+
   /** Processes the result of EDHOC Message 1 handling, linking the EDHOC
    * logic with the CoAP transport layer and returning the response code. */
-  coap_pdu_code_t (*process_message_1_result)(
-      struct srv_edhoc_message_1_responder_result message_1_result,
-      coap_session_t* session);
+  srv_edhoc_m1_process_result_fn process_message_1_result;
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  struct srv_edhoc_message_3_responder_result (*handle_message_3)(
-      struct srv_edhoc_message_3_request request_data,
-      struct com_writable_buffer* response_data);
+  srv_edhoc_m3_responder_fn respond_to_message_3;
+
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
-  coap_pdu_code_t (*process_message_3_result)(
-      struct srv_edhoc_message_3_responder_result message_3_result);
+  srv_edhoc_m3_process_result_fn process_message_3_result;
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
-  enum status_coap (*add_response_payload)(coap_pdu_t* response,
-                                           const uint8_t* payload,
-                                           size_t payload_len);
+  srv_coap_add_response_payload_fn add_response_payload;
 
   /** Retrieves application context data associated with a CoAP session. */
-  void* (*get_session_app_data)(const coap_session_t* session);
+  srv_coap_get_session_app_data_fn get_session_app_data;
 };
 
 /**

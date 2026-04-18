@@ -11,34 +11,38 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
+#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
-#include "edhoc/server/handshake/message_1/srv_m1_process_result.h"
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
 
-// TODO: change handlers to return the com_readonly_buffer
-
-/**
- * WHY ARE WE CASTING TO VOID THE RETURN?
- *
- * Protocol errors are more important than internal errors, so in case something
- * bad happens, we always want to report the greater failure.
- */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
-    const struct srv_edhoc_message_1_request request,
+    const struct srv_edhoc_message_1_responder_request request,
     struct com_writable_buffer* response) {
   if (!com_writable_buffer_is_writable(response)) {
     return srv_edhoc_message_1_responder_invalid_response_buffer_failure();
   }
 
+  const struct srv_edhoc_parse_message_1_result parse_result =
+      srv_edhoc_parse_message_1(request.raw_coap_payload, response);
+  if (parse_result.status != SRV_EDHOC_MSG1_PARSE_OK) {
+    return srv_edhoc_message_1_responder_failure(
+        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
+        parse_result.buffer);
+  }
+
+  const struct srv_edhoc_message_1_request process_request = {
+      .payload = parse_result.buffer,
+      .credentials = request.credentials,
+  };
   struct srv_edhoc_message_1_process_result process_result =
-      srv_edhoc_process_message_1(request, response);
+      srv_edhoc_process_message_1(process_request, response);
   if (process_result.status != SRV_EDHOC_MSG1_PROCESS_OK) {
     return srv_edhoc_message_1_responder_failure(
         SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED,
         process_result.error_buffer);
   }
+
   const struct srv_edhoc_message_2_compose_result compose_result =
       srv_edhoc_compose_message_2(process_result.context, response);
   if (compose_result.status != SRV_EDHOC_MSG2_COMPOSE_OK) {
@@ -58,6 +62,8 @@ const char* srv_edhoc_handle_message_1_status_code_to_string(
     return "ok";
   case SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER:
     return "invalid response buffer";
+  case SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED:
+    return "EDHOC message 1 parse failed";
   case SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED:
     return "EDHOC message 1 process failed";
   case SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED:

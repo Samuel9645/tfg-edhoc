@@ -8,25 +8,32 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 
+#include <edhoc.h>
+
 #include "common/com_data_models.h"
-#include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
+
+struct srv_edhoc_message_1_responder_request {
+  struct com_readonly_buffer raw_coap_payload;
+  const struct edhoc_credentials* credentials;
+};
 
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
- * @param[in] request Session/request metadata for Message 1
- * processing, including credentials.
+ * @param[in] request Session/request metadata for Message 1 responder,
+ * including raw CoAP payload and credentials.
  * @param[out] response Response buffer metadata for Message 2.
- * @return Struct containing status code and allocated EDHOC context on success,
- * or error code and NULL context on failure.
+ * @return Struct containing status code, allocated EDHOC context and Message 2
+ * in the buffer on success, or error code, NULL context and error buffer on
+ * failure.
  * @warning This function dynamically allocates the EDHOC context using
  * calloc(). On success, the caller assumes ownership of this memory and is
  * responsible for freeing it. On failure, the function safely cleans up after
  * itself and returns a NULL pointer.
  */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
-    struct srv_edhoc_message_1_request request,
+    struct srv_edhoc_message_1_responder_request request,
     struct com_writable_buffer* response);
 
 const char* srv_edhoc_handle_message_1_status_code_to_string(

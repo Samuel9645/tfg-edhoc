@@ -23,7 +23,7 @@ enum srv_edhoc_parse_message_3_status {
 
 struct srv_edhoc_parse_message_3_result {
   const enum srv_edhoc_parse_message_3_status status;
-  const struct com_readonly_buffer parsed_message_3;
+  const struct com_readonly_buffer buffer;
 };
 
 /**
@@ -32,13 +32,17 @@ struct srv_edhoc_parse_message_3_result {
  * payload, including the prepended connection ID.
  * @param[in] edhoc_ctx Pointer to the edhoc context to use the helpers to
  * extract the connection ID and verify it against the expected value.
+ * @param[out] error_response Writable buffer where CBOR error payload is
+ * written on parsing failure.
  * @return Result struct containing the parsing status and a view over the
  * parsed Message 3 payload (excluding the connection ID) on success, or an
- * empty view with error code on failure.
+ * empty view with error code on failure. On failure, error_response is filled
+ * with CBOR encoded error payload.
  */
 struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx);
+    const struct edhoc_context* edhoc_ctx,
+    struct com_writable_buffer* error_response);
 
 const char* srv_edhoc_parse_message_3_status_to_string(
     enum srv_edhoc_parse_message_3_status status);

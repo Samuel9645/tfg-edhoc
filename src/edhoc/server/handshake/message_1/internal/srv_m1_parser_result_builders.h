@@ -11,8 +11,12 @@
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 
 struct srv_edhoc_parse_message_1_result
+srv_coap_internal_parse_message_1_invalid_response_buffer_failure(void);
+
+struct srv_edhoc_parse_message_1_result
 srv_coap_internal_parse_message_1_failure(
-    enum srv_edhoc_parse_message_1_status status);
+    enum srv_edhoc_parse_message_1_status status,
+    struct com_readonly_buffer error_buffer);
 
 struct srv_edhoc_parse_message_1_result srv_coap_internal_parse_message_1_ok(
     struct com_readonly_buffer parsed_message_1);

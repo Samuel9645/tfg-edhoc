@@ -19,19 +19,22 @@ enum srv_edhoc_parse_message_1_status {
 
 struct srv_edhoc_parse_message_1_result {
   const enum srv_edhoc_parse_message_1_status status;
-  const struct com_readonly_buffer parsed_message_1;
+  const struct com_readonly_buffer buffer;
 };
 
 /**
  * @brief Parse EDHOC Message 1 payload into a clean payload view for the
  * handler.
  * @param[in] request_buffer Input buffer containing the request.
- * @return Result struct containing the status code and the parsed message 1
- * without the CBOR prefix on success, empty parse result with the corresponding
- * error status on failure.
+ * @param[out] error_response Writable buffer where CBOR error payload is
+ * written on parsing failure.
+ * @return Result struct containing the status code and output field. On
+ * success, output contains the parsed message 1 without the CBOR prefix. On
+ * failure, output contains the CBOR encoded error payload.
  */
 struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
-    struct com_readonly_buffer request_buffer);
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer* error_response);
 
 /**
  * @brief Convert a parsing status code into a human-readable string.

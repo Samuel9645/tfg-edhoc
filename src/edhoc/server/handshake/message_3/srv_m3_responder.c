@@ -12,19 +12,31 @@
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
+#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_process.h"
-#include "edhoc/server/handshake/message_3/srv_m3_process_result.h"
 #include "edhoc/server/handshake/message_4/srv_m4_compose.h"
 
 struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
-    const struct srv_edhoc_message_3_request request,
+    const struct srv_edhoc_message_3_responder_request request,
     struct com_writable_buffer* response) {
   if (!com_writable_buffer_is_writable(response)) {
     return srv_edhoc_message_3_responder_invalid_response_buffer_failure();
   }
 
+  const struct srv_edhoc_parse_message_3_result parse_result =
+      srv_edhoc_parse_message_3(request.raw_coap_payload, request.edhoc_context,
+                                response);
+  if (parse_result.status != SRV_EDHOC_MSG3_PARSE_OK) {
+    return srv_edhoc_message_3_responder_failure(
+        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE, parse_result.buffer);
+  }
+
+  const struct srv_edhoc_message_3_request process_request = {
+      .parsed_message_3 = parse_result.buffer,
+      .edhoc_context = request.edhoc_context,
+  };
   const struct srv_edhoc_message_3_process_result process_result =
-      srv_edhoc_process_message_3(request, response);
+      srv_edhoc_process_message_3(process_request, response);
   if (process_result.status != SRV_EDHOC_MSG3_PROCESS_OK) {
     return srv_edhoc_message_3_responder_failure(
         SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS,
@@ -47,6 +59,8 @@ const char* srv_edhoc_handle_message_3_status_code_to_string(
     return "ok";
   case SRV_EDHOC_MSG3_RESPONDER_ERR_INVALID_RESPONSE_BUFFER:
     return "invalid response buffer";
+  case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE:
+    return "message 3 parse failed";
   case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS:
     return "message 3 process failed";
   case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE:

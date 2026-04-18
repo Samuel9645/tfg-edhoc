@@ -10,18 +10,31 @@
 
 #include <edhoc_helpers.h>
 
+#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
+
+static struct com_readonly_buffer add_internal_error_to_buffer(
+    const char* error_message, struct com_writable_buffer* buffer) {
+  return com_edhoc_add_internal_error(error_message, buffer).buffer;
+}
 
 struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     const struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx) {
+    const struct edhoc_context* edhoc_ctx,
+    struct com_writable_buffer* error_response) {
+  if (!com_writable_buffer_is_writable(error_response)) {
+    return srv_coap_internal_parse_message_3_invalid_response_buffer_failure();
+  }
+
   if (!com_readonly_buffer_has_content(request_buffer)) {
     return srv_coap_internal_parse_message_3_failure(
-        SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER);
+        SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+        add_internal_error_to_buffer("invalid request buffer", error_response));
   }
   if (edhoc_ctx == NULL) {
     return srv_coap_internal_parse_message_3_failure(
-        SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT);
+        SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT,
+        add_internal_error_to_buffer("null EDHOC context", error_response));
   }
 
   struct edhoc_extracted_fields extracted_fields =
@@ -33,12 +46,16 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
       };
   if (edhoc_extract_connection_id(&extracted_fields) != EDHOC_SUCCESS) {
     return srv_coap_internal_parse_message_3_failure(
-        SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED);
+        SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
+        add_internal_error_to_buffer("connection ID extraction failed",
+                                     error_response));
   }
   if (!edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
                                  &edhoc_ctx->private_cid)) {
     return srv_coap_internal_parse_message_3_failure(
-        SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID);
+        SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
+        add_internal_error_to_buffer("unexpected connection ID",
+                                     error_response));
   }
   return srv_coap_internal_parse_message_3_ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,

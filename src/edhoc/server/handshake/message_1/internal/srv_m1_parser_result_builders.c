@@ -9,16 +9,24 @@
 
 struct srv_edhoc_parse_message_1_result
 srv_coap_internal_parse_message_1_failure(
-    const enum srv_edhoc_parse_message_1_status status) {
+    const enum srv_edhoc_parse_message_1_status status,
+    const struct com_readonly_buffer error_buffer) {
   return (struct srv_edhoc_parse_message_1_result){
       .status = status,
-      .parsed_message_1 = {.bytes = NULL, .length = 0},
+      .buffer = error_buffer,
   };
 }
 
-inline struct srv_edhoc_parse_message_1_result
-srv_coap_internal_parse_message_1_ok(
+struct srv_edhoc_parse_message_1_result srv_coap_internal_parse_message_1_ok(
     const struct com_readonly_buffer parsed_message_1) {
   return (struct srv_edhoc_parse_message_1_result){
-      .status = SRV_EDHOC_MSG1_PARSE_OK, .parsed_message_1 = parsed_message_1};
+      .status = SRV_EDHOC_MSG1_PARSE_OK,
+      .buffer = parsed_message_1,
+  };
+}
+
+struct srv_edhoc_parse_message_1_result
+srv_coap_internal_parse_message_1_invalid_response_buffer_failure(void) {
+  return (struct srv_edhoc_parse_message_1_result){
+      .status = SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER};
 }

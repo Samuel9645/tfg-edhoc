@@ -3,6 +3,8 @@
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 18/04/2026
  * @brief Logic for handling EDHOC Message 3 on the server side.
+ * @see [RFC 9528
+ * 5](https://datatracker.ietf.org/doc/html/rfc9528/#name-message-formatting-and-proc)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
@@ -29,4 +31,3 @@ const char* srv_edhoc_handle_message_3_status_code_to_string(
     enum srv_edhoc_message_3_responder_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESPONDER_H_
-

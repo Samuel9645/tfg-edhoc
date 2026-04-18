@@ -4,6 +4,8 @@
  * @since 18/04/2026
  * @brief Logic for responding to a Message 3 (Message 3 processing and Message
  * 4 composing)
+ * @see [RFC 9528
+ * 5](https://datatracker.ietf.org/doc/html/rfc9528/#name-message-formatting-and-proc)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

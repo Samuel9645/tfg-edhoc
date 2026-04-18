@@ -3,6 +3,8 @@
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 18/04/2026
  * @brief Message 3 processing on the responder side.
+ * @see [RFC
+ * 9528 5.4.3](https://datatracker.ietf.org/doc/html/rfc9528/#name-responder-processing-of-mess)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

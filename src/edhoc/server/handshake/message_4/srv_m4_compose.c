@@ -2,7 +2,9 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 18/04/2026
- * @brief Message 4 composition on the responder side.
+ * @brief Message 4 compose on the responder side.
+ * @see [RFC
+ * 9528 5.5.2](https://datatracker.ietf.org/doc/html/rfc9528/#name-responder-composition-of-mes)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

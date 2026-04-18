@@ -17,6 +17,7 @@
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.h"
+#include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
 
@@ -143,31 +144,32 @@ coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
-enum srv_edhoc_message_3_handler_status stb_srv_edhoc_handle_m3_ok(
+struct srv_edhoc_message_3_responder_result stb_srv_edhoc_handle_m3_ok(
     const struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
-  (void)response_data;
-  return EDH_MSG3_HDL_OK;
+  response_data->length = sizeof(DUMMY_PAYLOAD);
+  return srv_edhoc_message_3_responder_ok();
 }
 
-enum srv_edhoc_message_3_handler_status
+struct srv_edhoc_message_3_responder_result
 stb_srv_edhoc_handle_m3_protocol_failure(
     const struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   (void)response_data;
-  return EDH_MSG3_HDL_ERR_MESSAGE_4_COMPOSE_FAILED;
+  return srv_edhoc_message_3_responder_failure(
+      SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE);
 }
 
 coap_pdu_code_t stb_srv_coap_process_m3_ok(
-    const enum srv_edhoc_message_3_handler_status message_3_result) {
+    const struct srv_edhoc_message_3_responder_result message_3_result) {
   (void)message_3_result;
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
 coap_pdu_code_t stb_srv_coap_process_m3_failure(
-    const enum srv_edhoc_message_3_handler_status message_3_result) {
+    const struct srv_edhoc_message_3_responder_result message_3_result) {
   (void)message_3_result;
   return COAP_RESPONSE_CODE_INTERNAL_ERROR;
 }

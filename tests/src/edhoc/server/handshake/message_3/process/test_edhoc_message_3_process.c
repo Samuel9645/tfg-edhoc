@@ -1,0 +1,120 @@
+/**
+ * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 18/04/2026
+ * @brief Tests for Message 3 processing.
+ * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ * @see [Helper Unity
+ * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
+ */
+
+// ReSharper disable CppParameterMayBeConstPtrOrRef
+#include <edhoc.h>
+#include <string.h>
+#include <unity.h>
+
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
+#include "edhoc/server/handshake/message_3/srv_m3_process.h"
+#include "edhoc/server/handshake/mocks/message_3/tst_srv_mock_edhoc_message_3_process.h"
+
+enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
+
+static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
+
+static struct {
+  uint8_t error_buffer_data[TST_SRV_EDHOC_HND_BUF_LEN];
+  struct edhoc_context context;
+  struct srv_edhoc_message_3_request valid_request;
+  struct com_writable_buffer error;
+} env = {
+    .error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
+    .valid_request = {.parsed_message_3 = {.bytes = REQUEST_BUFFER,
+                                           .length = sizeof(REQUEST_BUFFER)}}};
+
+void setUp(void) {
+  tst_srv_edhoc_m3_reset_process_mock();
+  memset(env.error_buffer_data, 0, sizeof(env.error_buffer_data));
+  env.error.bytes = env.error_buffer_data;
+  env.error.length = 0;
+  env.valid_request.edhoc_context = &env.context;
+  env.context = (struct edhoc_context){0};
+}
+
+void test_process_ok_for_valid_data(void) {
+  tst_srv_edhoc_m3_set_process_ok();
+
+  const struct srv_edhoc_message_3_process_result result =
+      srv_edhoc_process_message_3(env.valid_request, &env.error);
+
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_OK, result.status);
+  TEST_ASSERT_EQUAL_UINT32_MESSAGE(0, result.error_buffer.length,
+                                   "process should not write an error payload");
+}
+
+static int error_buffer_is_valid(struct com_writable_buffer* error_buffer) {
+  return error_buffer != NULL && error_buffer->bytes != NULL &&
+         error_buffer->capacity > 0;
+}
+
+void test_process_fails_on_invalid_data(void) {
+  const struct srv_edhoc_message_3_request no_context = {
+      .parsed_message_3 = env.valid_request.parsed_message_3};
+  const struct srv_edhoc_message_3_request no_buffer = {.edhoc_context =
+                                                            &env.context};
+  const struct srv_edhoc_message_3_request empty_request = {
+      .edhoc_context = &env.context,
+      .parsed_message_3 = {.bytes = REQUEST_BUFFER, .length = 0}};
+  struct com_writable_buffer empty_error = {0};
+
+  const struct {
+    const char* description;
+    struct srv_edhoc_message_3_request request;
+    struct com_writable_buffer* error_buffer;
+    enum srv_edhoc_message_3_process_status expected_status;
+  } test_cases[] = {
+      {"error buffer is NULL", env.valid_request, NULL,
+       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_ERROR_BUFFER},
+      {"error buffer is empty/invalid", env.valid_request, &empty_error,
+       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_ERROR_BUFFER},
+      {"context is NULL", no_context, &env.error,
+       SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT},
+      {"request buffer is NULL", no_buffer, &env.error,
+       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_PARSED_MESSAGE_3},
+      {"request payload is empty (len 0)", empty_request, &env.error,
+       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_PARSED_MESSAGE_3},
+  };
+
+  for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
+    tst_srv_edhoc_m3_reset_process_mock();
+    struct com_writable_buffer* error_buffer = test_cases[i].error_buffer;
+
+    const struct srv_edhoc_message_3_process_result result =
+        srv_edhoc_process_message_3(test_cases[i].request, error_buffer);
+
+    TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
+                              test_cases[i].description);
+    if (error_buffer_is_valid(error_buffer)) {
+      tst_edhoc_assert_encoded_error_is_not_empty(*error_buffer);
+    }
+  }
+}
+
+/**
+ * WHY DON'T WE CHECK THE REPORTED ERROR?
+ *
+ * RFC only defines specific errors for other scenarios, so most of the RFC
+ * level codes are UNSPECIFIED_ERROR.
+ * @see [RFC 9528, Section
+ * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
+ */
+void test_process_fails_on_library_errors(void) {
+  tst_srv_edhoc_m3_set_process_failure();
+
+  const struct srv_edhoc_message_3_process_result result =
+      srv_edhoc_process_message_3(env.valid_request, &env.error);
+
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
+                    result.status);
+  tst_edhoc_assert_encoded_error_is_not_empty(env.error);
+}

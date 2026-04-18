@@ -9,8 +9,8 @@
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
-#include "edhoc/server/handshake/message_3/srv_m3_handler.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
+#include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 /**
  * @brief Dependency injection structure for EDHOC dispatcher seam testing.
@@ -59,13 +59,13 @@ struct srv_coap_dispatch_deps {
       coap_session_t* session);
 
   /** Processes EDHOC Message 3 and generates Message 4 response. */
-  enum srv_edhoc_message_3_handler_status (*handle_message_3)(
+  struct srv_edhoc_message_3_responder_result (*handle_message_3)(
       struct srv_edhoc_message_3_request request_data,
       struct com_writable_buffer* response_data);
   /** Processes the result of EDHOC Message 3 handling and returns the CoAP
    * response code. */
   coap_pdu_code_t (*process_message_3_result)(
-      enum srv_edhoc_message_3_handler_status message_3_result);
+      struct srv_edhoc_message_3_responder_result message_3_result);
 
   /** Adds response payload bytes to outgoing CoAP PDU. */
   enum status_coap (*add_response_payload)(coap_pdu_t* response,

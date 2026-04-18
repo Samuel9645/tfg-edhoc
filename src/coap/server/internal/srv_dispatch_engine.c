@@ -124,7 +124,7 @@ void srv_coap_dispatch_post_with_dependencies(
     const struct srv_edhoc_message_3_request handler_request = {
         .edhoc_context = edhoc_ctx,
         .parsed_message_3 = parse_message_3_result.parsed_message_3};
-    const enum srv_edhoc_message_3_handler_status message_3_result =
+    const struct srv_edhoc_message_3_responder_result message_3_result =
         deps->handle_message_3(handler_request, &response_data);
     response_code = deps->process_message_3_result(message_3_result);
   }

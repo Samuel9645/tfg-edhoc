@@ -238,16 +238,49 @@ add_unity_test(test_edhoc_message_1_responder
 #    ${COMMON_SRV_SOURCES}
 #)
 
-add_unity_test(test_edhoc_message_3_handler
-    /src/edhoc/server/handshake/message_3/handler/test_edhoc_message_3_handler.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/handler/tst_srv_mock_m3_handler_deps.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_handler.c
+set(EDHOC_MESSAGE_3_PROCESS_MOCK
+    src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_edhoc_message_3_process.c
+    "-Wl,--wrap=edhoc_message_3_process"
+)
+
+set(EDHOC_MESSAGE_4_COMPOSE_MOCK
+    src/edhoc/server/handshake/mocks/message_4/tst_srv_mock_edhoc_message_4_compose.c
+    "-Wl,--wrap=edhoc_message_4_compose"
+)
+
+set(MESSAGE_3_PROCESS_MOCKS
+    ${EDHOC_MESSAGE_3_PROCESS_MOCK}
+)
+
+set(MESSAGE_4_COMPOSE_MOCKS
+    ${EDHOC_MESSAGE_4_COMPOSE_MOCK}
+)
+
+add_unity_test(test_edhoc_message_3_process
+    /src/edhoc/server/handshake/message_3/process/test_edhoc_message_3_process.c
+    ${MESSAGE_3_PROCESS_SOURCES}
+    ${MESSAGE_3_PROCESS_MOCKS}
+    ${COMMON_SOURCES}
+)
+
+add_unity_test(test_edhoc_message_4_compose
+    /src/edhoc/server/handshake/message_4/test_edhoc_message_4_compose.c
+    ${MESSAGE_4_COMPOSE_SOURCES}
+    ${MESSAGE_4_COMPOSE_MOCKS}
+    ${COMMON_SOURCES}
+)
+
+add_unity_test(test_edhoc_message_3_responder
+    /src/edhoc/server/handshake/message_3/responder/test_edhoc_message_3_responder.c
+    ${MESSAGE_3_RESPONDER_SOURCES}
+    ${MESSAGE_3_PROCESS_MOCKS}
+    ${MESSAGE_4_COMPOSE_MOCKS}
     ${COMMON_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_3_parser
     /src/edhoc/server/handshake/message_3/parser/test_edhoc_message_3_parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/parser/tst_srv_mock_m3_parser_deps.c
+    src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_parser_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${COMMON_SRV_SOURCES}

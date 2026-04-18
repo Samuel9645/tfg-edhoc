@@ -12,7 +12,7 @@
 
 #include <coap3/coap.h>
 
-#include "edhoc/server/handshake/message_3/srv_m3_result.h"
+#include "edhoc/server/handshake/message_3/srv_m3_responder_result.h"
 
 /**
  * @brief Process Message 3 EDHOC result and map it to the corresponding CoAP
@@ -27,6 +27,6 @@
  * @return Mapped CoAP response code for the operation.
  */
 coap_pdu_code_t srv_coap_map_message_3_result_to_coap(
-    enum srv_edhoc_message_3_handler_status message_3_result);
+    struct srv_edhoc_message_3_responder_result message_3_result);
 
 #endif  // COAP_SERVER_EDHOC_MAPPER_SRV_M3_MAPPER_H_

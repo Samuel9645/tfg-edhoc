@@ -10,6 +10,8 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_
 
+#include "common/com_data_models.h"
+
 enum srv_edhoc_message_1_responder_status {
   SRV_EDHOC_MSG1_RESPONDER_OK = 0,
   SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER,
@@ -18,7 +20,8 @@ enum srv_edhoc_message_1_responder_status {
 };
 
 struct srv_edhoc_message_1_responder_result {
-  enum srv_edhoc_message_1_responder_status status;
+  const enum srv_edhoc_message_1_responder_status status;
+  const struct com_readonly_buffer response;
   /**
    * Pointer to the allocated EDHOC context on success, NULL on failure.
    * @warning The caller is responsible for freeing the allocated context (only

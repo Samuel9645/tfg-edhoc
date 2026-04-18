@@ -21,7 +21,7 @@ enum cli_edhoc_message_1_compose_status {
 };
 
 struct cli_edhoc_message_1_compose_result {
-  enum cli_edhoc_message_1_compose_status status;
+  const enum cli_edhoc_message_1_compose_status status;
   struct com_writable_buffer output;
 };
 

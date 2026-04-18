@@ -55,11 +55,7 @@ void test_responder_ok_for_valid_data(void) {
       srv_edhoc_respond_to_message_3(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_RESPONDER_OK, result.status);
-  tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(env.response);
-}
-
-static int response_buffer_is_valid(struct com_writable_buffer* response) {
-  return response != NULL && response->bytes != NULL && response->capacity > 0;
+  tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(result.response);
 }
 
 void test_responder_fails_on_invalid_data(void) {
@@ -101,9 +97,7 @@ void test_responder_fails_on_invalid_data(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected, result.status,
                               test_cases[i].description);
-    if (response_buffer_is_valid(response)) {
-      tst_edhoc_assert_encoded_error_is_not_empty(*response);
-    }
+    tst_edhoc_assert_error_not_empty_if_present(result.response);
   }
 }
 
@@ -139,6 +133,6 @@ void test_responder_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(env.response);
+    tst_edhoc_assert_encoded_error_is_not_empty(result.response);
   }
 }

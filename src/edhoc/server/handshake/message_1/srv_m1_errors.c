@@ -13,7 +13,8 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
-void srv_edhoc_message_1_handler_add_protocol_error(
+struct com_edhoc_add_error_result
+srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   enum edhoc_error_code error;
@@ -31,15 +32,19 @@ void srv_edhoc_message_1_handler_add_protocol_error(
             context, own_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE, &own_len,
             peer_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE,
             &peer_len) != EDHOC_SUCCESS) {
-      return;
+      return (struct com_edhoc_add_error_result){
+          .status = COM_EDHOC_ADD_ERROR_ERR_COMPOSE,
+          .buffer = (struct com_readonly_buffer){0}};
     }
     /*
      * Point where responder can compare his and peer cipher suites.
      * After comparison responder is able to send error message with his
      * preferences.
      */
-    return;
+    return (struct com_edhoc_add_error_result){
+        .status = COM_EDHOC_ADD_ERROR_ERR_COMPOSE,
+        .buffer = (struct com_readonly_buffer){0}};
   }
-  (void)com_edhoc_add_protocol_error_with_description(
+  return com_edhoc_add_protocol_error_with_description(
       context, error_description, response_data);
 }

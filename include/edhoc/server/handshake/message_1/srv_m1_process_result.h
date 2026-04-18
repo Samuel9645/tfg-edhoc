@@ -24,7 +24,7 @@ enum srv_edhoc_message_1_process_status {
 };
 
 struct srv_edhoc_message_1_process_result {
-  enum srv_edhoc_message_1_process_status status;
+  const enum srv_edhoc_message_1_process_status status;
   /**
    * Pointer to the allocated EDHOC context on success, NULL on failure.
    * @warning The caller is responsible for freeing the allocated context using
@@ -32,7 +32,7 @@ struct srv_edhoc_message_1_process_result {
    * no longer needed.
    */
   struct edhoc_context* context;
-  struct com_readonly_buffer error_buffer;
+  const struct com_readonly_buffer error_buffer;
 };
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PROCESS_RESULT_H_

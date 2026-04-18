@@ -18,7 +18,7 @@ enum cli_edhoc_message_2_process_status {
 };
 
 struct cli_edhoc_message_2_process_result {
-  enum cli_edhoc_message_2_process_status status;
+  const enum cli_edhoc_message_2_process_status status;
   struct com_writable_buffer output;
 };
 

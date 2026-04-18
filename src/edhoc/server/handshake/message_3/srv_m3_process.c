@@ -18,15 +18,14 @@
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
     const char* error_message, struct com_writable_buffer* buffer) {
-  (void)com_edhoc_add_internal_error(error_message, buffer);
-  return com_writable_as_readonly(buffer).buffer;
+  return com_edhoc_add_internal_error(error_message, buffer).buffer;
 }
 
-static struct com_readonly_buffer add_protocol_error_to_buffer(
-    const struct edhoc_context* context, const char* error_message,
-    struct com_writable_buffer* buffer) {
-  com_edhoc_add_protocol_error_with_description(context, error_message, buffer);
-  return com_writable_as_readonly(buffer).buffer;
+static struct com_readonly_buffer add_processing_error_to_buffer(
+    const struct edhoc_context* context, struct com_writable_buffer* buffer) {
+  return com_edhoc_add_protocol_error_with_description(
+             context, "Message 3 processing failed", buffer)
+      .buffer;
 }
 
 struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
@@ -51,9 +50,7 @@ struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
           request.parsed_message_3.length) != EDHOC_SUCCESS) {
     return srv_edhoc_message_3_process_failure(
         SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
-        add_protocol_error_to_buffer(request.edhoc_context,
-                                     "Message 3 processing failed",
-                                     error_buffer));
+        add_processing_error_to_buffer(request.edhoc_context, error_buffer));
   }
   return srv_edhoc_message_3_process_ok();
 }

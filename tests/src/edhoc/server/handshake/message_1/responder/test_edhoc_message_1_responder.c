@@ -77,7 +77,7 @@ void test_handler_ok_for_valid_data(void) {
       srv_edhoc_respond_to_message_1(env.valid_request, &env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_OK, result.status);
-  tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(env.response);
+  tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(result.response);
 
   TEST_ASSERT_NOT_NULL(result.edhoc_ctx);
   free(result.edhoc_ctx);
@@ -121,10 +121,7 @@ void test_handler_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
 
-    if (test_cases[i].response != NULL &&
-        test_cases[i].response->bytes != NULL) {
-      tst_edhoc_assert_encoded_error_is_not_empty(*test_cases[i].response);
-    }
+    tst_edhoc_assert_error_not_empty_if_present(result.response);
     ensure_context_is_freed_on_failure(result);
   }
 }
@@ -158,7 +155,7 @@ void test_handler_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(env.response);
+    tst_edhoc_assert_encoded_error_is_not_empty(result.response);
     ensure_context_is_freed_on_failure(result);
   }
 }

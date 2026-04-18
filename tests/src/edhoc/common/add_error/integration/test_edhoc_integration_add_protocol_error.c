@@ -49,35 +49,21 @@ void setUp(void) {
   try_to_get_error_code();
 }
 
-static void assert_status_ok(
-    const enum com_edhoc_add_error_status add_error_status) {
-  tst_edhoc_assert_add_error_status_ok(add_error_status,
-                                       env.error_buffer_view.length);
-}
-
-static void assert_status_ok_with_message(
-    const enum com_edhoc_add_error_status add_error_status,
-    const char* message) {
-  tst_edhoc_assert_add_error_status_ok_with_message(
-      add_error_status, env.error_buffer_view.length, message);
-}
-
-static void assert_encoded_error_matches(
-    const char* expected_error_description,
-    const enum edhoc_error_code error_code) {
-  tst_edhoc_assert_encoded_error_matches(
-      env.error_buffer_view, expected_error_description, error_code);
+void assert_result_matches(const char* expected_description,
+                           const struct com_edhoc_add_error_result result) {
+  tst_edhoc_assert_add_error_status_ok(result);
+  tst_edhoc_assert_encoded_error_matches(result.buffer, expected_description,
+                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_add_error_with_description_on_invalid_library_state(void) {
   const char* expected_description = "RANDOM DESCRIPTION";
 
-  const enum com_edhoc_add_error_status add_error_status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description(
           &env.context, expected_description, &env.error_buffer_view);
 
-  assert_status_ok(add_error_status);
-  assert_encoded_error_matches(expected_description, expected_error_code);
+  assert_result_matches(expected_description, result);
 }
 
 static void reset_test_case_state(struct edhoc_context* context) {
@@ -99,13 +85,14 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
-    const enum com_edhoc_add_error_status status =
+    const struct com_edhoc_add_error_result result =
         com_edhoc_add_protocol_error_with_description(
             test_cases[i].context, test_cases[i].error_description,
             &env.error_buffer_view);
 
-    assert_status_ok_with_message(status, test_cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
+    tst_edhoc_assert_add_error_status_ok_with_message(
+        result, test_cases[i].description);
+    tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 
     if (i < test_length - 1) {
       reset_test_case_state(test_cases[i + 1].context);
@@ -121,12 +108,10 @@ void test_add_error_with_error_info_on_invalid_library_state(void) {
       .total_entries = error_description_length,
       .written_entries = error_description_length};
 
-  const enum com_edhoc_add_error_status add_error_status =
-      com_edhoc_add_protocol_error(&env.context, &expected_error_info,
-                                   &env.error_buffer_view);
+  const struct com_edhoc_add_error_result result = com_edhoc_add_protocol_error(
+      &env.context, &expected_error_info, &env.error_buffer_view);
 
-  assert_status_ok(add_error_status);
-  assert_encoded_error_matches(expected_description, expected_error_code);
+  assert_result_matches(expected_description, result);
 }
 
 void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
@@ -165,11 +150,13 @@ void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
-    const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(
-        test_cases[i].context, test_cases[i].info, &env.error_buffer_view);
+    const struct com_edhoc_add_error_result result =
+        com_edhoc_add_protocol_error(test_cases[i].context, test_cases[i].info,
+                                     &env.error_buffer_view);
 
-    assert_status_ok_with_message(status, test_cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
+    tst_edhoc_assert_add_error_status_ok_with_message(
+        result, test_cases[i].description);
+    tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 
     if (i < test_length - 1) {
       reset_test_case_state(test_cases[i + 1].context);

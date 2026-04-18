@@ -13,25 +13,25 @@
 #include "common/com_data_models.h"
 #include "edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.h"
 
-void tst_edhoc_assert_add_error_status_ok(
-    const enum com_edhoc_add_error_status status,
-    const size_t error_buffer_length) {
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_OK, status);
-  TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
-      0, error_buffer_length, "Error buffer length should be greater than 0");
-}
-
 void tst_edhoc_assert_add_error_status_ok_with_message(
-    const enum com_edhoc_add_error_status status,
-    const size_t error_buffer_length, const char* message) {
-  TEST_ASSERT_EQUAL_MESSAGE(COM_EDHOC_ADD_ERROR_OK, status, message);
+    const struct com_edhoc_add_error_result add_error_result,
+    const char* message) {
+  TEST_ASSERT_EQUAL_MESSAGE(COM_EDHOC_ADD_ERROR_OK, add_error_result.status,
+                            message);
+  TEST_ASSERT_NOT_NULL_MESSAGE(add_error_result.buffer.bytes,
+                               "Error message buffer should not be NULL");
   TEST_ASSERT_GREATER_THAN_size_t_MESSAGE(
-      0, error_buffer_length,
+      0, add_error_result.buffer.length,
       "Error error_buffer length should be greater than 0");
 }
 
+void tst_edhoc_assert_add_error_status_ok(
+    const struct com_edhoc_add_error_result add_error_result) {
+  tst_edhoc_assert_add_error_status_ok_with_message(add_error_result, "");
+}
+
 void tst_edhoc_assert_encoded_error_matches(
-    const struct com_writable_buffer encoded_error_buffer,
+    const struct com_readonly_buffer encoded_error_buffer,
     const char* expected_error_description,
     const enum edhoc_error_code expected_error_code) {
   enum edhoc_error_code received_code = -1;
@@ -54,13 +54,14 @@ void tst_edhoc_assert_encoded_error_matches(
 }
 
 void tst_edhoc_assert_encoded_error_is_not_empty(
-    const struct com_writable_buffer encoded_error_buffer) {
+    const struct com_readonly_buffer encoded_error_buffer) {
   tst_edhoc_assert_encoded_error_matches(encoded_error_buffer, NULL,
                                          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
-void tst_edhoc_assert_encoded_error_is_not_empty_with_code(
-    const struct com_writable_buffer encoded_error_buffer,
-    const enum edhoc_error_code status) {
-  tst_edhoc_assert_encoded_error_matches(encoded_error_buffer, NULL, status);
+void tst_edhoc_assert_error_not_empty_if_present(
+    const struct com_readonly_buffer response) {
+  if (com_readonly_buffer_has_content(response)) {
+    tst_edhoc_assert_encoded_error_is_not_empty(response);
+  }
 }

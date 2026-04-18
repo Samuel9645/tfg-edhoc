@@ -52,11 +52,6 @@ void test_process_ok_for_valid_data(void) {
                                    "process should not write an error payload");
 }
 
-static int error_buffer_is_valid(struct com_writable_buffer* error_buffer) {
-  return error_buffer != NULL && error_buffer->bytes != NULL &&
-         error_buffer->capacity > 0;
-}
-
 void test_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_3_request no_context = {
       .parsed_message_3 = env.valid_request.parsed_message_3};
@@ -87,16 +82,14 @@ void test_process_fails_on_invalid_data(void) {
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     tst_srv_edhoc_m3_reset_process_mock();
-    struct com_writable_buffer* error_buffer = test_cases[i].error_buffer;
 
     const struct srv_edhoc_message_3_process_result result =
-        srv_edhoc_process_message_3(test_cases[i].request, error_buffer);
+        srv_edhoc_process_message_3(test_cases[i].request,
+                                    test_cases[i].error_buffer);
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
-    if (error_buffer_is_valid(error_buffer)) {
-      tst_edhoc_assert_encoded_error_is_not_empty(*error_buffer);
-    }
+    tst_edhoc_assert_error_not_empty_if_present(result.error_buffer);
   }
 }
 
@@ -116,5 +109,5 @@ void test_process_fails_on_library_errors(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.error);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
 }

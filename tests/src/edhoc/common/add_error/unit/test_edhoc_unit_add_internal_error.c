@@ -18,10 +18,12 @@ void test_add_internal_error_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
   const char* description = "RANDOM DESCRIPTION";
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_internal_error(description, &invalid_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
+  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
+                    result.status);
+  TEST_ASSERT_FALSE(com_readonly_buffer_has_content(result.buffer));
 }
 
 void test_add_internal_error_fails_on_error_compose_fail(void) {
@@ -31,8 +33,9 @@ void test_add_internal_error_fails_on_error_compose_fail(void) {
       .bytes = error_buffer, .capacity = sizeof(error_buffer)};
   tst_com_edhoc_set_error_compose_failed();
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_internal_error(description, &response_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);
+  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result.status);
+  TEST_ASSERT_FALSE(com_readonly_buffer_has_content(result.buffer));
 }

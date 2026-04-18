@@ -12,6 +12,7 @@
 #include <edhoc.h>
 
 #include "common/com_data_models.h"
+#include "edhoc/common/add_error/com_edhoc_add_error_status.h"
 /**
  * @brief Compose and write a Message 1 operation-specific EDHOC error message
  * into the response buffer.
@@ -22,7 +23,8 @@
  * @param[in] error_description Generic error text for non-cipher errors.
  * @param[out] response_data Buffer where the EDHOC error message is written.
  */
-void srv_edhoc_message_1_handler_add_protocol_error(
+struct com_edhoc_add_error_result
+srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 

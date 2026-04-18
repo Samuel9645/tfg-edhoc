@@ -18,11 +18,14 @@ srv_edhoc_message_3_responder_invalid_response_buffer_failure(void) {
 
 struct srv_edhoc_message_3_responder_result
 srv_edhoc_message_3_responder_failure(
-    const enum srv_edhoc_message_3_responder_status status) {
-  return (struct srv_edhoc_message_3_responder_result){.status = status};
+    const enum srv_edhoc_message_3_responder_status status,
+    const struct com_readonly_buffer error_buffer) {
+  return (struct srv_edhoc_message_3_responder_result){
+      .status = status, .response = error_buffer};
 }
 
-struct srv_edhoc_message_3_responder_result srv_edhoc_message_3_responder_ok() {
+struct srv_edhoc_message_3_responder_result srv_edhoc_message_3_responder_ok(
+    const struct com_readonly_buffer message_4) {
   return (struct srv_edhoc_message_3_responder_result){
-      .status = SRV_EDHOC_MSG3_RESPONDER_OK};
+      .status = SRV_EDHOC_MSG3_RESPONDER_OK, .response = message_4};
 }

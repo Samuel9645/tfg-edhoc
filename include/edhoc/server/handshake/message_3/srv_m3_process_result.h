@@ -20,9 +20,8 @@ enum srv_edhoc_message_3_process_status {
 };
 
 struct srv_edhoc_message_3_process_result {
-  enum srv_edhoc_message_3_process_status status;
-  struct com_readonly_buffer error_buffer;
+  const enum srv_edhoc_message_3_process_status status;
+  const struct com_readonly_buffer error_buffer;
 };
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PROCESS_RESULT_H_
-

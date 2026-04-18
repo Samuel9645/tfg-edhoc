@@ -14,7 +14,7 @@ enum com_coap_create_context_status {
 };
 
 struct com_coap_create_context_result {
-  enum com_coap_create_context_status status;
+  const enum com_coap_create_context_status status;
   coap_context_t *context;
 };
 

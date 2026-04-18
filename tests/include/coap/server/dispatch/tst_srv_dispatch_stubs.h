@@ -54,11 +54,11 @@ struct srv_edhoc_parse_message_3_result stb_srv_edhoc_parse_m3_protocol_failure(
     const struct edhoc_context* edhoc_ctx);
 
 struct srv_edhoc_message_1_responder_result
-stb_srv_edhoc_handle_m1_protocol_failure(
+stb_srv_edhoc_m1_responder_protocol_failure(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data);
 
-struct srv_edhoc_message_1_responder_result stb_srv_edhoc_handle_m1_ok(
+struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data);
 
@@ -70,12 +70,12 @@ coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
     struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session);
 
-struct srv_edhoc_message_3_responder_result stb_srv_edhoc_handle_m3_ok(
+struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
     struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data);
 
 struct srv_edhoc_message_3_responder_result
-stb_srv_edhoc_handle_m3_protocol_failure(
+stb_srv_edhoc_m3_responder_protocol_failure(
     struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data);
 

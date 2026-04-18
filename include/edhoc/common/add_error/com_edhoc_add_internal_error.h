@@ -21,7 +21,7 @@
  * @param[out] response_data Buffer where the error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_error_status com_edhoc_add_internal_error(
+struct com_edhoc_add_error_result com_edhoc_add_internal_error(
     const char* error_description, struct com_writable_buffer* response_data);
 
 #endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_INTERNAL_ERROR_H_

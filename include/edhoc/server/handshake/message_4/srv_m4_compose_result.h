@@ -21,9 +21,8 @@ enum srv_edhoc_message_4_compose_status {
 };
 
 struct srv_edhoc_message_4_compose_result {
-  enum srv_edhoc_message_4_compose_status status;
-  struct com_readonly_buffer compose_buffer;
+  const enum srv_edhoc_message_4_compose_status status;
+  const struct com_readonly_buffer buffer;
 };
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_4_SRV_M4_COMPOSE_RESULT_H_
-

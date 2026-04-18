@@ -20,6 +20,10 @@
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
+static const struct com_readonly_buffer DUMMY_READONLY_BUFFER = {
+    .bytes = DUMMY_PAYLOAD,
+    .length = sizeof(DUMMY_PAYLOAD),
+};
 
 struct srv_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
     const coap_pdu_t* request,
@@ -28,10 +32,7 @@ struct srv_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
   (void)request;
   (void)expected_format;
   (void)data_buffer;
-  return srv_coap_internal_parse_edhoc_ok((struct com_readonly_buffer){
-      .bytes = DUMMY_PAYLOAD,
-      .length = sizeof(DUMMY_PAYLOAD),
-  });
+  return srv_coap_internal_parse_edhoc_ok(DUMMY_READONLY_BUFFER);
 }
 
 struct srv_coap_parse_edhoc_request_result
@@ -77,10 +78,7 @@ void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
 struct srv_edhoc_parse_message_1_result stb_srv_edhoc_parse_m1_ok(
     const struct com_readonly_buffer request_buffer) {
   (void)request_buffer;
-  return srv_coap_internal_parse_message_1_ok((struct com_readonly_buffer){
-      .bytes = DUMMY_PAYLOAD,
-      .length = sizeof(DUMMY_PAYLOAD),
-  });
+  return srv_coap_internal_parse_message_1_ok(DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_parse_message_1_result stb_srv_edhoc_parse_m1_protocol_failure(
@@ -95,10 +93,7 @@ struct srv_edhoc_parse_message_3_result stb_srv_edhoc_parse_message_3_ok(
     const struct edhoc_context* edhoc_ctx) {
   (void)request_buffer;
   (void)edhoc_ctx;
-  return srv_coap_internal_parse_message_3_ok((struct com_readonly_buffer){
-      .bytes = DUMMY_PAYLOAD,
-      .length = sizeof(DUMMY_PAYLOAD),
-  });
+  return srv_coap_internal_parse_message_3_ok(DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_parse_message_3_result stb_srv_edhoc_parse_m3_protocol_failure(
@@ -111,21 +106,23 @@ struct srv_edhoc_parse_message_3_result stb_srv_edhoc_parse_m3_protocol_failure(
 }
 
 struct srv_edhoc_message_1_responder_result
-stb_srv_edhoc_handle_m1_protocol_failure(
+stb_srv_edhoc_m1_responder_protocol_failure(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   (void)response_data;
   return srv_edhoc_message_1_responder_failure(
-      SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER);
+      SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER,
+      DUMMY_READONLY_BUFFER);
 }
 
-struct srv_edhoc_message_1_responder_result stb_srv_edhoc_handle_m1_ok(
+struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     struct srv_edhoc_message_1_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   response_data->length = 10;
-  return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub);
+  return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub,
+                                          DUMMY_READONLY_BUFFER);
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(
@@ -144,22 +141,22 @@ coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
-struct srv_edhoc_message_3_responder_result stb_srv_edhoc_handle_m3_ok(
+struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
     const struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   response_data->length = sizeof(DUMMY_PAYLOAD);
-  return srv_edhoc_message_3_responder_ok();
+  return srv_edhoc_message_3_responder_ok(DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_message_3_responder_result
-stb_srv_edhoc_handle_m3_protocol_failure(
+stb_srv_edhoc_m3_responder_protocol_failure(
     const struct srv_edhoc_message_3_request request_data,
     struct com_writable_buffer* response_data) {
   (void)request_data;
   (void)response_data;
   return srv_edhoc_message_3_responder_failure(
-      SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE);
+      SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE, DUMMY_READONLY_BUFFER);
 }
 
 coap_pdu_code_t stb_srv_coap_process_m3_ok(

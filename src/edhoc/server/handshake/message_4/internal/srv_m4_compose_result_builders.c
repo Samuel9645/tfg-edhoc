@@ -18,11 +18,11 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_message_4_compose_failure(
     const enum srv_edhoc_message_4_compose_status status,
     const struct com_readonly_buffer error) {
   return (struct srv_edhoc_message_4_compose_result){.status = status,
-                                                     .compose_buffer = error};
+                                                     .buffer = error};
 }
 
 struct srv_edhoc_message_4_compose_result srv_edhoc_message_4_compose_ok(
     const struct com_readonly_buffer message_4) {
   return (struct srv_edhoc_message_4_compose_result){
-      .status = SRV_EDHOC_MSG4_COMPOSE_OK, .compose_buffer = message_4};
+      .status = SRV_EDHOC_MSG4_COMPOSE_OK, .buffer = message_4};
 }

@@ -29,7 +29,7 @@
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_error_status com_edhoc_add_protocol_error(
+struct com_edhoc_add_error_result com_edhoc_add_protocol_error(
     const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
     struct com_writable_buffer* response_data);
@@ -48,7 +48,7 @@ enum com_edhoc_add_error_status com_edhoc_add_protocol_error(
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-enum com_edhoc_add_error_status com_edhoc_add_protocol_error_with_description(
+struct com_edhoc_add_error_result com_edhoc_add_protocol_error_with_description(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 

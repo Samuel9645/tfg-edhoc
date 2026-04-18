@@ -24,7 +24,7 @@ enum srv_coap_parse_edhoc_request_status {
 };
 
 struct srv_coap_parse_edhoc_request_result {
-  enum srv_coap_parse_edhoc_request_status status;
+  const enum srv_coap_parse_edhoc_request_status status;
   const struct com_readonly_buffer parsed_request;
 };
 

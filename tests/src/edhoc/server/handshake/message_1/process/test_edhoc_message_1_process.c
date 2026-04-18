@@ -119,10 +119,7 @@ void test_m1_process_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
 
-    if (test_cases[i].response != NULL &&
-        test_cases[i].response->bytes != NULL) {
-      tst_edhoc_assert_encoded_error_is_not_empty(*test_cases[i].response);
-    }
+    tst_edhoc_assert_error_not_empty_if_present(result.error_buffer);
     ensure_context_is_null(result.context);
   }
 }
@@ -156,6 +153,6 @@ void test_m1_process_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(env.error);
+    tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
   }
 }

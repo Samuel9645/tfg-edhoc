@@ -18,8 +18,8 @@ enum srv_edhoc_parse_message_1_status {
 };
 
 struct srv_edhoc_parse_message_1_result {
-  enum srv_edhoc_parse_message_1_status status;
-  struct com_readonly_buffer parsed_message_1;
+  const enum srv_edhoc_parse_message_1_status status;
+  const struct com_readonly_buffer parsed_message_1;
 };
 
 /**

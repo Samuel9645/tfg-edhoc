@@ -20,34 +20,21 @@ static struct tst_edhoc_add_internal_error_env env = {
 
 void setUp(void) { tst_edhoc_add_internal_error_reset_env(&env); }
 
-static void assert_status_ok(
-    const enum com_edhoc_add_error_status add_error_status) {
-  tst_edhoc_assert_add_error_status_ok(add_error_status,
-                                       env.error_buffer_view.length);
-}
+void test_add_internal_error(void) {
+  const char* expected_description = "RANDOM DESCRIPTION";
 
-static void assert_encoded_error_matches(
-    const char* expected_error_description) {
-  tst_edhoc_assert_encoded_error_matches(env.error_buffer_view,
-                                         expected_error_description,
+  const struct com_edhoc_add_error_result result = com_edhoc_add_internal_error(
+      expected_description, &env.error_buffer_view);
+
+  tst_edhoc_assert_add_error_status_ok(result);
+  tst_edhoc_assert_encoded_error_matches(result.buffer, expected_description,
                                          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
-void test_add_internal_error(void) {
-  const char* expected_error_description = "RANDOM DESCRIPTION";
-
-  const enum com_edhoc_add_error_status add_error_status =
-      com_edhoc_add_internal_error(expected_error_description,
-                                   &env.error_buffer_view);
-
-  assert_status_ok(add_error_status);
-  assert_encoded_error_matches(expected_error_description);
-}
-
 void test_add_internal_error_creates_valid_error_on_null_message(void) {
-  const enum com_edhoc_add_error_status add_error_status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_internal_error(NULL, &env.error_buffer_view);
 
-  assert_status_ok(add_error_status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.error_buffer_view);
+  tst_edhoc_assert_add_error_status_ok(result);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }

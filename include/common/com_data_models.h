@@ -34,8 +34,8 @@ enum com_conversion_status {
 };
 
 struct com_readonly_conversion_result {
-  enum com_conversion_status status;
-  struct com_readonly_buffer buffer;
+  const enum com_conversion_status status;
+  const struct com_readonly_buffer buffer;
 };
 
 struct com_readonly_conversion_result com_writable_as_readonly(

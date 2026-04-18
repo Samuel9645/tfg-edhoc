@@ -16,9 +16,10 @@ srv_edhoc_message_3_responder_invalid_response_buffer_failure(void);
 
 struct srv_edhoc_message_3_responder_result
 srv_edhoc_message_3_responder_failure(
-    enum srv_edhoc_message_3_responder_status status);
+    enum srv_edhoc_message_3_responder_status status,
+    struct com_readonly_buffer error_buffer);
 
 struct srv_edhoc_message_3_responder_result srv_edhoc_message_3_responder_ok(
-    void);
+    struct com_readonly_buffer message_4);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_INTERNAL_SRV_M3_RESPONDER_RESULT_BUILDERS_H_

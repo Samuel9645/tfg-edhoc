@@ -14,7 +14,7 @@
 #include "edhoc/server/handshake/message_1/srv_m1_process_result.h"
 
 struct srv_edhoc_message_1_request {
-  struct com_readonly_buffer payload;
+  const struct com_readonly_buffer payload;
   const struct edhoc_credentials* credentials;
 };
 

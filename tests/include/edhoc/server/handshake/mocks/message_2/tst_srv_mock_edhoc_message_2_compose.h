@@ -20,7 +20,7 @@ void tst_srv_edhoc_m2_set_compose_failure(void);
 void tst_srv_edhoc_m2_set_compose_ok(void);
 void tst_srv_edhoc_m2_compose_set_compose_empty_length(void);
 void tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(
-    struct com_writable_buffer response);
+    struct com_readonly_buffer response);
 
 void tst_srv_edhoc_m2_reset_compose_mock(void);
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_MOCKS_TST_SRV_MOCK_EDHOC_MESSAGE_2_COMPOSE_H_

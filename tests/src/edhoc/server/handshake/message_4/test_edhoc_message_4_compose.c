@@ -43,11 +43,7 @@ void test_compose_ok_on_valid_data(void) {
 
   TEST_ASSERT_EQUAL_MESSAGE(SRV_EDHOC_MSG4_COMPOSE_OK, result.status,
                             "Expected composition to succeed");
-  tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(env.response);
-}
-
-static int response_is_valid(struct com_writable_buffer* response) {
-  return response != NULL && response->bytes != NULL;
+  tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(result.buffer);
 }
 
 void test_compose_fails_on_invalid_data(void) {
@@ -75,9 +71,7 @@ void test_compose_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
 
-    if (response_is_valid(response)) {
-      tst_edhoc_assert_encoded_error_is_not_empty(*response);
-    }
+    tst_edhoc_assert_error_not_empty_if_present(result.buffer);
     tst_srv_edhoc_m4_reset_compose_mock();
   }
 }
@@ -97,7 +91,7 @@ void test_compose_fails_on_library_compose_failure(void) {
       srv_edhoc_compose_message_4(&env.context, &env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
 
 void test_compose_fails_when_composition_produces_empty_buffer(void) {
@@ -107,5 +101,5 @@ void test_compose_fails_when_composition_produces_empty_buffer(void) {
       srv_edhoc_compose_message_4(&env.context, &env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(env.response);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }

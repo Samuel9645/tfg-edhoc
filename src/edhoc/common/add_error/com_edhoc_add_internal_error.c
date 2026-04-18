@@ -11,12 +11,27 @@
 
 #include "edhoc/common/add_error/internal/com_edhoc_set_error_info.h"
 
-const int INTERNAL_FAILURE_EDHOC_CODE = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+static struct com_edhoc_add_error_result add_internal_error_ok(
+    const struct com_readonly_buffer error_message) {
+  return (struct com_edhoc_add_error_result){.status = COM_EDHOC_ADD_ERROR_OK,
+                                             .buffer = error_message};
+}
 
-enum com_edhoc_add_error_status com_edhoc_add_internal_error(
+static struct com_edhoc_add_error_result
+add_internal_error_invalid_response_buffer(void) {
+  return (struct com_edhoc_add_error_result){
+      .status = COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER};
+}
+
+static struct com_edhoc_add_error_result add_internal_error(
+    const enum com_edhoc_add_error_status status) {
+  return (struct com_edhoc_add_error_result){.status = status};
+}
+
+struct com_edhoc_add_error_result com_edhoc_add_internal_error(
     const char* error_description, struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
-    return COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER;
+    return add_internal_error_invalid_response_buffer();
   }
 
   if (error_description == NULL) {
@@ -26,8 +41,14 @@ enum com_edhoc_add_error_status com_edhoc_add_internal_error(
   com_edhoc_set_error_info(&error_info, error_description);
   if (edhoc_message_error_compose(
           response_data->bytes, response_data->capacity, &response_data->length,
-          INTERNAL_FAILURE_EDHOC_CODE, &error_info) != EDHOC_SUCCESS) {
-    return COM_EDHOC_ADD_ERROR_ERR_COMPOSE;
+          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, &error_info) != EDHOC_SUCCESS) {
+    return add_internal_error(COM_EDHOC_ADD_ERROR_ERR_COMPOSE);
   }
-  return COM_EDHOC_ADD_ERROR_OK;
+  const struct com_readonly_conversion_result conversion_result =
+      com_writable_as_readonly(response_data);
+  if (conversion_result.status != COM_RDONLY_CONV_OK) {
+    // SHOULD NEVER HAPPEN
+    return add_internal_error(COM_EDHOC_ADD_ERROR_ERR_CONVERSION);
+  }
+  return add_internal_error_ok(conversion_result.buffer);
 }

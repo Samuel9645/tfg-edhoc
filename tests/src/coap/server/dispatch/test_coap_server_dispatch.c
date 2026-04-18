@@ -109,7 +109,7 @@ void test_server_responds_with_internal_error_if_adding_response_payload_fails(
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_null;
-  deps.handle_message_1 = stb_srv_edhoc_handle_m1_ok;
+  deps.handle_message_1 = stb_srv_edhoc_m1_responder_ok;
   deps.add_response_payload = stb_srv_coap_add_payload_failure;
 
   srv_coap_dispatch_post_with_dependencies(

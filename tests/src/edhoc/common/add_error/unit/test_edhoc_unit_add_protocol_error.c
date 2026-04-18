@@ -38,31 +38,32 @@ void setUp(void) {
   tst_edhoc_add_protocol_error_reset_env(&env);
 }
 
-static void assert_status_ok(
-    const enum com_edhoc_add_error_status add_error_status) {
-  tst_edhoc_assert_add_error_status_ok(add_error_status,
-                                       env.error_buffer_view.length);
-}
-
 void test_add_protocol_error_recovers_get_code_fail(void) {
   tst_com_edhoc_set_get_code_failed();
   tst_com_edhoc_use_real_compose();
 
-  const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(
+  const struct com_edhoc_add_error_result result = com_edhoc_add_protocol_error(
       &env.context, &VALID_INFO, &env.error_buffer_view);
 
-  assert_status_ok(status);
-  tst_edhoc_assert_encoded_error_matches(env.error_buffer_view, DESCRIPTION,
+  tst_edhoc_assert_add_error_status_ok(result);
+  tst_edhoc_assert_encoded_error_matches(result.buffer, DESCRIPTION,
                                          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+}
+
+static void assert_fails_with(
+    const enum com_edhoc_add_error_status expected_status,
+    const struct com_edhoc_add_error_result result) {
+  TEST_ASSERT_EQUAL(expected_status, result.status);
+  TEST_ASSERT_FALSE(com_readonly_buffer_has_content(result.buffer));
 }
 
 void test_add_protocol_error_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error(&env.context, &VALID_INFO, &invalid_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
+  assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, result);
 }
 
 static void assert_response_untouched(void) {
@@ -76,10 +77,10 @@ static void assert_response_untouched(void) {
 void test_add_protocol_error_fails_on_error_compose_fail(void) {
   tst_com_edhoc_set_error_compose_failed();
 
-  const enum com_edhoc_add_error_status status = com_edhoc_add_protocol_error(
+  const struct com_edhoc_add_error_result result = com_edhoc_add_protocol_error(
       &env.context, &VALID_INFO, &env.error_buffer_view);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);
+  assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result);
   assert_response_untouched();
 }
 
@@ -87,33 +88,33 @@ void test_add_protocol_error_with_description_recovers_get_code_fail(void) {
   tst_com_edhoc_set_get_code_failed();
   tst_com_edhoc_use_real_compose();
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description(&env.context, DESCRIPTION,
                                                     &env.error_buffer_view);
 
-  assert_status_ok(status);
-  tst_edhoc_assert_encoded_error_matches(env.error_buffer_view, DESCRIPTION,
+  tst_edhoc_assert_add_error_status_ok(result);
+  tst_edhoc_assert_encoded_error_matches(result.buffer, DESCRIPTION,
                                          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_add_protocol_error_with_description_fails_on_invalid_buffer(void) {
   struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description(&env.context, DESCRIPTION,
                                                     &invalid_buffer);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, status);
+  assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, result);
 }
 
 void test_add_protocol_error_with_description_fails_on_error_compose_fail(
     void) {
   tst_com_edhoc_set_error_compose_failed();
 
-  const enum com_edhoc_add_error_status status =
+  const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description(&env.context, DESCRIPTION,
                                                     &env.error_buffer_view);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, status);
+  assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result);
   assert_response_untouched();
 }

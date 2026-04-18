@@ -33,7 +33,7 @@ enum cli_coap_parse_and_resolve_status {
 };
 
 struct cli_coap_parse_and_resolve_result {
-  enum cli_coap_parse_and_resolve_status status;
+  const enum cli_coap_parse_and_resolve_status status;
   coap_address_t address;
   coap_uri_t uri;
 };
@@ -61,7 +61,7 @@ enum cli_coap_create_session_status {
 };
 
 struct cli_coap_create_session_result {
-  enum cli_coap_create_session_status status;
+  const enum cli_coap_create_session_status status;
   coap_session_t* session;
 };
 
@@ -85,7 +85,7 @@ enum cli_coap_prepare_pdu_status {
 };
 
 struct cli_coap_prepare_pdu_result {
-  enum cli_coap_prepare_pdu_status status;
+  const enum cli_coap_prepare_pdu_status status;
   coap_pdu_t* pdu;
 };
 

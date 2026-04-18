@@ -88,6 +88,7 @@ set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
 )
 
+
 add_unity_test(test_coap_server_dispatch
     /src/coap/server/dispatch/test_coap_server_dispatch.c
     ${SERVER_SOURCES}
@@ -180,8 +181,12 @@ set(COMMON_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/common/tst_edhoc_add_error_assertions.c
 )
 
-set(MOCK_EDHOC_M1_HANDLER_DEPS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/handler/tst_srv_mock_m1_handler_deps.c
+set(HANDSHAKE_ERROR_SUPPORT_SOURCES
+    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
 )
 
 set(EDHOC_CONTENT_INIT_MOCK
@@ -203,9 +208,8 @@ add_unity_test(test_edhoc_message_1_process
     /src/edhoc/server/handshake/message_1/process/test_edhoc_message_1_process.c
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_1_PROCESS_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
-
 
 set(MESSAGE_2_COMPOSE_MOCKS
     src/edhoc/server/handshake/mocks/message_2/tst_srv_mock_edhoc_message_2_compose.c
@@ -216,7 +220,7 @@ add_unity_test(test_edhoc_message_2_compose
     /src/edhoc/server/handshake/message_2/test_edhoc_message_2_compose.c
     ${MESSAGE_2_COMPOSE_SOURCES}
     ${MESSAGE_2_COMPOSE_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_1_responder
@@ -227,7 +231,7 @@ add_unity_test(test_edhoc_message_1_responder
     ${MESSAGE_1_PROCESS_MOCKS}
     ${MESSAGE_2_COMPOSE_SOURCES}
     ${MESSAGE_2_COMPOSE_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 #add_unity_test(test_edhoc_message_1_errors
@@ -260,14 +264,14 @@ add_unity_test(test_edhoc_message_3_process
     /src/edhoc/server/handshake/message_3/process/test_edhoc_message_3_process.c
     ${MESSAGE_3_PROCESS_SOURCES}
     ${MESSAGE_3_PROCESS_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_4_compose
     /src/edhoc/server/handshake/message_4/test_edhoc_message_4_compose.c
     ${MESSAGE_4_COMPOSE_SOURCES}
     ${MESSAGE_4_COMPOSE_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_3_responder
@@ -275,7 +279,7 @@ add_unity_test(test_edhoc_message_3_responder
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${MESSAGE_3_PROCESS_MOCKS}
     ${MESSAGE_4_COMPOSE_MOCKS}
-    ${COMMON_SOURCES}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_3_parser
@@ -286,13 +290,13 @@ add_unity_test(test_edhoc_message_3_parser
     ${COMMON_SRV_SOURCES}
 )
 
-#add_unity_test(test_integration
-#    /src/core/test_integration.c
-#    ${CORE_SOURCES}
-#)
-#
-## Apply the specific compile definitions ONLY to test_integration
-#target_compile_definitions(test_integration PRIVATE
-#    SERVER_PATH="$<TARGET_FILE:server>"
-#    CLIENT_PATH="$<TARGET_FILE:client>"
-#)
+add_unity_test(test_integration
+    /src/core/test_integration.c
+    ${CORE_SOURCES}
+)
+
+# Apply the specific compile definitions ONLY to test_integration
+target_compile_definitions(test_integration PRIVATE
+    SERVER_PATH="$<TARGET_FILE:server>"
+    CLIENT_PATH="$<TARGET_FILE:client>"
+)

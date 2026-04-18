@@ -9,6 +9,7 @@
 
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESPONDER_RESULT_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESPONDER_RESULT_H_
+#include "common/com_data_models.h"
 
 enum srv_edhoc_message_3_responder_status {
   SRV_EDHOC_MSG3_RESPONDER_OK = 0,
@@ -18,7 +19,8 @@ enum srv_edhoc_message_3_responder_status {
 };
 
 struct srv_edhoc_message_3_responder_result {
-  enum srv_edhoc_message_3_responder_status status;
+  const enum srv_edhoc_message_3_responder_status status;
+  const struct com_readonly_buffer response;
 };
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_RESPONDER_RESULT_H_

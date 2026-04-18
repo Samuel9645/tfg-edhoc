@@ -27,16 +27,17 @@ struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
       srv_edhoc_process_message_3(request, response);
   if (process_result.status != SRV_EDHOC_MSG3_PROCESS_OK) {
     return srv_edhoc_message_3_responder_failure(
-        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS);
+        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS,
+        process_result.error_buffer);
   }
 
   const struct srv_edhoc_message_4_compose_result compose_result =
       srv_edhoc_compose_message_4(request.edhoc_context, response);
   if (compose_result.status != SRV_EDHOC_MSG4_COMPOSE_OK) {
     return srv_edhoc_message_3_responder_failure(
-        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE);
+        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE, compose_result.buffer);
   }
-  return srv_edhoc_message_3_responder_ok();
+  return srv_edhoc_message_3_responder_ok(compose_result.buffer);
 }
 
 const char* srv_edhoc_handle_message_3_status_code_to_string(

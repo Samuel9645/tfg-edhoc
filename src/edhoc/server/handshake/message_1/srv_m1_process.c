@@ -21,16 +21,15 @@
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
     const char* error_message, struct com_writable_buffer* buffer) {
-  (void)com_edhoc_add_internal_error(error_message, buffer);
-  return com_writable_as_readonly(buffer).buffer;
+  return com_edhoc_add_internal_error(error_message, buffer).buffer;
 }
 
-static struct com_readonly_buffer add_protocol_error_to_buffer(
+static struct com_readonly_buffer add_processing_error_to_buffer(
     const struct edhoc_context* context, const char* error_message,
     struct com_writable_buffer* buffer) {
-  srv_edhoc_message_1_handler_add_protocol_error(context, error_message,
-                                                 buffer);
-  return com_writable_as_readonly(buffer).buffer;
+  return srv_edhoc_message_1_handler_add_protocol_error(context, error_message,
+                                                        buffer)
+      .buffer;
 }
 
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
@@ -60,16 +59,16 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     free(context);
     return srv_edhoc_message_1_process_failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-        add_protocol_error_to_buffer(context, "Context setup failed",
-                                     error_buffer));
+        add_processing_error_to_buffer(context, "Context setup failed",
+                                       error_buffer));
   }
   if (edhoc_message_1_process(context, request.payload.bytes,
                               request.payload.length) != EDHOC_SUCCESS) {
     srv_edhoc_cleanup_context(&context);
     return srv_edhoc_message_1_process_failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-        add_protocol_error_to_buffer(context, "Message 1 processing failed",
-                                     error_buffer));
+        add_processing_error_to_buffer(context, "Message 1 processing failed",
+                                       error_buffer));
   }
   return srv_edhoc_message_1_process_ok(context);
 }

@@ -48,7 +48,7 @@ void tst_srv_edhoc_m4_reset_compose_mock(void) {
 }
 
 void tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(
-    const struct com_writable_buffer response) {
+    const struct com_readonly_buffer response) {
   TEST_ASSERT_EQUAL_HEX8_ARRAY_MESSAGE(compose_buffer, response.bytes,
                                        compose_written_length,
                                        "message 4 content mismatch");

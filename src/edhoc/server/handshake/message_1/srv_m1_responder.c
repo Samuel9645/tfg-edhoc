@@ -29,24 +29,26 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     const struct srv_edhoc_message_1_request request,
     struct com_writable_buffer* response) {
   if (!com_writable_buffer_is_writable(response)) {
-    return srv_edhoc_message_1_responder_failure(
-        SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER);
+    return srv_edhoc_message_1_responder_invalid_response_buffer_failure();
   }
 
   struct srv_edhoc_message_1_process_result process_result =
       srv_edhoc_process_message_1(request, response);
   if (process_result.status != SRV_EDHOC_MSG1_PROCESS_OK) {
     return srv_edhoc_message_1_responder_failure(
-        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED);
+        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED,
+        process_result.error_buffer);
   }
   const struct srv_edhoc_message_2_compose_result compose_result =
       srv_edhoc_compose_message_2(process_result.context, response);
   if (compose_result.status != SRV_EDHOC_MSG2_COMPOSE_OK) {
     srv_edhoc_cleanup_context(&process_result.context);
     return srv_edhoc_message_1_responder_failure(
-        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED);
+        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED,
+        compose_result.buffer);
   }
-  return srv_edhoc_message_1_responder_ok(process_result.context);
+  return srv_edhoc_message_1_responder_ok(process_result.context,
+                                          compose_result.buffer);
 }
 
 const char* srv_edhoc_handle_message_1_status_code_to_string(

@@ -12,7 +12,13 @@
 enum com_edhoc_add_error_status {
   COM_EDHOC_ADD_ERROR_OK = 0,
   COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
+  COM_EDHOC_ADD_ERROR_ERR_CONVERSION,
   COM_EDHOC_ADD_ERROR_ERR_COMPOSE,
+};
+
+struct com_edhoc_add_error_result {
+  const enum com_edhoc_add_error_status status;
+  const struct com_readonly_buffer buffer;
 };
 
 #endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_ERROR_STATUS_H_

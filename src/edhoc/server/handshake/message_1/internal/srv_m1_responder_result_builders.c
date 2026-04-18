@@ -10,14 +10,23 @@
 #include <stddef.h>
 
 struct srv_edhoc_message_1_responder_result srv_edhoc_message_1_responder_ok(
-    struct edhoc_context* edhoc_ctx) {
+    struct edhoc_context* context, const struct com_readonly_buffer message_2) {
   return (struct srv_edhoc_message_1_responder_result){
-      .status = SRV_EDHOC_MSG1_RESPONDER_OK, .edhoc_ctx = edhoc_ctx};
+      .status = SRV_EDHOC_MSG1_RESPONDER_OK,
+      .edhoc_ctx = context,
+      .response = message_2};
 }
 
 struct srv_edhoc_message_1_responder_result
 srv_edhoc_message_1_responder_failure(
-    const enum srv_edhoc_message_1_responder_status status) {
-  return (struct srv_edhoc_message_1_responder_result){.status = status,
-                                                       .edhoc_ctx = NULL};
+    const enum srv_edhoc_message_1_responder_status status,
+    const struct com_readonly_buffer error_message) {
+  return (struct srv_edhoc_message_1_responder_result){
+      .status = status, .edhoc_ctx = NULL, .response = error_message};
+}
+
+struct srv_edhoc_message_1_responder_result
+srv_edhoc_message_1_responder_invalid_response_buffer_failure(void) {
+  return (struct srv_edhoc_message_1_responder_result){
+      .status = SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER};
 }

@@ -7,8 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "coap/server/edhoc_mapper/srv_m3_mapper.h"
-
+#include "coap/server/edhoc_message_process/srv_coap_m3_process.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static coap_pdu_code_t map_message_3_status_to_response(
@@ -27,7 +26,7 @@ static coap_pdu_code_t map_message_3_status_to_response(
   }
 }
 
-coap_pdu_code_t srv_coap_map_message_3_result_to_coap(
+coap_pdu_code_t srv_coap_process_message_3_result(
     const struct srv_edhoc_message_3_responder_result message_3_result) {
   if (message_3_result.status != SRV_EDHOC_MSG3_RESPONDER_OK) {
     const char* error_message =

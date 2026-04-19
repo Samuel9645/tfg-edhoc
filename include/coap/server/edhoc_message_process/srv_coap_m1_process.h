@@ -27,7 +27,7 @@
  * @param[in,out] session CoAP session where app-data is set on success.
  * @return Mapped CoAP response code for the operation.
  */
-coap_pdu_code_t srv_coap_map_message_1_result_to_coap(
+coap_pdu_code_t srv_coap_process_message_1_result(
     struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session);
 

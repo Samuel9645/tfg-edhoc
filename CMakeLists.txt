@@ -85,8 +85,8 @@ set(SERVER_SPECIFIC_SOURCES
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m1_mapper.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_mapper/srv_m3_mapper.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m1_process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m3_process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_srv.c

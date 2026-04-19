@@ -7,10 +7,11 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "coap/server/edhoc_mapper/srv_m1_mapper.h"
+#include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
 
 #include <stdlib.h>
 
+#include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 
 static coap_pdu_code_t map_message_1_status_to_response(
@@ -29,8 +30,14 @@ static coap_pdu_code_t map_message_1_status_to_response(
   }
 }
 
-coap_pdu_code_t srv_coap_map_message_1_result_to_coap(
-    const struct srv_edhoc_message_1_responder_result message_1_result,
+static void cleanup_context(void* context) {
+  if (context != NULL) {
+    srv_edhoc_cleanup_context((struct edhoc_context**)&context);
+  }
+}
+
+coap_pdu_code_t srv_coap_process_message_1_result(
+    struct srv_edhoc_message_1_responder_result message_1_result,
     coap_session_t* session) {
   if (message_1_result.status != SRV_EDHOC_MSG1_RESPONDER_OK) {
     const char* error_message =
@@ -39,10 +46,10 @@ coap_pdu_code_t srv_coap_map_message_1_result_to_coap(
     coap_log_err("Message 1 processing failed: %s\n", error_message);
     return map_message_1_status_to_response(message_1_result.status);
   }
-  if (coap_session_set_app_data2(session, message_1_result.edhoc_ctx, free) !=
-      NULL) {
+  if (coap_session_set_app_data2(session, message_1_result.edhoc_ctx,
+                                 cleanup_context) != NULL) {
     coap_log_err("already existing EDHOC context in CoAP session app data\n");
-    free(message_1_result.edhoc_ctx);
+    srv_edhoc_cleanup_context(&message_1_result.edhoc_ctx);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
   return map_message_1_status_to_response(message_1_result.status);

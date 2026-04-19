@@ -2,8 +2,8 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_response.h"
-#include "coap/server/edhoc_mapper/srv_m1_mapper.h"
-#include "coap/server/edhoc_mapper/srv_m3_mapper.h"
+#include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
+#include "coap/server/edhoc_message_process/srv_coap_m3_process.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
 #include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
@@ -13,9 +13,9 @@ static const struct srv_coap_dispatch_deps
         .parse_edhoc_request = srv_coap_parse_edhoc_request,
         .add_edhoc_response_options = com_coap_add_edhoc_response_options,
         .respond_to_message_1 = srv_edhoc_respond_to_message_1,
-        .process_message_1_result = srv_coap_map_message_1_result_to_coap,
+        .process_message_1_result = srv_coap_process_message_1_result,
         .respond_to_message_3 = srv_edhoc_respond_to_message_3,
-        .process_message_3_result = srv_coap_map_message_3_result_to_coap,
+        .process_message_3_result = srv_coap_process_message_3_result,
         .add_response_payload = com_coap_add_response_payload,
         .get_session_app_data = coap_session_get_app_data,
 };

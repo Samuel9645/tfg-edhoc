@@ -5,7 +5,7 @@
  * @brief Helper functions to build results of parsing EDHOC requests
  */
 
-#include "coap/common/internal/srv_parse_edhoc_request_builders.h"
+#include "coap/common/internal/com_parse_edhoc_request_builders.h"
 
 struct com_coap_parse_edhoc_request_result
 srv_coap_internal_parse_edhoc_failure(

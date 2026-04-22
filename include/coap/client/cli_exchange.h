@@ -25,15 +25,6 @@ struct cli_coap_exchange_session_data {
 bool cli_coap_exchange_session_data_is_valid(
     const struct cli_coap_exchange_session_data* session_data);
 
-// TODO: maybe use com_data_models?
-struct cli_coap_exchange {
-  struct cli_coap_exchange_session_data session_data;
-  bool have_response;
-  uint8_t incoming_message[CONFIG_COAP_MAX_PDU_SIZE];
-  size_t incoming_message_length;
-  coap_pdu_code_t last_response_code;
-};
-
 /**
  * @brief Input data used to send one EDHOC request message.
  */
@@ -46,16 +37,34 @@ bool cli_coap_exchange_request_data_is_valid(
     struct cli_coap_exchange_request request_data);
 
 /**
- * @brief Initialize exchange state and register coap_response.handler.
- *
- * @param[in] session_data Session and endpoint data required for init.
- * @param[out] exchange Exchange state storage provided by caller.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
- * failure.
+ * @brief Opaque struct to hold exchange-related data.
+ * This context is initialized via cli_coap_init_exchange() and its lifecycle
+ * is tied to the CoAP session. It is automatically deallocated via the
+ * coap_session_set_app_data2() release callback when the session terminates.
  */
-enum status_coap cli_coap_init_exchange(
+struct cli_coap_exchange;
+
+/**
+ * @brief Initializes the exchange state, binds session data, and registers
+ * handlers.
+ *
+ * This function handles the dynamic allocation of the exchange context and
+ * orchestrates the necessary libcoap registrations.
+ *
+ * @param[in] session_data Session and endpoint metadata required for
+ * initialization.
+ * @param[in] response_buffer The writable buffer data, designated to store the
+ * incoming CoAP response.
+ * @return A pointer to the initialized exchange on success, or NULL if
+ * allocation or session binding fails.
+ *
+ * @warning This function allocates memory using calloc(). The memory is managed
+ * by libcoap, ensure the CoAP session is eventually terminated to trigger the
+ * automatic deletion callback.
+ */
+struct cli_coap_exchange* cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
-    struct cli_coap_exchange* exchange);
+    struct com_writable_buffer response_buffer);
 
 /**
  * @brief Send EDHOC payload in a CoAP POST request.
@@ -69,20 +78,27 @@ enum status_coap cli_coap_exchange_send(
     const struct cli_coap_exchange* exchange,
     struct cli_coap_exchange_request request_data);
 
+struct cli_coap_wait_and_get_result {
+  const enum status_coap status;
+  const struct com_readonly_buffer response;
+};
+
 /**
  * @brief Wait for response and copy payload to caller buffer.
  *
  * @param[in,out] exchange Initialized exchange state.
- * @param[out] response_data Response output buffer metadata.
- * @return CCOM_STATUS_SUCCESS on 2.04 Changed responses,
- * CCOM_ERROR on transport failures or CoAP error responses.
+ * @param[in] response_data Response output buffer metadata.
+ * @return Struct containing status code and view of response payload on
+ * success, empty view on failure.
  *
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.
+ *
+ * @note This resets the state of the exchange after receiving the response
  */
-enum status_coap cli_coap_exchange_wait_and_get(
+struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     struct cli_coap_exchange* exchange,
-    struct com_writable_buffer* response_data);
+    const struct com_writable_buffer* response_data);
 
 /**
  * @brief Reset response state before next request.

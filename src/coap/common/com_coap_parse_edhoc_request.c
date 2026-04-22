@@ -9,7 +9,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 
 #include "coap/common/com_coap_get_data.h"
-#include "coap/common/internal/srv_parse_edhoc_request_builders.h"
+#include "coap/common/internal/com_parse_edhoc_request_builders.h"
 
 struct com_coap_parse_edhoc_request_result com_coap_parse_edhoc_request(
     const coap_pdu_t* request,

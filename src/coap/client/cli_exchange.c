@@ -2,27 +2,33 @@
 
 #include <edhoc.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "coap/client/cli_log_error.h"
 #include "coap/client/cli_utils.h"
-#include "coap/common/com_coap_get_data.h"
-#include "coap/common/com_coap_helpers.h"
+#include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_response.h"
 
-static bool client_coap_response_has_edhoc_content_format(
-    const coap_pdu_t* response) {
-  coap_opt_iterator_t option_iterator = {0};
-  const coap_opt_t* content_format_option =
-      coap_check_option(response, COAP_OPTION_CONTENT_FORMAT, &option_iterator);
-  if (content_format_option == NULL) {
-    return false;
-  }
+struct cli_coap_exchange {
+  struct cli_coap_exchange_session_data session_data;
+  bool have_response;
+  struct com_writable_buffer incoming_response_buffer;
 
-  const uint16_t content_format =
-      coap_decode_var_bytes(coap_opt_value(content_format_option),
-                            coap_opt_length(content_format_option));
-  return content_format == CONFIG_COAP_CONTENT_EDHOC;
+  struct {
+    const uint8_t* bytes;
+    size_t length;
+  } internal_parsed_response;
+
+  coap_pdu_code_t last_response_code;
+};
+
+static struct com_readonly_buffer get_readonly_buffer(
+    const struct cli_coap_exchange* exchange) {
+  return (struct com_readonly_buffer){
+      .bytes = exchange->internal_parsed_response.bytes,
+      .length = exchange->internal_parsed_response.length,
+  };
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -38,32 +44,23 @@ static coap_response_t coap_client_coap_response_handler(
   }
 
   exchange->have_response = true;
-  exchange->incoming_message_length = 0;
   const coap_pdu_code_t response_code = coap_pdu_get_code(received);
   exchange->last_response_code = response_code;
   if (response_code == COAP_EMPTY_CODE) {
     coap_log_info("received empty response\n");
     return COAP_RESPONSE_OK;
   }
-  if (!client_coap_response_has_edhoc_content_format(received)) {
-    coap_log_err("missing or invalid EDHOC content format in response\n");
-    return COAP_RESPONSE_OK;
-  }
 
-  struct com_writable_buffer request_data = {
-      .bytes = exchange->incoming_message,
-      .capacity = sizeof(exchange->incoming_message),
-      .length = 0};
-  const struct com_coap_get_data_result get_data_result =
-      com_coap_get_data(received, &request_data);
-  if (get_data_result.status != COM_COAP_GET_DATA_OK) {
-    coap_log_err("cannot get response pdu data\n");
-    return COAP_RESPONSE_OK;
-  }
-  exchange->incoming_message_length = get_data_result.data.length;
+  const struct com_coap_parse_edhoc_request_result parse_result =
+      com_coap_parse_edhoc_request(received, CONFIG_COAP_CONTENT_EDHOC,
+                                   &exchange->incoming_response_buffer);
+
+  exchange->internal_parsed_response.bytes = parse_result.parsed_request.bytes;
+  exchange->internal_parsed_response.length =
+      parse_result.parsed_request.length;
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
     cli_coap_log_received_edhoc_error_response(response_code,
-                                               get_data_result.data);
+                                               parse_result.parsed_request);
   }
   return COAP_RESPONSE_OK;
 }
@@ -79,32 +76,36 @@ bool cli_coap_exchange_request_data_is_valid(
   return com_readonly_buffer_has_content(request_data.buffer);
 }
 
-enum status_coap cli_coap_init_exchange(
+struct cli_coap_exchange* cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
-    struct cli_coap_exchange* exchange) {
-  if (exchange == NULL ||
-      !cli_coap_exchange_session_data_is_valid(session_data)) {
+    struct com_writable_buffer response_buffer) {
+  if (!cli_coap_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
-    return STATUS_COAP_ERR;
+    return NULL;
   }
 
-  memset(exchange, 0, sizeof(*exchange));
-
-  exchange->session_data.context = session_data->context;
-  exchange->session_data.session = session_data->session;
-  exchange->session_data.uri = session_data->uri;
-  exchange->session_data.destination = session_data->destination;
-
-  if (coap_session_set_app_data2(session_data->session, exchange, NULL) !=
+  struct cli_coap_exchange* exchange =
+      calloc(1, sizeof(struct cli_coap_exchange));
+  if (exchange == NULL) {
+    coap_log_err("failed calloc cli_coap_exchange\n");
+    return NULL;
+  }
+  exchange->session_data = *session_data;
+  // This is used to bypass the const limitation
+  memcpy(&exchange->incoming_response_buffer, &response_buffer,
+         sizeof(struct com_writable_buffer));
+  // TODO: Note: It is the responsibility of the caller to free off (if
+  // appropriate) any returned data.
+  if (coap_session_set_app_data2(session_data->session, exchange, free) !=
       NULL) {
     coap_log_err("unexpected existing session app-data in client\n");
-    return STATUS_COAP_ERR;
+    free(exchange);
+    return NULL;
   }
-
   coap_register_response_handler(session_data->context,
                                  coap_client_coap_response_handler);
 
-  return STATUS_COAP_OK;
+  return exchange;
 }
 
 enum status_coap cli_coap_exchange_send(
@@ -141,40 +142,40 @@ enum status_coap cli_coap_exchange_send(
                                     request_pdu);
 }
 
-enum status_coap cli_coap_exchange_wait_and_get(
+static struct cli_coap_wait_and_get_result wait_and_get_ok(
+    const struct com_readonly_buffer response_data) {
+  return (struct cli_coap_wait_and_get_result){
+      .status = STATUS_COAP_OK,
+      .response = response_data,
+  };
+}
+
+static struct cli_coap_wait_and_get_result wait_and_get_failure(void) {
+  return (struct cli_coap_wait_and_get_result){.status = STATUS_COAP_ERR};
+}
+
+struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     struct cli_coap_exchange* exchange,
-    struct com_writable_buffer* response_data) {
+    const struct com_writable_buffer* response_data) {
   if (exchange == NULL || !com_writable_buffer_is_writable(response_data)) {
     coap_log_err("invalid arguments to wait_and_get\n");
-    return STATUS_COAP_ERR;
+    return wait_and_get_failure();
   }
   const enum cli_coap_wait_status wait_status = cli_coap_wait_for_coap_response(
       exchange->session_data.context, exchange->session_data.session,
       &exchange->have_response);
   if (wait_status != CLI_COAP_WAIT_OK) {
     coap_log_err("error while waiting for CoAP response\n");
-    return STATUS_COAP_ERR;
+    return wait_and_get_failure();
   }
-
-  const size_t message_length = exchange->incoming_message_length;
-  const size_t capacity = response_data->capacity;
-  if (!exchange->have_response ||
-      !(message_length > 0 && message_length <= capacity)) {
-    coap_log_err("invalid response data\n");
-    return STATUS_COAP_ERR;
+  const struct com_readonly_buffer response_buffer =
+      get_readonly_buffer(exchange);
+  cli_coap_exchange_reset(exchange);
+  if (!com_readonly_buffer_has_content(response_buffer)) {
+    coap_log_err("no response received\n");
+    return wait_and_get_failure();
   }
-
-  const bool is_error_response =
-      !com_coap_coap_response_indicates_success(exchange->last_response_code);
-
-  memcpy(response_data->bytes, exchange->incoming_message,
-         exchange->incoming_message_length);
-  response_data->length = exchange->incoming_message_length;
-  exchange->have_response = false;
-  exchange->incoming_message_length = 0;
-  exchange->last_response_code = COAP_EMPTY_CODE;
-
-  return is_error_response ? STATUS_COAP_ERR : STATUS_COAP_OK;
+  return wait_and_get_ok(response_buffer);
 }
 
 void cli_coap_exchange_reset(struct cli_coap_exchange* exchange) {
@@ -183,6 +184,8 @@ void cli_coap_exchange_reset(struct cli_coap_exchange* exchange) {
   }
 
   exchange->have_response = false;
-  exchange->incoming_message_length = 0;
+  exchange->internal_parsed_response.bytes = NULL;
+  exchange->internal_parsed_response.length = 0;
+  exchange->incoming_response_buffer.length = 0;
   exchange->last_response_code = COAP_EMPTY_CODE;
 }

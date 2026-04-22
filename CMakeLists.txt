@@ -32,6 +32,8 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_parse_edhoc_request.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/com_parse_edhoc_request_builders.c
     ${ADD_EDHOC_ERROR_SOURCES}
     ${LIBEDHOC_SOURCES}
 )
@@ -79,8 +81,6 @@ set(MESSAGE_3_RESPONDER_SOURCES
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_parse_edhoc_request.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/srv_parse_edhoc_request_builders.c
     ${MESSAGE_1_RESPONDER_SOURCES}
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c

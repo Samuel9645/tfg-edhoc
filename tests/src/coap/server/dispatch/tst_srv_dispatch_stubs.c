@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-#include "../../../../../src/coap/common/internal/srv_parse_edhoc_request_builders.h"
+#include "coap/common/internal/com_parse_edhoc_request_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 

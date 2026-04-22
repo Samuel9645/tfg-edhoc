@@ -9,17 +9,17 @@
 #include <coap3/coap.h>
 
 #include "coap/coap_config.h"
+#include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
-#include "coap/server/srv_parse_edhoc_request.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
-struct srv_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
+struct com_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
     struct com_writable_buffer* data_buffer);
 
-struct srv_coap_parse_edhoc_request_result
+struct com_coap_parse_edhoc_request_result
 stb_srv_coap_parse_edhoc_request_fail(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,

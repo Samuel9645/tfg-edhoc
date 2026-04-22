@@ -4,15 +4,15 @@
 #include <coap3/coap.h>
 
 #include "coap/coap_config.h"
+#include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
-#include "coap/server/srv_parse_edhoc_request.h"
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
-typedef struct srv_coap_parse_edhoc_request_result (
+typedef struct com_coap_parse_edhoc_request_result (
     *srv_coap_parse_edhoc_request_fn)(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,

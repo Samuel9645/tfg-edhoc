@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-#include "coap/server/internal/srv_parse_edhoc_request_builders.h"
+#include "../../../../../src/coap/common/internal/srv_parse_edhoc_request_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
@@ -23,7 +23,7 @@ static const struct com_readonly_buffer DUMMY_READONLY_BUFFER = {
     .length = sizeof(DUMMY_PAYLOAD),
 };
 
-struct srv_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
+struct com_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
     struct com_writable_buffer* data_buffer) {
@@ -33,7 +33,7 @@ struct srv_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
   return srv_coap_internal_parse_edhoc_ok(DUMMY_READONLY_BUFFER);
 }
 
-struct srv_coap_parse_edhoc_request_result
+struct com_coap_parse_edhoc_request_result
 stb_srv_coap_parse_edhoc_request_fail(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
@@ -42,7 +42,7 @@ stb_srv_coap_parse_edhoc_request_fail(
   (void)expected_format;
   (void)data_buffer;
   return srv_coap_internal_parse_edhoc_failure(
-      SRV_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT);
+      COM_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT);
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};

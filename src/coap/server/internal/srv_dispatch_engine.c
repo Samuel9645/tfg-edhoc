@@ -1,7 +1,7 @@
 #include "srv_dispatch_engine.h"
 
 #include "coap/coap_config.h"
-#include "coap/server/srv_parse_edhoc_request.h"
+#include "coap/common/com_coap_parse_edhoc_request.h"
 #include "edhoc/edhoc_config.h"
 
 /**
@@ -98,12 +98,12 @@ void srv_coap_dispatch_post_with_dependencies(
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
       .length = 0,
   };
-  const struct srv_coap_parse_edhoc_request_result parse_edhoc_result =
+  const struct com_coap_parse_edhoc_request_result parse_edhoc_result =
       deps->parse_edhoc_request(request, CONFIG_COAP_CONTENT_CID_EDHOC,
                                 &pdu_data);
-  if (parse_edhoc_result.status != SRV_COAP_EDH_REQ_OK) {
+  if (parse_edhoc_result.status != COM_COAP_EDH_REQ_OK) {
     coap_log_err("failed to parse EDHOC message\n");
-    coap_pdu_set_code(response, srv_coap_map_parse_result_to_pdu_code(
+    coap_pdu_set_code(response, com_coap_map_parse_result_to_pdu_code(
                                     parse_edhoc_result.status));
     return;
   }

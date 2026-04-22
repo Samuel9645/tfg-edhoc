@@ -14,17 +14,17 @@
 #include "coap/coap_config.h"
 #include "common/com_data_models.h"
 
-enum srv_coap_parse_edhoc_request_status {
-  SRV_COAP_EDH_REQ_OK = 0,
-  SRV_COAP_EDH_REQ_ERR_PDU,
-  SRV_COAP_EDH_REQ_ERR_DATA_BUFFER,
-  SRV_COAP_EDH_REQ_ERR_MISSING_FORMAT,
-  SRV_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT,
-  SRV_COAP_EDH_REQ_ERR_NO_PAYLOAD,
+enum com_coap_parse_edhoc_request_status {
+  COM_COAP_EDH_REQ_OK = 0,
+  COM_COAP_EDH_REQ_ERR_PDU,
+  COM_COAP_EDH_REQ_ERR_DATA_BUFFER,
+  COM_COAP_EDH_REQ_ERR_MISSING_FORMAT,
+  COM_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT,
+  COM_COAP_EDH_REQ_ERR_NO_PAYLOAD,
 };
 
-struct srv_coap_parse_edhoc_request_result {
-  const enum srv_coap_parse_edhoc_request_status status;
+struct com_coap_parse_edhoc_request_result {
+  const enum com_coap_parse_edhoc_request_status status;
   const struct com_readonly_buffer parsed_request;
 };
 
@@ -35,12 +35,12 @@ struct srv_coap_parse_edhoc_request_result {
  * @param[out] data_buffer View of the buffer to write the data into
  * @return Struct containing a status code and a view of the parsed request
  */
-struct srv_coap_parse_edhoc_request_result srv_coap_parse_edhoc_request(
+struct com_coap_parse_edhoc_request_result com_coap_parse_edhoc_request(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
     struct com_writable_buffer* data_buffer);
 
-coap_pdu_code_t srv_coap_map_parse_result_to_pdu_code(
-    enum srv_coap_parse_edhoc_request_status status);
+coap_pdu_code_t com_coap_map_parse_result_to_pdu_code(
+    enum com_coap_parse_edhoc_request_status status);
 
 #endif  // COAP_SERVER_SRV_PARSE_EDHOC_REQUEST_H_

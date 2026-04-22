@@ -24,7 +24,7 @@ set(ADD_EDHOC_ERROR_SOURCES
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/edhoc_config.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
@@ -43,7 +43,7 @@ set(MESSAGE_1_PROCESS_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
     ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
 )
 
 set(MESSAGE_2_COMPOSE_SOURCES

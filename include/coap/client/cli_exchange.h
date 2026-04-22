@@ -3,7 +3,6 @@
 
 #include <coap3/coap.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_status.h"
@@ -48,8 +47,8 @@ struct cli_coap_exchange;
  * @brief Initializes the exchange state, binds session data, and registers
  * handlers.
  *
- * This function handles the dynamic allocation of the exchange context and
- * orchestrates the necessary libcoap registrations.
+ * This function handles the dynamic allocation of the exchange edhoc_context
+ * and orchestrates the necessary libcoap registrations.
  *
  * @param[in] session_data Session and endpoint metadata required for
  * initialization.

@@ -28,17 +28,15 @@ message_1_compose_protocol_failure(
 }
 
 static struct cli_edhoc_message_1_compose_result
-message_1_compose_local_failure(
-    const enum cli_edhoc_message_1_compose_status status) {
-  return (struct cli_edhoc_message_1_compose_result){.status = status};
+message_1_compose_local_failure(void) {
+  return (struct cli_edhoc_message_1_compose_result){
+      .status = CLI_EDHOC_MSG1_COMPOSE_ERR_INVALID_COMPOSE_BUFFER};
 }
 
 struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
-    struct cli_edhoc_handshake* state, struct com_writable_buffer* message_1) {
-  if (!cli_edhoc_handshake_is_initialized(state) ||
-      !com_writable_buffer_is_writable(message_1)) {
-    return message_1_compose_local_failure(
-        CLI_EDHOC_MSG1_COMPOSE_ERR_INVALID_ARGS);
+    struct edhoc_context* context, struct com_writable_buffer* message_1) {
+  if (!com_writable_buffer_is_writable(message_1)) {
+    return message_1_compose_local_failure();
   }
 
   struct edhoc_prepended_fields prepended_fields = {
@@ -50,10 +48,10 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
     return message_1_compose_protocol_failure(
         CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_FAILED, *message_1);
   }
-  if (edhoc_message_1_compose(
-          &state->context, prepended_fields.edhoc_message_ptr,
-          prepended_fields.edhoc_message_size,
-          &prepended_fields.edhoc_message_size) != EDHOC_SUCCESS) {
+  if (edhoc_message_1_compose(context, prepended_fields.edhoc_message_ptr,
+                              prepended_fields.edhoc_message_size,
+                              &prepended_fields.edhoc_message_size) !=
+      EDHOC_SUCCESS) {
     return message_1_compose_protocol_failure(
         CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE_FAILED, *message_1);
   }

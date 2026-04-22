@@ -10,6 +10,8 @@
 #include "common/com_emulation.h"
 #include "common/com_session_resources.h"
 #include "edhoc/client/cli_handshake.h"
+#include "edhoc/client/handshake/message_1/cli_m1_compose.h"
+#include "edhoc/common/com_edhoc_context_setup.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
 #include "edhoc/credentials/cred_pub_data.h"
@@ -109,16 +111,18 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (cli_edhoc_init_handshake(&client_resources.handshake, &credentials) !=
-      CLI_EDHOC_INIT_OK) {
-    coap_log_err("Failed to initialize EDHOC handshake\n");
+  struct edhoc_context edhoc_ctx = {0};
+  client_resources.edhoc_context = &edhoc_ctx;
+  if (com_edhoc_setup_context(client_resources.edhoc_context, &credentials) !=
+      COM_EDHOC_SETUP_CTX_OK) {
+    coap_log_err("Failed to initialize EDHOC context\n");
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
   const struct cli_edhoc_message_1_compose_result message_1_result =
-      cli_edhoc_handshake_compose_message_1(&client_resources.handshake,
-                                            &payload_buffer);
+      cli_edhoc_compose_message_1(client_resources.edhoc_context,
+                                  &payload_buffer);
   if (message_1_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 1\n");
     cli_coap_cleanup_resources(&client_resources);

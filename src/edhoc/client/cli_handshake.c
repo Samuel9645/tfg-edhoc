@@ -30,7 +30,7 @@ struct cli_edhoc_message_2_process_result cli_edhoc_handshake_process_message_2(
     struct cli_edhoc_handshake* state,
     const struct com_readonly_buffer message_2,
     struct com_writable_buffer* message_2_error) {
-  return cli_edhoc_process_message_2(state, message_2, message_2_error);
+  return cli_edhoc_process_message_2(state, message_2_error);
 }
 
 struct cli_edhoc_message_3_compose_result cli_edhoc_handshake_compose_message_3(

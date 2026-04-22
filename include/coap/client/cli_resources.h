@@ -8,7 +8,7 @@
 struct cli_coap_session_resources {
   struct com_session_resources common_resources;
   coap_session_t* coap_session;
-  struct cli_edhoc_handshake handshake;
+  struct edhoc_context* edhoc_context;
   struct cli_coap_exchange* exchange;
 };
 

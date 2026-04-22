@@ -1,22 +1,23 @@
 
-#include "edhoc/common/com_edhoc_setup.h"
+#include "edhoc/common/com_edhoc_context_setup.h"
 
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>
 #include <stdint.h>
 #include <stdio.h>
 
-int com_edhoc_setup_context(struct edhoc_context* context,
-                            const struct edhoc_credentials* credentials) {
+enum com_edhoc_setup_context_status com_edhoc_setup_context(
+    struct edhoc_context* context,
+    const struct edhoc_credentials* credentials) {
   const psa_status_t psa_status = psa_crypto_init();
   if (psa_status != PSA_SUCCESS) {
     fprintf(stderr, "cannot initialize PSA crypto: %d\n", psa_status);
-    return psa_status;
+    return COM_EDHOC_SETUP_CTX_ERR_PSA_INIT;
   }
   int ret = edhoc_context_init(context);
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot initialize context: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT;
   }
 
   const enum edhoc_method methods[] = {EDHOC_METHOD_0};
@@ -24,7 +25,7 @@ int com_edhoc_setup_context(struct edhoc_context* context,
   ret = edhoc_set_methods(context, methods, ARRAY_SIZE(methods));
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot set methods: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_SET_METHODS;
   }
 
   const struct edhoc_cipher_suite cipher_suite_2 = {
@@ -42,7 +43,7 @@ int com_edhoc_setup_context(struct edhoc_context* context,
                                 ARRAY_SIZE(cipher_suites));
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot set cipher suites: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES;
   }
 
   const struct edhoc_connection_id connection_id = {
@@ -53,27 +54,27 @@ int com_edhoc_setup_context(struct edhoc_context* context,
   ret = edhoc_set_connection_id(context, &connection_id);
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot set connection ID: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID;
   }
 
   ret = edhoc_bind_keys(context, edhoc_cipher_suite_2_get_keys());
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot bind keys: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS;
   }
 
   ret = edhoc_bind_crypto(context, edhoc_cipher_suite_2_get_crypto());
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot bind crypto: %d\n", ret);
-    return ret;
+    return COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO;
   }
 
   ret = edhoc_bind_credentials(context, credentials);
   if (ret != EDHOC_SUCCESS) {
     fprintf(stderr, "cannot bind credentials: %d\n", ret);
+    return COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS;
   }
-
-  return ret;
+  return COM_EDHOC_SETUP_CTX_OK;
 }
 
 void com_edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,

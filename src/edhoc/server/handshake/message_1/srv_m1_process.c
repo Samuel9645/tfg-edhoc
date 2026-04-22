@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/com_edhoc_setup.h"
+#include "edhoc/common/com_edhoc_context_setup.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.h"
 #include "edhoc/server/handshake/message_1/srv_m1_errors.h"
 
@@ -55,7 +55,8 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
         SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
         add_internal_error_to_buffer("Context calloc failed", error_buffer));
   }
-  if (com_edhoc_setup_context(context, request.credentials) != EDHOC_SUCCESS) {
+  if (com_edhoc_setup_context(context, request.credentials) !=
+      COM_EDHOC_SETUP_CTX_OK) {
     free(context);
     return srv_edhoc_message_1_process_failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,

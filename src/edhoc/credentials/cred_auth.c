@@ -3,15 +3,15 @@
 #include <edhoc_cipher_suite_2.h>
 #include <edhoc_values.h>
 
-#include "edhoc/common/com_edhoc_setup.h"
+#include "edhoc/common/com_edhoc_context_setup.h"
 
 int cred_edhoc_auth_fetch(void* user_context,
                           struct edhoc_auth_creds* credentials,
-                        const uint8_t* own_public_key,
-                        const size_t own_public_key_length,
-                        const uint8_t* own_private_key,
-                        const size_t own_private_key_length,
-                        const int32_t own_key_id) {
+                          const uint8_t* own_public_key,
+                          const size_t own_public_key_length,
+                          const uint8_t* own_private_key,
+                          const size_t own_private_key_length,
+                          const int32_t own_key_id) {
   if (credentials == NULL) {
     return EDHOC_ERROR_INVALID_ARGUMENT;
   }
@@ -30,11 +30,11 @@ int cred_edhoc_auth_fetch(void* user_context,
 
 int cred_edhoc_auth_verify(const void* user_context,
                            struct edhoc_auth_creds* credentials,
-                         const int32_t expected_key_id,
-                         const uint8_t* peer_public_key,
-                         const size_t peer_public_key_length,
-                         const uint8_t** public_key_reference,
-                         size_t* public_key_length) {
+                           const int32_t expected_key_id,
+                           const uint8_t* peer_public_key,
+                           const size_t peer_public_key_length,
+                           const uint8_t** public_key_reference,
+                           size_t* public_key_length) {
   (void)user_context;
   if (credentials == NULL) {
     return EDHOC_ERROR_INVALID_ARGUMENT;

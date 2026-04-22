@@ -16,11 +16,11 @@
 /**
  * @brief Compose EDHOC Message 1 payload.
  *
- * @param[in] state Initialized client handshake state.
+ * @param[in] context Initialized client handshake state.
  * @param[out] message_1 Destination buffer descriptor for composed payload.
  * @return Result wrapper containing status and output view.
  */
 struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
-    struct cli_edhoc_handshake* state, struct com_writable_buffer* message_1);
+    struct edhoc_context* context, struct com_writable_buffer* message_1);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_1_CLI_M1_COMPOSE_H_

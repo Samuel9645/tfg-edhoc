@@ -35,26 +35,24 @@ message_2_process_local_failure(
 }
 
 struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
-    struct cli_edhoc_handshake* state,
-    const struct com_readonly_buffer message_2,
-    struct com_writable_buffer* message_2_error) {
-  if (!cli_edhoc_handshake_is_initialized(state) ||
+    struct edhoc_context* context, struct com_writable_buffer* error_buffer) {
+  if (!cli_edhoc_handshake_is_initialized(context) ||
       !com_readonly_buffer_has_content(message_2) ||
-      !com_writable_buffer_is_writable(message_2_error)) {
+      !com_writable_buffer_is_writable(error_buffer)) {
     return message_2_process_local_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_INVALID_ARGS);
   }
 
   const int edhoc_result = edhoc_message_2_process(
-      &state->context, message_2.bytes, message_2.length);
+      &context->context, message_2.bytes, message_2.length);
 
   if (edhoc_result != EDHOC_SUCCESS) {
     com_edhoc_add_protocol_error_with_description(
-        &state->context, "Failed to process EDHOC message 2", message_2_error);
+        &context->context, "Failed to process EDHOC message 2", error_buffer);
     return message_2_process_protocol_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,
-        *message_2_error);
+        *error_buffer);
   }
-  message_2_error->length = 0;
+  error_buffer->length = 0;
   return message_2_process_ok();
 }

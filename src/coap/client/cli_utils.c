@@ -96,7 +96,10 @@ static coap_pdu_t* create_post_request_pdu(coap_session_t* coap_session) {
   if (pdu == NULL) {
     return NULL;
   }
-  uint8_t token[8];
+
+  enum { REQUIRED_TOKEN_SIZE = 8 };
+
+  uint8_t token[REQUIRED_TOKEN_SIZE];
   size_t token_len;
   coap_session_new_token(coap_session, &token_len, token);
   if (!coap_add_token(pdu, token_len, token)) {

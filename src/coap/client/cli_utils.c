@@ -79,9 +79,9 @@ struct cli_coap_create_session_result cli_coap_create_session(
   const coap_proto_t protocol = config.uri->scheme == COAP_URI_SCHEME_COAP_TCP
                                     ? COAP_PROTO_TCP
                                     : COAP_PROTO_UDP;
-  const coap_address_t* local_interface_address = NULL;
+  const coap_address_t* suitable_local_interface_option = NULL;
   coap_session_t* session = coap_new_client_session(
-      context, local_interface_address, config.address, protocol);
+      context, suitable_local_interface_option, config.address, protocol);
   if (session == NULL) {
     coap_log_err("failed to create CoAP session\n");
     return create_session_result_failure();

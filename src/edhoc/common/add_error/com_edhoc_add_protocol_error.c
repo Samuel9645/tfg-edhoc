@@ -33,7 +33,7 @@ static struct com_edhoc_add_error_result add_internal_error(
   return (struct com_edhoc_add_error_result){.status = status};
 }
 
-struct com_edhoc_add_error_result com_edhoc_add_protocol_error(
+struct com_edhoc_add_error_result com_edhoc_add_protocol_error_result(
     const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
     struct com_writable_buffer* response_data) {
@@ -69,7 +69,16 @@ struct com_edhoc_add_error_result com_edhoc_add_protocol_error(
   return add_internal_error_ok(conversion_result.buffer);
 }
 
-struct com_edhoc_add_error_result com_edhoc_add_protocol_error_with_description(
+struct com_readonly_buffer com_edhoc_add_protocol_error_view(
+    const struct edhoc_context* context,
+    const struct edhoc_error_info* error_info,
+    struct com_writable_buffer* response_data) {
+  return com_edhoc_add_protocol_error_result(context, error_info, response_data)
+      .buffer;
+}
+
+struct com_edhoc_add_error_result
+com_edhoc_add_protocol_error_with_description_result(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data) {
   if (error_description == NULL) {
@@ -77,5 +86,14 @@ struct com_edhoc_add_error_result com_edhoc_add_protocol_error_with_description(
   }
   struct edhoc_error_info error_info = {0};
   com_edhoc_set_error_info(&error_info, error_description);
-  return com_edhoc_add_protocol_error(context, &error_info, response_data);
+  return com_edhoc_add_protocol_error_result(context, &error_info,
+                                             response_data);
+}
+
+struct com_readonly_buffer com_edhoc_add_protocol_error_with_description_view(
+    const struct edhoc_context* context, const char* error_description,
+    struct com_writable_buffer* response_data) {
+  return com_edhoc_add_protocol_error_with_description_result(
+             context, error_description, response_data)
+      .buffer;
 }

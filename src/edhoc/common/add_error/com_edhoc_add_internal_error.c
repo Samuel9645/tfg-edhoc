@@ -28,7 +28,7 @@ static struct com_edhoc_add_error_result add_internal_error(
   return (struct com_edhoc_add_error_result){.status = status};
 }
 
-struct com_edhoc_add_error_result com_edhoc_add_internal_error(
+struct com_edhoc_add_error_result com_edhoc_add_internal_error_result(
     const char* error_description, struct com_writable_buffer* response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
     return add_internal_error_invalid_response_buffer();
@@ -51,4 +51,10 @@ struct com_edhoc_add_error_result com_edhoc_add_internal_error(
     return add_internal_error(COM_EDHOC_ADD_ERROR_ERR_CONVERSION);
   }
   return add_internal_error_ok(conversion_result.buffer);
+}
+
+struct com_readonly_buffer com_edhoc_add_internal_error_view(
+    const char* error_description, struct com_writable_buffer* response_data) {
+  return com_edhoc_add_internal_error_result(error_description, response_data)
+      .buffer;
 }

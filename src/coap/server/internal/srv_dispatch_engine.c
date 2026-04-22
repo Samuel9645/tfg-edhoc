@@ -54,7 +54,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
 
   if (edhoc_ctx == NULL) {
     const struct srv_edhoc_message_1_responder_request request_data = {
-        .raw_coap_payload = parsed_request, .credentials = credentials};
+        .raw_payload = parsed_request, .credentials = credentials};
 
     const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->respond_to_message_1(request_data, &response_data);
@@ -68,7 +68,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
   }
 
   const struct srv_edhoc_message_3_responder_request handler_request = {
-      .edhoc_context = edhoc_ctx, .raw_coap_payload = parsed_request};
+      .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
 
   const struct srv_edhoc_message_3_responder_result message_3_result =
       deps->respond_to_message_3(handler_request, &response_data);

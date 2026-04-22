@@ -13,11 +13,6 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.h"
 
-static struct com_readonly_buffer add_internal_error_to_buffer(
-    const char* error_message, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_internal_error(error_message, buffer).buffer;
-}
-
 struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
     const struct com_readonly_buffer request_buffer,
     struct com_writable_buffer* error_response) {
@@ -28,7 +23,8 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
   if (!com_readonly_buffer_has_content(request_buffer)) {
     return srv_coap_internal_parse_message_1_failure(
         SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
-        add_internal_error_to_buffer("invalid request buffer", error_response));
+        com_edhoc_add_internal_error_view("invalid request buffer",
+                                          error_response));
   }
 
   struct edhoc_extracted_fields extracted_fields = {
@@ -40,8 +36,8 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
   if (edhoc_extract_flow_info(&extracted_fields) != EDHOC_SUCCESS) {
     return srv_coap_internal_parse_message_1_failure(
         SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
-        add_internal_error_to_buffer("prefix extraction failed",
-                                     error_response));
+        com_edhoc_add_internal_error_view("prefix extraction failed",
+                                          error_response));
   }
   return srv_coap_internal_parse_message_1_ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,

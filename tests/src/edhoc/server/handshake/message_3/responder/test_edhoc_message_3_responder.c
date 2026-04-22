@@ -32,7 +32,7 @@ static struct {
   struct com_writable_buffer response;
 } env = {
     .response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-    .valid_request = {.raw_coap_payload = {.bytes = REQUEST_BUFFER,
+         .valid_request = {.raw_payload = {.bytes = REQUEST_BUFFER,
                                            .length = sizeof(REQUEST_BUFFER)}}};
 
 static void reset_mocks(void) {
@@ -70,16 +70,16 @@ void test_responder_ok_for_valid_data(void) {
 void test_responder_fails_on_invalid_data(void) {
   struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_message_3_responder_request no_buffer_request = {
-      .raw_coap_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
       .edhoc_context = &env.context,
   };
   const struct srv_edhoc_message_3_responder_request empty_payload_request = {
-      .raw_coap_payload = {.bytes = REQUEST_BUFFER, .length = 0},
+      .raw_payload = {.bytes = REQUEST_BUFFER, .length = 0},
       .edhoc_context = &env.context,
   };
   const struct srv_edhoc_message_3_responder_request no_context_request = {
-      .raw_coap_payload = {.bytes = REQUEST_BUFFER,
-                           .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = REQUEST_BUFFER,
+                      .length = sizeof(REQUEST_BUFFER)},
       .edhoc_context = NULL};
 
   const struct {

@@ -1,9 +1,9 @@
+
 #ifndef COAP_CLIENT_CLI_EXCHANGE_H_
 #define COAP_CLIENT_CLI_EXCHANGE_H_
 
 #include <coap3/coap.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_status.h"
@@ -48,8 +48,8 @@ struct cli_coap_exchange;
  * @brief Initializes the exchange state, binds session data, and registers
  * handlers.
  *
- * This function handles the dynamic allocation of the exchange context and
- * orchestrates the necessary libcoap registrations.
+ * This function handles the dynamic allocation of the exchange edhoc_context
+ * and orchestrates the necessary libcoap registrations.
  *
  * @param[in] session_data Session and endpoint metadata required for
  * initialization.
@@ -73,9 +73,10 @@ struct cli_coap_exchange* cli_coap_init_exchange(
  * @param[in] request_data EDHOC request payload and content format.
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
  * failure.
+ * @note This resets the state of the exchange before sending the data
  */
 enum status_coap cli_coap_exchange_send(
-    const struct cli_coap_exchange* exchange,
+    struct cli_coap_exchange* exchange,
     struct cli_coap_exchange_request request_data);
 
 struct cli_coap_wait_and_get_result {
@@ -87,18 +88,14 @@ struct cli_coap_wait_and_get_result {
  * @brief Wait for response and copy payload to caller buffer.
  *
  * @param[in,out] exchange Initialized exchange state.
- * @param[in] response_data Response output buffer metadata.
  * @return Struct containing status code and view of response payload on
  * success, empty view on failure.
  *
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.
- *
- * @note This resets the state of the exchange after receiving the response
  */
 struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
-    struct cli_coap_exchange* exchange,
-    const struct com_writable_buffer* response_data);
+    const struct cli_coap_exchange* exchange);
 
 /**
  * @brief Reset response state before next request.

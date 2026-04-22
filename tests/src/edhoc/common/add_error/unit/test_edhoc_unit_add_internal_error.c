@@ -19,7 +19,7 @@ void test_add_internal_error_fails_on_invalid_buffer(void) {
   const char* description = "RANDOM DESCRIPTION";
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_internal_error(description, &invalid_buffer);
+      com_edhoc_add_internal_error_result(description, &invalid_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER,
                     result.status);
@@ -34,7 +34,7 @@ void test_add_internal_error_fails_on_error_compose_fail(void) {
   tst_com_edhoc_set_error_compose_failed();
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_internal_error(description, &response_buffer);
+      com_edhoc_add_internal_error_result(description, &response_buffer);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result.status);
   TEST_ASSERT_FALSE(com_readonly_buffer_has_content(result.buffer));

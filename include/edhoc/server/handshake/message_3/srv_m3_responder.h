@@ -17,7 +17,7 @@
 #include "edhoc/server/handshake/message_3/srv_m3_responder_result.h"
 
 struct srv_edhoc_message_3_responder_request {
-  struct com_readonly_buffer raw_coap_payload;
+  struct com_readonly_buffer raw_payload;
   struct edhoc_context* edhoc_context;
 };
 

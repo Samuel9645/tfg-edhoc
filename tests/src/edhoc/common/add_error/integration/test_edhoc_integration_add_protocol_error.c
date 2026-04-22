@@ -60,7 +60,7 @@ void test_add_error_with_description_on_invalid_library_state(void) {
   const char* expected_description = "RANDOM DESCRIPTION";
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_protocol_error_with_description(
+      com_edhoc_add_protocol_error_with_description_result(
           &env.context, expected_description, &env.error_buffer_view);
 
   assert_result_matches(expected_description, result);
@@ -86,7 +86,7 @@ void test_add_error_with_description_creates_valid_error_with_null_parameters(
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
     const struct com_edhoc_add_error_result result =
-        com_edhoc_add_protocol_error_with_description(
+        com_edhoc_add_protocol_error_with_description_result(
             test_cases[i].context, test_cases[i].error_description,
             &env.error_buffer_view);
 
@@ -108,8 +108,8 @@ void test_add_error_with_error_info_on_invalid_library_state(void) {
       .total_entries = error_description_length,
       .written_entries = error_description_length};
 
-  const struct com_edhoc_add_error_result result = com_edhoc_add_protocol_error(
-      &env.context, &expected_error_info, &env.error_buffer_view);
+  const struct com_edhoc_add_error_result result =
+      com_edhoc_add_protocol_error_result(&env.context, &expected_error_info, &env.error_buffer_view);
 
   assert_result_matches(expected_description, result);
 }
@@ -151,8 +151,8 @@ void test_add_error_with_error_info_creates_valid_error_with_null_parameters(
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
     const struct com_edhoc_add_error_result result =
-        com_edhoc_add_protocol_error(test_cases[i].context, test_cases[i].info,
-                                     &env.error_buffer_view);
+        com_edhoc_add_protocol_error_result(
+            test_cases[i].context, test_cases[i].info, &env.error_buffer_view);
 
     tst_edhoc_assert_add_error_status_ok_with_message(
         result, test_cases[i].description);

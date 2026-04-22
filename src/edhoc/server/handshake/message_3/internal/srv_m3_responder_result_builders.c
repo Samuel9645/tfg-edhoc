@@ -8,8 +8,6 @@
 
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
-#include <stddef.h>
-
 struct srv_edhoc_message_3_responder_result
 srv_edhoc_message_3_responder_invalid_response_buffer_failure(void) {
   return (struct srv_edhoc_message_3_responder_result){

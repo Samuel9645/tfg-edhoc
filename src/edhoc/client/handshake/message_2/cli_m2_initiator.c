@@ -1,0 +1,80 @@
+/**
+ * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 22/04/2026
+ * @brief Logic for responding to Message 2 (process Message 2 and compose
+ * Message 3)
+ * @see [RFC 9528
+ * A.2.1](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
+#include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
+
+#include "edhoc/client/handshake/message_2/cli_m2_process.h"
+#include "edhoc/client/handshake/message_3/cli_m3_compose.h"
+
+static struct cli_edhoc_message_2_initiator_result empty_request_buffer_failure(
+    void) {
+  return (struct cli_edhoc_message_2_initiator_result){
+      .status = CLI_EDHOC_MSG2_INITIATOR_ERR_EMPTY_REQUEST_BUFFER,
+  };
+}
+
+static struct cli_edhoc_message_2_initiator_result failure(
+    const enum cli_edhoc_message_2_initiator_status status,
+    const struct com_readonly_buffer request) {
+  return (struct cli_edhoc_message_2_initiator_result){
+      .status = status,
+      .request = request,
+  };
+}
+
+static struct cli_edhoc_message_2_initiator_result ok(
+    const struct com_readonly_buffer request) {
+  return (struct cli_edhoc_message_2_initiator_result){
+      .status = CLI_EDHOC_MSG2_INITIATOR_OK,
+      .request = request,
+  };
+}
+
+struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
+    const struct cli_edhoc_message_2_initiator_request request,
+    struct com_writable_buffer* request_buffer) {
+  if (!com_writable_buffer_is_writable(request_buffer)) {
+    return empty_request_buffer_failure();
+  }
+
+  const struct cli_edhoc_message_2_process_result process_result =
+      cli_edhoc_process_message_2(request.edhoc_context, request.raw_payload,
+                                  request_buffer);
+  if (process_result.status != CLI_EDHOC_MSG2_PROCESS_OK) {
+    return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
+                   process_result.error_buffer);
+  }
+
+  const struct cli_edhoc_message_3_compose_result compose_result =
+      cli_edhoc_compose_message_3(request.edhoc_context, request_buffer);
+  if (compose_result.status != CLI_EDHOC_MSG3_COMPOSE_OK) {
+    return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
+                   compose_result.buffer);
+  }
+
+  return ok(compose_result.buffer);
+}
+
+const char* cli_edhoc_handle_message_2_status_code_to_string(
+    const enum cli_edhoc_message_2_initiator_status status) {
+  switch (status) {
+  case CLI_EDHOC_MSG2_INITIATOR_OK:
+    return "ok";
+  case CLI_EDHOC_MSG2_INITIATOR_ERR_EMPTY_REQUEST_BUFFER:
+    return "invalid request buffer";
+  case CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS:
+    return "message 2 process failed";
+  case CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE:
+    return "message 3 compose failed";
+  default:
+    return "unknown";
+  }
+}

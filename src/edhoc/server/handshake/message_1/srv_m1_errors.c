@@ -45,6 +45,6 @@ srv_edhoc_message_1_handler_add_protocol_error(
         .status = COM_EDHOC_ADD_ERROR_ERR_COMPOSE,
         .buffer = (struct com_readonly_buffer){0}};
   }
-  return com_edhoc_add_protocol_error_with_description(
+  return com_edhoc_add_protocol_error_with_description_result(
       context, error_description, response_data);
 }

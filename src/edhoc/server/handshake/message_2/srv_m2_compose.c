@@ -16,14 +16,13 @@
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
     const char* error_message, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_internal_error(error_message, buffer).buffer;
+  return com_edhoc_add_internal_error_result(error_message, buffer).buffer;
 }
 
 static struct com_readonly_buffer add_compose_error_to_buffer(
     const struct edhoc_context* context, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_protocol_error_with_description(
-             context, "Message 2 composition failed", buffer)
-      .buffer;
+  return com_edhoc_add_protocol_error_with_description_view(
+      context, "Message 2 composition failed", buffer);
 }
 
 struct srv_edhoc_message_2_compose_result srv_edhoc_compose_message_2(

@@ -29,10 +29,26 @@
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-struct com_edhoc_add_error_result com_edhoc_add_protocol_error(
+struct com_edhoc_add_error_result com_edhoc_add_protocol_error_result(
     const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
     struct com_writable_buffer* response_data);
+
+/**
+ * @brief Convenience wrapper for com_edhoc_add_protocol_error_result().
+ * @param[in] context Context used to translate libedhoc error to protocol
+ * error.
+ * @param[in] error_info Prepared EDHOC error info to embed in the response.
+ * @param[out] response_data Buffer where the EDHOC error message is written.
+ * @return A readonly buffer view containing the composed error message.
+ * @note This function is intended for protocol logic where the diagnostic
+ * status code is not required and only the resulting payload is needed.
+ */
+struct com_readonly_buffer com_edhoc_add_protocol_error_view(
+    const struct edhoc_context* context,
+    const struct edhoc_error_info* error_info,
+    struct com_writable_buffer* response_data);
+
 /**
  * @brief Compose and write an EDHOC error message payload into the response
  * buffer.
@@ -48,7 +64,24 @@ struct com_edhoc_add_error_result com_edhoc_add_protocol_error(
  * @param[out] response_data Buffer where the EDHOC error message is written.
  * @return Status code indicating success or failure of the operation.
  */
-struct com_edhoc_add_error_result com_edhoc_add_protocol_error_with_description(
+struct com_edhoc_add_error_result
+com_edhoc_add_protocol_error_with_description_result(
+    const struct edhoc_context* context, const char* error_description,
+    struct com_writable_buffer* response_data);
+
+/**
+ * @brief Convenience wrapper for
+ * com_edhoc_add_protocol_error_with_description_result().
+ * @param[in] context Context used to translate libedhoc error to protocol
+ * error.
+ * @param[in] error_description Description of the error to include in the
+ * error_info text_string
+ * @param[out] response_data Buffer where the EDHOC error message is written.
+ * @return A readonly buffer view containing the composed error message.
+ * @note This function is intended for protocol logic where the diagnostic
+ * status code is not required and only the resulting payload is needed.
+ */
+struct com_readonly_buffer com_edhoc_add_protocol_error_with_description_view(
     const struct edhoc_context* context, const char* error_description,
     struct com_writable_buffer* response_data);
 

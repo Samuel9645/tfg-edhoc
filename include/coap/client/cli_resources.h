@@ -1,14 +1,15 @@
 #ifndef COAP_CLIENT_CLI_RESOURCES_H_
 #define COAP_CLIENT_CLI_RESOURCES_H_
 
+#include <edhoc.h>
+
 #include "coap/client/cli_exchange.h"
 #include "common/com_session_resources.h"
-#include "edhoc/client/handshake/common/cli_state.h"
 
 struct cli_coap_session_resources {
   struct com_session_resources common_resources;
   coap_session_t* coap_session;
-  struct cli_edhoc_handshake handshake;
+  struct edhoc_context edhoc_ctx;
   struct cli_coap_exchange* exchange;
 };
 

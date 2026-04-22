@@ -19,8 +19,6 @@ struct cli_coap_exchange {
     const uint8_t* bytes;
     size_t length;
   } internal_parsed_response;
-
-  coap_pdu_code_t last_response_code;
 };
 
 static struct com_readonly_buffer get_readonly_buffer(
@@ -45,7 +43,6 @@ static coap_response_t coap_client_coap_response_handler(
 
   exchange->have_response = true;
   const coap_pdu_code_t response_code = coap_pdu_get_code(received);
-  exchange->last_response_code = response_code;
   if (response_code == COAP_EMPTY_CODE) {
     coap_log_info("received empty response\n");
     return COAP_RESPONSE_OK;
@@ -78,7 +75,7 @@ bool cli_coap_exchange_request_data_is_valid(
 
 struct cli_coap_exchange* cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
-    struct com_writable_buffer response_buffer) {
+    const struct com_writable_buffer response_buffer) {
   if (!cli_coap_exchange_session_data_is_valid(session_data)) {
     coap_log_err("invalid arguments to exchange_init\n");
     return NULL;
@@ -109,8 +106,10 @@ struct cli_coap_exchange* cli_coap_init_exchange(
 }
 
 enum status_coap cli_coap_exchange_send(
-    const struct cli_coap_exchange* exchange,
+    struct cli_coap_exchange* exchange,
     const struct cli_coap_exchange_request request_data) {
+  cli_coap_exchange_reset(exchange);
+
   if (exchange == NULL ||
       !cli_coap_exchange_request_data_is_valid(request_data)) {
     coap_log_err("invalid arguments to exchange_send\n");
@@ -155,9 +154,8 @@ static struct cli_coap_wait_and_get_result wait_and_get_failure(void) {
 }
 
 struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
-    struct cli_coap_exchange* exchange,
-    const struct com_writable_buffer* response_data) {
-  if (exchange == NULL || !com_writable_buffer_is_writable(response_data)) {
+    const struct cli_coap_exchange* exchange) {
+  if (exchange == NULL) {
     coap_log_err("invalid arguments to wait_and_get\n");
     return wait_and_get_failure();
   }
@@ -170,7 +168,6 @@ struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
   }
   const struct com_readonly_buffer response_buffer =
       get_readonly_buffer(exchange);
-  cli_coap_exchange_reset(exchange);
   if (!com_readonly_buffer_has_content(response_buffer)) {
     coap_log_err("no response received\n");
     return wait_and_get_failure();
@@ -187,5 +184,4 @@ void cli_coap_exchange_reset(struct cli_coap_exchange* exchange) {
   exchange->internal_parsed_response.bytes = NULL;
   exchange->internal_parsed_response.length = 0;
   exchange->incoming_response_buffer.length = 0;
-  exchange->last_response_code = COAP_EMPTY_CODE;
 }

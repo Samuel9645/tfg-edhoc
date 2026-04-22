@@ -14,16 +14,10 @@
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/server/handshake/message_4/internal/srv_m4_compose_result_builders.h"
 
-static struct com_readonly_buffer add_internal_error_to_buffer(
-    const char* error_message, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_internal_error(error_message, buffer).buffer;
-}
-
 static struct com_readonly_buffer add_compose_error_to_buffer(
     const struct edhoc_context* context, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_protocol_error_with_description(
-             context, "Message 4 composition failed", buffer)
-      .buffer;
+  return com_edhoc_add_protocol_error_with_description_view(
+      context, "Message 4 composition failed", buffer);
 }
 
 struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
@@ -34,7 +28,8 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
   if (context == NULL) {
     return srv_edhoc_message_4_compose_failure(
         SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT,
-        add_internal_error_to_buffer("Null EDHOC context", compose_buffer));
+        com_edhoc_add_internal_error_view("Null EDHOC context",
+                                          compose_buffer));
   }
 
   if (edhoc_message_4_compose(context, compose_buffer->bytes,
@@ -47,7 +42,8 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
   if (!com_writable_buffer_has_content(compose_buffer)) {
     return srv_edhoc_message_4_compose_failure(
         SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
-        add_internal_error_to_buffer("Empty compose result", compose_buffer));
+        com_edhoc_add_internal_error_view("Empty compose result",
+                                          compose_buffer));
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer);
@@ -55,7 +51,8 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
     // SHOULD NEVER HAPPEN
     return srv_edhoc_message_4_compose_failure(
         SRV_EDHOC_MSG4_COMPOSE_ERR_BUFFER_CONVERSION,
-        add_internal_error_to_buffer("Invalid compose buffer", compose_buffer));
+        com_edhoc_add_internal_error_view("Invalid compose buffer",
+                                          compose_buffer));
   }
   return srv_edhoc_message_4_compose_ok(conversion_result.buffer);
 }

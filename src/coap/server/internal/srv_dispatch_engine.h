@@ -7,9 +7,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
 #include "common/com_data_models.h"
-#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
-#include "edhoc/server/handshake/message_3/srv_m3_parser.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 typedef struct com_coap_parse_edhoc_request_result (

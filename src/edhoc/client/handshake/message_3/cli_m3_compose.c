@@ -2,7 +2,9 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 04/04/2026
- * @brief Composition implementation for client handshake Message 3.
+ * @brief Message 3 Composition for the client
+ * @see [RFC
+ * 9528 5.4.2](https://datatracker.ietf.org/doc/html/rfc9528/#name-initiator-composition-of-mes)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
@@ -10,87 +12,90 @@
 
 #include <edhoc_helpers.h>
 
+#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
-static struct cli_edhoc_message_3_compose_result message_3_compose_ok(
-    const struct com_writable_buffer message_3) {
+static struct cli_edhoc_message_3_compose_result ok(
+    const struct com_readonly_buffer message_3) {
   return (struct cli_edhoc_message_3_compose_result){
       .status = CLI_EDHOC_MSG3_COMPOSE_OK,
-      .output = message_3,
+      .buffer = message_3,
   };
 }
 
-static struct cli_edhoc_message_3_compose_result
-message_3_compose_protocol_failure(
+static struct cli_edhoc_message_3_compose_result protocol_failure(
     const enum cli_edhoc_message_3_compose_status status,
-    const struct com_writable_buffer error_buffer) {
+    const struct com_readonly_buffer error_buffer) {
   return (struct cli_edhoc_message_3_compose_result){
       .status = status,
-      .output = error_buffer,
+      .buffer = error_buffer,
   };
 }
 
-static struct cli_edhoc_message_3_compose_result
-message_3_compose_local_failure(
-    const enum cli_edhoc_message_3_compose_status status) {
+static struct cli_edhoc_message_3_compose_result invalid_compose_buffer(void) {
   return (struct cli_edhoc_message_3_compose_result){
-      .status = status,
+      .status = CLI_EDHOC_MSG3_COMPOSE_ERR_INVALID_COMPOSE_BUFFER,
+  };
+}
+
+static struct cli_edhoc_message_3_compose_result null_context_failure(
+    struct com_writable_buffer* compose_buffer) {
+  return (struct cli_edhoc_message_3_compose_result){
+      .status = CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT,
+      .buffer = com_edhoc_add_internal_error_view(
+          "Context pointer is NULL when composing message 3", compose_buffer),
   };
 }
 
 struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
-    struct cli_edhoc_handshake* state,
-    struct com_writable_buffer* message_3_or_error) {
-  const size_t min_payload_capacity = 1;
-  if (!cli_edhoc_handshake_is_initialized(state) ||
-      !com_writable_buffer_is_writable(message_3_or_error) ||
-      message_3_or_error->capacity < min_payload_capacity) {
-    return message_3_compose_local_failure(
-        CLI_EDHOC_MSG3_COMPOSE_ERR_INVALID_ARGS);
+    struct edhoc_context* context, struct com_writable_buffer* compose_buffer) {
+  if (!com_writable_buffer_is_writable(compose_buffer)) {
+    return invalid_compose_buffer();
+  }
+  if (context == NULL) {
+    return null_context_failure(compose_buffer);
   }
 
   struct edhoc_prepended_fields prepended_fields = {
-      .buffer = message_3_or_error->bytes,
-      .buffer_size = message_3_or_error->capacity,
-      .edhoc_message_ptr = message_3_or_error->bytes,
-      .edhoc_message_size = message_3_or_error->capacity,
+      .buffer = compose_buffer->bytes,
+      .buffer_size = compose_buffer->capacity,
+      .edhoc_message_ptr = compose_buffer->bytes,
+      .edhoc_message_size = compose_buffer->capacity,
   };
 
-  int edhoc_result = edhoc_prepend_connection_id(
-      &prepended_fields, &state->context.private_peer_cid);
-  if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_protocol_error_with_description(
-        &state->context, "Failed to prepend connection id for message 3",
-        message_3_or_error);
-    return message_3_compose_protocol_failure(
+  if (edhoc_prepend_connection_id(
+          &prepended_fields, &context->private_peer_cid) != EDHOC_SUCCESS) {
+    return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
-        *message_3_or_error);
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Failed to prepend connection id for message 3",
+            compose_buffer));
   }
 
-  size_t message3_len = 0;
-  edhoc_result = edhoc_message_3_compose(
-      &state->context, prepended_fields.edhoc_message_ptr,
-      prepended_fields.edhoc_message_size, &message3_len);
-  if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_protocol_error_with_description(
-        &state->context, "Failed to compose EDHOC message 3",
-        message_3_or_error);
-    return message_3_compose_protocol_failure(
+  if (edhoc_message_3_compose(context, prepended_fields.edhoc_message_ptr,
+                              prepended_fields.edhoc_message_size,
+                              &prepended_fields.edhoc_message_size) !=
+      EDHOC_SUCCESS) {
+    return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
-        *message_3_or_error);
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Failed to compose EDHOC message 3", compose_buffer));
   }
 
-  prepended_fields.edhoc_message_size = message3_len;
-  edhoc_result = edhoc_prepend_recalculate_size(&prepended_fields);
-  if (edhoc_result != EDHOC_SUCCESS) {
-    (void)com_edhoc_add_protocol_error_with_description(
-        &state->context, "Failed to recalculate prepended message size",
-        message_3_or_error);
-    return message_3_compose_protocol_failure(
+  if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
+    return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
-        *message_3_or_error);
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Failed to recalculate prepended message size",
+            compose_buffer));
   }
 
-  message_3_or_error->length = prepended_fields.buffer_size;
-  return message_3_compose_ok(*message_3_or_error);
+  compose_buffer->length = prepended_fields.buffer_size;
+  const struct com_readonly_conversion_result conversion_result =
+      com_writable_as_readonly(compose_buffer);
+  if (conversion_result.status != COM_RDONLY_CONV_OK) {
+    // SHOULD NEVER HAPPEN
+    return invalid_compose_buffer();
+  }
+  return ok(conversion_result.buffer);
 }

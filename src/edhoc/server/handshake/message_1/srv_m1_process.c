@@ -13,23 +13,13 @@
 #include <stdlib.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
+#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_context_setup.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.h"
-#include "edhoc/server/handshake/message_1/srv_m1_errors.h"
-
-// TODO: refactor the add error to return the readonly buffer too
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
     const char* error_message, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_internal_error(error_message, buffer).buffer;
-}
-
-static struct com_readonly_buffer add_processing_error_to_buffer(
-    const struct edhoc_context* context, const char* error_message,
-    struct com_writable_buffer* buffer) {
-  return srv_edhoc_message_1_handler_add_protocol_error(context, error_message,
-                                                        buffer)
-      .buffer;
+  return com_edhoc_add_internal_error_result(error_message, buffer).buffer;
 }
 
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
@@ -60,16 +50,16 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     free(context);
     return srv_edhoc_message_1_process_failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-        add_processing_error_to_buffer(context, "Context setup failed",
-                                       error_buffer));
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Context setup failed", error_buffer));
   }
   if (edhoc_message_1_process(context, request.payload.bytes,
                               request.payload.length) != EDHOC_SUCCESS) {
     srv_edhoc_cleanup_context(&context);
     return srv_edhoc_message_1_process_failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-        add_processing_error_to_buffer(context, "Message 1 processing failed",
-                                       error_buffer));
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Message 1 processing failed", error_buffer));
   }
   return srv_edhoc_message_1_process_ok(context);
 }

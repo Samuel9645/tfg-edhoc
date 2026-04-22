@@ -16,16 +16,10 @@
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_process_result_builders.h"
 
-static struct com_readonly_buffer add_internal_error_to_buffer(
-    const char* error_message, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_internal_error(error_message, buffer).buffer;
-}
-
 static struct com_readonly_buffer add_processing_error_to_buffer(
     const struct edhoc_context* context, struct com_writable_buffer* buffer) {
-  return com_edhoc_add_protocol_error_with_description(
-             context, "Message 3 processing failed", buffer)
-      .buffer;
+  return com_edhoc_add_protocol_error_with_description_view(
+      context, "Message 3 processing failed", buffer);
 }
 
 struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
@@ -37,12 +31,13 @@ struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
   if (request.edhoc_context == NULL) {
     return srv_edhoc_message_3_process_failure(
         SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT,
-        add_internal_error_to_buffer("Null EDHOC context", error_buffer));
+        com_edhoc_add_internal_error_view("Null EDHOC context", error_buffer));
   }
   if (!com_readonly_buffer_has_content(request.parsed_message_3)) {
     return srv_edhoc_message_3_process_failure(
         SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_PARSED_MESSAGE_3,
-        add_internal_error_to_buffer("Invalid parsed message 3", error_buffer));
+        com_edhoc_add_internal_error_view("Invalid parsed message 3",
+                                          error_buffer));
   }
 
   if (edhoc_message_3_process(

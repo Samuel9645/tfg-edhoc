@@ -2,7 +2,10 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 01/04/2026
- * @brief Logic for handling EDHOC Message 1 on the server side
+ * @brief Logic for responding to Message 1 (process Message 1 and compose
+ * Message 2)
+ * @see [RFC 9528
+ * A.2.1](https://datatracker.ietf.org/doc/html/rfc9528/#name-the-forward-message-flow)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
@@ -14,7 +17,7 @@
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
 struct srv_edhoc_message_1_responder_request {
-  struct com_readonly_buffer raw_coap_payload;
+  struct com_readonly_buffer raw_payload;
   const struct edhoc_credentials* credentials;
 };
 

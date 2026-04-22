@@ -9,8 +9,9 @@
 #include "coap/common/com_coap_context.h"
 #include "common/com_emulation.h"
 #include "common/com_session_resources.h"
-#include "edhoc/client/cli_handshake.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
+#include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
+#include "edhoc/client/handshake/message_4/cli_m4_process.h"
 #include "edhoc/common/com_edhoc_context_setup.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
@@ -111,9 +112,7 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  struct edhoc_context edhoc_ctx = {0};
-  client_resources.edhoc_context = &edhoc_ctx;
-  if (com_edhoc_setup_context(client_resources.edhoc_context, &credentials) !=
+  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, &credentials) !=
       COM_EDHOC_SETUP_CTX_OK) {
     coap_log_err("Failed to initialize EDHOC context\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -121,8 +120,7 @@ enum com_emulation_status core_run_client(void) {
   }
 
   const struct cli_edhoc_message_1_compose_result message_1_result =
-      cli_edhoc_compose_message_1(client_resources.edhoc_context,
-                                  &payload_buffer);
+      cli_edhoc_compose_message_1(&client_resources.edhoc_ctx, &payload_buffer);
   if (message_1_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 1\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -149,54 +147,30 @@ enum com_emulation_status core_run_client(void) {
   }
 
   struct cli_coap_wait_and_get_result wait_and_get_result =
-      cli_coap_exchange_wait_and_get(client_resources.exchange,
-                                     &payload_buffer);
+      cli_coap_exchange_wait_and_get(client_resources.exchange);
   if (wait_and_get_result.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 2\n");
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  const struct cli_edhoc_message_2_process_result message_2_result =
-      cli_edhoc_handshake_process_message_2(&client_resources.handshake,
-                                            wait_and_get_result.response,
-                                            &payload_buffer);
+  const struct cli_edhoc_message_2_initiator_result message_3_initiator_result =
+      cli_edhoc_respond_to_message_2(
+          (struct cli_edhoc_message_2_initiator_request){
+              .raw_payload = wait_and_get_result.response,
+              .edhoc_context = &client_resources.edhoc_ctx,
+          },
+          &payload_buffer);
 
-  if (message_2_result.status != CLI_EDHOC_MSG2_PROCESS_OK) {
+  if (message_3_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
-    struct com_readonly_conversion_result message_2_conversion_result =
-        com_writable_as_readonly(&payload_buffer);
-    // TODO: this is duplicated
-    if (message_2_conversion_result.status != COM_RDONLY_CONV_OK) {
-      coap_log_err(
-          "Failed to convert message 2 composing error to readonly buffer\n");
-      cli_coap_cleanup_resources(&client_resources);
-      return COM_EMULATION_FAILURE;
-    }
     cli_coap_try_send_edhoc_error_message(client_resources.exchange,
-                                          message_2_conversion_result.buffer);
-    cli_coap_cleanup_resources(&client_resources);
-    return COM_EMULATION_FAILURE;
-  }
-  const struct cli_edhoc_message_3_compose_result message_3_result =
-      cli_edhoc_handshake_compose_message_3(&client_resources.handshake,
-                                            &payload_buffer);
-  struct com_readonly_conversion_result message_3_conversion_result =
-      com_writable_as_readonly(&payload_buffer);
-  if (message_3_conversion_result.status != COM_RDONLY_CONV_OK) {
-    coap_log_err("Failed to convert composed message 3 to readonly buffer\n");
-    cli_coap_cleanup_resources(&client_resources);
-    return COM_EMULATION_FAILURE;
-  }
-  if (message_3_result.status != CLI_EDHOC_MSG3_COMPOSE_OK) {
-    coap_log_err("Failed to compose EDHOC message 3\n");
-    cli_coap_try_send_edhoc_error_message(client_resources.exchange,
-                                          message_3_conversion_result.buffer);
+                                          message_3_initiator_result.request);
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
   struct cli_coap_exchange_request message_3_request_data = {
-      .buffer = message_3_conversion_result.buffer,
+      .buffer = message_3_initiator_result.request,
       .content_format = CONFIG_COAP_CONTENT_CID_EDHOC,
   };
   if (cli_coap_exchange_send(client_resources.exchange,
@@ -207,8 +181,7 @@ enum com_emulation_status core_run_client(void) {
   }
 
   struct cli_coap_wait_and_get_result wait_and_get_result2 =
-      cli_coap_exchange_wait_and_get(client_resources.exchange,
-                                     &payload_buffer);
+      cli_coap_exchange_wait_and_get(client_resources.exchange);
   if (wait_and_get_result2.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 4\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -216,23 +189,14 @@ enum com_emulation_status core_run_client(void) {
   }
 
   const struct cli_edhoc_message_4_process_result message_4_result =
-      cli_edhoc_handshake_process_message_4(&client_resources.handshake,
-                                            wait_and_get_result2.response,
-                                            &payload_buffer);
+      cli_edhoc_process_message_4(&client_resources.edhoc_ctx,
+                                  wait_and_get_result2.response,
+                                  &payload_buffer);
 
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
-    struct com_readonly_conversion_result message_4_conversion_result =
-        com_writable_as_readonly(&payload_buffer);
-    // TODO: this is duplicated
-    if (message_4_conversion_result.status != COM_RDONLY_CONV_OK) {
-      coap_log_err(
-          "Failed to convert message 4 composing error to readonly buffer\n");
-      cli_coap_cleanup_resources(&client_resources);
-      return COM_EMULATION_FAILURE;
-    }
     cli_coap_try_send_edhoc_error_message(client_resources.exchange,
-                                          message_4_conversion_result.buffer);
+                                          message_4_result.error_buffer);
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }

@@ -5,6 +5,6 @@ void cli_coap_cleanup_resources(struct cli_coap_session_resources* resources) {
     return;
   }
 
-  edhoc_context_deinit(resources->edhoc_context);
+  edhoc_context_deinit(&resources->edhoc_ctx);
   com_cleanup_resources(&resources->common_resources);
 }

@@ -54,11 +54,10 @@ static struct {
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
   struct com_writable_buffer response;
   struct srv_edhoc_message_1_responder_request valid_request;
-} env = {
-    .response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-    .valid_request = {.raw_coap_payload = {.bytes = REQUEST_BUFFER,
+} env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
+         .valid_request = {.raw_payload = {.bytes = REQUEST_BUFFER,
                                            .length = sizeof(REQUEST_BUFFER)},
-                      .credentials = &DUMMY_TEST_CREDS}};
+                           .credentials = &DUMMY_TEST_CREDS}};
 
 static void reset_mocks(void) {
   tst_srv_edhoc_m1_reset_parse_mock();
@@ -94,12 +93,12 @@ static void ensure_context_is_freed_on_failure(
 void test_handler_fails_on_invalid_data(void) {
   struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
-      .raw_coap_payload = {.bytes = NULL, .length = 0},
+      .raw_payload = {.bytes = NULL, .length = 0},
       .credentials = &DUMMY_TEST_CREDS,
   };
   const struct srv_edhoc_message_1_responder_request no_credentials_request = {
-      .raw_coap_payload = {.bytes = REQUEST_BUFFER,
-                           .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = REQUEST_BUFFER,
+                      .length = sizeof(REQUEST_BUFFER)},
       .credentials = NULL,
   };
 
@@ -134,7 +133,7 @@ void test_handler_fails_on_invalid_data(void) {
 
 void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
   const struct srv_edhoc_message_1_responder_request invalid_request = {
-      .raw_coap_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
       .credentials = &DUMMY_TEST_CREDS,
   };
 

@@ -24,7 +24,7 @@ struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
   }
 
   const struct srv_edhoc_parse_message_3_result parse_result =
-      srv_edhoc_parse_message_3(request.raw_coap_payload, request.edhoc_context,
+      srv_edhoc_parse_message_3(request.raw_payload, request.edhoc_context,
                                 response);
   if (parse_result.status != SRV_EDHOC_MSG3_PARSE_OK) {
     return srv_edhoc_message_3_responder_failure(

@@ -69,6 +69,10 @@ enum com_emulation_status core_run_client(void) {
   if (parse_and_resolve_uri_result.status != CLI_COAP_PARSE_AND_RESOLVE_OK) {
     return COM_EMULATION_FAILURE;
   }
+  struct cli_coap_session_config config = {
+      .address = &parse_and_resolve_uri_result.address,
+      .uri = &parse_and_resolve_uri_result.uri,
+  };
   const struct com_coap_create_context_result create_context_result =
       com_coap_create_context();
   if (create_context_result.status != COM_COAP_INIT_OK) {
@@ -77,12 +81,9 @@ enum com_emulation_status core_run_client(void) {
   }
   client_resources.common_resources.coap_context =
       create_context_result.context;
-  struct cli_coap_session_config config = {
-      .address = &parse_and_resolve_uri_result.address,
-      .uri = &parse_and_resolve_uri_result.uri,
-  };
   struct cli_coap_create_session_result create_session_result =
-      cli_coap_create_session(create_context_result.context, config);
+      cli_coap_create_session(client_resources.common_resources.coap_context,
+                              config);
   if (create_session_result.status != CLI_COAP_CREATE_SESSION_OK) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

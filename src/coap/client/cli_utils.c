@@ -59,9 +59,9 @@ struct cli_coap_parse_and_resolve_result cli_coap_parse_and_resolve_coap_uri(
 }
 
 static struct cli_coap_create_session_result create_session_result_failure(
-    const enum cli_coap_create_session_status status) {
+    void) {
   return (struct cli_coap_create_session_result){
-      .status = status,
+      .status = CLI_COAP_CREATE_SESSION_ERR,
       .session = NULL,
   };
 }
@@ -84,7 +84,7 @@ struct cli_coap_create_session_result cli_coap_create_session(
       context, local_interface_address, config.address, protocol);
   if (session == NULL) {
     coap_log_err("failed to create CoAP session\n");
-    return create_session_result_failure(CLI_COAP_CREATE_SESSION_ERR);
+    return create_session_result_failure();
   }
   return create_session_success(session);
 }

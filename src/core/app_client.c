@@ -75,7 +75,7 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  client_resources.session_resources.coap_context =
+  client_resources.common_resources.coap_context =
       create_context_result.context;
   struct cli_coap_session_config config = {
       .address = &parse_and_resolve_uri_result.address,
@@ -87,11 +87,10 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  client_resources.session_resources.coap_session =
-      create_session_result.session;
+  client_resources.coap_session = create_session_result.session;
   struct cli_coap_exchange_session_data exchange_session_data = {
-      .context = client_resources.session_resources.coap_context,
-      .session = client_resources.session_resources.coap_session,
+      .context = client_resources.common_resources.coap_context,
+      .session = client_resources.coap_session,
       .uri = parse_and_resolve_uri_result.uri,
       .destination = parse_and_resolve_uri_result.address,
   };

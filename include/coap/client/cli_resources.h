@@ -6,7 +6,8 @@
 #include "edhoc/client/handshake/common/cli_state.h"
 
 struct cli_coap_session_resources {
-  struct com_session_resources session_resources;
+  struct com_session_resources common_resources;
+  coap_session_t* coap_session;
   struct cli_edhoc_handshake handshake;
   struct cli_coap_exchange exchange;
 };

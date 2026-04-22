@@ -5,24 +5,8 @@ void com_cleanup_resources(struct com_session_resources* resources) {
     return;
   }
 
-  if (resources->options != NULL) {
-    coap_delete_optlist(resources->options);
-    resources->options = NULL;
-  }
-  if (resources->coap_session != NULL) {
-    coap_session_release(resources->coap_session);
-    resources->coap_session = NULL;
-  }
   if (resources->coap_context != NULL) {
     coap_free_context(resources->coap_context);
     resources->coap_context = NULL;
-  }
-  if (resources->pdu != NULL) {
-    coap_delete_pdu(resources->pdu);
-    resources->pdu = NULL;
-  }
-  if (resources->edhoc_current_context != NULL) {
-    edhoc_context_deinit(resources->edhoc_current_context);
-    resources->edhoc_current_context = NULL;
   }
 }

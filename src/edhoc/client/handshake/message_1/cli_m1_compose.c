@@ -1,8 +1,8 @@
 /**
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since 04/04/10 Composition implementation for client handshake
- * Message 1.
+ * @since 04/04/10
+ * @brief Composition implementation for client handshake Message 1.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

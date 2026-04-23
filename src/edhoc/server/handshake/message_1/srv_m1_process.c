@@ -15,7 +15,29 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_context_setup.h"
-#include "edhoc/server/handshake/message_1/internal/srv_m1_process_result_builders.h"
+
+static struct srv_edhoc_message_1_process_result ok(
+    struct edhoc_context* context) {
+  return (struct srv_edhoc_message_1_process_result){
+      .status = SRV_EDHOC_MSG1_PROCESS_OK,
+      .context = context,
+  };
+}
+
+static struct srv_edhoc_message_1_process_result failure(
+    const enum srv_edhoc_message_1_process_status status,
+    const struct com_readonly_buffer error_buffer) {
+  return (struct srv_edhoc_message_1_process_result){
+      .status = status,
+      .error_buffer = error_buffer,
+  };
+}
+
+static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
+  return (struct srv_edhoc_message_1_process_result){
+      .status = SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER,
+  };
+}
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
     const char* error_message, struct com_writable_buffer* buffer) {
@@ -26,42 +48,40 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     struct com_writable_buffer* error_buffer) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
-    return srv_edhoc_message_1_process_invalid_error_buffer_failure();
+    return invalid_error_buffer();
   }
   if (request.credentials == NULL) {
-    return srv_edhoc_message_1_process_failure(
+    return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS,
         add_internal_error_to_buffer("Null credentials", error_buffer));
   }
   if (!com_readonly_buffer_has_content(request.payload)) {
-    return srv_edhoc_message_1_process_failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_REQUEST_BUFFER,
-        add_internal_error_to_buffer("Invalid request buffer", error_buffer));
+    return failure(
+        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
+        add_internal_error_to_buffer("Empty request buffer", error_buffer));
   }
 
   struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
   if (context == NULL) {
-    return srv_edhoc_message_1_process_failure(
+    return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
         add_internal_error_to_buffer("Context calloc failed", error_buffer));
   }
   if (com_edhoc_setup_context(context, request.credentials) !=
       COM_EDHOC_SETUP_CTX_OK) {
     free(context);
-    return srv_edhoc_message_1_process_failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context setup failed", error_buffer));
+    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
+                   com_edhoc_add_protocol_error_with_description_view(
+                       context, "Context setup failed", error_buffer));
   }
   if (edhoc_message_1_process(context, request.payload.bytes,
                               request.payload.length) != EDHOC_SUCCESS) {
     srv_edhoc_cleanup_context(&context);
-    return srv_edhoc_message_1_process_failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Message 1 processing failed", error_buffer));
+    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+                   com_edhoc_add_protocol_error_with_description_view(
+                       context, "Message 1 processing failed", error_buffer));
   }
-  return srv_edhoc_message_1_process_ok(context);
+  return ok(context);
 }
 
 enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(

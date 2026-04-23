@@ -161,7 +161,6 @@ set(MESSAGE_1_PARSER_MOCK
 add_unity_test(test_edhoc_message_1_parser
     /src/edhoc/server/handshake/message_1/parser/test_edhoc_message_1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
     ${MESSAGE_1_PARSER_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
@@ -225,9 +224,7 @@ add_unity_test(test_edhoc_message_2_compose
 add_unity_test(test_edhoc_message_1_responder
     /src/edhoc/server/handshake/message_1/responder/test_edhoc_message_1_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_parser_result_builders.c
     ${MESSAGE_1_PARSER_MOCK}
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_1_PROCESS_MOCKS}
@@ -252,7 +249,6 @@ set(MESSAGE_3_PARSER_MOCK
 add_unity_test(test_edhoc_message_3_parser
     /src/edhoc/server/handshake/message_3/parser/test_edhoc_message_3_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${MESSAGE_3_PARSER_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
@@ -295,9 +291,7 @@ add_unity_test(test_edhoc_message_4_compose
 add_unity_test(test_edhoc_message_3_responder
     /src/edhoc/server/handshake/message_3/responder/test_edhoc_message_3_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_responder.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_parser_result_builders.c
     ${MESSAGE_3_PARSER_MOCK}
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${MESSAGE_3_PROCESS_MOCKS}
@@ -384,6 +378,8 @@ add_unity_test(test_coap_server_dispatch
     /src/coap/server/dispatch/test_coap_server_dispatch.c
     ${SERVER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_srv_dispatch_stubs.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_create_base_dependencies.c
 )
 

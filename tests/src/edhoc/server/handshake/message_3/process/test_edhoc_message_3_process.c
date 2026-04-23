@@ -75,9 +75,9 @@ void test_process_fails_on_invalid_data(void) {
       {"context is NULL", no_context, &env.error,
        SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT},
       {"request buffer is NULL", no_buffer, &env.error,
-       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_PARSED_MESSAGE_3},
+       SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
       {"request payload is empty (len 0)", empty_request, &env.error,
-       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_PARSED_MESSAGE_3},
+       SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
   };
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {

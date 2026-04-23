@@ -54,7 +54,7 @@ void test_message_2_initiator_fails_on_invalid_request_buffer(void) {
   const struct cli_edhoc_message_2_initiator_result result =
       cli_edhoc_respond_to_message_2(env.request, &invalid_request_buffer);
 
-  TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_EMPTY_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_INVALID_RESPONSE_BUFFER,
                     result.status);
 }
 

@@ -14,10 +14,10 @@
 #include "edhoc/client/handshake/message_2/cli_m2_process.h"
 #include "edhoc/client/handshake/message_3/cli_m3_compose.h"
 
-static struct cli_edhoc_message_2_initiator_result empty_request_buffer_failure(
+static struct cli_edhoc_message_2_initiator_result invalid_response_failure(
     void) {
   return (struct cli_edhoc_message_2_initiator_result){
-      .status = CLI_EDHOC_MSG2_INITIATOR_ERR_EMPTY_REQUEST_BUFFER,
+      .status = CLI_EDHOC_MSG2_INITIATOR_ERR_INVALID_RESPONSE_BUFFER,
   };
 }
 
@@ -40,21 +40,21 @@ static struct cli_edhoc_message_2_initiator_result ok(
 
 struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
     const struct cli_edhoc_message_2_initiator_request request,
-    struct com_writable_buffer* request_buffer) {
-  if (!com_writable_buffer_is_writable(request_buffer)) {
-    return empty_request_buffer_failure();
+    struct com_writable_buffer* response_buffer) {
+  if (!com_writable_buffer_is_writable(response_buffer)) {
+    return invalid_response_failure();
   }
 
   const struct cli_edhoc_message_2_process_result process_result =
       cli_edhoc_process_message_2(request.edhoc_context, request.raw_payload,
-                                  request_buffer);
+                                  response_buffer);
   if (process_result.status != CLI_EDHOC_MSG2_PROCESS_OK) {
     return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
                    process_result.error_buffer);
   }
 
   const struct cli_edhoc_message_3_compose_result compose_result =
-      cli_edhoc_compose_message_3(request.edhoc_context, request_buffer);
+      cli_edhoc_compose_message_3(request.edhoc_context, response_buffer);
   if (compose_result.status != CLI_EDHOC_MSG3_COMPOSE_OK) {
     return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
                    compose_result.buffer);
@@ -68,7 +68,7 @@ const char* cli_edhoc_handle_message_2_status_code_to_string(
   switch (status) {
   case CLI_EDHOC_MSG2_INITIATOR_OK:
     return "ok";
-  case CLI_EDHOC_MSG2_INITIATOR_ERR_EMPTY_REQUEST_BUFFER:
+  case CLI_EDHOC_MSG2_INITIATOR_ERR_INVALID_RESPONSE_BUFFER:
     return "invalid request buffer";
   case CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS:
     return "message 2 process failed";

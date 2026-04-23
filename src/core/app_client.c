@@ -43,11 +43,16 @@ static const struct edhoc_credentials credentials = {
     .verify = client_credential_verify,
 };
 
-static void cli_coap_try_send_edhoc_error_message(
+static void try_to_send_edhoc_error_message(
     struct cli_coap_exchange* exchange,
     const struct com_readonly_buffer error_payload_data) {
-  if (exchange == NULL ||
-      !com_readonly_buffer_has_content(error_payload_data)) {
+  if (exchange == NULL) {
+    coap_log_err("Cannot send EDHOC error message: exchange is NULL\n");
+    return;
+  }
+  if (!com_readonly_buffer_has_content(error_payload_data)) {
+    coap_log_err(
+        "Cannot send EDHOC error message: error payload data is empty\n");
     return;
   }
 
@@ -156,8 +161,8 @@ enum com_emulation_status core_run_client(void) {
 
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
-    cli_coap_try_send_edhoc_error_message(client_resources.exchange,
-                                          message_2_initiator_result.request);
+    try_to_send_edhoc_error_message(client_resources.exchange,
+                                    message_2_initiator_result.request);
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
@@ -187,8 +192,8 @@ enum com_emulation_status core_run_client(void) {
 
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
-    cli_coap_try_send_edhoc_error_message(client_resources.exchange,
-                                          message_4_result.error_buffer);
+    try_to_send_edhoc_error_message(client_resources.exchange,
+                                    message_4_result.error_buffer);
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }

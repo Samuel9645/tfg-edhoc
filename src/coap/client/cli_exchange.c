@@ -10,6 +10,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_response.h"
 
+// ReSharper disable once CppClassNeverUsed it is used, it is opaque
 struct cli_coap_exchange {
   struct cli_coap_exchange_session_data session_data;
   bool have_response;

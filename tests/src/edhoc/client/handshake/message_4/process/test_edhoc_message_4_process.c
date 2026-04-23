@@ -1,5 +1,7 @@
 /**
  * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 23/04/2026
  * @brief Tests for client EDHOC Message 4 process.
  */
 

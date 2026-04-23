@@ -1,5 +1,7 @@
 /**
  * @file
+ * @author Samuel Rodriguez <alu0101545714@ull.edu.es>
+ * @since 23/04/2026
  * @brief Mock dependencies for client Message 1 compose tests.
  */
 

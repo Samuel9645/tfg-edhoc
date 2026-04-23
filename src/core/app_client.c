@@ -55,7 +55,6 @@ static void cli_coap_try_send_edhoc_error_message(
       .buffer = error_payload_data,
       .content_format = CONFIG_COAP_CONTENT_CID_EDHOC,
   };
-  cli_coap_exchange_reset(exchange);
   (void)cli_coap_exchange_send(exchange, request_data);
 }
 

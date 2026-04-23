@@ -97,11 +97,4 @@ struct cli_coap_wait_and_get_result {
 struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     const struct cli_coap_exchange* exchange);
 
-/**
- * @brief Reset response state before next request.
- *
- * @param[in,out] exchange Initialized exchange state.
- */
-void cli_coap_exchange_reset(struct cli_coap_exchange* exchange);
-
 #endif  // COAP_CLIENT_CLI_EXCHANGE_H_

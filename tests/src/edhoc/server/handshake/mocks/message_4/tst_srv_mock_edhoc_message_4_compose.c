@@ -63,11 +63,11 @@ static int mocked_message_4_compose(const struct edhoc_context* edhoc_context,
   (void)edhoc_context;
   if (message_4 == NULL) {
     tst_report_mock_error("message 4 destination buffer is NULL");
-    return EDHOC_ERROR_GENERIC_ERROR;
+    return EDHOC_ERROR_INVALID_ARGUMENT;
   }
   if (message_4_length == NULL) {
     tst_report_mock_error("message 4 output length pointer is NULL");
-    return EDHOC_ERROR_GENERIC_ERROR;
+    return EDHOC_ERROR_INVALID_ARGUMENT;
   }
 
   if (message_4_compose_result != EDHOC_SUCCESS) {

@@ -29,6 +29,13 @@ static struct cli_edhoc_message_1_compose_result protocol_failure(
   };
 }
 
+static struct cli_edhoc_message_1_compose_result empty_compose_failure(
+    const struct com_readonly_buffer error_buffer) {
+  return (struct cli_edhoc_message_1_compose_result){
+      .status = CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE,
+      .buffer = error_buffer};
+}
+
 static struct cli_edhoc_message_1_compose_result invalid_compose_buffer(void) {
   return (struct cli_edhoc_message_1_compose_result){
       .status = CLI_EDHOC_MSG1_COMPOSE_ERR_INVALID_COMPOSE_BUFFER};
@@ -68,6 +75,10 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
             compose_buffer));
   }
   compose_buffer->length = prepended_fields.buffer_size;
+  if (!com_writable_buffer_has_content(compose_buffer)) {
+    return empty_compose_failure(com_edhoc_add_internal_error_view(
+        "Empty compose result", compose_buffer));
+  }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {

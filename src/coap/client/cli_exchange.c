@@ -106,10 +106,21 @@ struct cli_coap_exchange* cli_coap_init_exchange(
   return exchange;
 }
 
+void reset(struct cli_coap_exchange* exchange) {
+  if (exchange == NULL) {
+    return;
+  }
+
+  exchange->have_response = false;
+  exchange->internal_parsed_response.bytes = NULL;
+  exchange->internal_parsed_response.length = 0;
+  exchange->incoming_response_buffer.length = 0;
+}
+
 enum status_coap cli_coap_exchange_send(
     struct cli_coap_exchange* exchange,
     const struct cli_coap_exchange_request request_data) {
-  cli_coap_exchange_reset(exchange);
+  reset(exchange);
 
   if (exchange == NULL ||
       !cli_coap_exchange_request_data_is_valid(request_data)) {
@@ -174,15 +185,4 @@ struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     return wait_and_get_failure();
   }
   return wait_and_get_ok(response_buffer);
-}
-
-void cli_coap_exchange_reset(struct cli_coap_exchange* exchange) {
-  if (exchange == NULL) {
-    return;
-  }
-
-  exchange->have_response = false;
-  exchange->internal_parsed_response.bytes = NULL;
-  exchange->internal_parsed_response.length = 0;
-  exchange->incoming_response_buffer.length = 0;
 }

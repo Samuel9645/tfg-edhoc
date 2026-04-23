@@ -60,7 +60,6 @@ struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
         com_edhoc_add_protocol_error_with_description_view(
             context, "Failed to process EDHOC message 4", error_buffer));
   }
-
   error_buffer->length = 0;
   return ok();
 }

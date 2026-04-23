@@ -49,13 +49,13 @@ void test_parser_returns_stripped_message_1_buffer_on_success(void) {
   TEST_ASSERT_EQUAL(0, test_env.error_buffer_view.length);
 }
 
-void test_parser_fails_and_populates_error_on_invalid_request_buffer(void) {
+void test_parser_fails_and_populates_error_on_empty_request_buffer(void) {
   const struct com_readonly_buffer empty_request = {0};
 
   const struct srv_edhoc_parse_message_1_result parse_result =
       srv_edhoc_parse_message_1(empty_request, &test_env.error_buffer_view);
 
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_EMPTY_REQUEST_BUFFER,
                     parse_result.status);
   tst_edhoc_assert_encoded_error_is_not_empty(parse_result.buffer);
 }
@@ -77,18 +77,19 @@ void test_parser_fails_and_populates_error_when_prefix_extraction_fails(void) {
   tst_edhoc_assert_encoded_error_is_not_empty(parse_result.buffer);
 }
 
-void test_parser_fails_on_invalid_response_buffer(void) {
+void test_parser_fails_on_invalid_error_buffer(void) {
   const uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04};
   const struct com_readonly_buffer request_buffer = {
       .bytes = buffer,
       .length = sizeof(buffer),
   };
-  struct com_writable_buffer invalid_response = {.bytes = NULL, .capacity = 0};
+  struct com_writable_buffer invalid_error_buffer = {.bytes = NULL,
+                                                     .capacity = 0};
 
   const struct srv_edhoc_parse_message_1_result parse_result =
-      srv_edhoc_parse_message_1(request_buffer, &invalid_response);
+      srv_edhoc_parse_message_1(request_buffer, &invalid_error_buffer);
 
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_INVALID_ERROR_BUFFER,
                     parse_result.status);
   TEST_ASSERT_NULL(parse_result.buffer.bytes);
   TEST_ASSERT_EQUAL(0, parse_result.buffer.length);

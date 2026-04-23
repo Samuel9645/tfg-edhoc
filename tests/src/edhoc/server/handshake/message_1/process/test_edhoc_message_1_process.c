@@ -101,7 +101,7 @@ void test_m1_process_fails_on_invalid_data(void) {
     enum srv_edhoc_message_1_process_status expected_status;
   } test_cases[] = {
       {"empty request payload", empty_request_with_credentials, &env.error,
-       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_REQUEST_BUFFER},
+       SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER},
       {"error buffer is NULL", env.valid_request, NULL,
        SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER},
       {"error buffer is empty/invalid", env.valid_request, &empty_response,

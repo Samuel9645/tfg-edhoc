@@ -12,7 +12,29 @@
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
-#include "edhoc/server/handshake/message_4/internal/srv_m4_compose_result_builders.h"
+
+static struct srv_edhoc_message_4_compose_result ok(
+    const struct com_readonly_buffer buffer) {
+  return (struct srv_edhoc_message_4_compose_result){
+      .status = SRV_EDHOC_MSG4_COMPOSE_OK,
+      .buffer = buffer,
+  };
+}
+
+static struct srv_edhoc_message_4_compose_result failure(
+    const enum srv_edhoc_message_4_compose_status status,
+    const struct com_readonly_buffer error) {
+  return (struct srv_edhoc_message_4_compose_result){
+      .status = status,
+      .buffer = error,
+  };
+}
+
+static struct srv_edhoc_message_4_compose_result invalid_buffer(void) {
+  return (struct srv_edhoc_message_4_compose_result){
+      .status = SRV_EDHOC_MSG4_COMPOSE_ERR_INVALID_COMPOSE_BUFFER,
+  };
+}
 
 static struct com_readonly_buffer add_compose_error_to_buffer(
     const struct edhoc_context* context, struct com_writable_buffer* buffer) {
@@ -23,36 +45,32 @@ static struct com_readonly_buffer add_compose_error_to_buffer(
 struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
     struct edhoc_context* context, struct com_writable_buffer* compose_buffer) {
   if (!com_writable_buffer_is_writable(compose_buffer)) {
-    return srv_edhoc_message_4_compose_invalid_compose_buffer_failure();
+    return invalid_buffer();
   }
   if (context == NULL) {
-    return srv_edhoc_message_4_compose_failure(
-        SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view("Null EDHOC context",
-                                          compose_buffer));
+    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT,
+                   com_edhoc_add_internal_error_view("Null EDHOC context",
+                                                     compose_buffer));
   }
 
   if (edhoc_message_4_compose(context, compose_buffer->bytes,
                               compose_buffer->capacity,
                               &compose_buffer->length) != EDHOC_SUCCESS) {
-    return srv_edhoc_message_4_compose_failure(
-        SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED,
-        add_compose_error_to_buffer(context, compose_buffer));
+    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED,
+                   add_compose_error_to_buffer(context, compose_buffer));
   }
   if (!com_writable_buffer_has_content(compose_buffer)) {
-    return srv_edhoc_message_4_compose_failure(
-        SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
-        com_edhoc_add_internal_error_view("Empty compose result",
-                                          compose_buffer));
+    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
+                   com_edhoc_add_internal_error_view("Empty compose result",
+                                                     compose_buffer));
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
     // SHOULD NEVER HAPPEN
-    return srv_edhoc_message_4_compose_failure(
-        SRV_EDHOC_MSG4_COMPOSE_ERR_BUFFER_CONVERSION,
-        com_edhoc_add_internal_error_view("Invalid compose buffer",
-                                          compose_buffer));
+    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_BUFFER_CONVERSION,
+                   com_edhoc_add_internal_error_view("Invalid compose buffer",
+                                                     compose_buffer));
   }
-  return srv_edhoc_message_4_compose_ok(conversion_result.buffer);
+  return ok(conversion_result.buffer);
 }

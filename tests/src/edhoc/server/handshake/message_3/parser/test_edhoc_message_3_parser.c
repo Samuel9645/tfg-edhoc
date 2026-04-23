@@ -63,7 +63,7 @@ void test_parser_fails_and_populates_error_when_buffer_is_invalid(void) {
       srv_edhoc_parse_message_3(invalid_buf, &test_env.context,
                                 &test_env.error_buffer_view);
 
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_EMPTY_REQUEST_BUFFER,
                     result.status);
   tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
@@ -102,14 +102,15 @@ void test_parser_fails_and_populates_error_on_connection_id_mismatch(void) {
   tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
 
-void test_parser_fails_on_invalid_response_buffer(void) {
-  struct com_writable_buffer invalid_response = {.bytes = NULL, .capacity = 0};
+void test_parser_fails_on_invalid_error_buffer(void) {
+  struct com_writable_buffer invalid_error_buffer = {.bytes = NULL,
+                                                     .capacity = 0};
 
   const struct srv_edhoc_parse_message_3_result result =
       srv_edhoc_parse_message_3(test_env.valid_request, &test_env.context,
-                                &invalid_response);
+                                &invalid_error_buffer);
 
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_INVALID_REQUEST_BUFFER,
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_INVALID_ERROR_BUFFER,
                     result.status);
   TEST_ASSERT_NULL(result.buffer.bytes);
   TEST_ASSERT_EQUAL(0, result.buffer.length);

@@ -40,7 +40,7 @@ static struct cli_edhoc_message_2_initiator_result ok(
 
 struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
     const struct cli_edhoc_message_2_initiator_request request,
-    struct com_writable_buffer* response_buffer) {
+    const struct com_writable_buffer response_buffer) {
   if (!com_writable_buffer_is_writable(response_buffer)) {
     return invalid_response_failure();
   }

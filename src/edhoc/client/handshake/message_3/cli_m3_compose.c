@@ -46,7 +46,7 @@ static struct cli_edhoc_message_3_compose_result invalid_compose_buffer(void) {
 }
 
 static struct cli_edhoc_message_3_compose_result null_context_failure(
-    struct com_writable_buffer* compose_buffer) {
+    const struct com_writable_buffer compose_buffer) {
   return (struct cli_edhoc_message_3_compose_result){
       .status = CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT,
       .buffer = com_edhoc_add_internal_error_view(
@@ -55,7 +55,8 @@ static struct cli_edhoc_message_3_compose_result null_context_failure(
 }
 
 struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
-    struct edhoc_context* context, struct com_writable_buffer* compose_buffer) {
+    struct edhoc_context* context,
+    const struct com_writable_buffer compose_buffer) {
   if (!com_writable_buffer_is_writable(compose_buffer)) {
     return invalid_compose_buffer();
   }
@@ -64,10 +65,10 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
   }
 
   struct edhoc_prepended_fields prepended_fields = {
-      .buffer = compose_buffer->bytes,
-      .buffer_size = compose_buffer->capacity,
-      .edhoc_message_ptr = compose_buffer->bytes,
-      .edhoc_message_size = compose_buffer->capacity,
+      .buffer = compose_buffer.bytes,
+      .buffer_size = compose_buffer.capacity,
+      .edhoc_message_ptr = compose_buffer.bytes,
+      .edhoc_message_size = compose_buffer.capacity,
   };
 
   if (edhoc_prepend_connection_id(
@@ -95,16 +96,11 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
             context, "Failed to recalculate prepended message size",
             compose_buffer));
   }
-  compose_buffer->length = prepended_fields.buffer_size;
-  if (!com_writable_buffer_has_content(compose_buffer)) {
+  const struct com_readonly_conversion_result conversion_result =
+      com_writable_as_readonly(compose_buffer, prepended_fields.buffer_size);
+  if (conversion_result.status != COM_RDONLY_CONV_OK) {
     return empty_compose_failure(com_edhoc_add_internal_error_view(
         "Empty compose result", compose_buffer));
-  }
-  const struct com_readonly_conversion_result conversion_result =
-      com_writable_as_readonly(compose_buffer);
-  if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    // SHOULD NEVER HAPPEN
-    return invalid_compose_buffer();
   }
   return ok(conversion_result.buffer);
 }

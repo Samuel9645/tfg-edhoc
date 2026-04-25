@@ -38,7 +38,7 @@ static struct srv_edhoc_parse_message_3_result invalid_error_buffer(void) {
 struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     const struct com_readonly_buffer request_buffer,
     const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer* error_response) {
+    const struct com_writable_buffer error_response) {
   if (!com_writable_buffer_is_writable(error_response)) {
     return invalid_error_buffer();
   }

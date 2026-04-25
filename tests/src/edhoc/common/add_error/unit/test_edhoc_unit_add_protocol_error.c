@@ -43,7 +43,8 @@ void test_add_protocol_error_recovers_get_code_fail(void) {
   tst_com_edhoc_use_real_compose();
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_protocol_error_result(&env.context, &VALID_INFO, &env.error_buffer_view);
+      com_edhoc_add_protocol_error_result(&env.context, &VALID_INFO,
+                                          env.error_buffer_view);
 
   tst_edhoc_assert_add_error_status_ok(result);
   tst_edhoc_assert_encoded_error_matches(result.buffer, DESCRIPTION,
@@ -58,18 +59,17 @@ static void assert_fails_with(
 }
 
 void test_add_protocol_error_fails_on_invalid_buffer(void) {
-  struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
+  const struct com_writable_buffer invalid_buffer = {.bytes = NULL,
+                                                     .capacity = 0};
 
   const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_result(&env.context, &VALID_INFO,
-                                          &invalid_buffer);
+                                          invalid_buffer);
 
   assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, result);
 }
 
 static void assert_response_untouched(void) {
-  TEST_ASSERT_EQUAL_size_t_MESSAGE(0, env.error_buffer_view.length,
-                                   "Length should not be updated on failure");
   TEST_ASSERT_EQUAL_HEX8_ARRAY_MESSAGE(
       zeros, env.error_buffer_view.bytes, TST_UNIT_PROTOCOL_ERROR_BUFFER_SIZE,
       "Buffer memory was modified despite failure");
@@ -79,7 +79,8 @@ void test_add_protocol_error_fails_on_error_compose_fail(void) {
   tst_com_edhoc_set_error_compose_failed();
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_protocol_error_result(&env.context, &VALID_INFO, &env.error_buffer_view);
+      com_edhoc_add_protocol_error_result(&env.context, &VALID_INFO,
+                                          env.error_buffer_view);
 
   assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result);
   assert_response_untouched();
@@ -91,7 +92,7 @@ void test_add_protocol_error_with_description_recovers_get_code_fail(void) {
 
   const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description_result(
-          &env.context, DESCRIPTION, &env.error_buffer_view);
+          &env.context, DESCRIPTION, env.error_buffer_view);
 
   tst_edhoc_assert_add_error_status_ok(result);
   tst_edhoc_assert_encoded_error_matches(result.buffer, DESCRIPTION,
@@ -99,11 +100,12 @@ void test_add_protocol_error_with_description_recovers_get_code_fail(void) {
 }
 
 void test_add_protocol_error_with_description_fails_on_invalid_buffer(void) {
-  struct com_writable_buffer invalid_buffer = {.bytes = NULL, .capacity = 0};
+  const struct com_writable_buffer invalid_buffer = {.bytes = NULL,
+                                                     .capacity = 0};
 
   const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description_result(
-          &env.context, DESCRIPTION, &invalid_buffer);
+          &env.context, DESCRIPTION, invalid_buffer);
 
   assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER, result);
 }
@@ -114,7 +116,7 @@ void test_add_protocol_error_with_description_fails_on_error_compose_fail(
 
   const struct com_edhoc_add_error_result result =
       com_edhoc_add_protocol_error_with_description_result(
-          &env.context, DESCRIPTION, &env.error_buffer_view);
+          &env.context, DESCRIPTION, env.error_buffer_view);
 
   assert_fails_with(COM_EDHOC_ADD_ERROR_ERR_COMPOSE, result);
   assert_response_untouched();

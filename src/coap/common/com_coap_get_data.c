@@ -6,9 +6,10 @@
  * client.
  */
 
+#include "coap/common/com_coap_get_data.h"
+
 #include <string.h>
 
-#include "coap/common/com_coap_get_data.h"
 #include "coap3/coap_debug.h"
 #include "coap3/coap_pdu.h"
 
@@ -26,7 +27,7 @@ static struct com_coap_get_data_result get_data_failure(
 }
 
 struct com_coap_get_data_result com_coap_get_data(
-    const coap_pdu_t* pdu, struct com_writable_buffer* data_buffer) {
+    const coap_pdu_t* pdu, const struct com_writable_buffer data_buffer) {
   if (pdu == NULL) {
     coap_log_err("pdu is NULL\n");
     return get_data_failure(COM_COAP_GET_DATA_ERR_PDU);
@@ -49,14 +50,13 @@ struct com_coap_get_data_result com_coap_get_data(
     coap_log_err("incomplete body");
     return get_data_failure(COM_COAP_GET_DATA_ERR_INCOMPLETE_BODY);
   }
-  if (length > data_buffer->capacity) {
+  if (length > data_buffer.capacity) {
     coap_log_err("data buffer is too small\n");
     return get_data_failure(COM_COAP_GET_DATA_ERR_DATA_BUFFER_TOO_SMALL);
   }
-  memcpy(data_buffer->bytes, data, length);
-  data_buffer->length = length;
+  memcpy(data_buffer.bytes, data, length);
   const struct com_readonly_conversion_result conversion_result =
-      com_writable_as_readonly(data_buffer);
+      com_writable_as_readonly(data_buffer, length);
   // SHOULD NEVER HAPPEN
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
     return get_data_failure(COM_COAP_GET_DATA_ERR_NO_PAYLOAD);

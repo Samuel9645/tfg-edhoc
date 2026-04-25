@@ -30,22 +30,20 @@ void setUp(void) {
   memset(env.error_raw, 0, sizeof(env.error_raw));
   env.context = (struct edhoc_context){0};
   env.error.bytes = env.error_raw;
-  env.error.length = 0;
 }
 
 void test_process_message_4_ok(void) {
   const struct cli_edhoc_message_4_process_result result =
-      cli_edhoc_process_message_4(&env.context, env.message_4, &env.error);
+      cli_edhoc_process_message_4(&env.context, env.message_4, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_OK, result.status);
-  TEST_ASSERT_EQUAL(0, env.error.length);
 }
 
 void test_process_message_4_fails_on_invalid_error_buffer(void) {
-  struct com_writable_buffer invalid_error = {0};
+  const struct com_writable_buffer invalid_error = {0};
 
   const struct cli_edhoc_message_4_process_result result =
-      cli_edhoc_process_message_4(&env.context, env.message_4, &invalid_error);
+      cli_edhoc_process_message_4(&env.context, env.message_4, invalid_error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_INVALID_ERROR_BUFFER,
                     result.status);
@@ -53,7 +51,7 @@ void test_process_message_4_fails_on_invalid_error_buffer(void) {
 
 void test_process_message_4_fails_on_null_context(void) {
   const struct cli_edhoc_message_4_process_result result =
-      cli_edhoc_process_message_4(NULL, env.message_4, &env.error);
+      cli_edhoc_process_message_4(NULL, env.message_4, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_NULL_CONTEXT, result.status);
   tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
@@ -63,7 +61,7 @@ void test_process_message_4_fails_on_empty_message(void) {
   const struct com_readonly_buffer empty_message = {0};
 
   const struct cli_edhoc_message_4_process_result result =
-      cli_edhoc_process_message_4(&env.context, empty_message, &env.error);
+      cli_edhoc_process_message_4(&env.context, empty_message, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_EMPTY_MESSAGE_4, result.status);
   tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
@@ -73,7 +71,7 @@ void test_process_message_4_fails_when_edhoc_process_fails(void) {
   tst_cli_edhoc_m4_process_set_failure();
 
   const struct cli_edhoc_message_4_process_result result =
-      cli_edhoc_process_message_4(&env.context, env.message_4, &env.error);
+      cli_edhoc_process_message_4(&env.context, env.message_4, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
                     result.status);

@@ -15,8 +15,14 @@
 
 #include "edhoc/server/handshake/message_4/srv_m4_compose_result.h"
 
+/**
+ * @brief Compose EDHOC Message 4 into a writable buffer view.
+ * @param[in] context EDHOC context used to generate the message.
+ * @param[in] compose_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
+ */
 struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
-    struct edhoc_context* context, struct com_writable_buffer* compose_buffer);
+    struct edhoc_context* context, struct com_writable_buffer compose_buffer);
 
 const char* srv_edhoc_compose_message_4_status_code_to_string(
     enum srv_edhoc_message_4_compose_status status);

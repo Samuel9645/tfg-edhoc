@@ -41,7 +41,7 @@ static struct srv_edhoc_message_3_responder_result invalid_response_buffer(
 
 struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
     const struct srv_edhoc_message_3_responder_request request,
-    struct com_writable_buffer* response) {
+    const struct com_writable_buffer response) {
   if (!com_writable_buffer_is_writable(response)) {
     return invalid_response_buffer();
   }

@@ -13,6 +13,5 @@
 void tst_edhoc_add_internal_error_reset_env(
     struct tst_edhoc_add_internal_error_env* env) {
   memset(env->error_message, 0, sizeof(env->error_message));
-  env->error_buffer_view.length = 0;
   env->error_buffer_view.bytes = env->error_message;
 }

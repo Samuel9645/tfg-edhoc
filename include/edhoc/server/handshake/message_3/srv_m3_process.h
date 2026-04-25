@@ -24,11 +24,11 @@ struct srv_edhoc_message_3_request {
  * fails.
  *
  * @param[in] request Session/request metadata for Message 3 processing.
- * @param[out] error_buffer View of the buffer to write the error message on
- * failure.
+ * @param[in] error_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
  * @return Struct containing status code and written error buffer on failure.
  */
 struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
     struct srv_edhoc_message_3_request request,
-    struct com_writable_buffer* error_buffer);
+    struct com_writable_buffer error_buffer);
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PROCESS_H_

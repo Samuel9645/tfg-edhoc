@@ -16,6 +16,6 @@
 #include "edhoc/server/handshake/message_2/srv_m2_compose_result.h"
 
 struct srv_edhoc_message_2_compose_result srv_edhoc_compose_message_2(
-    struct edhoc_context* context, struct com_writable_buffer* compose_buffer);
+    struct edhoc_context* context, struct com_writable_buffer compose_buffer);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_2_SRV_M2_COMPOSE_H_

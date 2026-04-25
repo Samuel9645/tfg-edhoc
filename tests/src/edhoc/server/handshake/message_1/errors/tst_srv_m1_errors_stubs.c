@@ -76,7 +76,7 @@ enum com_edhoc_add_edhoc_error_to_response_status
 com_edhoc_add_edhoc_error_to_response(
     const struct edhoc_context* context,
     const struct edhoc_error_info* error_info,
-    struct com_writable_buffer* response_data) {
+    struct com_writable_buffer response_data) {
   (void)context;
   (void)response_data;
 

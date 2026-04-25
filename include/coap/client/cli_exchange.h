@@ -53,8 +53,8 @@ struct cli_coap_exchange;
  *
  * @param[in] session_data Session and endpoint metadata required for
  * initialization.
- * @param[in] response_buffer The writable buffer data, designated to store the
- * incoming CoAP response.
+ * @param[in] response_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
  * @return A pointer to the initialized exchange on success, or NULL if
  * allocation or session binding fails.
  *

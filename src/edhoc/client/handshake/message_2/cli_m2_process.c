@@ -39,7 +39,7 @@ static struct cli_edhoc_message_2_process_result internal_failure(
 
 struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
     struct edhoc_context* context, const struct com_readonly_buffer message_2,
-    struct com_writable_buffer* error_buffer) {
+    const struct com_writable_buffer error_buffer) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
@@ -60,6 +60,5 @@ struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
         com_edhoc_add_protocol_error_with_description_view(
             context, "Failed to process EDHOC message 2", error_buffer));
   }
-  error_buffer->length = 0;
   return ok();
 }

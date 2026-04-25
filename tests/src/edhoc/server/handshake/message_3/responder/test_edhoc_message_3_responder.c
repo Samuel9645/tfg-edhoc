@@ -30,8 +30,7 @@ static struct {
   struct edhoc_context context;
   struct srv_edhoc_message_3_responder_request valid_request;
   struct com_writable_buffer response;
-} env = {
-    .response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
+} env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
          .valid_request = {.raw_payload = {.bytes = REQUEST_BUFFER,
                                            .length = sizeof(REQUEST_BUFFER)}}};
 
@@ -51,7 +50,6 @@ void setUp(void) {
   reset_mocks();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.response.bytes = env.response_buffer;
-  env.response.length = 0;
   env.context = (struct edhoc_context){0};
   env.valid_request.edhoc_context = &env.context;
 }
@@ -61,14 +59,14 @@ void test_responder_ok_for_valid_data(void) {
   tst_srv_edhoc_m4_set_compose_ok();
 
   const struct srv_edhoc_message_3_responder_result result =
-      srv_edhoc_respond_to_message_3(env.valid_request, &env.response);
+      srv_edhoc_respond_to_message_3(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_RESPONDER_OK, result.status);
   tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(result.response);
 }
 
 void test_responder_fails_on_invalid_data(void) {
-  struct com_writable_buffer empty_response = {0};
+  const struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_message_3_responder_request no_buffer_request = {
       .raw_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
       .edhoc_context = &env.context,
@@ -85,18 +83,16 @@ void test_responder_fails_on_invalid_data(void) {
   const struct {
     const char* description;
     struct srv_edhoc_message_3_responder_request request;
-    struct com_writable_buffer* response;
+    struct com_writable_buffer response;
     enum srv_edhoc_message_3_responder_status expected;
   } test_cases[] = {
-      {"response is NULL", env.valid_request, NULL,
+      {"response has 0 capacity", env.valid_request, empty_response,
        SRV_EDHOC_MSG3_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
-      {"response has 0 capacity", env.valid_request, &empty_response,
-       SRV_EDHOC_MSG3_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
-      {"request buffer is NULL", no_buffer_request, &env.response,
+      {"request buffer is NULL", no_buffer_request, env.response,
        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE},
-      {"request payload is empty (len 0)", empty_payload_request, &env.response,
+      {"request payload is empty (len 0)", empty_payload_request, env.response,
        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE},
-      {"context is NULL", no_context_request, &env.response,
+      {"context is NULL", no_context_request, env.response,
        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE},
   };
 
@@ -117,7 +113,7 @@ void test_responder_fails_when_parser_reports_extraction_failure(void) {
   tst_srv_m3_parser_set_extraction_failure();
 
   const struct srv_edhoc_message_3_responder_result result =
-      srv_edhoc_respond_to_message_3(env.valid_request, &env.response);
+      srv_edhoc_respond_to_message_3(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE,
                     result.status);
@@ -128,7 +124,7 @@ void test_responder_fails_when_parser_reports_connection_id_mismatch(void) {
   tst_srv_m3_parser_set_cid_mismatch();
 
   const struct srv_edhoc_message_3_responder_result result =
-      srv_edhoc_respond_to_message_3(env.valid_request, &env.response);
+      srv_edhoc_respond_to_message_3(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE,
                     result.status);
@@ -163,7 +159,7 @@ void test_responder_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_3_responder_result result =
-        srv_edhoc_respond_to_message_3(env.valid_request, &env.response);
+        srv_edhoc_respond_to_message_3(env.valid_request, env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

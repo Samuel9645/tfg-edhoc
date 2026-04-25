@@ -104,10 +104,9 @@ enum com_emulation_status core_run_client(void) {
   };
   // TODO: encapsulate this process better
   uint8_t payload_memory[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  struct com_writable_buffer payload_buffer = {
+  const struct com_writable_buffer payload_buffer = {
       .bytes = payload_memory,
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
-      .length = 0,
   };
   client_resources.exchange =
       cli_coap_init_exchange(&exchange_session_data, payload_buffer);
@@ -124,7 +123,7 @@ enum com_emulation_status core_run_client(void) {
   }
 
   const struct cli_edhoc_message_1_compose_result message_1_result =
-      cli_edhoc_compose_message_1(&client_resources.edhoc_ctx, &payload_buffer);
+      cli_edhoc_compose_message_1(&client_resources.edhoc_ctx, payload_buffer);
   if (message_1_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 1\n");
     cli_coap_cleanup_resources(&client_resources);
@@ -157,7 +156,7 @@ enum com_emulation_status core_run_client(void) {
       };
   const struct cli_edhoc_message_2_initiator_result message_2_initiator_result =
       cli_edhoc_respond_to_message_2(message_2_initiator_request,
-                                     &payload_buffer);
+                                     payload_buffer);
 
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("Failed to receive or process EDHOC message 2\n");
@@ -188,7 +187,7 @@ enum com_emulation_status core_run_client(void) {
   const struct cli_edhoc_message_4_process_result message_4_result =
       cli_edhoc_process_message_4(&client_resources.edhoc_ctx,
                                   wait_and_get_result2.response,
-                                  &payload_buffer);
+                                  payload_buffer);
 
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");

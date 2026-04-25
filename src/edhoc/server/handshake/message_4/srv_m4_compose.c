@@ -37,13 +37,15 @@ static struct srv_edhoc_message_4_compose_result invalid_buffer(void) {
 }
 
 static struct com_readonly_buffer add_compose_error_to_buffer(
-    const struct edhoc_context* context, struct com_writable_buffer* buffer) {
+    const struct edhoc_context* context,
+    const struct com_writable_buffer buffer) {
   return com_edhoc_add_protocol_error_with_description_view(
       context, "Message 4 composition failed", buffer);
 }
 
 struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
-    struct edhoc_context* context, struct com_writable_buffer* compose_buffer) {
+    struct edhoc_context* context,
+    const struct com_writable_buffer compose_buffer) {
   if (!com_writable_buffer_is_writable(compose_buffer)) {
     return invalid_buffer();
   }
@@ -53,23 +55,18 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
                                                      compose_buffer));
   }
 
-  if (edhoc_message_4_compose(context, compose_buffer->bytes,
-                              compose_buffer->capacity,
-                              &compose_buffer->length) != EDHOC_SUCCESS) {
+  size_t written_length = 0;
+  if (edhoc_message_4_compose(context, compose_buffer.bytes,
+                              compose_buffer.capacity,
+                              &written_length) != EDHOC_SUCCESS) {
     return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED,
                    add_compose_error_to_buffer(context, compose_buffer));
   }
-  if (!com_writable_buffer_has_content(compose_buffer)) {
+  const struct com_readonly_conversion_result conversion_result =
+      com_writable_as_readonly(compose_buffer, written_length);
+  if (conversion_result.status != COM_RDONLY_CONV_OK) {
     return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
                    com_edhoc_add_internal_error_view("Empty compose result",
-                                                     compose_buffer));
-  }
-  const struct com_readonly_conversion_result conversion_result =
-      com_writable_as_readonly(compose_buffer);
-  if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    // SHOULD NEVER HAPPEN
-    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_BUFFER_CONVERSION,
-                   com_edhoc_add_internal_error_view("Invalid compose buffer",
                                                      compose_buffer));
   }
   return ok(conversion_result.buffer);

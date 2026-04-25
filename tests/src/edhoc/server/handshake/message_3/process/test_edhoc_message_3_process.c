@@ -36,7 +36,6 @@ void setUp(void) {
   tst_srv_edhoc_m3_reset_process_mock();
   memset(env.error_buffer_data, 0, sizeof(env.error_buffer_data));
   env.error.bytes = env.error_buffer_data;
-  env.error.length = 0;
   env.valid_request.edhoc_context = &env.context;
   env.context = (struct edhoc_context){0};
 }
@@ -45,7 +44,7 @@ void test_process_ok_for_valid_data(void) {
   tst_srv_edhoc_m3_set_process_ok();
 
   const struct srv_edhoc_message_3_process_result result =
-      srv_edhoc_process_message_3(env.valid_request, &env.error);
+      srv_edhoc_process_message_3(env.valid_request, env.error);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_OK, result.status);
   TEST_ASSERT_EQUAL_UINT32_MESSAGE(0, result.error_buffer.length,
@@ -60,23 +59,21 @@ void test_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_3_request empty_request = {
       .edhoc_context = &env.context,
       .parsed_message_3 = {.bytes = REQUEST_BUFFER, .length = 0}};
-  struct com_writable_buffer empty_error = {0};
+  const struct com_writable_buffer empty_error = {0};
 
   const struct {
     const char* description;
     struct srv_edhoc_message_3_request request;
-    struct com_writable_buffer* error_buffer;
+    struct com_writable_buffer error_buffer;
     enum srv_edhoc_message_3_process_status expected_status;
   } test_cases[] = {
-      {"error buffer is NULL", env.valid_request, NULL,
+      {"error buffer is empty/invalid", env.valid_request, empty_error,
        SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"error buffer is empty/invalid", env.valid_request, &empty_error,
-       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"context is NULL", no_context, &env.error,
+      {"context is NULL", no_context, env.error,
        SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT},
-      {"request buffer is NULL", no_buffer, &env.error,
+      {"request buffer is NULL", no_buffer, env.error,
        SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
-      {"request payload is empty (len 0)", empty_request, &env.error,
+      {"request payload is empty (len 0)", empty_request, env.error,
        SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
   };
 
@@ -105,7 +102,7 @@ void test_process_fails_on_library_errors(void) {
   tst_srv_edhoc_m3_set_process_failure();
 
   const struct srv_edhoc_message_3_process_result result =
-      srv_edhoc_process_message_3(env.valid_request, &env.error);
+      srv_edhoc_process_message_3(env.valid_request, env.error);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
                     result.status);

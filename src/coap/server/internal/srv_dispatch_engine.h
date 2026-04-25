@@ -14,7 +14,7 @@ typedef struct com_coap_parse_edhoc_request_result (
     *srv_coap_parse_edhoc_request_fn)(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
-    struct com_writable_buffer* data_buffer);
+    struct com_writable_buffer data_buffer);
 
 typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
     coap_pdu_t* response,
@@ -23,7 +23,7 @@ typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
 typedef struct srv_edhoc_message_1_responder_result (
     *srv_edhoc_m1_responder_fn)(
     struct srv_edhoc_message_1_responder_request request_data,
-    struct com_writable_buffer* response_data);
+    struct com_writable_buffer response_data);
 
 typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(
     struct srv_edhoc_message_1_responder_result message_1_result,
@@ -32,7 +32,7 @@ typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(
 typedef struct srv_edhoc_message_3_responder_result (
     *srv_edhoc_m3_responder_fn)(
     struct srv_edhoc_message_3_responder_request request_data,
-    struct com_writable_buffer* response_data);
+    struct com_writable_buffer response_data);
 
 typedef coap_pdu_code_t (*srv_edhoc_m3_process_result_fn)(
     struct srv_edhoc_message_3_responder_result message_3_result);

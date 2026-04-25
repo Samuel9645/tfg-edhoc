@@ -26,13 +26,13 @@ struct srv_edhoc_message_3_responder_request {
  *
  * @param[in] request Session/request metadata for Message 3 responder,
  * including raw CoAP payload and EDHOC context.
- * @param[out] response Response buffer metadata for Message 4.
+ * @param[in] response Response buffer view used as input.
  * @return Struct containing status code and the composed Message 4 buffer on
  * success, or error code and error buffer on failure.
  */
 struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
     struct srv_edhoc_message_3_responder_request request,
-    struct com_writable_buffer* response);
+    struct com_writable_buffer response);
 
 const char* srv_edhoc_handle_message_3_status_code_to_string(
     enum srv_edhoc_message_3_responder_status status);

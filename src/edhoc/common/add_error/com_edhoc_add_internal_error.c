@@ -11,7 +11,7 @@
 
 #include "edhoc/common/add_error/internal/com_edhoc_set_error_info.h"
 
-static struct com_edhoc_add_error_result add_internal_error_ok(
+static struct com_edhoc_add_error_result ok(
     const struct com_readonly_buffer error_message) {
   return (struct com_edhoc_add_error_result){.status = COM_EDHOC_ADD_ERROR_OK,
                                              .buffer = error_message};
@@ -23,13 +23,14 @@ add_internal_error_invalid_response_buffer(void) {
       .status = COM_EDHOC_ADD_ERROR_ERR_INVALID_RESPONSE_BUFFER};
 }
 
-static struct com_edhoc_add_error_result add_internal_error(
+static struct com_edhoc_add_error_result internal_error(
     const enum com_edhoc_add_error_status status) {
   return (struct com_edhoc_add_error_result){.status = status};
 }
 
 struct com_edhoc_add_error_result com_edhoc_add_internal_error_result(
-    const char* error_description, struct com_writable_buffer* response_data) {
+    const char* error_description,
+    const struct com_writable_buffer response_data) {
   if (!com_writable_buffer_is_writable(response_data)) {
     return add_internal_error_invalid_response_buffer();
   }
@@ -39,22 +40,24 @@ struct com_edhoc_add_error_result com_edhoc_add_internal_error_result(
   }
   struct edhoc_error_info error_info = {0};
   com_edhoc_set_error_info(&error_info, error_description);
+  size_t written_length = 0;
   if (edhoc_message_error_compose(
-          response_data->bytes, response_data->capacity, &response_data->length,
+          response_data.bytes, response_data.capacity, &written_length,
           EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, &error_info) != EDHOC_SUCCESS) {
-    return add_internal_error(COM_EDHOC_ADD_ERROR_ERR_COMPOSE);
+    return internal_error(COM_EDHOC_ADD_ERROR_ERR_COMPOSE);
   }
   const struct com_readonly_conversion_result conversion_result =
-      com_writable_as_readonly(response_data);
+      com_writable_as_readonly(response_data, written_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
     // SHOULD NEVER HAPPEN
-    return add_internal_error(COM_EDHOC_ADD_ERROR_ERR_CONVERSION);
+    return internal_error(COM_EDHOC_ADD_ERROR_ERR_CONVERSION);
   }
-  return add_internal_error_ok(conversion_result.buffer);
+  return ok(conversion_result.buffer);
 }
 
 struct com_readonly_buffer com_edhoc_add_internal_error_view(
-    const char* error_description, struct com_writable_buffer* response_data) {
+    const char* error_description,
+    const struct com_writable_buffer response_data) {
   return com_edhoc_add_internal_error_result(error_description, response_data)
       .buffer;
 }

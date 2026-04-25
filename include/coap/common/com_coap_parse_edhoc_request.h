@@ -32,13 +32,14 @@ struct com_coap_parse_edhoc_request_result {
  * @brief Validate EDHOC CoAP request content format and extract payload.
  * @param[in] request Incoming CoAP request.
  * @param[in] expected_format Expected content format value.
- * @param[out] data_buffer View of the buffer to write the data into
+ * @param[in] data_buffer Metadata of the buffer (pointer and capacity) to write
+ * into
  * @return Struct containing a status code and a view of the parsed request
  */
 struct com_coap_parse_edhoc_request_result com_coap_parse_edhoc_request(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
-    struct com_writable_buffer* data_buffer);
+    struct com_writable_buffer data_buffer);
 
 coap_pdu_code_t com_coap_map_parse_result_to_pdu_code(
     enum com_coap_parse_edhoc_request_status status);

@@ -28,11 +28,12 @@ struct com_coap_get_data_result {
 /**
  * @brief Gets the data from the given pdu
  * @param[in] pdu Protocol data unit to get the data from
- * @param[out] data_buffer View of the buffer to write the data into.
+ * @param[in] data_buffer Metadata of the buffer (pointer and capacity) to write
+ * into
  * @return Result struct containing the status of the operation and a view over
  * the data on success, or an empty view with error code on failure.
  */
 struct com_coap_get_data_result com_coap_get_data(
-    const coap_pdu_t* pdu, struct com_writable_buffer* data_buffer);
+    const coap_pdu_t* pdu, struct com_writable_buffer data_buffer);
 
 #endif  // COAP_COMMON_COAP_GET_DATA_H_

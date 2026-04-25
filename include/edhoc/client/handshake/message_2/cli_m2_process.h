@@ -21,12 +21,13 @@
  *
  * @param[in] context Initialized client handshake state.
  * @param[in] message_2 Message 2 payload descriptor from peer.
- * @param[out] error_buffer Destination buffer descriptor for EDHOC error
- * payload.
+ * @param[in] error_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
+ * buffer to know how many bytes were actually written.
  * @return Result wrapper containing status and output view.
  */
 struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
     struct edhoc_context* context, struct com_readonly_buffer message_2,
-    struct com_writable_buffer* error_buffer);
+    struct com_writable_buffer error_buffer);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_PROCESS_H_

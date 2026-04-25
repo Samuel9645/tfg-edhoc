@@ -37,14 +37,15 @@ static struct srv_edhoc_message_3_process_result invalid_error_buffer(void) {
 }
 
 static struct com_readonly_buffer add_processing_error_to_buffer(
-    const struct edhoc_context* context, struct com_writable_buffer* buffer) {
+    const struct edhoc_context* context,
+    const struct com_writable_buffer buffer) {
   return com_edhoc_add_protocol_error_with_description_view(
       context, "Message 3 processing failed", buffer);
 }
 
 struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
     const struct srv_edhoc_message_3_request request,
-    struct com_writable_buffer* error_buffer) {
+    const struct com_writable_buffer error_buffer) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }

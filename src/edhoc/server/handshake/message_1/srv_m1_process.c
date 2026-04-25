@@ -40,13 +40,13 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 }
 
 static struct com_readonly_buffer add_internal_error_to_buffer(
-    const char* error_message, struct com_writable_buffer* buffer) {
+    const char* error_message, const struct com_writable_buffer buffer) {
   return com_edhoc_add_internal_error_result(error_message, buffer).buffer;
 }
 
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
-    struct com_writable_buffer* error_buffer) {
+    const struct com_writable_buffer error_buffer) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }

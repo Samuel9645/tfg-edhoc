@@ -65,7 +65,6 @@ void setUp(void) {
   reset_mock_results();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.error.bytes = env.response_buffer;
-  env.error.length = 0;
 }
 
 static void ensure_context_is_null(struct edhoc_context* context) {
@@ -76,7 +75,7 @@ void test_m1_process_ok_for_valid_data(void) {
   tst_srv_edhoc_m1_set_process_ok();
 
   struct srv_edhoc_message_1_process_result result =
-      srv_edhoc_process_message_1(env.valid_request, &env.error);
+      srv_edhoc_process_message_1(env.valid_request, env.error);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.context);
@@ -92,21 +91,19 @@ void test_m1_process_fails_on_invalid_data(void) {
   const struct edhoc_credentials dummy_credentials = {0};
   const struct srv_edhoc_message_1_request empty_request_with_credentials = {
       .credentials = &dummy_credentials};
-  struct com_writable_buffer empty_response = {0};
+  const struct com_writable_buffer empty_response = {0};
 
   const struct {
     const char* description;
     struct srv_edhoc_message_1_request request;
-    struct com_writable_buffer* response;
+    struct com_writable_buffer response;
     enum srv_edhoc_message_1_process_status expected_status;
   } test_cases[] = {
-      {"empty request payload", empty_request_with_credentials, &env.error,
+      {"empty request payload", empty_request_with_credentials, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER},
-      {"error buffer is NULL", env.valid_request, NULL,
+      {"error buffer is empty/invalid", env.valid_request, empty_response,
        SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"error buffer is empty/invalid", env.valid_request, &empty_response,
-       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"credentials are missing", empty_request, &env.error,
+      {"credentials are missing", empty_request, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS},
   };
 
@@ -149,7 +146,7 @@ void test_m1_process_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_process_result result =
-        srv_edhoc_process_message_1(env.valid_request, &env.error);
+        srv_edhoc_process_message_1(env.valid_request, env.error);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

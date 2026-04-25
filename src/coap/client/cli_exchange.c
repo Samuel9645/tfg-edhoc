@@ -51,7 +51,7 @@ static coap_response_t coap_client_coap_response_handler(
 
   const struct com_coap_parse_edhoc_request_result parse_result =
       com_coap_parse_edhoc_request(received, CONFIG_COAP_CONTENT_EDHOC,
-                                   &exchange->incoming_response_buffer);
+                                   exchange->incoming_response_buffer);
 
   exchange->internal_parsed_response.bytes = parse_result.parsed_request.bytes;
   exchange->internal_parsed_response.length =
@@ -114,7 +114,6 @@ void reset(struct cli_coap_exchange* exchange) {
   exchange->have_response = false;
   exchange->internal_parsed_response.bytes = NULL;
   exchange->internal_parsed_response.length = 0;
-  exchange->incoming_response_buffer.length = 0;
 }
 
 enum status_coap cli_coap_exchange_send(

@@ -14,7 +14,7 @@
 struct com_coap_parse_edhoc_request_result com_coap_parse_edhoc_request(
     const coap_pdu_t* request,
     const enum config_coap_content_format_edhoc_values expected_format,
-    struct com_writable_buffer* data_buffer) {
+    const struct com_writable_buffer data_buffer) {
   if (request == NULL) {
     coap_log_err("request pdu is null\n");
     return srv_coap_internal_parse_edhoc_failure(COM_COAP_EDH_REQ_ERR_PDU);

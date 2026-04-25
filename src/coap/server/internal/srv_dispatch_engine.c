@@ -45,10 +45,9 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     const struct edhoc_credentials* credentials, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
   uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  struct com_writable_buffer response_data = {
+  const struct com_writable_buffer response_data = {
       .bytes = response_payload,
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
-      .length = 0,
   };
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
 
@@ -57,7 +56,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
         .raw_payload = parsed_request, .credentials = credentials};
 
     const struct srv_edhoc_message_1_responder_result message_1_result =
-        deps->respond_to_message_1(request_data, &response_data);
+        deps->respond_to_message_1(request_data, response_data);
 
     if (!add_payload_if_present(response, message_1_result.response,
                                 deps->add_response_payload)) {
@@ -71,7 +70,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
       .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
 
   const struct srv_edhoc_message_3_responder_result message_3_result =
-      deps->respond_to_message_3(handler_request, &response_data);
+      deps->respond_to_message_3(handler_request, response_data);
 
   if (!add_payload_if_present(response, message_3_result.response,
                               deps->add_response_payload)) {
@@ -93,14 +92,13 @@ void srv_coap_dispatch_post_with_dependencies(
   }
 
   uint8_t pdu_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  struct com_writable_buffer pdu_data = {
+  const struct com_writable_buffer pdu_data = {
       .bytes = pdu_buffer,
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
-      .length = 0,
   };
   const struct com_coap_parse_edhoc_request_result parse_edhoc_result =
       deps->parse_edhoc_request(request, CONFIG_COAP_CONTENT_CID_EDHOC,
-                                &pdu_data);
+                                pdu_data);
   if (parse_edhoc_result.status != COM_COAP_EDH_REQ_OK) {
     coap_log_err("failed to parse EDHOC message\n");
     coap_pdu_set_code(response, com_coap_map_parse_result_to_pdu_code(

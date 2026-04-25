@@ -69,14 +69,13 @@ void setUp(void) {
   reset_mocks();
   memset(env.response_buffer, 0, sizeof(env.response_buffer));
   env.response.bytes = env.response_buffer;
-  env.response.length = 0;
 }
 
 void test_handler_ok_for_valid_data(void) {
   tst_srv_edhoc_m2_set_compose_ok();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(env.valid_request, &env.response);
+      srv_edhoc_respond_to_message_1(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_OK, result.status);
   tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(result.response);
@@ -91,7 +90,7 @@ static void ensure_context_is_freed_on_failure(
 }
 
 void test_handler_fails_on_invalid_data(void) {
-  struct com_writable_buffer empty_response = {0};
+  const struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
       .raw_payload = {.bytes = NULL, .length = 0},
       .credentials = &DUMMY_TEST_CREDS,
@@ -105,16 +104,14 @@ void test_handler_fails_on_invalid_data(void) {
   const struct {
     const char* description;
     struct srv_edhoc_message_1_responder_request request;
-    struct com_writable_buffer* response;
+    struct com_writable_buffer response;
     enum srv_edhoc_message_1_responder_status expected_status;
   } test_cases[] = {
-      {"response buffer is NULL", env.valid_request, NULL,
+      {"response buffer is empty/invalid", env.valid_request, empty_response,
        SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
-      {"response buffer is empty/invalid", env.valid_request, &empty_response,
-       SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
-      {"raw payload is empty", empty_payload_request, &env.response,
+      {"raw payload is empty", empty_payload_request, env.response,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED},
-      {"credentials are missing", no_credentials_request, &env.response,
+      {"credentials are missing", no_credentials_request, env.response,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED},
   };
 
@@ -138,7 +135,7 @@ void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
   };
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(invalid_request, &env.response);
+      srv_edhoc_respond_to_message_1(invalid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -150,7 +147,7 @@ void test_handler_fails_when_parser_reports_prefix_extraction_failure(void) {
   tst_srv_edhoc_m1_set_extract_failed();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(env.valid_request, &env.response);
+      srv_edhoc_respond_to_message_1(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -186,7 +183,7 @@ void test_handler_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_responder_result result =
-        srv_edhoc_respond_to_message_1(env.valid_request, &env.response);
+        srv_edhoc_respond_to_message_1(env.valid_request, env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

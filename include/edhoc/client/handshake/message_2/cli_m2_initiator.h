@@ -21,9 +21,15 @@ struct cli_edhoc_message_2_initiator_request {
   struct edhoc_context* edhoc_context;
 };
 
+/**
+ * @brief Process Message 2 and compose Message 3 into a writable buffer view.
+ * @param[in] request Message 2 request metadata and EDHOC context.
+ * @param[in] response_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
+ */
 struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
     struct cli_edhoc_message_2_initiator_request request,
-    struct com_writable_buffer* response_buffer);
+    struct com_writable_buffer response_buffer);
 
 const char* cli_edhoc_handle_message_2_status_code_to_string(
     enum cli_edhoc_message_2_initiator_status status);

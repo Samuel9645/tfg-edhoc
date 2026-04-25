@@ -35,24 +35,23 @@ void setUp(void) {
   env.context = (struct edhoc_context){0};
   env.request.edhoc_context = &env.context;
   env.request_buffer.bytes = env.request_raw;
-  env.request_buffer.length = 0;
 }
 
 void test_message_2_initiator_ok(void) {
   tst_cli_edhoc_m3_compose_set_compose_ok();
 
   const struct cli_edhoc_message_2_initiator_result result =
-      cli_edhoc_respond_to_message_2(env.request, &env.request_buffer);
+      cli_edhoc_respond_to_message_2(env.request, env.request_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_OK, result.status);
   tst_cli_edhoc_m3_compose_assert_writes_message_in_buffer(result.request);
 }
 
 void test_message_2_initiator_fails_on_invalid_request_buffer(void) {
-  struct com_writable_buffer invalid_request_buffer = {0};
+  const struct com_writable_buffer invalid_request_buffer = {0};
 
   const struct cli_edhoc_message_2_initiator_result result =
-      cli_edhoc_respond_to_message_2(env.request, &invalid_request_buffer);
+      cli_edhoc_respond_to_message_2(env.request, invalid_request_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_INVALID_RESPONSE_BUFFER,
                     result.status);
@@ -62,7 +61,7 @@ void test_message_2_initiator_fails_when_message_2_process_fails(void) {
   tst_cli_edhoc_m2_process_set_failure();
 
   const struct cli_edhoc_message_2_initiator_result result =
-      cli_edhoc_respond_to_message_2(env.request, &env.request_buffer);
+      cli_edhoc_respond_to_message_2(env.request, env.request_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
                     result.status);
@@ -73,7 +72,7 @@ void test_message_2_initiator_fails_when_message_3_compose_fails(void) {
   tst_cli_edhoc_m3_compose_set_compose_failure();
 
   const struct cli_edhoc_message_2_initiator_result result =
-      cli_edhoc_respond_to_message_2(env.request, &env.request_buffer);
+      cli_edhoc_respond_to_message_2(env.request, env.request_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
                     result.status);

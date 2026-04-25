@@ -26,7 +26,7 @@ static const struct com_readonly_buffer DUMMY_READONLY_BUFFER = {
 struct com_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
-    struct com_writable_buffer* data_buffer) {
+    struct com_writable_buffer data_buffer) {
   (void)request;
   (void)expected_format;
   (void)data_buffer;
@@ -37,7 +37,7 @@ struct com_coap_parse_edhoc_request_result
 stb_srv_coap_parse_edhoc_request_fail(
     const coap_pdu_t* request,
     enum config_coap_content_format_edhoc_values expected_format,
-    struct com_writable_buffer* data_buffer) {
+    struct com_writable_buffer data_buffer) {
   (void)request;
   (void)expected_format;
   (void)data_buffer;
@@ -76,7 +76,7 @@ void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
     struct srv_edhoc_message_1_responder_request request_data,
-    struct com_writable_buffer* response_data) {
+    struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
   return srv_edhoc_message_1_responder_failure(
@@ -86,9 +86,9 @@ stb_srv_edhoc_m1_responder_protocol_failure(
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     struct srv_edhoc_message_1_responder_request request_data,
-    struct com_writable_buffer* response_data) {
+    struct com_writable_buffer response_data) {
   (void)request_data;
-  response_data->length = 10;
+  (void)response_data;
   return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub,
                                           DUMMY_READONLY_BUFFER);
 }
@@ -111,16 +111,16 @@ coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
 
 struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
     const struct srv_edhoc_message_3_responder_request request_data,
-    struct com_writable_buffer* response_data) {
+    struct com_writable_buffer response_data) {
   (void)request_data;
-  response_data->length = sizeof(DUMMY_PAYLOAD);
+  (void)response_data;
   return srv_edhoc_message_3_responder_ok(DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_message_3_responder_result
 stb_srv_edhoc_m3_responder_protocol_failure(
     const struct srv_edhoc_message_3_responder_request request_data,
-    struct com_writable_buffer* response_data) {
+    struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
   return srv_edhoc_message_3_responder_failure(

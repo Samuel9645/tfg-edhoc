@@ -16,7 +16,7 @@
 struct com_edhoc_add_error_result
 srv_edhoc_message_1_handler_add_protocol_error(
     const struct edhoc_context* context, const char* error_description,
-    struct com_writable_buffer* response_data) {
+    const struct com_writable_buffer response_data) {
   enum edhoc_error_code error;
   if (edhoc_error_get_code(context, &error) != EDHOC_SUCCESS) {
     error = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;

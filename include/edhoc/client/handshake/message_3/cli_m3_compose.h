@@ -20,11 +20,11 @@
  * @brief Compose EDHOC Message 3 and fill error payload on failure.
  *
  * @param[in] context Initialized EDHOC context.
- * @param[out] compose_buffer Destination buffer descriptor for Message 3 or
- * EDHOC error payload.
+ * @param[in] compose_buffer Metadata of the buffer (pointer and capacity) to
+ * write into
  * @return Result wrapper containing status and output view.
  */
 struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
-    struct edhoc_context* context, struct com_writable_buffer* compose_buffer);
+    struct edhoc_context* context, struct com_writable_buffer compose_buffer);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_3_CLI_M3_COMPOSE_H_

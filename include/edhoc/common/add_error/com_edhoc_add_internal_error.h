@@ -18,20 +18,22 @@
  * buffer for internal errors that are not directly related to a specific
  * libedhoc error code.
  * @param[in] error_description Description of the error
- * @param[out] response_data Buffer where the error message is written.
+ * @param[in] response_data Metadata of the buffer (pointer and capacity) to
+ * write into com_writable_buffer
  * @return Status code indicating success or failure of the operation.
  */
 struct com_edhoc_add_error_result com_edhoc_add_internal_error_result(
-    const char* error_description, struct com_writable_buffer* response_data);
+    const char* error_description, struct com_writable_buffer response_data);
 /**
  * @brief Convenience wrapper for com_edhoc_add_internal_error_result().
  * @param[in] error_description Description of the error.
- * @param[out] response_data Buffer where the error message is written.
+ * @param[in] response_data Metadata of the buffer (pointer and capacity) to
+ * write into com_writable_buffer
  * @return A readonly buffer view containing the composed error message.
  * @note This function is intended for protocol logic where the diagnostic
  * status code is not required and only the resulting payload is needed.
  */
 struct com_readonly_buffer com_edhoc_add_internal_error_view(
-    const char* error_description, struct com_writable_buffer* response_data);
+    const char* error_description, struct com_writable_buffer response_data);
 
 #endif  // EDHOC_COMMON_ADD_ERROR_COM_EDHOC_ADD_INTERNAL_ERROR_H_

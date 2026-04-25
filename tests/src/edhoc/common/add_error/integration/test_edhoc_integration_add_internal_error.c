@@ -24,7 +24,8 @@ void test_add_internal_error(void) {
   const char* expected_description = "RANDOM DESCRIPTION";
 
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_internal_error_result(expected_description, &env.error_buffer_view);
+      com_edhoc_add_internal_error_result(expected_description,
+                                          env.error_buffer_view);
 
   tst_edhoc_assert_add_error_status_ok(result);
   tst_edhoc_assert_encoded_error_matches(result.buffer, expected_description,
@@ -33,7 +34,7 @@ void test_add_internal_error(void) {
 
 void test_add_internal_error_creates_valid_error_on_null_message(void) {
   const struct com_edhoc_add_error_result result =
-      com_edhoc_add_internal_error_result(NULL, &env.error_buffer_view);
+      com_edhoc_add_internal_error_result(NULL, env.error_buffer_view);
 
   tst_edhoc_assert_add_error_status_ok(result);
   tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);

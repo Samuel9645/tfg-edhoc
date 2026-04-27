@@ -94,7 +94,7 @@ struct srv_coap_dispatch_deps {
  *
  * @param[in] session Active CoAP session bound to the remote client.
  * @param[in] request Incoming CoAP PDU with EDHOC message payload.
- * @param[in] credentials EDHOC credentials for the session.
+ * @param[in] edhoc_parameters EDHOC credentials for the session.
  * @param[in,out] response CoAP response PDU where code and payload are set.
 
  * @param[in] deps Dependency injection structure with custom implementations
@@ -113,7 +113,7 @@ struct srv_coap_dispatch_deps {
  */
 void srv_coap_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
-    const struct edhoc_credentials* credentials, coap_pdu_t* response,
+    struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

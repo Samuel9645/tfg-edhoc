@@ -115,7 +115,11 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, &credentials) !=
+  struct srv_edhoc_parameters edhoc_parameters = {
+      .credentials = &credentials,
+      .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+  };
+  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, edhoc_parameters) !=
       COM_EDHOC_SETUP_CTX_OK) {
     coap_log_err("Failed to initialize EDHOC context\n");
     cli_coap_cleanup_resources(&client_resources);

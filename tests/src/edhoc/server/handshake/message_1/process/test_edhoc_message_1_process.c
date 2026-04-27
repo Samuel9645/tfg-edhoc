@@ -18,6 +18,7 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
+#include "edhoc/common/tst_edhoc_default_params.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_context_init.h"
@@ -25,40 +26,23 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
-static int dummy_fetch_credentials(void* user_context,
-                                   struct edhoc_auth_creds* credentials) {
-  (void)user_context;
-  (void)credentials;
-  return EDHOC_SUCCESS;
-}
-
-static int dummy_verify_credentials(
-    void* user_context, struct edhoc_auth_creds* credentials,
-    const uint8_t** public_key_reference,
-    size_t* public_key_length) {  // NOLINT(*-non-const-parameter)
-  (void)user_context;
-  (void)credentials;
-  (void)public_key_reference;
-  (void)public_key_length;
-  return EDHOC_SUCCESS;
-}
-
-static const struct edhoc_credentials DUMMY_TEST_CREDS = {
-    .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
 static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
 static struct {
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
-  const struct srv_edhoc_message_1_request valid_request;
   struct com_writable_buffer error;
-} env = {.error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-         .valid_request = {.payload = {.length = TST_SRV_EDHOC_HND_BUF_LEN,
-                                       .bytes = REQUEST_BUFFER},
-                           .credentials = &DUMMY_TEST_CREDS}};
+} env = {.error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN}};
 
 static void reset_mock_results(void) {
   tst_srv_edhoc_m1_reset_process_mock();
   tst_srv_edhoc_m1_reset_context_init_mock();
+}
+
+// TODO: this is duplicated with m1 responder
+static struct srv_edhoc_message_1_request create_valid_request(void) {
+  return (struct srv_edhoc_message_1_request){
+      .payload = {.bytes = REQUEST_BUFFER, .length = TST_SRV_EDHOC_HND_BUF_LEN},
+      .edhoc_parameters = tst_edhoc_srv_get_default_params()};
 }
 
 void setUp(void) {
@@ -75,7 +59,7 @@ void test_m1_process_ok_for_valid_data(void) {
   tst_srv_edhoc_m1_set_process_ok();
 
   struct srv_edhoc_message_1_process_result result =
-      srv_edhoc_process_message_1(env.valid_request, env.error);
+      srv_edhoc_process_message_1(create_valid_request(), env.error);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.context);
@@ -87,10 +71,21 @@ void test_m1_process_ok_for_valid_data(void) {
 }
 
 void test_m1_process_fails_on_invalid_data(void) {
-  const struct srv_edhoc_message_1_request empty_request = {0};
-  const struct edhoc_credentials dummy_credentials = {0};
-  const struct srv_edhoc_message_1_request empty_request_with_credentials = {
-      .credentials = &dummy_credentials};
+  const struct srv_edhoc_message_1_request valid_request =
+      create_valid_request();
+  const struct srv_edhoc_message_1_request valid_request_without_credentials = {
+      .payload = valid_request.payload,
+      .edhoc_parameters = {
+          .credentials = NULL,
+          .supported_cipher_suites =
+              valid_request.edhoc_parameters.supported_cipher_suites}};
+  const struct srv_edhoc_message_1_request valid_request_without_suites = {
+      .payload = valid_request.payload,
+      .edhoc_parameters = {
+          .supported_cipher_suites = NULL,
+          .credentials = valid_request.edhoc_parameters.credentials}};
+  const struct srv_edhoc_message_1_request empty_request_with_edhoc_params = {
+      .edhoc_parameters = valid_request.edhoc_parameters};
   const struct com_writable_buffer empty_response = {0};
 
   const struct {
@@ -99,13 +94,14 @@ void test_m1_process_fails_on_invalid_data(void) {
     struct com_writable_buffer response;
     enum srv_edhoc_message_1_process_status expected_status;
   } test_cases[] = {
-      {"empty request payload", empty_request_with_credentials, env.error,
+      {"empty request payload", empty_request_with_edhoc_params, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER},
-      {"error buffer is empty/invalid", env.valid_request, empty_response,
+      {"error buffer is empty/invalid", valid_request, empty_response,
        SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"credentials are missing", empty_request, env.error,
+      {"credentials are missing", valid_request_without_credentials, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS},
-  };
+      {"invalid cipher suites", valid_request_without_suites, env.error,
+       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_CIPHER_SUITES}};
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     reset_mock_results();
@@ -146,7 +142,7 @@ void test_m1_process_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_process_result result =
-        srv_edhoc_process_message_1(env.valid_request, env.error);
+        srv_edhoc_process_message_1(create_valid_request(), env.error);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

@@ -17,8 +17,11 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                coap_pdu_t* response) {
   (void)resource;
   (void)query;
-  srv_coap_dispatch_edhoc_post(session, request, &CRED_EDHOC_SRV_CRED,
-                               response);
+  const struct srv_edhoc_parameters edhoc_parameters = {
+      .credentials = &CRED_EDHOC_SRV_CRED,
+      .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+  };
+  srv_coap_dispatch_edhoc_post(session, request, edhoc_parameters, response);
 }
 
 enum com_emulation_status core_run_server(void) {

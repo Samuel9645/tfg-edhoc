@@ -11,14 +11,13 @@
 #ifndef EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 
-#include <edhoc.h>
-
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
+#include "edhoc/common/com_edhoc_context_setup.h"
 
 struct srv_edhoc_message_1_responder_request {
   struct com_readonly_buffer raw_payload;
-  const struct edhoc_credentials* credentials;
+  const struct srv_edhoc_parameters edhoc_parameters;
 };
 
 /**

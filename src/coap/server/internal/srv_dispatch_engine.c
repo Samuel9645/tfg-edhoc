@@ -42,7 +42,7 @@ static bool add_payload_if_present(
 // TODO: maybe only pass the specific deps instead of all
 static coap_pdu_code_t route_and_process_edhoc_message(
     coap_session_t* session, const struct com_readonly_buffer parsed_request,
-    const struct edhoc_credentials* credentials, coap_pdu_t* response,
+    const struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
   uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
   const struct com_writable_buffer response_data = {
@@ -53,7 +53,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
 
   if (edhoc_ctx == NULL) {
     const struct srv_edhoc_message_1_responder_request request_data = {
-        .raw_payload = parsed_request, .credentials = credentials};
+        .raw_payload = parsed_request, .edhoc_parameters = edhoc_parameters};
 
     const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->respond_to_message_1(request_data, response_data);
@@ -81,7 +81,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
 
 void srv_coap_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
-    const struct edhoc_credentials* credentials, coap_pdu_t* response,
+    const struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
   if (srv_dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
@@ -113,5 +113,5 @@ void srv_coap_dispatch_post_with_dependencies(
   }
   coap_pdu_set_code(response, route_and_process_edhoc_message(
                                   session, parse_edhoc_result.parsed_request,
-                                  credentials, response, deps));
+                                  edhoc_parameters, response, deps));
 }

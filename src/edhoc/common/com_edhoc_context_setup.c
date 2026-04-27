@@ -3,75 +3,57 @@
 
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>
-#include <stdint.h>
-#include <stdio.h>
 
 enum com_edhoc_setup_context_status com_edhoc_setup_context(
     struct edhoc_context* context,
-    const struct edhoc_credentials* credentials) {
-  const psa_status_t psa_status = psa_crypto_init();
-  if (psa_status != PSA_SUCCESS) {
-    fprintf(stderr, "cannot initialize PSA crypto: %d\n", psa_status);
+    const struct srv_edhoc_parameters edhoc_parameters) {
+  if (psa_crypto_init() != PSA_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_PSA_INIT;
   }
-  int ret = edhoc_context_init(context);
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot initialize context: %d\n", ret);
+  if (edhoc_context_init(context) != EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT;
+  }
+  const struct com_edhoc_cipher_suite_list* supported_suites =
+      edhoc_parameters.supported_cipher_suites;
+  if (!com_edhoc_cipher_suites_are_valid(supported_suites)) {
+    return COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES;
   }
 
   const enum edhoc_method methods[] = {EDHOC_METHOD_0};
 
-  ret = edhoc_set_methods(context, methods, ARRAY_SIZE(methods));
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot set methods: %d\n", ret);
+  if (edhoc_set_methods(context, methods, ARRAY_SIZE(methods)) !=
+      EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_SET_METHODS;
   }
-
-  const struct edhoc_cipher_suite cipher_suite_2 = {
-      .value = 2,
-      .aead_key_length = 16,
-      .aead_tag_length = 8,
-      .aead_iv_length = 13,
-      .hash_length = 32,
-      .mac_length = 32,
-      .ecc_key_length = 32,
-      .ecc_sign_length = 64,
-  };
-  const struct edhoc_cipher_suite cipher_suites[] = {cipher_suite_2};
-  ret = edhoc_set_cipher_suites(context, cipher_suites,
-                                ARRAY_SIZE(cipher_suites));
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot set cipher suites: %d\n", ret);
+  const size_t number_of_suites = supported_suites->number_of_suites;
+  struct edhoc_cipher_suite cipher_suites[number_of_suites];
+  for (size_t i = 0; i < number_of_suites; i++) {
+    cipher_suites[i] = *supported_suites->suites[i].metadata;
+  }
+  if (edhoc_set_cipher_suites(context, cipher_suites, number_of_suites) !=
+      EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES;
   }
-
   const struct edhoc_connection_id connection_id = {
       .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER,
       .int_value = 21,
       .bstr_length = 0,
   };
-  ret = edhoc_set_connection_id(context, &connection_id);
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot set connection ID: %d\n", ret);
+  if (edhoc_set_connection_id(context, &connection_id) != EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID;
   }
-
-  ret = edhoc_bind_keys(context, edhoc_cipher_suite_2_get_keys());
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot bind keys: %d\n", ret);
+  const struct com_edhoc_cipher_suite_details* first_suite_details =
+      &supported_suites->suites[0];
+  if (edhoc_bind_keys(context, first_suite_details->get_keys()) !=
+      EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS;
   }
-
-  ret = edhoc_bind_crypto(context, edhoc_cipher_suite_2_get_crypto());
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot bind crypto: %d\n", ret);
+  if (edhoc_bind_crypto(context, first_suite_details->get_crypto()) !=
+      EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO;
   }
-
-  ret = edhoc_bind_credentials(context, credentials);
-  if (ret != EDHOC_SUCCESS) {
-    fprintf(stderr, "cannot bind credentials: %d\n", ret);
+  if (edhoc_bind_credentials(context, edhoc_parameters.credentials) !=
+      EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS;
   }
   return COM_EDHOC_SETUP_CTX_OK;

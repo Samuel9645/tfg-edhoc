@@ -1,6 +1,5 @@
 #include "coap/server/srv_dispatch.h"
 
-#include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_response.h"
 #include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
@@ -20,11 +19,10 @@ static const struct srv_coap_dispatch_deps
         .get_session_app_data = coap_session_get_app_data,
 };
 
-void srv_coap_dispatch_edhoc_post(coap_session_t* session,
-                                  const coap_pdu_t* request,
-                                  const struct edhoc_credentials* credentials,
-                                  coap_pdu_t* response) {
+void srv_coap_dispatch_edhoc_post(
+    coap_session_t* session, const coap_pdu_t* request,
+    const struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
   srv_coap_dispatch_post_with_dependencies(
-      session, request, credentials, response,
+      session, request, edhoc_parameters, response,
       &coap_server_edhoc_dispatch_default_deps);
 }

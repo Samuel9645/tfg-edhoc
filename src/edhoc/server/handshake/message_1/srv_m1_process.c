@@ -50,10 +50,16 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
-  if (request.credentials == NULL) {
+  if (request.edhoc_parameters.credentials == NULL) {
     return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS,
         add_internal_error_to_buffer("Null credentials", error_buffer));
+  }
+  if (com_edhoc_cipher_suites_are_valid(
+          request.edhoc_parameters.supported_cipher_suites) != true) {
+    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_CIPHER_SUITES,
+                   add_internal_error_to_buffer("Invalid cipher suites details",
+                                                error_buffer));
   }
   if (!com_readonly_buffer_has_content(request.payload)) {
     return failure(
@@ -67,13 +73,15 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
         SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
         add_internal_error_to_buffer("Context calloc failed", error_buffer));
   }
-  if (com_edhoc_setup_context(context, request.credentials) !=
+
+  if (com_edhoc_setup_context(context, request.edhoc_parameters) !=
       COM_EDHOC_SETUP_CTX_OK) {
     free(context);
     return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
                    com_edhoc_add_protocol_error_with_description_view(
                        context, "Context setup failed", error_buffer));
   }
+
   if (edhoc_message_1_process(context, request.payload.bytes,
                               request.payload.length) != EDHOC_SUCCESS) {
     srv_edhoc_cleanup_context(&context);

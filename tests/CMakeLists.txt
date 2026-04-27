@@ -2,12 +2,6 @@
 set(UNITY_SCRIPT_DIR ${CMAKE_SOURCE_DIR}/externals/unity/auto)
 find_package(Threads REQUIRED)
 
-# 2. Define your source groups (keep these as handy variables)
-set(CORE_SOURCES
-    ${SERVER_SOURCES}
-    ${CLIENT_SOURCES}
-)
-
 # Suppress warnings from helpers
 set_source_files_properties(${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
 
@@ -86,6 +80,8 @@ endfunction()
 
 set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_edhoc_default_params.c
+    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
 )
 
 set(COMMON_SRV_SOURCES
@@ -166,15 +162,6 @@ add_unity_test(test_edhoc_message_1_parser
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SRV_SOURCES}
-)
-
-set(COMMON_SOURCES
-    ${COMMON_SRV_SOURCES}
-    ${MOCK_EDHOC_ERROR_GET_CODE}
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/common/tst_edhoc_add_error_assertions.c
 )
 
 set(HANDSHAKE_ERROR_SUPPORT_SOURCES
@@ -377,16 +364,18 @@ add_unity_test(test_edhoc_message_2_initiator
 add_unity_test(test_coap_server_dispatch
     /src/coap/server/dispatch/test_coap_server_dispatch.c
     ${SERVER_SOURCES}
+    ${COMMON_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_srv_dispatch_stubs.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_create_base_dependencies.c
 )
 
-
 add_unity_test(test_integration
     /src/core/test_integration.c
-    ${CORE_SOURCES}
+    ${SERVER_SOURCES}
+    ${CLIENT_SOURCES}
+    ${COMMON_SOURCES}
 )
 
 # Apply the specific compile definitions ONLY to test_integration

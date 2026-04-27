@@ -28,16 +28,4 @@ enum com_edhoc_setup_context_status {
 enum com_edhoc_setup_context_status com_edhoc_setup_context(
     struct edhoc_context* context, const struct edhoc_credentials* credentials);
 
-/**
- * @brief Initializes credential key information in EDHOC credentials structure
- * @param[in] credentials Pointer to EDHOC credentials structure
- * @param[in] public_key Public key bytes
- * @param[in] public_key_length Length of public key
- * @param[in] key_id_integer Key identifier as integer
- */
-void com_edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
-                                         const uint8_t* public_key,
-                                         size_t public_key_length,
-                                         int32_t key_id_integer);
-
 #endif  // EDHOC_COMMON_EDHOC_SETUP_H_

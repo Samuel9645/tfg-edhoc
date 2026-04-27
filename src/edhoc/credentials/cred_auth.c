@@ -5,6 +5,18 @@
 
 #include "edhoc/common/com_edhoc_context_setup.h"
 
+static void initialize_credential_key(struct edhoc_auth_creds* credentials,
+                                      const uint8_t* public_key,
+                                      const size_t public_key_length,
+                                      const int32_t key_id_integer) {
+  credentials->label = EDHOC_COSE_HEADER_KID;
+  credentials->key_id.cred = public_key;
+  credentials->key_id.cred_len = public_key_length;
+  credentials->key_id.cred_is_cbor = false;
+  credentials->key_id.encode_type = EDHOC_ENCODE_TYPE_INTEGER;
+  credentials->key_id.key_id_int = key_id_integer;
+}
+
 int cred_edhoc_auth_fetch(void* user_context,
                           struct edhoc_auth_creds* credentials,
                           const uint8_t* own_public_key,
@@ -16,8 +28,8 @@ int cred_edhoc_auth_fetch(void* user_context,
     return EDHOC_ERROR_INVALID_ARGUMENT;
   }
 
-  com_edhoc_initialize_credential_key(credentials, own_public_key,
-                                      own_public_key_length, own_key_id);
+  initialize_credential_key(credentials, own_public_key, own_public_key_length,
+                            own_key_id);
 
   if (edhoc_cipher_suite_2_key_import(
           user_context, EDHOC_KT_SIGNATURE, own_private_key,
@@ -49,8 +61,8 @@ int cred_edhoc_auth_verify(const void* user_context,
   *public_key_reference = peer_public_key;
   *public_key_length = peer_public_key_length;
 
-  com_edhoc_initialize_credential_key(credentials, peer_public_key,
-                                      peer_public_key_length, expected_key_id);
+  initialize_credential_key(credentials, peer_public_key,
+                            peer_public_key_length, expected_key_id);
 
   return EDHOC_SUCCESS;
 }

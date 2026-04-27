@@ -76,15 +76,3 @@ enum com_edhoc_setup_context_status com_edhoc_setup_context(
   }
   return COM_EDHOC_SETUP_CTX_OK;
 }
-
-void com_edhoc_initialize_credential_key(struct edhoc_auth_creds* credentials,
-                                         const uint8_t* public_key,
-                                         const size_t public_key_length,
-                                         const int32_t key_id_integer) {
-  credentials->label = EDHOC_COSE_HEADER_KID;
-  credentials->key_id.cred = public_key;
-  credentials->key_id.cred_len = public_key_length;
-  credentials->key_id.cred_is_cbor = false;
-  credentials->key_id.encode_type = EDHOC_ENCODE_TYPE_INTEGER;
-  credentials->key_id.key_id_int = key_id_integer;
-}

@@ -36,13 +36,9 @@ static struct com_writable_buffer create_valid_error_buffer(void) {
                                       .capacity = sizeof(env.error_buffer)};
 }
 
-static struct srv_edhoc_parameters create_valid_params(void) {
-  return tst_edhoc_srv_get_default_params();
-}
-
 void test_setup_context_ok_with_valid_parameters(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
 
   const struct com_edhoc_setup_context_result result =
       com_edhoc_setup_context(&env.context, params, error_buffer);
@@ -53,7 +49,7 @@ void test_setup_context_ok_with_valid_parameters(void) {
 void test_setup_context_fails_on_invalid_error_buffer(void) {
   const struct com_writable_buffer invalid_buffer = {.bytes = NULL,
                                                      .capacity = 0};
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
 
   const struct com_edhoc_setup_context_result result =
       com_edhoc_setup_context(&env.context, params, invalid_buffer);
@@ -64,7 +60,8 @@ void test_setup_context_fails_on_invalid_error_buffer(void) {
 
 void test_setup_context_fails_on_null_credentials(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters valid_params = create_valid_params();
+  const struct srv_edhoc_parameters valid_params =
+      tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_parameters params = {
       .credentials = NULL,
       .supported_cipher_suites = valid_params.supported_cipher_suites,
@@ -81,7 +78,8 @@ void test_setup_context_fails_on_null_credentials(void) {
 
 void test_setup_context_fails_on_invalid_cipher_suites(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters valid_params = create_valid_params();
+  const struct srv_edhoc_parameters valid_params =
+      tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_parameters params = {
       .credentials = valid_params.credentials,
       .supported_cipher_suites = NULL,
@@ -99,7 +97,8 @@ void test_setup_context_fails_on_invalid_cipher_suites(void) {
 
 void test_setup_context_fails_on_invalid_methods(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters valid_params = create_valid_params();
+  const struct srv_edhoc_parameters valid_params =
+      tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_methods invalid_methods = {.data = NULL, .size = 0};
   const struct srv_edhoc_parameters params = {
       .credentials = valid_params.credentials,
@@ -117,7 +116,7 @@ void test_setup_context_fails_on_invalid_methods(void) {
 
 void test_setup_context_fails_on_psa_crypto_init_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_psa_crypto_init_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -131,7 +130,7 @@ void test_setup_context_fails_on_psa_crypto_init_failure(void) {
 
 void test_setup_context_fails_on_edhoc_context_init_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_context_init_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -145,7 +144,7 @@ void test_setup_context_fails_on_edhoc_context_init_failure(void) {
 
 void test_setup_context_fails_on_set_methods_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_methods_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -159,7 +158,7 @@ void test_setup_context_fails_on_set_methods_failure(void) {
 
 void test_setup_context_fails_on_set_cipher_suites_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_cipher_suites_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -173,7 +172,7 @@ void test_setup_context_fails_on_set_cipher_suites_failure(void) {
 
 void test_setup_context_fails_on_set_connection_id_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_connection_id_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -187,7 +186,7 @@ void test_setup_context_fails_on_set_connection_id_failure(void) {
 
 void test_setup_context_fails_on_bind_keys_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_keys_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -201,7 +200,7 @@ void test_setup_context_fails_on_bind_keys_failure(void) {
 
 void test_setup_context_fails_on_bind_crypto_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_crypto_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -215,7 +214,7 @@ void test_setup_context_fails_on_bind_crypto_failure(void) {
 
 void test_setup_context_fails_on_bind_credentials_failure(void) {
   const struct com_writable_buffer error_buffer = create_valid_error_buffer();
-  const struct srv_edhoc_parameters params = create_valid_params();
+  const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_credentials_failure();
 
   const struct com_edhoc_setup_context_result result =

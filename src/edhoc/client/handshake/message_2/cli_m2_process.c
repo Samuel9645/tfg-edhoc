@@ -46,7 +46,7 @@ struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
   if (context == NULL) {
     return internal_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view("Null credentials", error_buffer));
+        com_edhoc_add_internal_error_view("Null EDHOC context", error_buffer));
   }
   if (!com_readonly_buffer_has_content(message_2)) {
     return internal_failure(

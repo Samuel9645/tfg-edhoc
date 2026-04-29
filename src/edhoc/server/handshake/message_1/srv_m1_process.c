@@ -46,21 +46,8 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
-  // TODO: move these checks and add_errors into com_setup_context
-  if (request.edhoc_parameters.credentials == NULL) {
-    return failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS,
-        com_edhoc_add_internal_error_view("Null credentials", error_buffer));
-  }
-  if (com_edhoc_cipher_suites_are_valid(
-          request.edhoc_parameters.supported_cipher_suites) != true) {
-    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_CIPHER_SUITES,
-                   com_edhoc_add_internal_error_view(
-                       "Invalid cipher suites details", error_buffer));
-  }
   if (!com_readonly_buffer_has_content(request.payload)) {
-    return failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
+    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
                    com_edhoc_add_internal_error_view("Empty request buffer",
                                                      error_buffer));
   }
@@ -72,12 +59,12 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
                                                      error_buffer));
   }
 
-  if (com_edhoc_setup_context(context, request.edhoc_parameters) !=
-      COM_EDHOC_SETUP_CTX_OK) {
+  const struct com_edhoc_setup_context_result setup_context_result =
+      com_edhoc_setup_context(context, request.edhoc_parameters, error_buffer);
+  if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
     const struct srv_edhoc_message_1_process_result failure_result =
         failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-                com_edhoc_add_protocol_error_with_description_view(
-                    context, "Context setup failed", error_buffer));
+                setup_context_result.error_buffer);
     free(context);
     return failure_result;
   }

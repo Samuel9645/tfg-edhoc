@@ -32,8 +32,8 @@ static int client_credential_verify(void* user_context,
                                     struct edhoc_auth_creds* credentials,
                                     const uint8_t** public_key_reference,
                                     size_t* public_key_length) {
-  return cred_edhoc_auth_verify(user_context, credentials,
-                                CRED_EDHOC_PUB_SRV_KID, CRED_EDHOC_PUB_SRV_PK,
+  return cred_edhoc_auth_verify(
+      user_context, credentials, CRED_EDHOC_PUB_SRV_KID, CRED_EDHOC_PUB_SRV_PK,
       CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
 }
 
@@ -125,8 +125,12 @@ enum com_emulation_status core_run_client(void) {
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
   };
-  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, edhoc_parameters) !=
-      COM_EDHOC_SETUP_CTX_OK) {
+  // WHY ARE WE NOT USING THE ERROR BUFFER?
+  // This error is before any message is sent so it doesn't make sense to start
+  // the communication with an error message
+  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, edhoc_parameters,
+                              payload_buffer)
+          .status != COM_EDHOC_SETUP_CTX_OK) {
     coap_log_err("Failed to initialize EDHOC context\n");
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

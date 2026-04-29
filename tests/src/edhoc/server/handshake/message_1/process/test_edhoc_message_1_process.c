@@ -174,17 +174,6 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
 void test_m1_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_1_request valid_request =
       create_valid_request();
-  const struct srv_edhoc_message_1_request valid_request_without_credentials = {
-      .payload = valid_request.payload,
-      .edhoc_parameters = {
-          .credentials = NULL,
-          .supported_cipher_suites =
-              valid_request.edhoc_parameters.supported_cipher_suites}};
-  const struct srv_edhoc_message_1_request valid_request_without_suites = {
-      .payload = valid_request.payload,
-      .edhoc_parameters = {
-          .supported_cipher_suites = NULL,
-          .credentials = valid_request.edhoc_parameters.credentials}};
   const struct srv_edhoc_message_1_request empty_request_with_edhoc_params = {
       .edhoc_parameters = valid_request.edhoc_parameters};
   const struct com_writable_buffer empty_response = {0};
@@ -198,11 +187,7 @@ void test_m1_process_fails_on_invalid_data(void) {
       {"empty request payload", empty_request_with_edhoc_params, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER},
       {"error buffer is empty/invalid", valid_request, empty_response,
-       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"credentials are missing", valid_request_without_credentials, env.error,
-       SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS},
-      {"invalid cipher suites", valid_request_without_suites, env.error,
-       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_CIPHER_SUITES}};
+       SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER}};
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     reset_mock_results();

@@ -75,11 +75,17 @@ endfunction()
 # 4. REGISTER TESTS WITH GRANULAR CONTROL
 # ==============================================================================
 
+set(EDHOC_CORE_ERROR_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
+)
 
 set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_edhoc_default_params.c
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
+    ${EDHOC_CORE_ERROR_SOURCES}
 )
 
 set(COMMON_SRV_SOURCES
@@ -97,8 +103,6 @@ set(ADD_EDHOC_ERROR_INTEGRATION_SOURCES
 )
 
 set(ADD_PROTOCOL_ERROR_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.c
 )
 
@@ -131,8 +135,6 @@ add_unity_test(test_edhoc_unit_add_protocol_error
 )
 
 set(ADD_INTERNAL_ERROR_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.c
 )
 
@@ -148,6 +150,38 @@ add_unity_test(test_edhoc_unit_add_internal_error
     ${ADD_INTERNAL_ERROR_SOURCES}
 )
 
+set(HANDSHAKE_ERROR_SUPPORT_SOURCES
+    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
+    ${ADD_PROTOCOL_ERROR_SOURCES}
+    ${ADD_INTERNAL_ERROR_SOURCES}
+    ${ADD_EDHOC_ERROR_UNIT_SOURCES}
+    ${MOCK_EDHOC_ERROR_GET_CODE}
+)
+
+set(SETUP_CONTEXT_MOCK
+    src/edhoc/common/setup_context/mocks/tst_com_mock_edhoc_setup_context.c
+    "-Wl,--wrap=psa_crypto_init"
+    "-Wl,--wrap=edhoc_context_init"
+    "-Wl,--wrap=edhoc_set_methods"
+    "-Wl,--wrap=edhoc_set_cipher_suites"
+    "-Wl,--wrap=edhoc_set_connection_id"
+    "-Wl,--wrap=edhoc_bind_keys"
+    "-Wl,--wrap=edhoc_bind_crypto"
+    "-Wl,--wrap=edhoc_bind_credentials"
+)
+
+set(SETUP_CONTEXT_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
+)
+
+add_unity_test(test_edhoc_setup_context
+    /src/edhoc/common/setup_context/test_edhoc_setup_context.c
+    ${SETUP_CONTEXT_SOURCES}
+    ${SETUP_CONTEXT_MOCK}
+    ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
+)
+
 set(MESSAGE_1_PARSER_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.c
 )
@@ -157,20 +191,9 @@ add_unity_test(test_edhoc_message_1_parser
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${MESSAGE_1_PARSER_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SRV_SOURCES}
 )
 
-set(HANDSHAKE_ERROR_SUPPORT_SOURCES
-    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${ADD_EDHOC_ERROR_UNIT_SOURCES}
-    ${MOCK_EDHOC_ERROR_GET_CODE}
-)
 
 set(EDHOC_CONTENT_INIT_MOCK
     src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_context_init.c
@@ -218,13 +241,6 @@ add_unity_test(test_edhoc_message_1_responder
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
-#add_unity_test(test_edhoc_message_1_errors
-#    /src/edhoc/server/handshake/message_1/errors/test_edhoc_edhoc_message_1_errors.c
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors/tst_srv_m1_errors_stubs.c
-#    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
-#    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
-#    ${COMMON_SRV_SOURCES}
-#)
 
 set(MESSAGE_3_PARSER_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_parser_deps.c

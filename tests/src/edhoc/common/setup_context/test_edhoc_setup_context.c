@@ -18,30 +18,27 @@
 
 enum { TST_SETUP_CONTEXT_BUFFER_SIZE = 256 };
 
+static uint8_t error_buffer[TST_SETUP_CONTEXT_BUFFER_SIZE];
+
 static struct {
-  uint8_t error_buffer[TST_SETUP_CONTEXT_BUFFER_SIZE];
   struct edhoc_context context;
-} env = {0};
+  const struct com_writable_buffer error_buffer_view;
+} env = {.error_buffer_view = {.bytes = error_buffer,
+                               .capacity = sizeof(error_buffer)}};
 
 static void reset_env(void) {
   tst_com_reset_setup_context_mock();
-  memset(env.error_buffer, 0, sizeof(env.error_buffer));
+  memset(error_buffer, 0, sizeof(error_buffer));
   memset(&env.context, 0, sizeof(env.context));
 }
 
 void setUp(void) { reset_env(); }
 
-static struct com_writable_buffer create_valid_error_buffer(void) {
-  return (struct com_writable_buffer){.bytes = env.error_buffer,
-                                      .capacity = sizeof(env.error_buffer)};
-}
-
 void test_setup_context_ok_with_valid_parameters(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_OK, result.status);
 }
@@ -59,7 +56,6 @@ void test_setup_context_fails_on_invalid_error_buffer(void) {
 }
 
 void test_setup_context_fails_on_null_credentials(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters valid_params =
       tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_parameters params = {
@@ -68,7 +64,7 @@ void test_setup_context_fails_on_null_credentials(void) {
       .methods = valid_params.methods};
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_NULL_CREDENTIALS, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -77,7 +73,6 @@ void test_setup_context_fails_on_null_credentials(void) {
 }
 
 void test_setup_context_fails_on_invalid_cipher_suites(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters valid_params =
       tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_parameters params = {
@@ -86,7 +81,7 @@ void test_setup_context_fails_on_invalid_cipher_suites(void) {
       .methods = valid_params.methods};
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES,
                     result.status);
@@ -96,7 +91,6 @@ void test_setup_context_fails_on_invalid_cipher_suites(void) {
 }
 
 void test_setup_context_fails_on_invalid_methods(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters valid_params =
       tst_edhoc_srv_get_default_params();
   const struct srv_edhoc_methods invalid_methods = {.data = NULL, .size = 0};
@@ -106,7 +100,7 @@ void test_setup_context_fails_on_invalid_methods(void) {
       .methods = invalid_methods};
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_METHODS, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -115,12 +109,11 @@ void test_setup_context_fails_on_invalid_methods(void) {
 }
 
 void test_setup_context_fails_on_psa_crypto_init_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_psa_crypto_init_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_PSA_INIT, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -129,12 +122,11 @@ void test_setup_context_fails_on_psa_crypto_init_failure(void) {
 }
 
 void test_setup_context_fails_on_edhoc_context_init_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_context_init_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -143,12 +135,11 @@ void test_setup_context_fails_on_edhoc_context_init_failure(void) {
 }
 
 void test_setup_context_fails_on_set_methods_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_methods_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_METHODS, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -157,12 +148,11 @@ void test_setup_context_fails_on_set_methods_failure(void) {
 }
 
 void test_setup_context_fails_on_set_cipher_suites_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_cipher_suites_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -171,12 +161,11 @@ void test_setup_context_fails_on_set_cipher_suites_failure(void) {
 }
 
 void test_setup_context_fails_on_set_connection_id_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_set_connection_id_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -185,12 +174,11 @@ void test_setup_context_fails_on_set_connection_id_failure(void) {
 }
 
 void test_setup_context_fails_on_bind_keys_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_keys_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -199,12 +187,11 @@ void test_setup_context_fails_on_bind_keys_failure(void) {
 }
 
 void test_setup_context_fails_on_bind_crypto_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_crypto_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,
@@ -213,12 +200,11 @@ void test_setup_context_fails_on_bind_crypto_failure(void) {
 }
 
 void test_setup_context_fails_on_bind_credentials_failure(void) {
-  const struct com_writable_buffer error_buffer = create_valid_error_buffer();
   const struct srv_edhoc_parameters params = tst_edhoc_srv_get_default_params();
   tst_com_set_edhoc_bind_credentials_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, error_buffer);
+      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS, result.status);
   tst_edhoc_assert_encoded_error_matches(result.error_buffer,

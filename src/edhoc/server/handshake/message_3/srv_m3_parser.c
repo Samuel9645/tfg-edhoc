@@ -81,21 +81,3 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
       .length = extracted_fields.edhoc_message_size,
   });
 }
-
-const char* srv_edhoc_parse_message_3_status_to_string(
-    const enum srv_edhoc_parse_message_3_status status) {
-  switch (status) {
-  case SRV_EDHOC_MSG3_PARSE_OK:
-    return "ok";
-  case SRV_EDHOC_MSG3_PARSE_ERR_EMPTY_REQUEST_BUFFER:
-    return "invalid request buffer";
-  case SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT:
-    return "null EDHOC context";
-  case SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED:
-    return "connection ID extraction failed";
-  case SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID:
-    return "unexpected connection ID";
-  default:
-    return "unknown";
-  }
-}

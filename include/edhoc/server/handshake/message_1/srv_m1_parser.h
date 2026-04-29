@@ -37,13 +37,5 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
     struct com_readonly_buffer request_buffer,
     struct com_writable_buffer error_response);
 
-/**
- * @brief Convert a parsing status code into a human-readable string.
- * @param status status of the parsing operation
- * @return human-readable string describing the parsing status, useful for
- * logging and debugging.
- */
-const char* srv_edhoc_parse_message_1_status_to_string(
-    enum srv_edhoc_parse_message_1_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_

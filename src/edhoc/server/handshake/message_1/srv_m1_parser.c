@@ -66,17 +66,3 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
       .length = extracted_fields.edhoc_message_size,
   });
 }
-
-const char* srv_edhoc_parse_message_1_status_to_string(
-    const enum srv_edhoc_parse_message_1_status status) {
-  switch (status) {
-  case SRV_EDHOC_MSG1_PARSE_OK:
-    return "ok";
-  case SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION:
-    return "prefix missing";
-  case SRV_EDHOC_MSG1_PARSE_ERR_INVALID_ERROR_BUFFER:
-    return "invalid request buffer";
-  default:
-    return "unknown";
-  }
-}

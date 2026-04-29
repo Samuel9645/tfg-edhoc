@@ -54,7 +54,9 @@ void test_compose_message_1_fails_when_prepend_flow_fails(void) {
       cli_edhoc_compose_message_1(&env.context, env.compose);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 1 Compose error: Failed to prepend flow",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_1_fails_when_edhoc_compose_fails(void) {
@@ -65,7 +67,9 @@ void test_compose_message_1_fails_when_edhoc_compose_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 1 Compose error: Failed to compose EDHOC message",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_1_fails_when_size_recalculation_fails(void) {
@@ -76,7 +80,10 @@ void test_compose_message_1_fails_when_size_recalculation_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_SIZE_CALC,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer,
+      "Message 1 Compose error: Failed to recalculate prepended size",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_1_fails_when_composition_produces_empty_buffer(void) {
@@ -86,5 +93,7 @@ void test_compose_message_1_fails_when_composition_produces_empty_buffer(void) {
       cli_edhoc_compose_message_1(&env.context, env.compose);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 1 Compose error: Empty compose result",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

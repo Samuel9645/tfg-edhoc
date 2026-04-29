@@ -46,19 +46,22 @@ struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
   if (context == NULL) {
     return internal_failure(
         CLI_EDHOC_MSG4_PROCESS_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view("Null edhoc context", error_buffer));
+        com_edhoc_add_internal_error_view(
+            "Message 4 Process error: Null context", error_buffer));
   }
   if (!com_readonly_buffer_has_content(message_4)) {
     return internal_failure(
         CLI_EDHOC_MSG4_PROCESS_ERR_EMPTY_MESSAGE_4,
-        com_edhoc_add_internal_error_view("Empty Message 4", error_buffer));
+        com_edhoc_add_internal_error_view(
+            "Message 4 Process error: Empty message", error_buffer));
   }
 
   if (edhoc_message_4_process(context, message_4.bytes, message_4.length) !=
       EDHOC_SUCCESS) {
     return process_protocol_failure(
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to process EDHOC message 4", error_buffer));
+            context, "Message 4 Process error: Failed to process EDHOC message",
+            error_buffer));
   }
   return ok();
 }

@@ -54,7 +54,9 @@ void test_process_message_4_fails_on_null_context(void) {
       cli_edhoc_process_message_4(NULL, env.message_4, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_NULL_CONTEXT, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Message 4 Process error: Null context",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_process_message_4_fails_on_empty_message(void) {
@@ -64,7 +66,9 @@ void test_process_message_4_fails_on_empty_message(void) {
       cli_edhoc_process_message_4(&env.context, empty_message, env.error);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_EMPTY_MESSAGE_4, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Message 4 Process error: Empty message",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_process_message_4_fails_when_edhoc_process_fails(void) {
@@ -75,5 +79,8 @@ void test_process_message_4_fails_when_edhoc_process_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer,
+      "Message 4 Process error: Failed to process EDHOC message",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

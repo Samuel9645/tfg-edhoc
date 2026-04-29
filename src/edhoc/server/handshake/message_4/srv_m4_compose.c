@@ -40,7 +40,7 @@ static struct com_readonly_buffer add_compose_error_to_buffer(
     const struct edhoc_context* context,
     const struct com_writable_buffer buffer) {
   return com_edhoc_add_protocol_error_with_description_view(
-      context, "Message 4 composition failed", buffer);
+      context, "Message 4 Compose error: Composition failed", buffer);
 }
 
 struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
@@ -50,9 +50,10 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
     return invalid_buffer();
   }
   if (context == NULL) {
-    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT,
-                   com_edhoc_add_internal_error_view("Null EDHOC context",
-                                                     compose_buffer));
+    return failure(
+        SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT,
+        com_edhoc_add_internal_error_view(
+            "Message 4 Compose error: Null context", compose_buffer));
   }
 
   size_t written_length = 0;
@@ -65,9 +66,10 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, written_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
-                   com_edhoc_add_internal_error_view("Empty compose result",
-                                                     compose_buffer));
+    return failure(
+        SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE,
+        com_edhoc_add_internal_error_view(
+            "Message 4 Compose error: Empty compose result", compose_buffer));
   }
   return ok(conversion_result.buffer);
 }

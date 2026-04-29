@@ -76,14 +76,6 @@ void test_compose_fails_on_invalid_data(void) {
   }
 }
 
-/**
- * WHY DON'T WE CHECK THE REPORTED ERROR?
- *
- * RFC only defines specific errors for other scenarios, so most of the RFC
- * level codes are UNSPECIFIED_ERROR.
- * @see [RFC 9528, Section
- * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
- */
 void test_compose_fails_on_library_compose_failure(void) {
   tst_srv_edhoc_m2_reset_compose_mock();
 
@@ -91,7 +83,9 @@ void test_compose_fails_on_library_compose_failure(void) {
       srv_edhoc_compose_message_2(&env.context, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG2_COMPOSE_ERR_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 2 Compose error: Composition failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_fails_when_composition_produces_empty_buffer(void) {
@@ -101,5 +95,7 @@ void test_compose_fails_when_composition_produces_empty_buffer(void) {
       srv_edhoc_compose_message_2(&env.context, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG2_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 2 Compose error: Empty compose result",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

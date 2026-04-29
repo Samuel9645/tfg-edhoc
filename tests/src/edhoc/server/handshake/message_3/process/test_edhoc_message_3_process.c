@@ -91,14 +91,6 @@ void test_process_fails_on_invalid_data(void) {
   }
 }
 
-/**
- * WHY DON'T WE CHECK THE REPORTED ERROR?
- *
- * RFC only defines specific errors for other scenarios, so most of the RFC
- * level codes are UNSPECIFIED_ERROR.
- * @see [RFC 9528, Section
- * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
- */
 void test_process_fails_on_library_errors(void) {
   tst_srv_edhoc_m3_set_process_failure();
 
@@ -107,5 +99,7 @@ void test_process_fails_on_library_errors(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Message 3 Process error: Processing failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

@@ -46,19 +46,21 @@ struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
   if (context == NULL) {
     return internal_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view("Null EDHOC context", error_buffer));
+        com_edhoc_add_internal_error_view(
+            "Message 2 Process error: Null context", error_buffer));
   }
   if (!com_readonly_buffer_has_content(message_2)) {
     return internal_failure(
         CLI_EDHOC_MSG2_PROCESS_ERR_EMPTY_MESSAGE_2,
-        com_edhoc_add_internal_error_view("Empty Message 2", error_buffer));
+        com_edhoc_add_internal_error_view(
+            "Message 2 Process error: Empty message", error_buffer));
   }
 
   if (edhoc_message_2_process(context, message_2.bytes, message_2.length) !=
       EDHOC_SUCCESS) {
     return process_protocol_failure(
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to process EDHOC message 2", error_buffer));
+            context, "Message 2 Process error: Failed to process EDHOC message", error_buffer));
   }
   return ok();
 }

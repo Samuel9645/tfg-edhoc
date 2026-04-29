@@ -67,9 +67,9 @@ void test_setup_context_fails_on_null_credentials(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_NULL_CREDENTIALS, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Null credentials",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Null credentials",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_invalid_cipher_suites(void) {
@@ -85,9 +85,10 @@ void test_setup_context_fails_on_invalid_cipher_suites(void) {
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES,
                     result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Invalid supported cipher suites",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer,
+      "Context Setup error: Invalid supported cipher suites",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_invalid_methods(void) {
@@ -103,9 +104,9 @@ void test_setup_context_fails_on_invalid_methods(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_METHODS, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Invalid EDHOC methods",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Invalid EDHOC methods",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_psa_crypto_init_failure(void) {
@@ -116,9 +117,10 @@ void test_setup_context_fails_on_psa_crypto_init_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_PSA_INIT, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "PSA crypto initialization failed",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer,
+      "Context Setup error: PSA crypto initialization failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_edhoc_context_init_failure(void) {
@@ -129,9 +131,10 @@ void test_setup_context_fails_on_edhoc_context_init_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "EDHOC context initialization failed",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer,
+      "Context Setup error: EDHOC context initialization failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_set_methods_failure(void) {
@@ -142,9 +145,9 @@ void test_setup_context_fails_on_set_methods_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_METHODS, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to set EDHOC methods",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to set EDHOC methods",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_set_cipher_suites_failure(void) {
@@ -155,9 +158,9 @@ void test_setup_context_fails_on_set_cipher_suites_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to set cipher suites",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to set cipher suites",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_set_connection_id_failure(void) {
@@ -168,9 +171,9 @@ void test_setup_context_fails_on_set_connection_id_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to set connection ID",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to set connection ID",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_bind_keys_failure(void) {
@@ -181,9 +184,9 @@ void test_setup_context_fails_on_bind_keys_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to bind keys",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to bind keys",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_bind_crypto_failure(void) {
@@ -194,9 +197,9 @@ void test_setup_context_fails_on_bind_crypto_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to bind crypto",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to bind crypto",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_setup_context_fails_on_bind_credentials_failure(void) {
@@ -207,7 +210,7 @@ void test_setup_context_fails_on_bind_credentials_failure(void) {
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS, result.status);
-  tst_edhoc_assert_encoded_error_matches(result.error_buffer,
-                                         "Failed to bind credentials",
-                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_matches(
+      result.error_buffer, "Context Setup error: Failed to bind credentials",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

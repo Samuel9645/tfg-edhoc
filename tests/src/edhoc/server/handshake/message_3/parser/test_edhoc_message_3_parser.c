@@ -63,7 +63,9 @@ void test_parser_fails_and_populates_error_when_buffer_is_invalid(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_EMPTY_REQUEST_BUFFER,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 3 Parser error: Empty request buffer",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_and_populates_error_when_context_is_null(void) {
@@ -72,7 +74,9 @@ void test_parser_fails_and_populates_error_when_context_is_null(void) {
                                 test_env.error_buffer_view);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(result.buffer,
+                                         "Message 3 Parser error: Null context",
+                                         EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_and_populates_error_when_connection_id_extraction_fails(
@@ -85,7 +89,9 @@ void test_parser_fails_and_populates_error_when_connection_id_extraction_fails(
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 3 Parser error: Connection ID extraction failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_and_populates_error_on_connection_id_mismatch(void) {
@@ -97,7 +103,9 @@ void test_parser_fails_and_populates_error_on_connection_id_mismatch(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      result.buffer, "Message 3 Parser error: Unexpected connection ID",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_on_invalid_error_buffer(void) {

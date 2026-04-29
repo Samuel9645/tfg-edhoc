@@ -50,7 +50,7 @@ static struct cli_edhoc_message_3_compose_result null_context_failure(
   return (struct cli_edhoc_message_3_compose_result){
       .status = CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT,
       .buffer = com_edhoc_add_internal_error_view(
-          "Context pointer is NULL when composing message 3", compose_buffer),
+          "Message 3 Compose error: Null context", compose_buffer),
   };
 }
 
@@ -76,7 +76,7 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
     return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to prepend connection id for message 3",
+            context, "Message 3 Compose error: Failed to prepend connection id",
             compose_buffer));
   }
 
@@ -87,20 +87,23 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
     return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to compose EDHOC message 3", compose_buffer));
+            context, "Message 3 Compose error: Failed to compose EDHOC message",
+            compose_buffer));
   }
   if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
     return protocol_failure(
         CLI_EDHOC_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to recalculate prepended message size",
+            context,
+            "Message 3 Compose error: Failed to recalculate prepended message "
+            "size",
             compose_buffer));
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, prepended_fields.buffer_size);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
     return empty_compose_failure(com_edhoc_add_internal_error_view(
-        "Empty compose result", compose_buffer));
+        "Message 3 Compose error: Empty compose result", compose_buffer));
   }
   return ok(conversion_result.buffer);
 }

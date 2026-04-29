@@ -55,7 +55,9 @@ void test_parser_fails_and_populates_error_on_empty_request_buffer(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_EMPTY_REQUEST_BUFFER,
                     parse_result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(parse_result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      parse_result.buffer, "Message 1 Parser error: Empty request buffer",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_and_populates_error_when_prefix_extraction_fails(void) {
@@ -72,7 +74,9 @@ void test_parser_fails_and_populates_error_when_prefix_extraction_fails(void) {
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
                     parse_result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(parse_result.buffer);
+  tst_edhoc_assert_encoded_error_matches(
+      parse_result.buffer, "Message 1 Parser error: Prefix extraction failed",
+      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_parser_fails_on_invalid_error_buffer(void) {

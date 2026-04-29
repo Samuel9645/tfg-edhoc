@@ -203,23 +203,17 @@ void test_m1_process_fails_on_invalid_data(void) {
   }
 }
 
-/**
- * WHY DON'T WE CHECK THE REPORTED ERROR?
- *
- * RFC only defines specific errors for other scenarios, so most of the RFC
- * level codes are UNSPECIFIED_ERROR.
- * @see [RFC 9528, Section
- * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
- */
 void test_m1_process_fails_on_library_errors(void) {
   const struct {
     const char* description;
+    const char* expected_error_description;
     void (*setup_scenario)(void);
     enum srv_edhoc_message_1_process_status expected_status;
   } cases[] = {
-      {"setup fails", tst_srv_edhoc_m1_set_context_init_failure,
+      {"setup fails", NULL, tst_srv_edhoc_m1_set_context_init_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP},
-      {"processing fails", tst_srv_edhoc_m1_set_process_failure,
+      {"processing fails", "Message 1 Process error: Processing failed",
+       tst_srv_edhoc_m1_set_process_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS},
   };
 
@@ -232,6 +226,12 @@ void test_m1_process_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+    if (cases[i].expected_error_description == NULL) {
+      tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
+    } else {
+      tst_edhoc_assert_encoded_error_matches(
+          result.error_buffer, cases[i].expected_error_description,
+          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+    }
   }
 }

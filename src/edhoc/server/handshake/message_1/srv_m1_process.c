@@ -47,16 +47,18 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     return invalid_error_buffer();
   }
   if (!com_readonly_buffer_has_content(request.payload)) {
-    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
-                   com_edhoc_add_internal_error_view("Empty request buffer",
-                                                     error_buffer));
+    return failure(
+        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
+        com_edhoc_add_internal_error_view(
+            "Message 1 Process error: Empty request buffer", error_buffer));
   }
 
   struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
   if (context == NULL) {
-    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
-                   com_edhoc_add_internal_error_view("Context calloc failed",
-                                                     error_buffer));
+    return failure(
+        SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
+        com_edhoc_add_internal_error_view(
+            "Message 1 Process error: Context calloc failed", error_buffer));
   }
 
   const struct com_edhoc_setup_context_result setup_context_result =
@@ -74,7 +76,8 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_process_result failure_result =
         failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
                 srv_edhoc_message_1_process_add_protocol_error(
-                    context, "Message 1 processing failed", error_buffer));
+                    context, "Message 1 Process error: Processing failed",
+                    error_buffer));
     srv_edhoc_cleanup_context(&context);
     return failure_result;
   }

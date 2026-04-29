@@ -33,7 +33,8 @@ struct com_readonly_buffer srv_edhoc_message_1_process_add_protocol_error(
             &peer_length) != EDHOC_SUCCESS) {
       return com_edhoc_add_protocol_error_with_description_view(
           context,
-          "Fatal: wrong cipher suite error but failed to get the cipher suites",
+          "Message 1 Process error: Fatal: wrong cipher suite error but failed "
+          "to get cipher suites",
           response_data);
     }
     const struct edhoc_error_info error_info = {

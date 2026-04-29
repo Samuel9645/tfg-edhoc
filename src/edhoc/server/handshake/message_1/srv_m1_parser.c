@@ -43,9 +43,10 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
   }
 
   if (!com_readonly_buffer_has_content(request_buffer)) {
-    return failure(SRV_EDHOC_MSG1_PARSE_ERR_EMPTY_REQUEST_BUFFER,
-                   com_edhoc_add_internal_error_view("empty request buffer",
-                                                     error_response));
+    return failure(
+        SRV_EDHOC_MSG1_PARSE_ERR_EMPTY_REQUEST_BUFFER,
+        com_edhoc_add_internal_error_view(
+            "Message 1 Parser error: Empty request buffer", error_response));
   }
 
   struct edhoc_extracted_fields extracted_fields = {
@@ -56,8 +57,9 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
   };
   if (edhoc_extract_flow_info(&extracted_fields) != EDHOC_SUCCESS) {
     return failure(SRV_EDHOC_MSG1_PARSE_ERR_PREFIX_EXTRACTION,
-                   com_edhoc_add_internal_error_view("prefix extraction failed",
-                                                     error_response));
+                   com_edhoc_add_internal_error_view(
+                       "Message 1 Parser error: Prefix extraction failed",
+                       error_response));
   }
   return ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,

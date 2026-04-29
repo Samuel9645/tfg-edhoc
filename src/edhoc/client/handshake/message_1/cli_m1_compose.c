@@ -57,7 +57,8 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
     return protocol_failure(
         CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to prepend flow for message 1", compose_buffer));
+            context, "Message 1 Compose error: Failed to prepend flow",
+            compose_buffer));
   }
   if (edhoc_message_1_compose(context, prepended_fields.edhoc_message_ptr,
                               prepended_fields.edhoc_message_size,
@@ -66,20 +67,22 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
     return protocol_failure(
         CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to compose EDHOC message 1", compose_buffer));
+            context, "Message 1 Compose error: Failed to compose EDHOC message",
+            compose_buffer));
   }
   if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
     return protocol_failure(
         CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_PREPEND_SIZE_CALC,
         com_edhoc_add_protocol_error_with_description_view(
-            context, "Failed to recalculate prepended size for message 1",
+            context,
+            "Message 1 Compose error: Failed to recalculate prepended size",
             compose_buffer));
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, prepended_fields.buffer_size);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
     return empty_compose_failure(com_edhoc_add_internal_error_view(
-        "Empty compose result", compose_buffer));
+        "Message 1 Compose error: Empty compose result", compose_buffer));
   }
   return ok(conversion_result.buffer);
 }

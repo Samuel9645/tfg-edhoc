@@ -40,7 +40,7 @@ static struct com_readonly_buffer add_processing_error_to_buffer(
     const struct edhoc_context* context,
     const struct com_writable_buffer buffer) {
   return com_edhoc_add_protocol_error_with_description_view(
-      context, "Message 3 processing failed", buffer);
+      context, "Message 3 Process error: Processing failed", buffer);
 }
 
 struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
@@ -50,14 +50,15 @@ struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
     return invalid_error_buffer();
   }
   if (request.edhoc_context == NULL) {
-    return failure(
-        SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT,
-        com_edhoc_add_internal_error_view("Null EDHOC context", error_buffer));
+    return failure(SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT,
+                   com_edhoc_add_internal_error_view(
+                       "Message 3 Process error: Null context", error_buffer));
   }
   if (!com_readonly_buffer_has_content(request.parsed_message_3)) {
-    return failure(SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3,
-                   com_edhoc_add_internal_error_view("Empty parsed message 3",
-                                                     error_buffer));
+    return failure(
+        SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3,
+        com_edhoc_add_internal_error_view(
+            "Message 3 Process error: Empty parsed message", error_buffer));
   }
 
   if (edhoc_message_3_process(

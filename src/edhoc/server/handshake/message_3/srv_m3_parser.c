@@ -44,14 +44,15 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
   }
 
   if (!com_readonly_buffer_has_content(request_buffer)) {
-    return failure(SRV_EDHOC_MSG3_PARSE_ERR_EMPTY_REQUEST_BUFFER,
-                   com_edhoc_add_internal_error_view("Empty request buffer",
-                                                     error_response));
+    return failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_EMPTY_REQUEST_BUFFER,
+        com_edhoc_add_internal_error_view(
+            "Message 3 Parser error: Empty request buffer", error_response));
   }
   if (edhoc_ctx == NULL) {
     return failure(SRV_EDHOC_MSG3_PARSE_ERR_NULL_EDHOC_CONTEXT,
-                   com_edhoc_add_internal_error_view("null EDHOC context",
-                                                     error_response));
+                   com_edhoc_add_internal_error_view(
+                       "Message 3 Parser error: Null context", error_response));
   }
 
   struct edhoc_extracted_fields extracted_fields =
@@ -62,15 +63,18 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
           .edhoc_message_size = request_buffer.length,
       };
   if (edhoc_extract_connection_id(&extracted_fields) != EDHOC_SUCCESS) {
-    return failure(SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
-                   com_edhoc_add_internal_error_view(
-                       "connection ID extraction failed", error_response));
+    return failure(
+        SRV_EDHOC_MSG3_PARSE_ERR_CON_ID_EXTRACTION_FAILED,
+        com_edhoc_add_internal_error_view(
+            "Message 3 Parser error: Connection ID extraction failed",
+            error_response));
   }
   if (!edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
                                  &edhoc_ctx->private_cid)) {
     return failure(SRV_EDHOC_MSG3_PARSE_ERR_UNEXPECTED_CONNECTION_ID,
-                   com_edhoc_add_internal_error_view("unexpected connection ID",
-                                                     error_response));
+                   com_edhoc_add_internal_error_view(
+                       "Message 3 Parser error: Unexpected connection ID",
+                       error_response));
   }
   return ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,

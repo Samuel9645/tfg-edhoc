@@ -102,13 +102,9 @@ set(ADD_EDHOC_ERROR_INTEGRATION_SOURCES
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
 )
 
-set(ADD_PROTOCOL_ERROR_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.c
-)
 
 add_unity_test(test_edhoc_integration_add_protocol_error
     /src/edhoc/common/add_error/integration/test_edhoc_integration_add_protocol_error.c
-    ${ADD_PROTOCOL_ERROR_SOURCES}
     ${ADD_EDHOC_ERROR_INTEGRATION_SOURCES}
 )
 
@@ -129,32 +125,24 @@ set(ADD_EDHOC_ERROR_UNIT_SOURCES
 
 add_unity_test(test_edhoc_unit_add_protocol_error
     /src/edhoc/common/add_error/unit/test_edhoc_unit_add_protocol_error.c
-    ${ADD_PROTOCOL_ERROR_SOURCES}
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
     ${MOCK_EDHOC_ERROR_GET_CODE}
 )
 
-set(ADD_INTERNAL_ERROR_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.c
-)
 
 add_unity_test(test_edhoc_integration_add_internal_error
     /src/edhoc/common/add_error/integration/test_edhoc_integration_add_internal_error.c
     ${ADD_EDHOC_ERROR_INTEGRATION_SOURCES}
-    ${ADD_INTERNAL_ERROR_SOURCES}
 )
 
 add_unity_test(test_edhoc_unit_add_internal_error
     /src/edhoc/common/add_error/unit/test_edhoc_unit_add_internal_error.c
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
-    ${ADD_INTERNAL_ERROR_SOURCES}
 )
 
 set(HANDSHAKE_ERROR_SUPPORT_SOURCES
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/tst_report_mock_error.c
-    ${ADD_PROTOCOL_ERROR_SOURCES}
-    ${ADD_INTERNAL_ERROR_SOURCES}
     ${ADD_EDHOC_ERROR_UNIT_SOURCES}
     ${MOCK_EDHOC_ERROR_GET_CODE}
 )

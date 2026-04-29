@@ -15,10 +15,13 @@
 #include "common/com_data_models.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
-#include "edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.h"
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_capacity.h"
 
-static struct tst_edhoc_add_protocol_error_env env = {
-    .error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
+static struct {
+  uint8_t error_message[TST_EDHOC_ADD_ERROR_CAPACITY];
+  struct com_writable_buffer error_buffer_view;
+  struct edhoc_context context;
+} env = {.error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
 
 static enum edhoc_error_code expected_error_code = -1;
 
@@ -38,14 +41,17 @@ static void trigger_library_error(struct edhoc_context* context) {
   edhoc_message_1_process(context, garbage, sizeof(garbage));
 }
 
-static void reset_test_state(
-    struct tst_edhoc_add_protocol_error_env* environment) {
-  tst_edhoc_add_protocol_error_reset_env(environment);
-  trigger_library_error(&environment->context);
+static void reset_test_case_state(struct edhoc_context* context) {
+  memset(env.error_message, 0, sizeof(env.error_message));
+  env.error_buffer_view.bytes = env.error_message;
+  env.context = (struct edhoc_context){0};
+  if (context != NULL) {
+    trigger_library_error(context);
+  }
 }
 
 void setUp(void) {
-  reset_test_state(&env);
+  reset_test_case_state(&env.context);
   try_to_get_error_code();
 }
 
@@ -64,13 +70,6 @@ void test_add_error_with_description_on_invalid_library_state(void) {
           &env.context, expected_description, env.error_buffer_view);
 
   assert_result_matches(expected_description, result);
-}
-
-static void reset_test_case_state(struct edhoc_context* context) {
-  tst_edhoc_add_protocol_error_reset_env(&env);
-  if (context != NULL) {
-    trigger_library_error(context);
-  }
 }
 
 void test_add_error_with_description_creates_valid_error_with_null_parameters(

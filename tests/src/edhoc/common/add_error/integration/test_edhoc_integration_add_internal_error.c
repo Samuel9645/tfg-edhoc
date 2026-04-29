@@ -8,17 +8,23 @@
  */
 
 #include <edhoc.h>
+#include <string.h>
 #include <unity.h>
 
 #include "common/com_data_models.h"
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
-#include "edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.h"
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_capacity.h"
 
-static struct tst_edhoc_add_internal_error_env env = {
-    .error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
+static struct {
+  uint8_t error_message[TST_EDHOC_ADD_ERROR_CAPACITY];
+  struct com_writable_buffer error_buffer_view;
+} env = {.error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
 
-void setUp(void) { tst_edhoc_add_internal_error_reset_env(&env); }
+void setUp(void) {
+  memset(env.error_message, 0, sizeof(env.error_message));
+  env.error_buffer_view.bytes = env.error_message;
+}
 
 void test_add_internal_error(void) {
   const char* expected_description = "RANDOM DESCRIPTION";

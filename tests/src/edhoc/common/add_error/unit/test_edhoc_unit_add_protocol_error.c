@@ -7,13 +7,13 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
+#include <edhoc.h>
 #include <string.h>
 #include <unity.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_capacity.h"
-#include "edhoc/common/add_error/environments/tst_edhoc_add_protocol_error_env.h"
 #include "edhoc/common/add_error/mocks/tst_mock_edhoc_error_compose.h"
 #include "edhoc/common/add_error/mocks/tst_mock_edhoc_get_code.h"
 
@@ -29,13 +29,18 @@ static const struct edhoc_error_info VALID_INFO = {
 };
 static const uint8_t zeros[TST_UNIT_PROTOCOL_ERROR_BUFFER_SIZE] = {0};
 
-static struct tst_edhoc_add_protocol_error_env env = {
-    .error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
+static struct {
+  uint8_t error_message[TST_EDHOC_ADD_ERROR_CAPACITY];
+  struct com_writable_buffer error_buffer_view;
+  struct edhoc_context context;
+} env = {.error_buffer_view = {.capacity = TST_EDHOC_ADD_ERROR_CAPACITY}};
 
 void setUp(void) {
   tst_com_edhoc_reset_error_compose_mock();
   tst_com_edhoc_reset_get_code_mock();
-  tst_edhoc_add_protocol_error_reset_env(&env);
+  memset(env.error_message, 0, sizeof(env.error_message));
+  env.error_buffer_view.bytes = env.error_message;
+  env.context = (struct edhoc_context){0};
 }
 
 void test_add_protocol_error_recovers_get_code_fail(void) {

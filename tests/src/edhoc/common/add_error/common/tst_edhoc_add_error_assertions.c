@@ -11,7 +11,7 @@
 #include <unity.h>
 
 #include "common/com_data_models.h"
-#include "edhoc/common/add_error/environments/tst_edhoc_add_internal_error_env.h"
+#include "edhoc/common/add_error/common/tst_edhoc_add_error_capacity.h"
 
 void tst_edhoc_assert_add_error_status_ok_with_message(
     const struct com_edhoc_add_error_result add_error_result,

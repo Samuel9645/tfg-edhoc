@@ -20,8 +20,8 @@
 static bool use_real_psa_crypto_init = true;
 static psa_status_t psa_crypto_init_result = PSA_SUCCESS;
 
-extern psa_status_t __real_psa_crypto_init(
-    void);  // NOLINT(*-reserved-identifier)
+extern psa_status_t __real_psa_crypto_init(  // NOLINT(*-reserved-identifier)
+    void);
 
 psa_status_t __wrap_psa_crypto_init(void) {  // NOLINT(*-reserved-identifier)
   if (use_real_psa_crypto_init) {

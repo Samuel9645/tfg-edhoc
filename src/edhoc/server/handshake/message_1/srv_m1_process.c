@@ -40,11 +40,6 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
   };
 }
 
-static struct com_readonly_buffer add_internal_error_to_buffer(
-    const char* error_message, const struct com_writable_buffer buffer) {
-  return com_edhoc_add_internal_error_result(error_message, buffer).buffer;
-}
-
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     const struct com_writable_buffer error_buffer) {
@@ -55,25 +50,26 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
   if (request.edhoc_parameters.credentials == NULL) {
     return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS,
-        add_internal_error_to_buffer("Null credentials", error_buffer));
+        com_edhoc_add_internal_error_view("Null credentials", error_buffer));
   }
   if (com_edhoc_cipher_suites_are_valid(
           request.edhoc_parameters.supported_cipher_suites) != true) {
     return failure(SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_CIPHER_SUITES,
-                   add_internal_error_to_buffer("Invalid cipher suites details",
-                                                error_buffer));
+                   com_edhoc_add_internal_error_view(
+                       "Invalid cipher suites details", error_buffer));
   }
   if (!com_readonly_buffer_has_content(request.payload)) {
     return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
-        add_internal_error_to_buffer("Empty request buffer", error_buffer));
+                   com_edhoc_add_internal_error_view("Empty request buffer",
+                                                     error_buffer));
   }
 
   struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
   if (context == NULL) {
-    return failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
-        add_internal_error_to_buffer("Context calloc failed", error_buffer));
+    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
+                   com_edhoc_add_internal_error_view("Context calloc failed",
+                                                     error_buffer));
   }
 
   if (com_edhoc_setup_context(context, request.edhoc_parameters) !=

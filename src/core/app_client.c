@@ -22,8 +22,8 @@ static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
   return cred_edhoc_auth_fetch(
       user_context, credentials, CRED_EDHOC_PUB_CLI_PK,
-      ARRAY_SIZE(CRED_EDHOC_PUB_CLI_PK), CRED_EDHOC_CLI_PRIVATE_KEY,
-      ARRAY_SIZE(CRED_EDHOC_CLI_PRIVATE_KEY), CRED_EDHOC_PUB_CLI_KID);
+      CRED_EDHOC_PUB_PK_LENGTH, CRED_EDHOC_CLI_PRIVATE_KEY,
+      CRED_EDHOC_CLI_PRIVATE_KEY_LENGTH, CRED_EDHOC_PUB_CLI_KID);
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef (libedhoc signature
@@ -34,8 +34,7 @@ static int client_credential_verify(void* user_context,
                                     size_t* public_key_length) {
   return cred_edhoc_auth_verify(user_context, credentials,
                                 CRED_EDHOC_PUB_SRV_KID, CRED_EDHOC_PUB_SRV_PK,
-                                ARRAY_SIZE(CRED_EDHOC_PUB_SRV_PK),
-                                public_key_reference, public_key_length);
+      CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
 }
 
 static const struct edhoc_credentials credentials = {
@@ -115,9 +114,16 @@ enum com_emulation_status core_run_client(void) {
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+
+  const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
   struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
       .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+      .methods =
+          {
+              .data = SUPPORTED_METHODS,
+              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
+          },
   };
   if (com_edhoc_setup_context(&client_resources.edhoc_ctx, edhoc_parameters) !=
       COM_EDHOC_SETUP_CTX_OK) {

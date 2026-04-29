@@ -22,8 +22,8 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
-static const uint8_t REQUEST_BUFFER[] = {0x01, 0x02, 0x03, 0x04,
-                                         0x05, 0x06, 0x07, 0x08};
+static const uint8_t DUMMY_REQUEST_BUFFER[] = {0x01, 0x02, 0x03, 0x04,
+                                               0x05, 0x06, 0x07, 0x08};
 
 static struct {
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
@@ -31,18 +31,18 @@ static struct {
   struct srv_edhoc_message_3_responder_request valid_request;
   struct com_writable_buffer response;
 } env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-         .valid_request = {.raw_payload = {.bytes = REQUEST_BUFFER,
-                                           .length = sizeof(REQUEST_BUFFER)}}};
+    .valid_request = {.raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
+                                      .length = sizeof(DUMMY_REQUEST_BUFFER)}}};
 
 static void reset_mocks(void) {
   tst_srv_edhoc_message_3_parser_reset_stub_results();
   tst_srv_edhoc_m3_reset_process_mock();
   tst_srv_edhoc_m4_reset_compose_mock();
   tst_srv_m3_parser_set_success_data((struct edhoc_extracted_fields){
-      .buffer = REQUEST_BUFFER,
-      .buffer_size = sizeof(REQUEST_BUFFER),
-      .edhoc_message_ptr = REQUEST_BUFFER + 1,
-      .edhoc_message_size = sizeof(REQUEST_BUFFER) - 1,
+      .buffer = DUMMY_REQUEST_BUFFER,
+      .buffer_size = sizeof(DUMMY_REQUEST_BUFFER),
+      .edhoc_message_ptr = DUMMY_REQUEST_BUFFER + 1,
+      .edhoc_message_size = sizeof(DUMMY_REQUEST_BUFFER) - 1,
   });
 }
 
@@ -68,16 +68,16 @@ void test_responder_ok_for_valid_data(void) {
 void test_responder_fails_on_invalid_data(void) {
   const struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_message_3_responder_request no_buffer_request = {
-      .raw_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = NULL, .length = sizeof(DUMMY_REQUEST_BUFFER)},
       .edhoc_context = &env.context,
   };
   const struct srv_edhoc_message_3_responder_request empty_payload_request = {
-      .raw_payload = {.bytes = REQUEST_BUFFER, .length = 0},
+      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER, .length = 0},
       .edhoc_context = &env.context,
   };
   const struct srv_edhoc_message_3_responder_request no_context_request = {
-      .raw_payload = {.bytes = REQUEST_BUFFER,
-                      .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
+                      .length = sizeof(DUMMY_REQUEST_BUFFER)},
       .edhoc_context = NULL};
 
   const struct {

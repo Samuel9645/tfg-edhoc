@@ -48,8 +48,8 @@ static int dummy_verify_credentials(
 
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {
     .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
-static const uint8_t REQUEST_BUFFER[] = {0x01, 0x02, 0x03, 0x04,
-                                         0x05, 0x06, 0x07, 0x08};
+static const uint8_t DUMMY_REQUEST_BUFFER[] = {0x01, 0x02, 0x03, 0x04,
+                                               0x05, 0x06, 0x07, 0x08};
 
 static struct {
   uint8_t response_buffer[TST_SRV_EDHOC_HND_BUF_LEN];
@@ -58,7 +58,7 @@ static struct {
 
 static struct srv_edhoc_message_1_responder_request create_valid_request(void) {
   return (struct srv_edhoc_message_1_responder_request){
-      .raw_payload = {.bytes = REQUEST_BUFFER,
+      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
                       .length = TST_SRV_EDHOC_HND_BUF_LEN},
       .edhoc_parameters = tst_edhoc_srv_get_default_params()};
 }
@@ -100,8 +100,8 @@ void test_handler_fails_on_invalid_data(void) {
       .edhoc_parameters = {.credentials = &DUMMY_TEST_CREDS},
   };
   const struct srv_edhoc_message_1_responder_request no_credentials_request = {
-      .raw_payload = {.bytes = REQUEST_BUFFER,
-                      .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
+                      .length = sizeof(DUMMY_REQUEST_BUFFER)},
       .edhoc_parameters = {0}};
 
   const struct {
@@ -133,7 +133,7 @@ void test_handler_fails_on_invalid_data(void) {
 
 void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
   const struct srv_edhoc_message_1_responder_request invalid_request = {
-      .raw_payload = {.bytes = NULL, .length = sizeof(REQUEST_BUFFER)},
+      .raw_payload = {.bytes = NULL, .length = sizeof(DUMMY_REQUEST_BUFFER)},
       .edhoc_parameters = tst_edhoc_srv_get_default_params()};
 
   const struct srv_edhoc_message_1_responder_result result =

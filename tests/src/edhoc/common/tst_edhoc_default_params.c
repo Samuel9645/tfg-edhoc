@@ -35,9 +35,18 @@ static int dummy_verify_credentials(
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {
     .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
 
+static const enum edhoc_method METHOD_0[] = {EDHOC_METHOD_0};
+
 struct srv_edhoc_parameters tst_edhoc_srv_get_default_params(void) {
   static const struct srv_edhoc_parameters params = {
       .credentials = &DUMMY_TEST_CREDS,
-      .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2};
+      .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+      .methods =
+          {
+              .data = METHOD_0,
+              .size = 1,
+          },
+  };
+
   return params;
 }

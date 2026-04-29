@@ -29,6 +29,8 @@ void tst_com_edhoc_set_get_code_failed(void) {
   get_code_result = EDHOC_ERROR_BAD_STATE;
 }
 
+void tst_com_edhoc_use_real_get_code(void) { use_real_get_code = true; }
+
 int __wrap_edhoc_error_get_code(  // NOLINT(*-reserved-identifier)
                                   // we need this
     const struct edhoc_context *edhoc_context,

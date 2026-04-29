@@ -9,6 +9,8 @@
 #include "common/com_session_resources.h"
 #include "edhoc/credentials/cred_srv.h"
 
+static const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
+
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void edhoc_post_handler(coap_resource_t* resource,
                                coap_session_t* session,
@@ -20,6 +22,11 @@ static void edhoc_post_handler(coap_resource_t* resource,
   const struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &CRED_EDHOC_SRV_CRED,
       .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+      .methods =
+          {
+              .data = SUPPORTED_METHODS,
+              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
+          },
   };
   srv_coap_dispatch_edhoc_post(session, request, edhoc_parameters, response);
 }

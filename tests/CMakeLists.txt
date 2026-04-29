@@ -2,9 +2,6 @@
 set(UNITY_SCRIPT_DIR ${CMAKE_SOURCE_DIR}/externals/unity/auto)
 find_package(Threads REQUIRED)
 
-# Suppress warnings from helpers
-set_source_files_properties(${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
-
 
 # ==============================================================================
 # 3. DEFINE THE TEST GENERATOR FUNCTION
@@ -53,6 +50,7 @@ function(add_unity_test TARGET_NAME TEST_FILE)
   # 5. Link Libraries
   target_link_libraries(${TARGET_NAME} PRIVATE
       libedhoc
+      edhoc_external_helpers
       libcoap::coap-3
       unity
       Threads::Threads
@@ -223,7 +221,7 @@ add_unity_test(test_edhoc_message_1_responder
 #add_unity_test(test_edhoc_message_1_errors
 #    /src/edhoc/server/handshake/message_1/errors/test_edhoc_edhoc_message_1_errors.c
 #    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/errors/tst_srv_m1_errors_stubs.c
-#    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+#    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
 #    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_edhoc_error_info.c
 #    ${COMMON_SRV_SOURCES}
 #)

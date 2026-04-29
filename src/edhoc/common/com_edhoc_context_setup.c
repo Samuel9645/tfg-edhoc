@@ -7,22 +7,27 @@
 enum com_edhoc_setup_context_status com_edhoc_setup_context(
     struct edhoc_context* context,
     const struct srv_edhoc_parameters edhoc_parameters) {
+  const struct com_edhoc_cipher_suite_list* supported_suites =
+      edhoc_parameters.supported_cipher_suites;
+  if (!com_edhoc_cipher_suites_are_valid(supported_suites)) {
+    return COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES;
+  }
+  if (edhoc_parameters.methods.data == NULL ||
+      edhoc_parameters.methods.size == 0) {
+    return COM_EDHOC_SETUP_CTX_ERR_INVALID_METHODS;
+  }
+  if (edhoc_parameters.credentials == NULL) {
+    return COM_EDHOC_SETUP_CTX_ERR_NULL_CREDENTIALS;
+  }
+
   if (psa_crypto_init() != PSA_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_PSA_INIT;
   }
   if (edhoc_context_init(context) != EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT;
   }
-  const struct com_edhoc_cipher_suite_list* supported_suites =
-      edhoc_parameters.supported_cipher_suites;
-  if (!com_edhoc_cipher_suites_are_valid(supported_suites)) {
-    return COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES;
-  }
-
-  const enum edhoc_method methods[] = {EDHOC_METHOD_0};
-
-  if (edhoc_set_methods(context, methods, ARRAY_SIZE(methods)) !=
-      EDHOC_SUCCESS) {
+  if (edhoc_set_methods(context, edhoc_parameters.methods.data,
+                        edhoc_parameters.methods.size) != EDHOC_SUCCESS) {
     return COM_EDHOC_SETUP_CTX_ERR_SET_METHODS;
   }
   const size_t number_of_suites = supported_suites->number_of_suites;

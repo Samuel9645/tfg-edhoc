@@ -10,6 +10,7 @@
 #define EDHOC_COMMON_ADD_ERROR_TST_MOCK_EDHOC_GET_CODE_H_
 
 void tst_com_edhoc_reset_get_code_mock(void);
+void tst_com_edhoc_use_real_get_code(void);
 
 void tst_com_edhoc_set_get_code_failed(void);
 

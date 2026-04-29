@@ -17,17 +17,25 @@
 #include <edhoc.h>
 
 static int message_1_process_result = EDHOC_SUCCESS;
+static bool use_real_message_1_process = false;
 
 void tst_srv_edhoc_m1_set_process_failure(void) {
   message_1_process_result = EDHOC_ERROR_MSG_1_PROCESS_FAILURE;
+  use_real_message_1_process = false;
 }
 
 void tst_srv_edhoc_m1_set_process_ok(void) {
   message_1_process_result = EDHOC_SUCCESS;
+  use_real_message_1_process = false;
+}
+
+void tst_srv_edhoc_m1_use_real_process(void) {
+  use_real_message_1_process = true;
 }
 
 void tst_srv_edhoc_m1_reset_process_mock(void) {
   message_1_process_result = EDHOC_SUCCESS;
+  use_real_message_1_process = false;
 }
 
 extern int __real_edhoc_message_1_process(  // NOLINT(*-reserved-identifier)
@@ -42,5 +50,9 @@ int __wrap_edhoc_message_1_process(  // NOLINT(*-reserved-identifier)
   (void)edhoc_context;
   (void)message_1;
   (void)message_1_length;
+  if (use_real_message_1_process) {
+    return __real_edhoc_message_1_process(edhoc_context, message_1,
+                                          message_1_length);
+  }
   return message_1_process_result;
 }

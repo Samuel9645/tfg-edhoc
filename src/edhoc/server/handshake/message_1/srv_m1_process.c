@@ -15,6 +15,7 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/server/handshake/message_1/srv_m1_process_errors.h"
 
 static struct srv_edhoc_message_1_process_result ok(
     struct edhoc_context* context) {
@@ -50,6 +51,7 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
+  // TODO: move these checks and add_errors into com_setup_context
   if (request.edhoc_parameters.credentials == NULL) {
     return failure(
         SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CREDENTIALS,
@@ -76,18 +78,22 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
 
   if (com_edhoc_setup_context(context, request.edhoc_parameters) !=
       COM_EDHOC_SETUP_CTX_OK) {
+    const struct srv_edhoc_message_1_process_result failure_result =
+        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
+                com_edhoc_add_protocol_error_with_description_view(
+                    context, "Context setup failed", error_buffer));
     free(context);
-    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-                   com_edhoc_add_protocol_error_with_description_view(
-                       context, "Context setup failed", error_buffer));
+    return failure_result;
   }
 
   if (edhoc_message_1_process(context, request.payload.bytes,
                               request.payload.length) != EDHOC_SUCCESS) {
+    const struct srv_edhoc_message_1_process_result failure_result =
+        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+                srv_edhoc_message_1_process_add_protocol_error(
+                    context, "Message 1 processing failed", error_buffer));
     srv_edhoc_cleanup_context(&context);
-    return failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-                   com_edhoc_add_protocol_error_with_description_view(
-                       context, "Message 1 processing failed", error_buffer));
+    return failure_result;
   }
   return ok(context);
 }

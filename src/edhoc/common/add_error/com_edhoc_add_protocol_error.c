@@ -57,8 +57,8 @@ struct com_edhoc_add_error_result com_edhoc_add_protocol_error_result(
   }
   size_t written_length = 0;
   if (edhoc_message_error_compose(
-          response_data.bytes, response_data.capacity, &written_length,
-          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR, error_info) != EDHOC_SUCCESS) {
+          response_data.bytes, response_data.capacity, &written_length, error_code,
+                                  error_info) != EDHOC_SUCCESS) {
     return internal_error(COM_EDHOC_ADD_ERROR_ERR_COMPOSE);
   }
   const struct com_readonly_conversion_result conversion_result =

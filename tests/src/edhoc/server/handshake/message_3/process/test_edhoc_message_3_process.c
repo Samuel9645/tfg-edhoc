@@ -20,7 +20,7 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
-static const uint8_t REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
+static const uint8_t DUMMY_REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
 static struct {
   uint8_t error_buffer_data[TST_SRV_EDHOC_HND_BUF_LEN];
@@ -29,8 +29,9 @@ static struct {
   struct com_writable_buffer error;
 } env = {
     .error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-    .valid_request = {.parsed_message_3 = {.bytes = REQUEST_BUFFER,
-                                           .length = sizeof(REQUEST_BUFFER)}}};
+         .valid_request = {
+             .parsed_message_3 = {.bytes = DUMMY_REQUEST_BUFFER,
+                                  .length = sizeof(DUMMY_REQUEST_BUFFER)}}};
 
 void setUp(void) {
   tst_srv_edhoc_m3_reset_process_mock();
@@ -58,7 +59,7 @@ void test_process_fails_on_invalid_data(void) {
                                                             &env.context};
   const struct srv_edhoc_message_3_request empty_request = {
       .edhoc_context = &env.context,
-      .parsed_message_3 = {.bytes = REQUEST_BUFFER, .length = 0}};
+      .parsed_message_3 = {.bytes = DUMMY_REQUEST_BUFFER, .length = 0}};
   const struct com_writable_buffer empty_error = {0};
 
   const struct {

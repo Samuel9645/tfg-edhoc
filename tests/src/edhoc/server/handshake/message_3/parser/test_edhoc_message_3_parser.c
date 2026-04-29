@@ -20,7 +20,7 @@
 
 enum { TEST_MSG_3_PAYLOAD_LENGTH = 5, TST_M3_PARSER_ERROR_BUFFER_SIZE = 256 };
 
-static const uint8_t REQUEST_BUFFER[TEST_MSG_3_PAYLOAD_LENGTH] = {0};
+static const uint8_t DUMMY_REQUEST_BUFFER[TEST_MSG_3_PAYLOAD_LENGTH] = {0};
 
 static struct {
   struct com_readonly_buffer valid_request;
@@ -28,7 +28,7 @@ static struct {
   uint8_t error_message[TST_M3_PARSER_ERROR_BUFFER_SIZE];
   struct com_writable_buffer error_buffer_view;
 } test_env = {
-    .valid_request = {.bytes = REQUEST_BUFFER,
+    .valid_request = {.bytes = DUMMY_REQUEST_BUFFER,
                       .length = TEST_MSG_3_PAYLOAD_LENGTH},
     .error_buffer_view = {.capacity = TST_M3_PARSER_ERROR_BUFFER_SIZE}};
 
@@ -39,7 +39,7 @@ void setUp(void) {
 }
 
 void test_parser_advances_pointers_on_success(void) {
-  const uint8_t* advanced_pointed = REQUEST_BUFFER + 2;
+  const uint8_t* advanced_pointed = DUMMY_REQUEST_BUFFER + 2;
   const int reduced_length = TEST_MSG_3_PAYLOAD_LENGTH - 2;
   tst_srv_m3_parser_set_success_data(
       (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,

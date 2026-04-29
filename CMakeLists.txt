@@ -12,8 +12,16 @@ add_subdirectory(externals)
 
 set(LIBEDHOC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_0.c
     ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_helpers.c
 )
+add_library(edhoc_external_helpers STATIC ${LIBEDHOC_SOURCES})
+target_include_directories(edhoc_external_helpers SYSTEM PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/include
+)
+target_compile_options(edhoc_external_helpers PRIVATE -w)
+target_link_libraries(edhoc_external_helpers PRIVATE libedhoc)
 
 set(ADD_EDHOC_ERROR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
@@ -24,7 +32,6 @@ set(ADD_EDHOC_ERROR_SOURCES
 set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_cipher_suites.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
 )
 
 set(BASE_SOURCES
@@ -41,13 +48,11 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/com_parse_edhoc_request_builders.c
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
     ${ADD_EDHOC_ERROR_SOURCES}
-    ${LIBEDHOC_SOURCES}
 )
 
 set(MESSAGE_1_PROCESS_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
-    ${CMAKE_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
 )
 
@@ -58,7 +63,7 @@ set(MESSAGE_2_COMPOSE_SOURCES
 set(MESSAGE_1_RESPONDER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_errors.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_2_COMPOSE_SOURCES}
 )
@@ -124,11 +129,12 @@ add_executable(client
 )
 
 # Link libraries
-target_link_libraries(server PRIVATE libedhoc libcoap::coap-3)
-target_link_libraries(client PRIVATE libedhoc libcoap::coap-3)
+target_link_libraries(server PRIVATE edhoc_external_helpers libedhoc libcoap::coap-3)
+target_link_libraries(client PRIVATE edhoc_external_helpers libedhoc libcoap::coap-3)
 
 # Suppress warnings from helpers
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_2.c PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/externals/libedhoc/helpers/src/edhoc_cipher_suite_0.c PROPERTIES COMPILE_FLAGS "-Wno-error")
 
 # Add helper include directories. SYSTEM is set to suppress warnings from external
 # code

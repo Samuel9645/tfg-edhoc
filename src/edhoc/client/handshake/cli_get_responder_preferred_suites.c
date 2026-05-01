@@ -25,14 +25,25 @@ static struct cli_edhoc_responder_preferred_suites_result no_common_suites(
       .status = CLI_EDHOC_RESP_PREFERRED_SUITES_NO_COMMON_SUITES};
 }
 
+static struct cli_edhoc_responder_preferred_suites_result failure(
+    const enum cli_edhoc_responder_preferred_suites_status status) {
+  return (struct cli_edhoc_responder_preferred_suites_result){.status = status};
+}
+
 enum { CLI_GET_RESPONDER_SUITES_ERROR_SIZE = 100 };
 
 struct cli_edhoc_responder_preferred_suites_result
 cli_edhoc_get_responder_preferred_suites(
     const struct com_edhoc_cipher_suite_list* own_supported_suites,
     const struct com_readonly_buffer encoded_error_buffer) {
-  (void)own_supported_suites;
-  (void)encoded_error_buffer;
+  if (!com_readonly_buffer_has_content(encoded_error_buffer)) {
+    return failure(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_EMPTY_ERROR_BUFFER);
+  }
+  if (!com_edhoc_cipher_suites_are_valid(own_supported_suites)) {
+    return failure(
+        CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES);
+  }
+
   enum edhoc_error_code received_code = -1;
   char decoded_error[CLI_GET_RESPONDER_SUITES_ERROR_SIZE] = {0};
   struct edhoc_error_info received_info = {

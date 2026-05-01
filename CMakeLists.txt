@@ -29,9 +29,13 @@ set(ADD_EDHOC_ERROR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
 )
 
+set(EDHOC_CIPHER_SUITES_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_cipher_suites.c
+)
+
 set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_cipher_suites.c
+    ${EDHOC_CIPHER_SUITES_SOURCES}
 )
 
 set(BASE_SOURCES

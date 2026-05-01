@@ -66,6 +66,9 @@ struct cli_coap_exchange* cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
     struct com_writable_buffer response_buffer);
 
+bool cli_coap_exchange_response_is_error(
+    const struct cli_coap_exchange* exchange);
+
 /**
  * @brief Send EDHOC payload in a CoAP POST request.
  *

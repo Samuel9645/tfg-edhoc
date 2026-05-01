@@ -68,7 +68,6 @@ enum com_emulation_status core_run_client(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_DEBUG);
 
-  struct cli_coap_session_resources client_resources = {0};
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
   struct cli_coap_parse_and_resolve_result parse_and_resolve_uri_result =
@@ -76,49 +75,29 @@ enum com_emulation_status core_run_client(void) {
   if (parse_and_resolve_uri_result.status != CLI_COAP_PARSE_AND_RESOLVE_OK) {
     return COM_EMULATION_FAILURE;
   }
-  struct cli_coap_session_config config = {
+  const struct cli_coap_session_config config = {
       .address = &parse_and_resolve_uri_result.address,
       .uri = &parse_and_resolve_uri_result.uri,
   };
-
   const struct com_coap_create_context_result create_context_result =
       com_coap_create_context();
   if (create_context_result.status != COM_COAP_INIT_OK) {
-    cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  client_resources.common_resources.coap_context =
-      create_context_result.context;
-  struct cli_coap_create_session_result create_session_result =
-      cli_coap_create_session(client_resources.common_resources.coap_context,
-                              config);
+  const struct cli_coap_create_session_result create_session_result =
+      cli_coap_create_session(create_context_result.context, config);
   if (create_session_result.status != CLI_COAP_CREATE_SESSION_OK) {
-    cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  client_resources.coap_session = create_session_result.session;
-  struct cli_coap_exchange_session_data exchange_session_data = {
-      .context = client_resources.common_resources.coap_context,
-      .session = client_resources.coap_session,
-      .uri = parse_and_resolve_uri_result.uri,
-      .destination = parse_and_resolve_uri_result.address,
-  };
-  // TODO: encapsulate this process better
-  uint8_t payload_memory[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  const struct com_writable_buffer payload_buffer = {
-      .bytes = payload_memory,
-      .capacity = CONFIG_COAP_MAX_PDU_SIZE,
-  };
-  client_resources.exchange =
-      cli_coap_init_exchange(&exchange_session_data, payload_buffer);
-  if (client_resources.exchange == NULL) {
-    coap_log_err("Failed to initialize CoAP exchange\n");
-    cli_coap_cleanup_resources(&client_resources);
-    return COM_EMULATION_FAILURE;
+  struct cli_resources* client_resources = cli_resources_create(
+      create_context_result.context, create_session_result.session,
+      parse_and_resolve_uri_result.uri, parse_and_resolve_uri_result.address);
+  if (client_resources == NULL) {
+    coap_log_err("Failed to create client resources\n");
   }
 
   const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
-  struct srv_edhoc_parameters edhoc_parameters = {
+  const struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
       .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
       .methods =
@@ -127,42 +106,53 @@ enum com_emulation_status core_run_client(void) {
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
   };
-  // WHY ARE WE NOT USING THE ERROR BUFFER?
-  // This error is before any message is sent so it doesn't make sense to start
-  // the communication with an error message
-  if (com_edhoc_setup_context(&client_resources.edhoc_ctx, edhoc_parameters,
-                              payload_buffer)
-          .status != COM_EDHOC_SETUP_CTX_OK) {
-    coap_log_err("Failed to initialize EDHOC context\n");
-    cli_coap_cleanup_resources(&client_resources);
+  if (!cli_resources_setup_session(client_resources, edhoc_parameters)) {
+    coap_log_err("Failed to setup EDHOC session\n");
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
+  const struct com_writable_buffer payload_buffer =
+      cli_resources_get_payload(client_resources);
 
+  struct edhoc_context* edhoc_context =
+      cli_resources_get_edhoc_context(client_resources);
+  if (edhoc_context == NULL) {
+    coap_log_err("Failed to get EDHOC context\n");
+    cli_coap_cleanup_resources(client_resources);
+    return COM_EMULATION_FAILURE;
+  }
   const struct cli_edhoc_message_1_compose_result message_1_result =
-      cli_edhoc_compose_message_1(&client_resources.edhoc_ctx, payload_buffer);
+      cli_edhoc_compose_message_1(edhoc_context, payload_buffer);
   if (message_1_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
     coap_log_err("Failed to compose EDHOC message 1\n");
-    cli_coap_cleanup_resources(&client_resources);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  if (!send_message(client_resources.exchange, message_1_result.buffer)) {
-    coap_log_err("Failed to send CoAP request for message 1\n");
-    cli_coap_cleanup_resources(&client_resources);
+  struct cli_coap_exchange* exchange =
+      cli_resources_get_exchange(client_resources);
+  if (exchange == NULL) {
+    coap_log_err("Failed to get CoAP exchange for sending message 1\n");
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
-  struct cli_coap_wait_and_get_result wait_and_get_result =
-      cli_coap_exchange_wait_and_get(client_resources.exchange);
+  if (!send_message(exchange, message_1_result.buffer)) {
+    coap_log_err("Failed to send CoAP request for message 1\n");
+    cli_coap_cleanup_resources(client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+  const struct cli_coap_wait_and_get_result wait_and_get_result =
+      cli_coap_exchange_wait_and_get(exchange);
   if (wait_and_get_result.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 2\n");
-    cli_coap_cleanup_resources(&client_resources);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
 
   const struct cli_edhoc_message_2_initiator_request
       message_2_initiator_request = {
           .raw_payload = wait_and_get_result.response,
-          .edhoc_context = &client_resources.edhoc_ctx,
+          .edhoc_context = edhoc_context,
       };
   const struct cli_edhoc_message_2_initiator_result message_2_initiator_result =
       cli_edhoc_respond_to_message_2(message_2_initiator_request,
@@ -171,34 +161,32 @@ enum com_emulation_status core_run_client(void) {
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("%s", cli_edhoc_respond_to_message_2_status_code_to_string(
                            message_2_initiator_result.status));
-    send_message(client_resources.exchange, message_2_initiator_result.request);
-    cli_coap_cleanup_resources(&client_resources);
+    send_message(exchange, message_2_initiator_result.request);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (!send_message(client_resources.exchange,
-                    message_2_initiator_result.request)) {
+  if (!send_message(exchange, message_2_initiator_result.request)) {
     coap_log_err("Failed to send EDHOC message 3\n");
-    cli_coap_cleanup_resources(&client_resources);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  struct cli_coap_wait_and_get_result wait_and_get_result2 =
-      cli_coap_exchange_wait_and_get(client_resources.exchange);
+  const struct cli_coap_wait_and_get_result wait_and_get_result2 =
+      cli_coap_exchange_wait_and_get(exchange);
   if (wait_and_get_result2.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 4\n");
-    cli_coap_cleanup_resources(&client_resources);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
   const struct cli_edhoc_message_4_process_result message_4_result =
-      cli_edhoc_process_message_4(&client_resources.edhoc_ctx,
-                                  wait_and_get_result2.response,
+      cli_edhoc_process_message_4(edhoc_context, wait_and_get_result2.response,
                                   payload_buffer);
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
-    send_message(client_resources.exchange, message_4_result.error_buffer);
-    cli_coap_cleanup_resources(&client_resources);
+    send_message(exchange, message_4_result.error_buffer);
+    cli_coap_cleanup_resources(client_resources);
     return COM_EMULATION_FAILURE;
   }
-  cli_coap_cleanup_resources(&client_resources);
+  cli_coap_cleanup_resources(client_resources);
   return COM_EMULATION_SUCCESS;
 }

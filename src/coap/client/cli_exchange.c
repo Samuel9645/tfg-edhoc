@@ -14,6 +14,7 @@
 struct cli_coap_exchange {
   struct cli_coap_exchange_session_data session_data;
   bool have_response;
+  bool response_is_error;
   struct com_writable_buffer incoming_response_buffer;
 
   struct {
@@ -61,10 +62,23 @@ static coap_response_t coap_client_coap_response_handler(
   exchange->internal_parsed_response.length =
       parse_result.parsed_request.length;
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
+    exchange->response_is_error = true;
     cli_coap_log_received_edhoc_error_response(response_code,
                                                parse_result.parsed_request);
+  } else {
+    exchange->response_is_error = false;
   }
   return COAP_RESPONSE_OK;
+}
+
+bool cli_coap_exchange_response_is_error(
+    const struct cli_coap_exchange* exchange) {
+  if (exchange == NULL) {
+    coap_log_err(
+        "FATAL ERROR: exchange is NULL when checking if it is an error\n");
+    return true;
+  }
+  return exchange->response_is_error;
 }
 
 bool cli_coap_exchange_session_data_is_valid(

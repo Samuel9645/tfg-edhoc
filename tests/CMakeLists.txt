@@ -303,13 +303,16 @@ add_unity_test(test_edhoc_message_1_compose
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
-set(EDHOC_CIPHER_SUITES
-    edhoc/common/com_edhoc_cipher_suites.c)
+set(EDHOC_PROCESS_ERROR_MOCK
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/mocks/tst_cli_mock_edhoc_process_error.c
+    "-Wl,--wrap=edhoc_message_error_process"
+)
 
 add_unity_test(test_edhoc_get_responder_preferred_suites
     src/edhoc/server/handshake/test_edhoc_get_responder_preferred_suites.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/cli_get_responder_preferred_suites.c
     ${EDHOC_CIPHER_SUITES_SOURCES}
+    ${EDHOC_PROCESS_ERROR_MOCK}
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
 )
 

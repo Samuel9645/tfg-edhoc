@@ -14,6 +14,7 @@
 
 #include "common/com_data_models.h"
 #include "edhoc/client/handshake/cli_get_responder_preferred_suites.h"
+#include "edhoc/client/handshake/mocks/tst_cli_mock_edhoc_process_error.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 
 enum {
@@ -23,6 +24,8 @@ enum {
   TST_PREF_SUITES_SUITE_3 = 0x3,
   TST_PREF_SUITES_SUITE_2 = 0x2,
 };
+
+void setUp(void) { tst_cli_edhoc_reset_process_error_mock(); }
 
 /**
  * @see [RFC 9529
@@ -140,4 +143,16 @@ void test_fails_on_invalid_data(void) {
     TEST_ASSERT_EQUAL(test_cases[i].expected_status, result.status);
     TEST_ASSERT_NULL(result.preferred_suite);
   }
+}
+
+void test_fails_when_error_process_fails(void) {
+  tst_cli_edhoc_set_process_error_failure();
+
+  const struct cli_edhoc_responder_preferred_suites_result result =
+      cli_edhoc_get_responder_preferred_suites(&COM_EDHOC_ONLY_SUITE_0,
+                                               ONLY_SUITE_3_BUFFER);
+
+  TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_PROCESSING_ERROR,
+                    result.status);
+  TEST_ASSERT_NULL(result.preferred_suite);
 }

@@ -77,7 +77,7 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
   const size_t number_of_suites = supported_suites->number_of_suites;
   struct edhoc_cipher_suite cipher_suites[number_of_suites];
   for (size_t i = 0; i < number_of_suites; i++) {
-    cipher_suites[i] = *supported_suites->suites[i].metadata;
+    cipher_suites[i] = *supported_suites->suites[i]->metadata;
   }
   if (edhoc_set_cipher_suites(context, cipher_suites, number_of_suites) !=
       EDHOC_SUCCESS) {
@@ -100,7 +100,7 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             error_buffer));
   }
   const struct com_edhoc_cipher_suite_details* first_suite_details =
-      &supported_suites->suites[0];
+      supported_suites->suites[0];
   if (edhoc_bind_keys(context, first_suite_details->get_keys()) !=
       EDHOC_SUCCESS) {
     return failure(

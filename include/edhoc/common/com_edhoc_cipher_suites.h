@@ -19,19 +19,22 @@ struct com_edhoc_cipher_suite_details {
 };
 
 struct com_edhoc_cipher_suite_list {
-  const struct com_edhoc_cipher_suite_details* suites;
+  // WHY ARE WE USING DOUBLE POINTERS?
+  // This ensures that only global cipher suites are being used
+  // and prevents copying errors
+  const struct com_edhoc_cipher_suite_details* const* suites;
   const size_t number_of_suites;
 };
 
 /**
  * @brief Check if the cipher suites struct is not NULL and if it contains at
  * least one valid cipher suite details struct.
- * @param details Pointer to the struct containing the cipher suites details to
+ * @param list Pointer to the struct containing the cipher suites details to
  * check.
  * @return true if the struct is valid, false otherwise.
  */
 bool com_edhoc_cipher_suites_are_valid(
-    const struct com_edhoc_cipher_suite_list* details);
+    const struct com_edhoc_cipher_suite_list* list);
 
 /**
  * @brief Gets the cipher suite details that matches the given value

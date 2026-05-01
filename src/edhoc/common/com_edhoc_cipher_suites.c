@@ -22,12 +22,17 @@ static bool suites_details_are_valid(
 }
 
 bool com_edhoc_cipher_suites_are_valid(
-    const struct com_edhoc_cipher_suite_list* details) {
-  if (details == NULL) {
+    const struct com_edhoc_cipher_suite_list* list) {
+  if (list == NULL || list->suites == NULL || list->number_of_suites == 0) {
     return false;
   }
-  return details->number_of_suites != 0 &&
-         suites_details_are_valid(details->suites);
+
+  for (size_t i = 0; i < list->number_of_suites; i++) {
+    if (!suites_details_are_valid(list->suites[i])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const struct com_edhoc_cipher_suite_details*
@@ -58,9 +63,11 @@ const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0 = {
     .get_keys = edhoc_cipher_suite_0_get_keys,
 };
 
+static const struct com_edhoc_cipher_suite_details* SUITE_0_PTRS[] = {
+    &COM_EDHOC_SUITE_0};
 const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0 = {
-    .number_of_suites = 1,
-    .suites = &COM_EDHOC_SUITE_0,
+    .number_of_suites = sizeof(SUITE_0_PTRS) / sizeof(SUITE_0_PTRS[0]),
+    .suites = SUITE_0_PTRS,
 };
 
 static const struct edhoc_cipher_suite cipher_suite_2 = {
@@ -80,7 +87,9 @@ const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_2 = {
     .get_crypto = edhoc_cipher_suite_2_get_crypto,
 };
 
+static const struct com_edhoc_cipher_suite_details* SUITE_2_PTRS[] = {
+    &COM_EDHOC_SUITE_2};
 const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_2 = {
-    .number_of_suites = 1,
-    .suites = &COM_EDHOC_SUITE_2,
+    .number_of_suites = sizeof(SUITE_2_PTRS) / sizeof(SUITE_2_PTRS[0]),
+    .suites = SUITE_2_PTRS,  // Apunta al array de direcciones
 };

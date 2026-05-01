@@ -27,6 +27,19 @@ enum {
 
 void setUp(void) { tst_cli_edhoc_reset_process_error_mock(); }
 
+static const struct com_edhoc_cipher_suite_list* get_cipher_suites_0_2_list(
+    void) {
+  static const struct com_edhoc_cipher_suite_details* CIPHER_SUITE_0_2_ARR[] = {
+      &COM_EDHOC_SUITE_0, &COM_EDHOC_SUITE_2};
+
+  static const struct com_edhoc_cipher_suite_list CIPHER_SUITE_0_2 = {
+      .suites = CIPHER_SUITE_0_2_ARR,
+      .number_of_suites =
+          sizeof(CIPHER_SUITE_0_2_ARR) / sizeof(CIPHER_SUITE_0_2_ARR[0]),
+  };
+  return &CIPHER_SUITE_0_2;
+}
+
 /**
  * @see [RFC 9529
  * 3](https://datatracker.ietf.org/doc/html/rfc9529#name-authentication-with-static-)
@@ -53,11 +66,6 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
   } test_cases[] = {{ONLY_SUITE_2, sizeof(ONLY_SUITE_2), &COM_EDHOC_SUITE_2},
                     {ONLY_SUITE_0, sizeof(ONLY_SUITE_0), &COM_EDHOC_SUITE_0},
                     {SUITES_0_2_3, sizeof(SUITES_0_2_3), &COM_EDHOC_SUITE_0}};
-  const struct com_edhoc_cipher_suite_list supported_suites = {
-      .suites = (struct com_edhoc_cipher_suite_details[]){COM_EDHOC_SUITE_0,
-                                                          COM_EDHOC_SUITE_2},
-      .number_of_suites = 2,
-  };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
@@ -65,7 +73,7 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
         .bytes = test_cases[i].data, .length = test_cases[i].written_length};
 
     const struct cli_edhoc_responder_preferred_suites_result result =
-        cli_edhoc_get_responder_preferred_suites(&supported_suites,
+        cli_edhoc_get_responder_preferred_suites(get_cipher_suites_0_2_list(),
                                                  test_buffer);
 
     TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_OK, result.status);
@@ -79,11 +87,6 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
 }
 
 void test_prioritize_initiator_suite_preference(void) {
-  const struct com_edhoc_cipher_suite_list SUPPORTED_SUITES = {
-      .suites = (struct com_edhoc_cipher_suite_details[]){COM_EDHOC_SUITE_0,
-                                                          COM_EDHOC_SUITE_2},
-      .number_of_suites = 2,
-  };
   const uint8_t SUITES_3_2_0[] = {
       TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_3,
       TST_PREF_SUITES_SUITE_3, TST_PREF_SUITES_SUITE_2,
@@ -91,14 +94,18 @@ void test_prioritize_initiator_suite_preference(void) {
   const struct com_readonly_buffer test_buffer = {
       .bytes = SUITES_3_2_0, .length = sizeof(SUITES_3_2_0)};
 
+  const struct com_edhoc_cipher_suite_list* own_supported_suites =
+      get_cipher_suites_0_2_list();
   const struct cli_edhoc_responder_preferred_suites_result result =
-      cli_edhoc_get_responder_preferred_suites(&SUPPORTED_SUITES, test_buffer);
+      cli_edhoc_get_responder_preferred_suites(own_supported_suites,
+                                               test_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.preferred_suite);
-  TEST_ASSERT_EQUAL_INT(SUPPORTED_SUITES.suites[0].metadata->value,
+  TEST_ASSERT_EQUAL_INT(own_supported_suites->suites[0]->metadata->value,
                         result.preferred_suite->metadata->value);
-  TEST_ASSERT_EQUAL_PTR(&SUPPORTED_SUITES.suites[0], result.preferred_suite);
+  TEST_ASSERT_EQUAL_PTR(own_supported_suites->suites[0],
+                        result.preferred_suite);
 }
 
 static const uint8_t ONLY_SUITE_3[] = {TST_PREF_SUITES_ERR_CODE_2,
@@ -107,14 +114,8 @@ static const struct com_readonly_buffer ONLY_SUITE_3_BUFFER = {
     .bytes = ONLY_SUITE_3, .length = sizeof(ONLY_SUITE_3)};
 
 void test_gives_no_suites_when_negotiation_cannot_be_made(void) {
-  const struct com_edhoc_cipher_suite_list supported_suites = {
-      .suites = (struct com_edhoc_cipher_suite_details[]){COM_EDHOC_SUITE_0,
-                                                          COM_EDHOC_SUITE_2},
-      .number_of_suites = 2,
-  };
-
   const struct cli_edhoc_responder_preferred_suites_result result =
-      cli_edhoc_get_responder_preferred_suites(&supported_suites,
+      cli_edhoc_get_responder_preferred_suites(get_cipher_suites_0_2_list(),
                                                ONLY_SUITE_3_BUFFER);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_NO_COMMON_SUITES,
@@ -150,9 +151,9 @@ void test_fails_on_invalid_data(void) {
            CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES},
 
       {.buffer = ONLY_SUITE_3_BUFFER,
-       .supported_suites = {.number_of_suites = 1,
-                            .suites =
-                                (struct com_edhoc_cipher_suite_details[]){{0}}},
+       .supported_suites =
+           {.number_of_suites = 1,
+            .suites = (const struct com_edhoc_cipher_suite_details*[]){NULL}},
        .expected_status =
            CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES},
   };

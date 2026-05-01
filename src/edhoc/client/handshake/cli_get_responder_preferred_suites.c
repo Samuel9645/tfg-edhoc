@@ -60,7 +60,7 @@ cli_edhoc_get_responder_preferred_suites(
       continue;
     }
     for (size_t j = 0; j < own_supported_suites->number_of_suites; j++) {
-      if (own_supported_suites->suites[j].metadata->value ==
+      if (own_supported_suites->suites[j]->metadata->value ==
           details->metadata->value) {
         return ok(details);
       }

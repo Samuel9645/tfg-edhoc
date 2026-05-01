@@ -115,7 +115,7 @@ static void assert_error_contains_supported_cipher_suites(
                             received_info.written_entries,
                             "Number of suites do not match");
   for (size_t i = 0; i < expected_cipher_suites->number_of_suites; i++) {
-    TEST_ASSERT_EQUAL(expected_cipher_suites->suites[i].metadata->value,
+    TEST_ASSERT_EQUAL(expected_cipher_suites->suites[i]->metadata->value,
                       received_info.cipher_suites[i]);
   }
 }

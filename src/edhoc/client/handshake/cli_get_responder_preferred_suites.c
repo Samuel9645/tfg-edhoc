@@ -52,7 +52,7 @@ cli_edhoc_get_responder_preferred_suites(
                                   encoded_error_buffer.length, &received_code,
                                   &received_info) != EDHOC_SUCCESS) {
     return failure(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_PROCESSING_ERROR);
-  };
+  }
   for (size_t i = 0; i < received_info.written_entries; i++) {
     const struct com_edhoc_cipher_suite_details* details =
         com_edhoc_get_cipher_suite_from_value(received_info.cipher_suites[i]);

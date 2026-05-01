@@ -92,7 +92,7 @@ void test_responder_fails_on_invalid_data(void) {
       create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
       .raw_payload = {.bytes = NULL, .length = 0}};
-  struct srv_edhoc_parameters empty_params = {0};
+  const struct srv_edhoc_parameters empty_params = {0};
 
   const struct {
     const char* description;

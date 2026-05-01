@@ -31,7 +31,7 @@ struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
     struct cli_edhoc_message_2_initiator_request request,
     struct com_writable_buffer response_buffer);
 
-const char* cli_edhoc_handle_message_2_status_code_to_string(
+const char* cli_edhoc_respond_to_message_2_status_code_to_string(
     enum cli_edhoc_message_2_initiator_status status);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_INITIATOR_H_

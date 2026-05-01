@@ -63,7 +63,7 @@ struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
   return ok(compose_result.buffer);
 }
 
-const char* cli_edhoc_handle_message_2_status_code_to_string(
+const char* cli_edhoc_respond_to_message_2_status_code_to_string(
     const enum cli_edhoc_message_2_initiator_status status) {
   switch (status) {
   case CLI_EDHOC_MSG2_INITIATOR_OK:

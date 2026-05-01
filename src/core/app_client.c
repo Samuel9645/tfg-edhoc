@@ -169,7 +169,8 @@ enum com_emulation_status core_run_client(void) {
                                      payload_buffer);
 
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
-    coap_log_err("Failed to receive or process EDHOC message 2\n");
+    coap_log_err("%s", cli_edhoc_respond_to_message_2_status_code_to_string(
+                           message_2_initiator_result.status));
     send_message(client_resources.exchange, message_2_initiator_result.request);
     cli_coap_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

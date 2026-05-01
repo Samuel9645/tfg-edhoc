@@ -110,12 +110,13 @@ struct cli_coap_exchange* cli_coap_init_exchange(
   // This is used to bypass the const limitation
   memcpy(&exchange->incoming_response_buffer, &response_buffer,
          sizeof(struct com_writable_buffer));
-  // TODO: Note: It is the responsibility of the caller to free off (if
-  // appropriate) any returned data.
-  if (coap_session_set_app_data2(session_data->session, exchange, free) !=
-      NULL) {
+  void* previous_session_data =
+      coap_session_set_app_data2(session_data->session, exchange, free);
+  if (previous_session_data != NULL) {
+    coap_session_set_app_data2(session_data->session, NULL, NULL);
     coap_log_err("unexpected existing session app-data in client\n");
     free(exchange);
+    free(previous_session_data);
     return NULL;
   }
   coap_register_response_handler(session_data->context,

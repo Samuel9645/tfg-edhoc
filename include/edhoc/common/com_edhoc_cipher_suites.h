@@ -10,7 +10,6 @@
 #define EDHOC_COMMON_COM_EDHOC_CIPHER_SUITES_H_
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 struct com_edhoc_cipher_suite_details {
   const struct edhoc_cipher_suite* metadata;
@@ -35,14 +34,6 @@ struct com_edhoc_cipher_suite_list {
  */
 bool com_edhoc_cipher_suites_are_valid(
     const struct com_edhoc_cipher_suite_list* list);
-
-/**
- * @brief Gets the cipher suite details that matches the given value
- * @param value Cipher suite IANA registry value.
- * @return Pointer to the cipher suite or NULL pointer if not found
- */
-const struct com_edhoc_cipher_suite_details*
-com_edhoc_get_cipher_suite_from_value(int32_t value);
 
 extern const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0;
 extern const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0;

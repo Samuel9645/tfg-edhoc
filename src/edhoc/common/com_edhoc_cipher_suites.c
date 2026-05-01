@@ -35,18 +35,6 @@ bool com_edhoc_cipher_suites_are_valid(
   return true;
 }
 
-const struct com_edhoc_cipher_suite_details*
-com_edhoc_get_cipher_suite_from_value(const int32_t value) {
-  switch (value) {
-  case 0:
-    return &COM_EDHOC_SUITE_0;
-  case 2:
-    return &COM_EDHOC_SUITE_2;
-  default:
-    return NULL;
-  }
-}
-
 static const struct edhoc_cipher_suite cipher_suite_0 = {
     .value = 0,
     .aead_key_length = 16,

@@ -56,13 +56,6 @@ static struct {
   struct com_writable_buffer response;
 } env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN}};
 
-static struct srv_edhoc_message_1_responder_request create_valid_request(void) {
-  return (struct srv_edhoc_message_1_responder_request){
-      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
-                      .length = TST_SRV_EDHOC_HND_BUF_LEN},
-      .edhoc_parameters = tst_edhoc_srv_get_default_params()};
-}
-
 static void reset_mocks(void) {
   tst_srv_edhoc_m1_reset_parse_mock();
   tst_srv_edhoc_m1_reset_process_mock();
@@ -75,11 +68,27 @@ void setUp(void) {
   env.response.bytes = env.response_buffer;
 }
 
+static struct srv_edhoc_message_1_responder_request create_valid_request(void) {
+  return (struct srv_edhoc_message_1_responder_request){
+      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
+                      .length = TST_SRV_EDHOC_HND_BUF_LEN}};
+}
+
+static struct srv_edhoc_parameters create_test_params(void) {
+  const struct srv_edhoc_parameters default_params =
+      tst_edhoc_srv_get_default_params();
+  return (struct srv_edhoc_parameters){
+      .credentials = &DUMMY_TEST_CREDS,
+      .supported_cipher_suites = default_params.supported_cipher_suites,
+      .methods = default_params.methods};
+}
+
 void test_handler_ok_for_valid_data(void) {
   tst_srv_edhoc_m2_set_compose_ok();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(create_valid_request(), env.response);
+      srv_edhoc_respond_to_message_1(create_valid_request(),
+                                     create_test_params(), env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_OK, result.status);
   tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(result.response);
@@ -93,28 +102,36 @@ static void ensure_context_is_freed_on_failure(
                            "Memory Leak: edhoc_ctx was not NULL on failure");
 }
 
+/**
+ * @see [RFC
+ * 9529 3.5](https://datatracker.ietf.org/doc/html/rfc9529#name-message_3-2)
+ * @see [RFC
+ * 9528 5.4](https://datatracker.ietf.org/doc/html/rfc9528/#name-edhoc-message-3)
+ */
+void test_handler_reports_failure_when_receiving_message_3(void) {}
+
 void test_handler_fails_on_invalid_data(void) {
   const struct com_writable_buffer empty_response = {0};
+  const struct srv_edhoc_parameters valid_parameters =
+      tst_edhoc_srv_get_default_params();
+  const struct srv_edhoc_message_1_responder_request valid_request =
+      create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
-      .raw_payload = {.bytes = NULL, .length = 0},
-      .edhoc_parameters = {.credentials = &DUMMY_TEST_CREDS},
-  };
-  const struct srv_edhoc_message_1_responder_request no_credentials_request = {
-      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
-                      .length = sizeof(DUMMY_REQUEST_BUFFER)},
-      .edhoc_parameters = {0}};
+      .raw_payload = {.bytes = NULL, .length = 0}};
+  struct srv_edhoc_parameters empty_params = {0};
 
   const struct {
     const char* description;
     struct srv_edhoc_message_1_responder_request request;
+    struct srv_edhoc_parameters edhoc_parameters;
     struct com_writable_buffer response;
     enum srv_edhoc_message_1_responder_status expected_status;
   } test_cases[] = {
-      {"response buffer is empty/invalid", create_valid_request(),
+      {"response buffer is empty/invalid", valid_request, valid_parameters,
        empty_response, SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
-      {"raw payload is empty", empty_payload_request, env.response,
-       SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED},
-      {"credentials are missing", no_credentials_request, env.response,
+      {"raw payload is empty", empty_payload_request, valid_parameters,
+       env.response, SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED},
+      {"empty params", valid_request, empty_params, env.response,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED},
   };
 
@@ -122,6 +139,7 @@ void test_handler_fails_on_invalid_data(void) {
     reset_mocks();
     const struct srv_edhoc_message_1_responder_result result =
         srv_edhoc_respond_to_message_1(test_cases[i].request,
+                                       test_cases[i].edhoc_parameters,
                                        test_cases[i].response);
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
@@ -134,10 +152,11 @@ void test_handler_fails_on_invalid_data(void) {
 void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
   const struct srv_edhoc_message_1_responder_request invalid_request = {
       .raw_payload = {.bytes = NULL, .length = sizeof(DUMMY_REQUEST_BUFFER)},
-      .edhoc_parameters = tst_edhoc_srv_get_default_params()};
+  };
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(invalid_request, env.response);
+      srv_edhoc_respond_to_message_1(
+          invalid_request, tst_edhoc_srv_get_default_params(), env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -149,7 +168,9 @@ void test_handler_fails_when_parser_reports_prefix_extraction_failure(void) {
   tst_srv_edhoc_m1_set_extract_failed();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(create_valid_request(), env.response);
+      srv_edhoc_respond_to_message_1(create_valid_request(),
+                                     tst_edhoc_srv_get_default_params(),
+                                     env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -185,7 +206,9 @@ void test_handler_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_responder_result result =
-        srv_edhoc_respond_to_message_1(create_valid_request(), env.response);
+        srv_edhoc_respond_to_message_1(create_valid_request(),
+                                       tst_edhoc_srv_get_default_params(),
+                                       env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

@@ -45,33 +45,27 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     const struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
   uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
-  const struct com_writable_buffer response_data = {
+  const struct com_writable_buffer response_buffer = {
       .bytes = response_payload,
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
   };
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
-
   if (edhoc_ctx == NULL) {
-    const struct srv_edhoc_message_1_responder_request request_data = {
-        .raw_payload = parsed_request, .edhoc_parameters = edhoc_parameters};
-
+    const struct srv_edhoc_message_1_responder_request request = {
+        .raw_payload = parsed_request};
     const struct srv_edhoc_message_1_responder_result message_1_result =
-        deps->respond_to_message_1(request_data, response_data);
-
+        deps->respond_to_message_1(request, edhoc_parameters, response_buffer);
     if (!add_payload_if_present(response, message_1_result.response,
                                 deps->add_response_payload)) {
       return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
-
     return deps->process_message_1_result(message_1_result, session);
   }
 
   const struct srv_edhoc_message_3_responder_request handler_request = {
       .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
-
   const struct srv_edhoc_message_3_responder_result message_3_result =
-      deps->respond_to_message_3(handler_request, response_data);
-
+      deps->respond_to_message_3(handler_request, response_buffer);
   if (!add_payload_if_present(response, message_3_result.response,
                               deps->add_response_payload)) {
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;

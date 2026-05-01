@@ -42,6 +42,7 @@ static struct srv_edhoc_message_1_responder_result invalid_response_buffer(
 
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     const struct srv_edhoc_message_1_responder_request request,
+    const struct srv_edhoc_parameters context_parameters,
     const struct com_writable_buffer response) {
   if (!com_writable_buffer_is_writable(response)) {
     return invalid_response_buffer();
@@ -56,10 +57,10 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
 
   const struct srv_edhoc_message_1_request process_request = {
       .payload = parse_result.buffer,
-      .edhoc_parameters = request.edhoc_parameters,
   };
   struct srv_edhoc_message_1_process_result process_result =
-      srv_edhoc_process_message_1(process_request, response);
+      srv_edhoc_process_message_1(process_request, response,
+                                  context_parameters);
   if (process_result.status != SRV_EDHOC_MSG1_PROCESS_OK) {
     return failure(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED,
                    process_result.error_buffer);

@@ -81,3 +81,20 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
       .length = extracted_fields.edhoc_message_size,
   });
 }
+
+bool srv_edhoc_is_message_3(const struct com_readonly_buffer request_buffer,
+                            const struct edhoc_context* context) {
+  if (!com_readonly_buffer_has_content(request_buffer) || context == NULL) {
+    return false;
+  }
+
+  struct edhoc_extracted_fields extracted_fields = {
+      .buffer = request_buffer.bytes,
+      .buffer_size = request_buffer.length,
+  };
+  if (edhoc_extract_connection_id(&extracted_fields) != EDHOC_SUCCESS) {
+    return false;
+  }
+  return edhoc_connection_id_equal(&extracted_fields.extracted_conn_id,
+                                   &context->private_cid);
+}

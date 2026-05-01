@@ -37,5 +37,6 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
     struct com_readonly_buffer request_buffer,
     struct com_writable_buffer error_response);
 
+bool srv_edhoc_is_message_1(struct com_readonly_buffer request_buffer);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PARSER_H_

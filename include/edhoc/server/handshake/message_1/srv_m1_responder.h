@@ -12,12 +12,12 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 
 #include "common/com_data_models.h"
-#include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 #include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
+// TODO: maybe inline this struct
 struct srv_edhoc_message_1_responder_request {
   struct com_readonly_buffer raw_payload;
-  const struct srv_edhoc_parameters edhoc_parameters;
 };
 
 /**
@@ -25,6 +25,8 @@ struct srv_edhoc_message_1_responder_request {
  *
  * @param[in] request Session/request metadata for Message 1 responder,
  * including raw CoAP payload and credentials.
+ * @param[in] context_parameters Parameters to use when creating the EDHOC
+ * context in the processing phase
  * @param[in] response Response buffer metadata for Message 2.
  * @return Struct containing status code, allocated EDHOC context and Message 2
  * in the buffer on success, or error code, NULL context and error buffer on
@@ -36,6 +38,7 @@ struct srv_edhoc_message_1_responder_request {
  */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     struct srv_edhoc_message_1_responder_request request,
+    struct srv_edhoc_parameters context_parameters,
     struct com_writable_buffer response);
 
 const char* srv_edhoc_handle_message_1_status_code_to_string(

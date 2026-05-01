@@ -45,4 +45,7 @@ struct srv_edhoc_parse_message_3_result srv_edhoc_parse_message_3(
     const struct edhoc_context* edhoc_ctx,
     struct com_writable_buffer error_response);
 
+bool srv_edhoc_is_message_3(struct com_readonly_buffer request_buffer,
+                            const struct edhoc_context* context);
+
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_3_SRV_M3_PARSER_H_

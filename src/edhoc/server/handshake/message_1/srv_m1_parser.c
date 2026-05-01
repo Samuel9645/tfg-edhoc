@@ -66,3 +66,15 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
       .length = extracted_fields.edhoc_message_size,
   });
 }
+
+bool srv_edhoc_is_message_1(const struct com_readonly_buffer request_buffer) {
+  if (!com_readonly_buffer_has_content(request_buffer)) {
+    return false;
+  }
+
+  struct edhoc_extracted_fields extracted_fields = {
+      .buffer = request_buffer.bytes,
+      .buffer_size = request_buffer.length,
+  };
+  return edhoc_extract_flow_info(&extracted_fields) == EDHOC_SUCCESS;
+}

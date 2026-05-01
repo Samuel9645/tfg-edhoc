@@ -46,8 +46,7 @@ static void reset_mock_results(void) {
 static struct srv_edhoc_message_1_request create_valid_request(void) {
   return (struct srv_edhoc_message_1_request){
       .payload = {.bytes = DUMMY_REQUEST_BUFFER,
-                  .length = TST_SRV_EDHOC_HND_BUF_LEN},
-      .edhoc_parameters = tst_edhoc_srv_get_default_params()};
+                  .length = TST_SRV_EDHOC_HND_BUF_LEN}};
 }
 
 void setUp(void) {
@@ -60,35 +59,36 @@ static void ensure_context_is_null(struct edhoc_context* context) {
   TEST_ASSERT_NULL_MESSAGE(context, "edhoc context was not NULL");
 }
 
-static struct srv_edhoc_message_1_request create_custom_request(
-    const uint8_t* payload, const size_t length,
+static struct srv_edhoc_parameters create_test_params(
     const struct com_edhoc_cipher_suite_list* suites,
     const struct srv_edhoc_methods methods) {
   const struct srv_edhoc_parameters defaults =
       tst_edhoc_srv_get_default_params();
+  return (struct srv_edhoc_parameters){.credentials = defaults.credentials,
+                                       .supported_cipher_suites = suites,
+                                       .methods = methods};
+}
+
+static struct srv_edhoc_parameters get_params_suite_0_method_0(void) {
+  static const enum edhoc_method ONLY_METHOD_0[] = {EDHOC_METHOD_0};
+
+  return create_test_params(
+      &COM_EDHOC_ONLY_SUITE_0,
+      (struct srv_edhoc_methods){.data = ONLY_METHOD_0, .size = 1});
+}
+
+static struct srv_edhoc_parameters get_params_suite_2_method_3(void) {
+  static const enum edhoc_method ONLY_METHOD_3[] = {EDHOC_METHOD_3};
+
+  return create_test_params(
+      &COM_EDHOC_ONLY_SUITE_2,
+      (struct srv_edhoc_methods){.data = ONLY_METHOD_3, .size = 1});
+}
+
+static struct srv_edhoc_message_1_request create_msg1_request(
+    const uint8_t* payload, const size_t length) {
   return (struct srv_edhoc_message_1_request){
-      .edhoc_parameters = {.credentials = defaults.credentials,
-                           .supported_cipher_suites = suites,
-                           .methods = methods},
       .payload = {.bytes = payload, .length = length}};
-}
-
-static struct srv_edhoc_message_1_request create_suite_0_method_0_request(
-    const uint8_t* payload, const size_t length) {
-  static const enum edhoc_method method_0[] = {EDHOC_METHOD_0};
-  const struct srv_edhoc_methods ONLY_METHOD_0 = {.data = method_0, .size = 1};
-
-  return create_custom_request(payload, length, &COM_EDHOC_ONLY_SUITE_0,
-                               ONLY_METHOD_0);
-}
-
-static struct srv_edhoc_message_1_request create_suite_2_method_3_request(
-    const uint8_t* payload, const size_t length) {
-  static const enum edhoc_method method_3[] = {EDHOC_METHOD_3};
-  const struct srv_edhoc_methods ONLY_METHOD_3 = {.data = method_3, .size = 1};
-
-  return create_custom_request(payload, length, &COM_EDHOC_ONLY_SUITE_2,
-                               ONLY_METHOD_3);
 }
 
 /**
@@ -102,12 +102,12 @@ void test_m1_process_ok_for_valid_data(void) {
       0xbb, 0xf0, 0xf1, 0x94, 0xd9, 0x13, 0xcc, 0x12, 0xef, 0x15,
       0x32, 0xd3, 0x28, 0xef, 0x32, 0x63, 0x2a, 0x48, 0x81, 0xa1,
       0xc0, 0x70, 0x1e, 0x23, 0x7f, 0x04, 0x2d};
-  const struct srv_edhoc_message_1_request suite_0_method_0_request =
-      create_suite_0_method_0_request(MESSAGE_1_SUITE_0_METHOD_0,
-                                      sizeof(MESSAGE_1_SUITE_0_METHOD_0));
+  const struct srv_edhoc_message_1_request request = create_msg1_request(
+      MESSAGE_1_SUITE_0_METHOD_0, sizeof(MESSAGE_1_SUITE_0_METHOD_0));
 
   struct srv_edhoc_message_1_process_result result =
-      srv_edhoc_process_message_1(suite_0_method_0_request, env.error);
+      srv_edhoc_process_message_1(request, env.error,
+                                  get_params_suite_0_method_0());
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.context);
@@ -157,15 +157,14 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
       0x8f, 0xbb, 0x61, 0x5e, 0x94, 0x38, 0x6a, 0xa3, 0xb6, 0x1b,
       0xea, 0x5b, 0x3d, 0x8f, 0x65, 0xf3, 0x26, 0x20, 0xb7, 0x49,
       0xbe, 0xe8, 0xd2, 0x78, 0xef, 0xa9, 0x0e};
-
-  const struct srv_edhoc_message_1_request suite_2_method_3_request =
-      create_suite_2_method_3_request(MESSAGE_1_SUITE_6_REQUEST,
-                                      sizeof(MESSAGE_1_SUITE_6_REQUEST));
+  const struct srv_edhoc_message_1_request request = create_msg1_request(
+      MESSAGE_1_SUITE_6_REQUEST, sizeof(MESSAGE_1_SUITE_6_REQUEST));
   tst_srv_edhoc_m1_use_real_process();
   tst_com_edhoc_use_real_get_code();
 
   const struct srv_edhoc_message_1_process_result result =
-      srv_edhoc_process_message_1(suite_2_method_3_request, env.error);
+      srv_edhoc_process_message_1(request, env.error,
+                                  get_params_suite_2_method_3());
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS, result.status);
   assert_error_contains_supported_cipher_suites(result.error_buffer);
@@ -174,8 +173,7 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
 void test_m1_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_1_request valid_request =
       create_valid_request();
-  const struct srv_edhoc_message_1_request empty_request_with_edhoc_params = {
-      .edhoc_parameters = valid_request.edhoc_parameters};
+  const struct srv_edhoc_message_1_request empty_request = {0};
   const struct com_writable_buffer empty_response = {0};
 
   const struct {
@@ -184,7 +182,7 @@ void test_m1_process_fails_on_invalid_data(void) {
     struct com_writable_buffer response;
     enum srv_edhoc_message_1_process_status expected_status;
   } test_cases[] = {
-      {"empty request payload", empty_request_with_edhoc_params, env.error,
+      {"empty request payload", empty_request, env.error,
        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER},
       {"error buffer is empty/invalid", valid_request, empty_response,
        SRV_EDHOC_MSG1_PROCESS_ERR_INVALID_ERROR_BUFFER}};
@@ -193,7 +191,8 @@ void test_m1_process_fails_on_invalid_data(void) {
     reset_mock_results();
     const struct srv_edhoc_message_1_process_result result =
         srv_edhoc_process_message_1(test_cases[i].request,
-                                    test_cases[i].response);
+                                    test_cases[i].response,
+                                    tst_edhoc_srv_get_default_params());
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
@@ -222,7 +221,8 @@ void test_m1_process_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_process_result result =
-        srv_edhoc_process_message_1(create_valid_request(), env.error);
+        srv_edhoc_process_message_1(create_valid_request(), env.error,
+                                    tst_edhoc_srv_get_default_params());
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

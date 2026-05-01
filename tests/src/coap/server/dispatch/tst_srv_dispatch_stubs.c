@@ -75,20 +75,24 @@ void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
 
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
-    struct srv_edhoc_message_1_responder_request request_data,
-    struct com_writable_buffer response_data) {
+    const struct srv_edhoc_message_1_responder_request request_data,
+    const struct srv_edhoc_parameters edhoc_parameters,
+    const struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
+  (void)edhoc_parameters;
   return srv_edhoc_message_1_responder_failure(
       SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER,
       DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
-    struct srv_edhoc_message_1_responder_request request_data,
-    struct com_writable_buffer response_data) {
+    const struct srv_edhoc_message_1_responder_request request_data,
+    const struct srv_edhoc_parameters edhoc_parameters,
+    const struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
+  (void)edhoc_parameters;
   return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub,
                                           DUMMY_READONLY_BUFFER);
 }

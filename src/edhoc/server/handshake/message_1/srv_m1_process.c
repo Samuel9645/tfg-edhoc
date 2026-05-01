@@ -42,7 +42,8 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
-    const struct com_writable_buffer error_buffer) {
+    const struct com_writable_buffer error_buffer,
+    const struct srv_edhoc_parameters context_parameters) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
@@ -62,7 +63,7 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
   }
 
   const struct com_edhoc_setup_context_result setup_context_result =
-      com_edhoc_setup_context(context, request.edhoc_parameters, error_buffer);
+      com_edhoc_setup_context(context, context_parameters, error_buffer);
   if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
     const struct srv_edhoc_message_1_process_result failure_result =
         failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,

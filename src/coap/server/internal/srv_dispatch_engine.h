@@ -23,6 +23,7 @@ typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
 typedef struct srv_edhoc_message_1_responder_result (
     *srv_edhoc_m1_responder_fn)(
     struct srv_edhoc_message_1_responder_request request_data,
+    struct srv_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer response_data);
 
 typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(

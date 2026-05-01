@@ -40,10 +40,12 @@ void* stb_srv_coap_get_session_valid(const coap_session_t* session);
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
     struct srv_edhoc_message_1_responder_request request_data,
+    struct srv_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer response_data);
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     struct srv_edhoc_message_1_responder_request request_data,
+    struct srv_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer response_data);
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(

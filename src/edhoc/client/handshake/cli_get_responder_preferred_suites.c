@@ -53,16 +53,13 @@ cli_edhoc_get_responder_preferred_suites(
                                   &received_info) != EDHOC_SUCCESS) {
     return failure(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_PROCESSING_ERROR);
   }
-  for (size_t i = 0; i < received_info.written_entries; i++) {
-    const struct com_edhoc_cipher_suite_details* details =
-        com_edhoc_get_cipher_suite_from_value(received_info.cipher_suites[i]);
-    if (details == NULL) {
-      continue;
-    }
-    for (size_t j = 0; j < own_supported_suites->number_of_suites; j++) {
-      if (own_supported_suites->suites[j]->metadata->value ==
-          details->metadata->value) {
-        return ok(details);
+  for (size_t j = 0; j < own_supported_suites->number_of_suites; j++) {
+    const struct com_edhoc_cipher_suite_details* current_suite =
+        own_supported_suites->suites[j];
+    const int32_t own_suite_value = current_suite->metadata->value;
+    for (size_t i = 0; i < received_info.written_entries; i++) {
+      if (received_info.cipher_suites[i] == own_suite_value) {
+        return ok(current_suite);
       }
     }
   }

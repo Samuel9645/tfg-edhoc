@@ -71,7 +71,7 @@ struct cli_coap_exchange* cli_coap_init_exchange(
  *
  * @param[in] exchange Initialized exchange state.
  * @param[in] request_data EDHOC request payload and content format.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE on
+ * @return STATUS_COAP_OK on success, STATUS_COAP_ERR on
  * failure.
  * @note This resets the state of the exchange before sending the data
  */

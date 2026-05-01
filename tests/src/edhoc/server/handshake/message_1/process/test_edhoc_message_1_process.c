@@ -99,7 +99,7 @@ void test_m1_process_ok_for_valid_data(void) {
 
 static void assert_error_contains_supported_cipher_suites(
     const struct com_readonly_buffer encoded_error_buffer,
-    const struct srv_edhoc_parameters expected_parameters) {
+    const struct com_edhoc_cipher_suite_list* expected_cipher_suites) {
   enum edhoc_error_code received_code = -1;
   char decoded_error[TST_EDHOC_ADD_ERROR_CAPACITY] = {0};
   struct edhoc_error_info received_info = {
@@ -111,8 +111,6 @@ static void assert_error_contains_supported_cipher_suites(
                                 "CBOR Decode Failed");
   TEST_ASSERT_EQUAL_MESSAGE(EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE,
                             received_code, "Unexpected error code");
-  const struct com_edhoc_cipher_suite_list* expected_cipher_suites =
-      expected_parameters.supported_cipher_suites;
   TEST_ASSERT_EQUAL_MESSAGE(expected_cipher_suites->number_of_suites,
                             received_info.written_entries,
                             "Number of suites do not match");
@@ -138,14 +136,15 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
   const struct srv_edhoc_message_1_request request = create_msg1_request(
       MESSAGE_1_SUITE_6_REQUEST, sizeof(MESSAGE_1_SUITE_6_REQUEST));
   use_real_implementations();
+  struct srv_edhoc_parameters method_3_suite_2_params =
+      tst_edhoc_srv_get_method_3_suite_2_params();
 
   const struct srv_edhoc_message_1_process_result result =
-      srv_edhoc_process_message_1(request, env.error,
-                                  tst_edhoc_srv_get_method_3_suite_2_params());
+      srv_edhoc_process_message_1(request, env.error, method_3_suite_2_params);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS, result.status);
   assert_error_contains_supported_cipher_suites(
-      result.error_buffer, tst_edhoc_srv_get_method_3_suite_2_params());
+      result.error_buffer, method_3_suite_2_params.supported_cipher_suites);
 }
 
 void test_m1_process_fails_on_invalid_data(void) {

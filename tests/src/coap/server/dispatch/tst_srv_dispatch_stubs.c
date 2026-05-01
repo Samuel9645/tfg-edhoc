@@ -42,7 +42,7 @@ stb_srv_coap_parse_edhoc_request_fail(
   (void)expected_format;
   (void)data_buffer;
   return srv_coap_internal_parse_edhoc_failure(
-      COM_COAP_EDH_REQ_ERR_UNSUPPORTED_FORMAT);
+      COM_COAP_PARSE_EDHOC_REQ_ERR_UNSUPPORTED_FORMAT);
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};

@@ -38,7 +38,7 @@ static coap_response_t coap_client_coap_response_handler(
   (void)id;
   struct cli_coap_exchange* exchange = coap_session_get_app_data(session);
   if (exchange == NULL) {
-    coap_log_err("missing client exchange state in coap_response.handler\n");
+    coap_log_err("missing client exchange state in coap_response handler\n");
     return COAP_RESPONSE_FAIL;
   }
 
@@ -52,6 +52,10 @@ static coap_response_t coap_client_coap_response_handler(
   const struct com_coap_parse_edhoc_request_result parse_result =
       com_coap_parse_edhoc_request(received, CONFIG_COAP_CONTENT_EDHOC,
                                    exchange->incoming_response_buffer);
+  if (parse_result.status != COM_COAP_PARSE_EDHOC_REQ_OK) {
+    coap_log_err("failed to parse EDHOC response\n");
+    return COAP_RESPONSE_FAIL;
+  }
 
   exchange->internal_parsed_response.bytes = parse_result.parsed_request.bytes;
   exchange->internal_parsed_response.length =

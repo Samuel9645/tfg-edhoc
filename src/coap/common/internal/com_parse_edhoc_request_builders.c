@@ -19,7 +19,7 @@ srv_coap_internal_parse_edhoc_failure(
 struct com_coap_parse_edhoc_request_result srv_coap_internal_parse_edhoc_ok(
     const struct com_readonly_buffer parsed_data) {
   return (struct com_coap_parse_edhoc_request_result){
-      .status = COM_COAP_EDH_REQ_OK,
+      .status = COM_COAP_PARSE_EDHOC_REQ_OK,
       .parsed_request = parsed_data,
   };
 }

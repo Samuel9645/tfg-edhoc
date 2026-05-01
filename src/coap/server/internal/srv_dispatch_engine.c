@@ -93,7 +93,7 @@ void srv_coap_dispatch_post_with_dependencies(
   const struct com_coap_parse_edhoc_request_result parse_edhoc_result =
       deps->parse_edhoc_request(request, CONFIG_COAP_CONTENT_CID_EDHOC,
                                 pdu_data);
-  if (parse_edhoc_result.status != COM_COAP_EDH_REQ_OK) {
+  if (parse_edhoc_result.status != COM_COAP_PARSE_EDHOC_REQ_OK) {
     coap_log_err("failed to parse EDHOC message\n");
     coap_pdu_set_code(response, com_coap_map_parse_result_to_pdu_code(
                                     parse_edhoc_result.status));

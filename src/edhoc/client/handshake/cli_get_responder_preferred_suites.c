@@ -19,6 +19,12 @@ static struct cli_edhoc_responder_preferred_suites_result ok(
   };
 }
 
+static struct cli_edhoc_responder_preferred_suites_result no_common_suites(
+    void) {
+  return (struct cli_edhoc_responder_preferred_suites_result){
+      .status = CLI_EDHOC_RESP_PREFERRED_SUITES_NO_COMMON_SUITES};
+}
+
 enum { CLI_GET_RESPONDER_SUITES_ERROR_SIZE = 100 };
 
 struct cli_edhoc_responder_preferred_suites_result
@@ -47,5 +53,5 @@ cli_edhoc_get_responder_preferred_suites(
       }
     }
   }
-  return ok(NULL);
+  return no_common_suites();
 }

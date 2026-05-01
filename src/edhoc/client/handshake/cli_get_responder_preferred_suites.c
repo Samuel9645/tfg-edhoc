@@ -19,11 +19,33 @@ static struct cli_edhoc_responder_preferred_suites_result ok(
   };
 }
 
+enum { CLI_GET_RESPONDER_SUITES_ERROR_SIZE = 100 };
+
 struct cli_edhoc_responder_preferred_suites_result
 cli_edhoc_get_responder_preferred_suites(
     const struct com_edhoc_cipher_suite_list* own_supported_suites,
     const struct com_readonly_buffer encoded_error_buffer) {
   (void)own_supported_suites;
   (void)encoded_error_buffer;
+  enum edhoc_error_code received_code = -1;
+  char decoded_error[CLI_GET_RESPONDER_SUITES_ERROR_SIZE] = {0};
+  struct edhoc_error_info received_info = {
+      .text_string = decoded_error, .total_entries = sizeof(decoded_error)};
+  edhoc_message_error_process(encoded_error_buffer.bytes,
+                              encoded_error_buffer.length, &received_code,
+                              &received_info);
+  for (size_t i = 0; i < received_info.written_entries; i++) {
+    const struct com_edhoc_cipher_suite_details* details =
+        com_edhoc_get_cipher_suite_from_value(received_info.cipher_suites[i]);
+    if (details == NULL) {
+      continue;
+    }
+    for (size_t j = 0; j < own_supported_suites->number_of_suites; j++) {
+      if (own_supported_suites->suites[j].metadata->value ==
+          details->metadata->value) {
+        return ok(details);
+      }
+    }
+  }
   return ok(NULL);
 }

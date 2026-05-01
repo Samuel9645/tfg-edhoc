@@ -57,7 +57,7 @@ static const struct edhoc_cipher_suite cipher_suite_2 = {
     .aead_tag_length = 8,
     .aead_iv_length = 13,
     .hash_length = 32,
-    .mac_length = 32,
+    .mac_length = 8,
     .ecc_key_length = 32,
     .ecc_sign_length = 64,
 };

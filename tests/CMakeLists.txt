@@ -176,7 +176,7 @@ set(MESSAGE_1_PARSER_MOCK
 )
 
 add_unity_test(test_edhoc_message_1_parser
-    /src/edhoc/server/handshake/message_1/parser/test_edhoc_message_1_parser.c
+    /src/edhoc/server/handshake/message_1/test_edhoc_message_1_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${MESSAGE_1_PARSER_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
@@ -200,7 +200,7 @@ set(MESSAGE_1_PROCESS_MOCKS
 )
 
 add_unity_test(test_edhoc_message_1_process
-    /src/edhoc/server/handshake/message_1/process/test_edhoc_message_1_process.c
+    /src/edhoc/server/handshake/message_1/test_edhoc_message_1_process.c
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_1_PROCESS_MOCKS}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
@@ -219,7 +219,7 @@ add_unity_test(test_edhoc_message_2_compose
 )
 
 add_unity_test(test_edhoc_message_1_responder
-    /src/edhoc/server/handshake/message_1/responder/test_edhoc_message_1_responder.c
+    /src/edhoc/server/handshake/message_1/test_edhoc_message_1_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${MESSAGE_1_PARSER_MOCK}
@@ -237,7 +237,7 @@ set(MESSAGE_3_PARSER_MOCK
 )
 
 add_unity_test(test_edhoc_message_3_parser
-    /src/edhoc/server/handshake/message_3/parser/test_edhoc_message_3_parser.c
+    /src/edhoc/server/handshake/message_3/test_edhoc_message_3_parser.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${MESSAGE_3_PARSER_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
@@ -265,7 +265,7 @@ set(MESSAGE_4_COMPOSE_MOCKS
 )
 
 add_unity_test(test_edhoc_message_3_process
-    /src/edhoc/server/handshake/message_3/process/test_edhoc_message_3_process.c
+    /src/edhoc/server/handshake/message_3/test_edhoc_message_3_process.c
     ${MESSAGE_3_PROCESS_SOURCES}
     ${MESSAGE_3_PROCESS_MOCKS}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
@@ -279,7 +279,7 @@ add_unity_test(test_edhoc_message_4_compose
 )
 
 add_unity_test(test_edhoc_message_3_responder
-    /src/edhoc/server/handshake/message_3/responder/test_edhoc_message_3_responder.c
+    /src/edhoc/server/handshake/message_3/test_edhoc_message_3_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${MESSAGE_3_PARSER_MOCK}
@@ -313,7 +313,7 @@ set(CLIENT_MESSAGE_2_PROCESS_SOURCES
 )
 
 add_unity_test(test_edhoc_message_2_process
-    /src/edhoc/client/handshake/message_2/process/test_edhoc_message_2_process.c
+    /src/edhoc/client/handshake/message_2/test_edhoc_message_2_process.c
     ${CLIENT_MESSAGE_2_PROCESS_SOURCES}
     ${CLIENT_MESSAGE_2_PROCESS_MOCKS}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
@@ -347,14 +347,14 @@ set(CLIENT_MESSAGE_4_PROCESS_SOURCES
 )
 
 add_unity_test(test_edhoc_message_4_process
-    /src/edhoc/client/handshake/message_4/process/test_edhoc_message_4_process.c
+    /src/edhoc/client/handshake/message_4/test_edhoc_message_4_process.c
     ${CLIENT_MESSAGE_4_PROCESS_SOURCES}
     ${CLIENT_MESSAGE_4_PROCESS_MOCKS}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
 add_unity_test(test_edhoc_message_2_initiator
-    /src/edhoc/client/handshake/message_2/initiator/test_edhoc_message_2_initiator.c
+    /src/edhoc/client/handshake/message_2/test_edhoc_message_2_initiator.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_initiator.c
     ${CLIENT_MESSAGE_2_PROCESS_SOURCES}
     ${CLIENT_MESSAGE_2_PROCESS_MOCKS}

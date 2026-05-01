@@ -78,6 +78,29 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
   }
 }
 
+void test_prioritize_initiator_suite_preference(void) {
+  const struct com_edhoc_cipher_suite_list SUPPORTED_SUITES = {
+      .suites = (struct com_edhoc_cipher_suite_details[]){COM_EDHOC_SUITE_0,
+                                                          COM_EDHOC_SUITE_2},
+      .number_of_suites = 2,
+  };
+  const uint8_t SUITES_3_2_0[] = {
+      TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_3,
+      TST_PREF_SUITES_SUITE_3, TST_PREF_SUITES_SUITE_2,
+      TST_PREF_SUITES_SUITE_0};
+  const struct com_readonly_buffer test_buffer = {
+      .bytes = SUITES_3_2_0, .length = sizeof(SUITES_3_2_0)};
+
+  const struct cli_edhoc_responder_preferred_suites_result result =
+      cli_edhoc_get_responder_preferred_suites(&SUPPORTED_SUITES, test_buffer);
+
+  TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_OK, result.status);
+  TEST_ASSERT_NOT_NULL(result.preferred_suite);
+  TEST_ASSERT_EQUAL_INT(SUPPORTED_SUITES.suites[0].metadata->value,
+                        result.preferred_suite->metadata->value);
+  TEST_ASSERT_EQUAL_PTR(&SUPPORTED_SUITES.suites[0], result.preferred_suite);
+}
+
 static const uint8_t ONLY_SUITE_3[] = {TST_PREF_SUITES_ERR_CODE_2,
                                        TST_PREF_SUITES_SUITE_3};
 static const struct com_readonly_buffer ONLY_SUITE_3_BUFFER = {

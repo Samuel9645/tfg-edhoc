@@ -29,13 +29,9 @@ void tst_srv_edhoc_m1_set_process_ok(void) {
   use_real_message_1_process = false;
 }
 
-void tst_srv_edhoc_m1_use_real_process(void) {
-  use_real_message_1_process = true;
-}
-
 void tst_srv_edhoc_m1_reset_process_mock(void) {
   message_1_process_result = EDHOC_SUCCESS;
-  use_real_message_1_process = false;
+  use_real_message_1_process = true;
 }
 
 extern int __real_edhoc_message_1_process(  // NOLINT(*-reserved-identifier)

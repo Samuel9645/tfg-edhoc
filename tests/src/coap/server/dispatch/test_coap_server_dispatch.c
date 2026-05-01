@@ -18,7 +18,7 @@
 
 #include "coap/server/dispatch/tst_create_base_dependencies.h"
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
-#include "edhoc/common/tst_edhoc_default_params.h"
+#include "edhoc/common/tst_edhoc_params.h"
 
 static coap_session_t* dummy_session = NULL;
 static coap_pdu_t* dummy_request = NULL;
@@ -51,9 +51,8 @@ void test_server_sends_changed_response_for_valid_message_1(void) {
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_null;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
@@ -63,9 +62,8 @@ void test_server_responds_with_bad_request_for_malformed_edhoc_message(void) {
       test_srv_coap_dispatch_create_base_dependencies();
   deps.parse_edhoc_request = stb_srv_coap_parse_edhoc_request_fail;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -75,9 +73,8 @@ void test_server_responds_with_internal_error_on_server_side_failure(void) {
       test_srv_coap_dispatch_create_base_dependencies();
   deps.add_edhoc_response_options = stb_srv_coap_add_options_fail;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -90,9 +87,8 @@ void test_server_responds_with_bad_request_if_context_already_exists_for_message
   deps.respond_to_message_3 = stb_srv_edhoc_m3_responder_protocol_failure;
   deps.process_message_3_result = stb_srv_coap_process_m3_protocol_failure;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -103,9 +99,8 @@ void test_server_responds_with_error_when_message_1_processing_fails(void) {
   deps.get_session_app_data = stb_srv_coap_get_session_null;
   deps.process_message_1_result = stb_srv_coap_process_m1_protocol_failure;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
@@ -119,9 +114,8 @@ void test_server_responds_with_internal_error_if_adding_response_payload_fails(
   deps.respond_to_message_1 = stb_srv_edhoc_m1_responder_ok;
   deps.add_response_payload = stb_srv_coap_add_payload_failure;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -134,9 +128,8 @@ void test_server_responds_with_bad_request_for_message_3_without_active_context(
   deps.respond_to_message_1 = stb_srv_edhoc_m1_responder_protocol_failure;
   deps.process_message_1_result = stb_srv_coap_process_m1_protocol_failure;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -146,9 +139,8 @@ void test_server_sends_changed_response_for_valid_message_3(void) {
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_valid;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
@@ -161,9 +153,8 @@ void test_server_responds_with_bad_request_for_unrecognized_message_format(
   deps.respond_to_message_3 = stb_srv_edhoc_m3_responder_protocol_failure;
   deps.process_message_3_result = stb_srv_coap_process_m3_protocol_failure;
 
-  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request,
-                                           tst_edhoc_srv_get_default_params(),
-                                           dummy_response, &deps);
+  srv_coap_dispatch_post_with_dependencies(dummy_session, dummy_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+      dummy_response, &deps);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }

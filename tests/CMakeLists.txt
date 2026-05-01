@@ -83,7 +83,7 @@ set(EDHOC_CORE_ERROR_SOURCES
 
 set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_edhoc_default_params.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_edhoc_params.c
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
     ${EDHOC_CORE_ERROR_SOURCES}
 )
@@ -172,6 +172,7 @@ add_unity_test(test_edhoc_setup_context
 
 set(MESSAGE_1_PARSER_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.c
+    "-Wl,--wrap=edhoc_extract_flow_info"
 )
 
 add_unity_test(test_edhoc_message_1_parser

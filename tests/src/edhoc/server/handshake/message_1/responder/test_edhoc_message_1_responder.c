@@ -19,7 +19,7 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
-#include "edhoc/common/tst_edhoc_default_params.h"
+#include "edhoc/common/tst_edhoc_params.h"
 #include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.h"
@@ -28,27 +28,8 @@
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
-static int dummy_fetch_credentials(void* user_context,
-                                   struct edhoc_auth_creds* credentials) {
-  (void)user_context;
-  (void)credentials;
-  return EDHOC_SUCCESS;
-}
-
-static int dummy_verify_credentials(
-    void* user_context, struct edhoc_auth_creds* credentials,
-    const uint8_t** public_key_reference,
-    size_t* public_key_length) {  // NOLINT(*-non-const-parameter)
-  (void)user_context;
-  (void)credentials;
-  (void)public_key_reference;
-  (void)public_key_length;
-  return EDHOC_SUCCESS;
-}
-
-static const struct edhoc_credentials DUMMY_TEST_CREDS = {
-    .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
-static const uint8_t DUMMY_REQUEST_BUFFER[] = {0x01, 0x02, 0x03, 0x04,
+// WITH PREFIX 0xF5 so that parsing succeeds
+static const uint8_t DUMMY_REQUEST_BUFFER[] = {0xF5, 0x02, 0x03, 0x04,
                                                0x05, 0x06, 0x07, 0x08};
 
 static struct {
@@ -57,7 +38,7 @@ static struct {
 } env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN}};
 
 static void reset_mocks(void) {
-  tst_srv_edhoc_m1_reset_parse_mock();
+  tst_srv_edhoc_m1_reset_extract_mock();
   tst_srv_edhoc_m1_reset_process_mock();
   tst_srv_edhoc_m2_reset_compose_mock();
 }
@@ -74,21 +55,14 @@ static struct srv_edhoc_message_1_responder_request create_valid_request(void) {
                       .length = TST_SRV_EDHOC_HND_BUF_LEN}};
 }
 
-static struct srv_edhoc_parameters create_test_params(void) {
-  const struct srv_edhoc_parameters default_params =
-      tst_edhoc_srv_get_default_params();
-  return (struct srv_edhoc_parameters){
-      .credentials = &DUMMY_TEST_CREDS,
-      .supported_cipher_suites = default_params.supported_cipher_suites,
-      .methods = default_params.methods};
-}
-
-void test_handler_ok_for_valid_data(void) {
+void test_responder_ok_for_valid_data(void) {
+  tst_srv_edhoc_m1_set_process_ok();
   tst_srv_edhoc_m2_set_compose_ok();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(create_valid_request(),
-                                     create_test_params(), env.response);
+      srv_edhoc_respond_to_message_1(
+          create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
+          env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_OK, result.status);
   tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(result.response);
@@ -108,12 +82,12 @@ static void ensure_context_is_freed_on_failure(
  * @see [RFC
  * 9528 5.4](https://datatracker.ietf.org/doc/html/rfc9528/#name-edhoc-message-3)
  */
-void test_handler_reports_failure_when_receiving_message_3(void) {}
+void test_responder_reports_failure_when_receiving_message_3(void) {}
 
-void test_handler_fails_on_invalid_data(void) {
+void test_responder_fails_on_invalid_data(void) {
   const struct com_writable_buffer empty_response = {0};
   const struct srv_edhoc_parameters valid_parameters =
-      tst_edhoc_srv_get_default_params();
+      tst_edhoc_srv_get_method_0_suite_0_params();
   const struct srv_edhoc_message_1_responder_request valid_request =
       create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
@@ -149,14 +123,15 @@ void test_handler_fails_on_invalid_data(void) {
   }
 }
 
-void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
+void test_responder_fails_when_parser_reports_invalid_request_buffer(void) {
   const struct srv_edhoc_message_1_responder_request invalid_request = {
       .raw_payload = {.bytes = NULL, .length = sizeof(DUMMY_REQUEST_BUFFER)},
   };
 
   const struct srv_edhoc_message_1_responder_result result =
       srv_edhoc_respond_to_message_1(
-          invalid_request, tst_edhoc_srv_get_default_params(), env.response);
+          invalid_request, tst_edhoc_srv_get_method_0_suite_0_params(),
+          env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -164,18 +139,28 @@ void test_handler_fails_when_parser_reports_invalid_request_buffer(void) {
   ensure_context_is_freed_on_failure(result);
 }
 
-void test_handler_fails_when_parser_reports_prefix_extraction_failure(void) {
+void test_responder_fails_when_parser_reports_prefix_extraction_failure(void) {
   tst_srv_edhoc_m1_set_extract_failed();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(create_valid_request(),
-                                     tst_edhoc_srv_get_default_params(),
-                                     env.response);
+      srv_edhoc_respond_to_message_1(
+          create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
+          env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
   tst_edhoc_assert_encoded_error_is_not_empty(result.response);
   ensure_context_is_freed_on_failure(result);
+}
+
+static void only_m2_compose_failure(void) {
+  tst_srv_edhoc_m1_set_process_ok();
+  tst_srv_edhoc_m2_set_compose_failure();
+}
+
+static void only_m2_compose_empty_but_ok(void) {
+  tst_srv_edhoc_m1_set_process_ok();
+  tst_srv_edhoc_m2_compose_set_compose_empty_length();
 }
 
 /**
@@ -186,7 +171,7 @@ void test_handler_fails_when_parser_reports_prefix_extraction_failure(void) {
  * @see [RFC 9528, Section
  * 6](https://datatracker.ietf.org/doc/html/rfc9528/#name-error-handling)
  */
-void test_handler_fails_on_library_errors(void) {
+void test_responder_fails_on_library_errors(void) {
   const struct {
     const char* description;
     void (*setup_scenario)(void);
@@ -194,10 +179,9 @@ void test_handler_fails_on_library_errors(void) {
   } cases[] = {
       {"setup fails", tst_srv_edhoc_m1_set_process_failure,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED},
-      {"composition fails", tst_srv_edhoc_m2_set_compose_failure,
+      {"composition fails", only_m2_compose_failure,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED},
-      {"composition produces empty buffer",
-       tst_srv_edhoc_m2_compose_set_compose_empty_length,
+      {"composition produces empty buffer", only_m2_compose_empty_but_ok,
        SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED},
   };
 
@@ -206,9 +190,9 @@ void test_handler_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_responder_result result =
-        srv_edhoc_respond_to_message_1(create_valid_request(),
-                                       tst_edhoc_srv_get_default_params(),
-                                       env.response);
+        srv_edhoc_respond_to_message_1(
+            create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
+            env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

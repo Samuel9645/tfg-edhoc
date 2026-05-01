@@ -15,7 +15,6 @@
 
 void tst_srv_edhoc_m1_set_process_failure(void);
 void tst_srv_edhoc_m1_set_process_ok(void);
-void tst_srv_edhoc_m1_use_real_process(void);
 
 void tst_srv_edhoc_m1_reset_process_mock(void);
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_MOCKS_TST_SRV_MOCK_EDHOC_MESSAGE_1_PROCESS_H_

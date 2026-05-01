@@ -61,6 +61,12 @@ struct srv_edhoc_parse_message_1_result srv_edhoc_parse_message_1(
                        "Message 1 Parser error: Prefix extraction failed",
                        error_response));
   }
+  if (!extracted_fields.is_forward_flow) {
+    return failure(SRV_EDHOC_MSG1_PARSE_ERR_UNSUPPORTED_FORWARD_FLOW,
+                   com_edhoc_add_internal_error_view(
+                       "Message 1 Parser error: Unsupported forward flow",
+                       error_response));
+  }
   return ok((struct com_readonly_buffer){
       .bytes = extracted_fields.edhoc_message_ptr,
       .length = extracted_fields.edhoc_message_size,

@@ -15,22 +15,40 @@
 #include <stdbool.h>
 
 static bool extract_flow_should_fail = false;
+static bool use_real_extract_flow = true;
 
 void tst_srv_edhoc_m1_set_extract_failed(void) {
   extract_flow_should_fail = true;
+  use_real_extract_flow = false;
 }
 
-void tst_srv_edhoc_m1_reset_parse_mock(void) {
+void tst_srv_edhoc_m1_set_mocked_extract_ok(void) {
   extract_flow_should_fail = false;
+  use_real_extract_flow = false;
 }
 
-int edhoc_extract_flow_info(struct edhoc_extracted_fields* extracted_fields) {
+void tst_srv_edhoc_m1_reset_extract_mock(void) {
+  extract_flow_should_fail = false;
+  use_real_extract_flow = true;
+}
+
+extern int __real_edhoc_extract_flow_info(  // NOLINT(*-reserved-identifier)
+                                            // we need this
+    struct edhoc_extracted_fields* extracted_fields);
+
+int __wrap_edhoc_extract_flow_info(  // NOLINT(*-reserved-identifier)
+                                     // we need this
+    struct edhoc_extracted_fields* extracted_fields) {
   if (extract_flow_should_fail) {
     return EDHOC_ERROR_INVALID_ARGUMENT;
+  }
+  if (use_real_extract_flow) {
+    return __real_edhoc_extract_flow_info(extracted_fields);
   }
   if (extracted_fields != NULL && extracted_fields->edhoc_message_ptr != NULL) {
     extracted_fields->edhoc_message_ptr += 1;
     extracted_fields->edhoc_message_size -= 1;
+    extracted_fields->is_forward_flow = true;
   }
   return EDHOC_SUCCESS;
 }

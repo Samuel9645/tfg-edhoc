@@ -12,6 +12,7 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_TST_SRV_M1_PARSER_STUBS_H_
 
 void tst_srv_edhoc_m1_set_extract_failed(void);
-void tst_srv_edhoc_m1_reset_parse_mock(void);
+void tst_srv_edhoc_m1_set_mocked_extract_ok(void);
+void tst_srv_edhoc_m1_reset_extract_mock(void);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_PARSER_TST_SRV_M1_PARSER_STUBS_H_

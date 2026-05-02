@@ -12,7 +12,7 @@
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/client/handshake/message_4/cli_m4_process.h"
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
 #include "edhoc/credentials/cred_pub_data.h"

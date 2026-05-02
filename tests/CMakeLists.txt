@@ -160,7 +160,7 @@ set(SETUP_CONTEXT_MOCK
 )
 
 set(SETUP_CONTEXT_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_context_setup.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup_context.c
 )
 
 add_unity_test(test_edhoc_setup_context

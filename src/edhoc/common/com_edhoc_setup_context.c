@@ -1,5 +1,5 @@
 
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>

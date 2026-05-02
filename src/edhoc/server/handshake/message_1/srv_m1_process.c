@@ -14,7 +14,7 @@
 
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process_errors.h"
 
 static struct srv_edhoc_message_1_process_result ok(

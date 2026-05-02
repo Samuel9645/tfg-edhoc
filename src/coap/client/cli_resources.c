@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "common/com_session_resources.h"
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 
 /**
  * @brief Infrastructure sub-structure: CoAP context, session, and endpoint

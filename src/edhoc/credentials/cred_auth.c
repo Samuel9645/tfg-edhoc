@@ -3,7 +3,7 @@
 #include <edhoc_cipher_suite_2.h>
 #include <edhoc_values.h>
 
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 
 static void initialize_credential_key(struct edhoc_auth_creds* credentials,
                                       const uint8_t* public_key,

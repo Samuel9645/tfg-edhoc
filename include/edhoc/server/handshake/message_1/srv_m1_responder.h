@@ -12,7 +12,7 @@
 #define EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_
 
 #include "common/com_data_models.h"
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
 // TODO: maybe inline this struct

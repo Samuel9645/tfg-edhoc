@@ -12,7 +12,7 @@
 #include <unity.h>
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
-#include "edhoc/common/com_edhoc_context_setup.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/common/setup_context/mocks/tst_com_mock_edhoc_setup_context.h"
 #include "edhoc/common/tst_edhoc_params.h"
 

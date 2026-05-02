@@ -17,6 +17,9 @@
 #include "edhoc/client/handshake/mocks/tst_cli_mock_edhoc_process_error.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 
+// Array format extracted from [RFC
+// 9528](https://datatracker.ietf.org/doc/html/rfc9528/#name-initiator-state-machine)
+// with the help of https://cbor.me/
 enum {
   TST_PREF_SUITES_ERR_CODE_2 = 0x2,
   TST_PREF_SUITES_CBOR_ARRAY_3 = 0x83,
@@ -66,9 +69,6 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
 
   // Extracted from [RFC
   // 9529 3.2](https://datatracker.ietf.org/doc/html/rfc9529#name-error)
-  // Array format extracted from [RFC
-  // 9528](https://datatracker.ietf.org/doc/html/rfc9528/#name-initiator-state-machine)
-  // with the help of https://cbor.me/
   const struct {
     const uint8_t* data;
     const size_t written_length;
@@ -93,6 +93,8 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
 }
 
 void test_prioritize_initiator_suite_preference(void) {
+  // This case seems imposible but since libedhoc only support cipher suites 0
+  // and 2, and we are only checking that the order is preserved, is valid
   const uint8_t SUITES_3_2_0[] = {
       TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_3,
       TST_PREF_SUITES_SUITE_3, TST_PREF_SUITES_SUITE_2,

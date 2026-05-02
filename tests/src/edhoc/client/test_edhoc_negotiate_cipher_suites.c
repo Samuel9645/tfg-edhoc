@@ -157,6 +157,8 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
         initial_preferred_suites, result.renegotiation_suites.suites);
     assert_last_suite_is_the_preferred_suite(
         result, test_cases[i].expected_preferred_suite);
+    TEST_ASSERT_EQUAL_PTR(test_cases[i].expected_preferred_suite,
+                          result.selected_suite);
   }
 }
 
@@ -184,6 +186,7 @@ void test_prioritize_initiator_suite_preference(void) {
   assert_renegotiation_contains_initial_preferences(
       initial_preferred_suites, result.renegotiation_suites.suites);
   assert_last_suite_is_the_preferred_suite(result, &COM_EDHOC_SUITE_0);
+  TEST_ASSERT_EQUAL_PTR(&COM_EDHOC_SUITE_0, result.selected_suite);
 }
 
 void assert_result_empty(

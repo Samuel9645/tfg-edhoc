@@ -7,20 +7,21 @@
  * @see [RFC
  * 9528 6.3.1](https://datatracker.ietf.org/doc/html/rfc9528/#name-cipher-suite-negotiation)
  */
-#include <edhoc.h>
-
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 
+#include <edhoc.h>
+
 static struct cli_edhoc_suites_negotiation_result ok(
-    const struct cli_edhoc_renegotiation_list renegotiation_suites) {
+    const struct cli_edhoc_renegotiation_list renegotiation_suites,
+    const struct com_edhoc_cipher_suite_details* const selected_suite) {
   return (struct cli_edhoc_suites_negotiation_result){
       .status = CLI_EDHOC_NEGOTIATE_SUITES_OK,
       .renegotiation_suites = renegotiation_suites,
+      .selected_suite = selected_suite,
   };
 }
 
-static struct cli_edhoc_suites_negotiation_result no_common_suites(
-    void) {
+static struct cli_edhoc_suites_negotiation_result no_common_suites(void) {
   return (struct cli_edhoc_suites_negotiation_result){
       .status = CLI_EDHOC_NEGOTIATE_SUITES_NO_COMMON_SUITES};
 }
@@ -45,8 +46,7 @@ static struct cli_edhoc_renegotiation_list merge_suite_list(
   return result;
 }
 
-struct cli_edhoc_suites_negotiation_result
-cli_edhoc_negotiate_suites(
+struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     const struct com_edhoc_cipher_suite_list own_supported_suites,
     const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
     const struct com_readonly_buffer encoded_error_buffer) {
@@ -54,8 +54,7 @@ cli_edhoc_negotiate_suites(
     return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_EMPTY_ERROR_BUFFER);
   }
   if (!com_edhoc_cipher_suites_are_valid(own_supported_suites)) {
-    return failure(
-        CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_SUPPORTED_SUITES);
+    return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_SUPPORTED_SUITES);
   }
   if (!com_edhoc_cipher_suites_are_valid(own_initial_preferred_suites)) {
     return failure(
@@ -63,8 +62,7 @@ cli_edhoc_negotiate_suites(
   }
   if (own_initial_preferred_suites.number_of_suites + 1 >
       MAX_RENEGOTIATION_SIZE) {
-    return failure(
-        CLI_EDHOC_NEGOTIATE_SUITES_ERR_INTERNAL_BUFFER_TOO_SMALL);
+    return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_INTERNAL_BUFFER_TOO_SMALL);
   }
 
   enum edhoc_error_code received_code = -1;
@@ -82,8 +80,8 @@ cli_edhoc_negotiate_suites(
     const int32_t own_suite_value = current_suite->metadata->value;
     for (size_t i = 0; i < received_info.written_entries; i++) {
       if (received_info.cipher_suites[i] == own_suite_value) {
-        return ok(
-            merge_suite_list(own_initial_preferred_suites, current_suite));
+        return ok(merge_suite_list(own_initial_preferred_suites, current_suite),
+                  current_suite);
       }
     }
   }

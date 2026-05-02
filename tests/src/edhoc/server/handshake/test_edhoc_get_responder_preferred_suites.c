@@ -243,6 +243,25 @@ void test_fails_on_invalid_data(void) {
        .initial_preferred_suites = DUMMY_SUITE_LIST,
        .expected_status =
            CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES},
+      {.buffer = ONLY_SUITE_3_BUFFER,
+       .initial_preferred_suites = INVALID_SUITES,
+       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
+       .expected_status =
+           CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
+
+      {.buffer = ONLY_SUITE_3_BUFFER,
+       .initial_preferred_suites = {.number_of_suites = 1, .suites = NULL},
+       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
+       .expected_status =
+           CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
+
+      {.buffer = ONLY_SUITE_3_BUFFER,
+       .initial_preferred_suites =
+           {.number_of_suites = 1,
+            .suites = (const struct com_edhoc_cipher_suite_details*[]){NULL}},
+       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
+       .expected_status =
+           CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
   };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);

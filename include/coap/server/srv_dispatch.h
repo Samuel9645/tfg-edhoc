@@ -20,6 +20,7 @@
  */
 void srv_coap_dispatch_edhoc_post(
     coap_session_t* session, const coap_pdu_t* request,
-    struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response);
+                                  struct com_edhoc_parameters edhoc_parameters,
+                                  coap_pdu_t* response);
 
 #endif  // COAP_SERVER_SRV_DISPATCH_H_

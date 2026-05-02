@@ -86,18 +86,18 @@ void test_responder_reports_failure_when_receiving_message_3(void) {}
 
 void test_responder_fails_on_invalid_data(void) {
   const struct com_writable_buffer empty_response = {0};
-  const struct srv_edhoc_parameters valid_parameters =
+  const struct com_edhoc_parameters valid_parameters =
       tst_edhoc_srv_get_method_0_suite_0_params();
   const struct srv_edhoc_message_1_responder_request valid_request =
       create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
       .raw_payload = {.bytes = NULL, .length = 0}};
-  const struct srv_edhoc_parameters empty_params = {0};
+  const struct com_edhoc_parameters empty_params = {0};
 
   const struct {
     const char* description;
     struct srv_edhoc_message_1_responder_request request;
-    struct srv_edhoc_parameters edhoc_parameters;
+    struct com_edhoc_parameters edhoc_parameters;
     struct com_writable_buffer response;
     enum srv_edhoc_message_1_responder_status expected_status;
   } test_cases[] = {

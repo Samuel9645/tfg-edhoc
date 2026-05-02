@@ -23,7 +23,7 @@ typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
 typedef struct srv_edhoc_message_1_responder_result (
     *srv_edhoc_m1_responder_fn)(
     struct srv_edhoc_message_1_responder_request request_data,
-    struct srv_edhoc_parameters edhoc_parameters,
+    struct com_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer response_data);
 
 typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(
@@ -114,7 +114,7 @@ struct srv_coap_dispatch_deps {
  */
 void srv_coap_dispatch_post_with_dependencies(
     coap_session_t* session, const coap_pdu_t* request,
-    struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
+    struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

@@ -14,20 +14,19 @@
 #include "common/com_data_models.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 
-struct srv_edhoc_methods {
+struct com_edhoc_methods {
   const enum edhoc_method* data;
   const size_t size;
 };
 
-struct srv_edhoc_parameters {
+struct com_edhoc_parameters {
   const struct edhoc_credentials* credentials;
   const struct com_edhoc_cipher_suite_list supported_cipher_suites;
-  const struct com_edhoc_cipher_suite_list preferred_cipher_suites;
   const struct com_edhoc_cipher_suite_details* selected_cipher_suite;
-  const struct srv_edhoc_methods methods;
+  const struct com_edhoc_methods methods;
 };
 
-struct srv_edhoc_validate_parameters_result {
+struct com_edhoc_validate_parameters_result {
   bool valid_parameters;
   const struct com_readonly_buffer error_message;
 };
@@ -40,7 +39,7 @@ struct srv_edhoc_validate_parameters_result {
  * @return Struct containing valid_parameters as true and empty error message on
  * success, false valid_parameters and a view of the error message on failure
  */
-struct srv_edhoc_validate_parameters_result com_edhoc_validate_parameters(
-    const struct srv_edhoc_parameters* parameters,
+struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
+    const struct com_edhoc_parameters* parameters,
     struct com_writable_buffer error_buffer);
 #endif  // EDHOC_COMMON_COM_EDHOC_PARAMETERS_H_

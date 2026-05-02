@@ -12,7 +12,7 @@
 
 #include "edhoc/common/com_edhoc_parameters.h"
 
-struct srv_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void);
-struct srv_edhoc_parameters tst_edhoc_srv_get_method_3_suite_2_params(void);
+struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void);
+struct com_edhoc_parameters tst_edhoc_srv_get_method_3_suite_2_params(void);
 
 #endif  // EDHOC_COMMON_TST_EDHOC_DEFAULT_PARAMS_H_

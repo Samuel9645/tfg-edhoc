@@ -38,5 +38,6 @@ extern const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0;
 extern const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0;
 extern const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_2;
 extern const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_2;
+extern const struct com_edhoc_cipher_suite_list COM_EDHOC_SUITES_2_0;
 
 #endif  // EDHOC_COMMON_COM_EDHOC_CIPHER_SUITES_H_

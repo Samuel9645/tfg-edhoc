@@ -76,7 +76,7 @@ void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
     const struct srv_edhoc_message_1_responder_request request_data,
-    const struct srv_edhoc_parameters edhoc_parameters,
+    const struct com_edhoc_parameters edhoc_parameters,
     const struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
@@ -88,7 +88,7 @@ stb_srv_edhoc_m1_responder_protocol_failure(
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     const struct srv_edhoc_message_1_responder_request request_data,
-    const struct srv_edhoc_parameters edhoc_parameters,
+    const struct com_edhoc_parameters edhoc_parameters,
     const struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;

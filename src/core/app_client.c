@@ -64,6 +64,110 @@ static bool send_message(struct cli_coap_exchange* exchange,
   return true;
 }
 
+enum cli_first_interaction_status {
+  CLI_EDHOC_NEGOTIATION_OK,
+  CLI_EDHOC_NEGOTIATION_RENEGOTIATE,
+  CLI_EDHOC_NEGOTIATION_ERR
+};
+
+struct cli_edhoc_negotiation_attempt_result {
+  enum cli_first_interaction_status status;
+  struct com_readonly_buffer response_payload;
+};
+
+static struct cli_edhoc_negotiation_attempt_result failure(void) {
+  return (struct cli_edhoc_negotiation_attempt_result){
+      .status = CLI_EDHOC_NEGOTIATION_ERR};
+}
+
+static struct cli_edhoc_negotiation_attempt_result ok(
+    const struct cli_coap_wait_and_get_result wait_and_get_result) {
+  return (struct cli_edhoc_negotiation_attempt_result){
+      .status = CLI_EDHOC_NEGOTIATION_OK,
+      .response_payload = wait_and_get_result.response};
+}
+
+static struct cli_edhoc_negotiation_attempt_result renegotiation(
+    const struct cli_coap_wait_and_get_result wait_and_get_result) {
+  return (struct cli_edhoc_negotiation_attempt_result){
+      .status = CLI_EDHOC_NEGOTIATION_RENEGOTIATE,
+      .response_payload = wait_and_get_result.response};
+}
+
+static struct cli_edhoc_negotiation_attempt_result
+cli_edhoc_perform_negotiation_attempt(
+    struct cli_resources* resources, const struct com_edhoc_parameters params,
+    const struct com_writable_buffer payload_buffer) {
+  if (com_edhoc_setup_context(&resources->edhoc_context, params,
+                              cli_resources_get_payload(resources))
+          .status != COM_EDHOC_SETUP_CTX_OK) {
+    coap_log_err("Failed to initialize EDHOC context\n");
+    return failure();
+  }
+
+  const struct cli_edhoc_message_1_compose_result compose_result =
+      cli_edhoc_compose_message_1(&resources->edhoc_context, payload_buffer);
+  if (compose_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
+    coap_log_err("Failed to compose Message 1\n");
+    return failure();
+  }
+  struct cli_coap_exchange* exchange = resources->exchange;
+  if (!send_message(exchange, compose_result.buffer)) {
+    return failure();
+  }
+  const struct cli_coap_wait_and_get_result wait_and_get_result =
+      cli_coap_exchange_wait_and_get(exchange);
+  if (wait_and_get_result.status != STATUS_COAP_OK) {
+    coap_log_err("Failed get Message 1 response\n");
+    return failure();
+  }
+  if (cli_coap_exchange_response_is_error(exchange)) {
+    coap_log_info(
+        "Received error response to Message 1, attempting renegotiation\n");
+    return renegotiation(wait_and_get_result);
+  }
+  return ok(wait_and_get_result);
+}
+
+static struct cli_edhoc_negotiation_attempt_result
+cli_edhoc_resolve_negotiation(
+    struct cli_resources* client_resources,
+    const struct com_edhoc_parameters edhoc_parameters,
+    const struct com_edhoc_cipher_suite_list supported_suites,
+    const struct com_edhoc_cipher_suite_list initial_preferred_suites,
+    const struct com_writable_buffer payload_buffer) {
+  const struct cli_edhoc_negotiation_attempt_result result =
+      cli_edhoc_perform_negotiation_attempt(client_resources, edhoc_parameters,
+                                            payload_buffer);
+  if (result.status == CLI_EDHOC_NEGOTIATION_ERR) {
+    coap_log_err("Failed to perform initial EDHOC M1-M2 exchange\n");
+    return result;
+  }
+  if (result.status == CLI_EDHOC_NEGOTIATION_RENEGOTIATE) {
+    const struct cli_edhoc_suites_negotiation_result negotiation_result =
+        cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
+                                   result.response_payload);
+    if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
+      return failure();
+    }
+    const struct com_edhoc_parameters retry_params = {
+        .credentials = edhoc_parameters.credentials,
+        .methods = edhoc_parameters.methods,
+        .supported_cipher_suites =
+            {
+                .number_of_suites =
+                    negotiation_result.renegotiation_suites.number_of_suites,
+                .suites = negotiation_result.renegotiation_suites.suites,
+            },
+        .selected_cipher_suite = negotiation_result.selected_suite};
+    cli_reset_edhoc_context(client_resources);
+
+    return cli_edhoc_perform_negotiation_attempt(client_resources, retry_params,
+                                                 payload_buffer);
+  }
+  return result;
+}
+
 enum com_emulation_status core_run_client(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_DEBUG);
@@ -89,87 +193,82 @@ enum com_emulation_status core_run_client(void) {
   if (create_session_result.status != CLI_COAP_CREATE_SESSION_OK) {
     return COM_EMULATION_FAILURE;
   }
-  struct cli_resources* client_resources = cli_resources_create(
-      create_context_result.context, create_session_result.session,
-      parse_and_resolve_uri_result.uri, parse_and_resolve_uri_result.address);
-  if (client_resources == NULL) {
-    coap_log_err("Failed to create client resources\n");
-  }
 
   const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
-  const struct srv_edhoc_parameters edhoc_parameters = {
+  const struct com_edhoc_cipher_suite_list SUPPORTED_SUITES =
+      COM_EDHOC_SUITES_2_0;
+  const struct com_edhoc_cipher_suite_list INITIAL_PREFERRED_SUITES =
+      COM_EDHOC_ONLY_SUITE_0;
+  const struct com_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
-      .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
-      .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
-      .selected_cipher_suite = COM_EDHOC_ONLY_SUITE_2.suites[0],
+      .supported_cipher_suites = INITIAL_PREFERRED_SUITES,
+      .selected_cipher_suite = INITIAL_PREFERRED_SUITES.suites[0],
       .methods =
           {
               .data = SUPPORTED_METHODS,
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
   };
-  if (!cli_resources_setup_session(client_resources, edhoc_parameters)) {
-    coap_log_err("Failed to setup EDHOC session\n");
-    cli_coap_cleanup_resources(client_resources);
-    return COM_EMULATION_FAILURE;
-  }
-  const struct com_writable_buffer payload_buffer =
-      cli_resources_get_payload(client_resources);
 
-  struct edhoc_context* edhoc_context =
-      cli_resources_get_edhoc_context(client_resources);
-  if (edhoc_context == NULL) {
-    coap_log_err("Failed to get EDHOC context\n");
-    cli_coap_cleanup_resources(client_resources);
-    return COM_EMULATION_FAILURE;
-  }
-  const struct cli_edhoc_message_1_compose_result message_1_result =
-      cli_edhoc_compose_message_1(edhoc_context, payload_buffer);
-  if (message_1_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
-    coap_log_err("Failed to compose EDHOC message 1\n");
-    cli_coap_cleanup_resources(client_resources);
+  struct cli_resources client_resources = {0};
+  const struct com_writable_buffer payload_buffer = {
+      .bytes = client_resources.payload, .capacity = CONFIG_COAP_MAX_PDU_SIZE};
+  const struct cli_coap_exchange_session_data session_data = {
+      .session = create_session_result.session,
+      .context = create_context_result.context,
+      .destination = parse_and_resolve_uri_result.address,
+      .uri = parse_and_resolve_uri_result.uri,
+  };
+  client_resources.exchange =
+      cli_coap_init_exchange(&session_data, payload_buffer);
+  if (client_resources.exchange == NULL) {
+    coap_log_err("Failed to initialize CoAP exchange\n");
     return COM_EMULATION_FAILURE;
   }
 
-  struct cli_coap_exchange* exchange =
-      cli_resources_get_exchange(client_resources);
-  if (exchange == NULL) {
-    coap_log_err("Failed to get CoAP exchange for sending message 1\n");
-    cli_coap_cleanup_resources(client_resources);
+  if (com_edhoc_setup_context(&client_resources.edhoc_context, edhoc_parameters,
+                              payload_buffer)
+          .status != COM_EDHOC_SETUP_CTX_OK) {
+    coap_log_err("Failed to initialize EDHOC context\n");
     return COM_EMULATION_FAILURE;
   }
-  if (!send_message(exchange, message_1_result.buffer)) {
-    coap_log_err("Failed to send CoAP request for message 1\n");
-    cli_coap_cleanup_resources(client_resources);
-    return COM_EMULATION_FAILURE;
-  }
-  const struct cli_coap_wait_and_get_result wait_and_get_result =
-      cli_coap_exchange_wait_and_get(exchange);
-  if (wait_and_get_result.status != STATUS_COAP_OK) {
-    coap_log_err("Failed to receive EDHOC message 2\n");
-    cli_coap_cleanup_resources(client_resources);
+
+  const struct cli_edhoc_negotiation_attempt_result result =
+      cli_edhoc_resolve_negotiation(&client_resources, edhoc_parameters,
+                                    SUPPORTED_SUITES, INITIAL_PREFERRED_SUITES,
+                                    payload_buffer);
+
+  if (result.status != CLI_EDHOC_NEGOTIATION_OK) {
+    coap_log_err("Handshake failed after all attempts\n");
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
   const struct cli_edhoc_message_2_initiator_request
       message_2_initiator_request = {
-          .raw_payload = wait_and_get_result.response,
-          .edhoc_context = edhoc_context,
+          .raw_payload = result.response_payload,
+          .edhoc_context = &client_resources.edhoc_context,
       };
   const struct cli_edhoc_message_2_initiator_result message_2_initiator_result =
       cli_edhoc_respond_to_message_2(message_2_initiator_request,
                                      payload_buffer);
 
+  struct cli_coap_exchange* exchange = client_resources.exchange;
+  if (exchange == NULL) {
+    coap_log_err("Failed to get exchange\n");
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("%s", cli_edhoc_respond_to_message_2_status_code_to_string(
                            message_2_initiator_result.status));
     send_message(exchange, message_2_initiator_result.request);
-    cli_coap_cleanup_resources(client_resources);
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
   if (!send_message(exchange, message_2_initiator_result.request)) {
     coap_log_err("Failed to send EDHOC message 3\n");
-    cli_coap_cleanup_resources(client_resources);
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
@@ -177,18 +276,19 @@ enum com_emulation_status core_run_client(void) {
       cli_coap_exchange_wait_and_get(exchange);
   if (wait_and_get_result2.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 4\n");
-    cli_coap_cleanup_resources(client_resources);
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
   const struct cli_edhoc_message_4_process_result message_4_result =
-      cli_edhoc_process_message_4(edhoc_context, wait_and_get_result2.response,
+      cli_edhoc_process_message_4(&client_resources.edhoc_context,
+                                  wait_and_get_result2.response,
                                   payload_buffer);
   if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
     coap_log_err("Failed to process EDHOC message 4\n");
     send_message(exchange, message_4_result.error_buffer);
-    cli_coap_cleanup_resources(client_resources);
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  cli_coap_cleanup_resources(client_resources);
+  cli_cleanup_resources(&client_resources);
   return COM_EMULATION_SUCCESS;
 }

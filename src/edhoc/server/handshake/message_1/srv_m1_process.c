@@ -43,7 +43,7 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     const struct com_writable_buffer error_buffer,
-    const struct srv_edhoc_parameters context_parameters) {
+    const struct com_edhoc_parameters context_parameters) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }

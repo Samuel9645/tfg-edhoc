@@ -39,7 +39,7 @@ struct com_edhoc_setup_context_result {
  * deinitialized with edhoc_context_deinit after use to free resources.
  */
 struct com_edhoc_setup_context_result com_edhoc_setup_context(
-    struct edhoc_context* context, struct srv_edhoc_parameters edhoc_parameters,
+    struct edhoc_context* context, struct com_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer error_buffer);
 
 #endif  // EDHOC_COMMON_EDHOC_SETUP_H_

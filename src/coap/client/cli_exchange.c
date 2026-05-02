@@ -71,6 +71,15 @@ static coap_response_t coap_client_coap_response_handler(
   return COAP_RESPONSE_OK;
 }
 
+void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange) {
+  if (exchange == NULL) {
+    return;
+  }
+  coap_session_release(exchange->session_data.session);
+  coap_free_context(exchange->session_data.context);
+  free(exchange);
+}
+
 bool cli_coap_exchange_response_is_error(
     const struct cli_coap_exchange* exchange) {
   if (exchange == NULL) {
@@ -111,17 +120,14 @@ struct cli_coap_exchange* cli_coap_init_exchange(
   memcpy(&exchange->incoming_response_buffer, &response_buffer,
          sizeof(struct com_writable_buffer));
   void* previous_session_data =
-      coap_session_set_app_data2(session_data->session, exchange, free);
+      coap_session_set_app_data2(session_data->session, exchange, NULL);
   if (previous_session_data != NULL) {
-    coap_session_set_app_data2(session_data->session, NULL, NULL);
-    coap_log_err("unexpected existing session app-data in client\n");
-    free(exchange);
+    coap_log_warn(
+        "Cleaning up previous exchange from failed negotiation attempt...\n");
     free(previous_session_data);
-    return NULL;
   }
   coap_register_response_handler(session_data->context,
                                  coap_client_coap_response_handler);
-
   return exchange;
 }
 

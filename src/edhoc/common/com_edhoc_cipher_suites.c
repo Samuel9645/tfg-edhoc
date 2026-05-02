@@ -81,3 +81,11 @@ const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_2 = {
     .number_of_suites = sizeof(SUITE_2_PTRS) / sizeof(SUITE_2_PTRS[0]),
     .suites = SUITE_2_PTRS,
 };
+
+static const struct com_edhoc_cipher_suite_details* SUITE_0_2_PTRS[] = {
+    &COM_EDHOC_SUITE_0, &COM_EDHOC_SUITE_2};
+
+const struct com_edhoc_cipher_suite_list COM_EDHOC_SUITES_2_0 = {
+    .number_of_suites = sizeof(SUITE_0_2_PTRS) / sizeof(SUITE_0_2_PTRS[0]),
+    .suites = SUITE_0_2_PTRS,
+};

@@ -21,7 +21,7 @@ static const struct srv_coap_dispatch_deps
 
 void srv_coap_dispatch_edhoc_post(
     coap_session_t* session, const coap_pdu_t* request,
-    const struct srv_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
+    const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
   srv_coap_dispatch_post_with_dependencies(
       session, request, edhoc_parameters, response,
       &coap_server_edhoc_dispatch_default_deps);

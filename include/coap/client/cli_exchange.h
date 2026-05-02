@@ -58,13 +58,21 @@ struct cli_coap_exchange;
  * @return A pointer to the initialized exchange on success, or NULL if
  * allocation or session binding fails.
  *
- * @warning This function allocates memory using calloc(). The memory is managed
- * by libcoap, ensure the CoAP session is eventually terminated to trigger the
- * automatic deletion callback.
+ * @warning This function allocates memory using calloc(). Ensure to call
+ * cli_coap_cleanup_exchange() to free resources when the exchange is no longer
+ * needed.
  */
 struct cli_coap_exchange* cli_coap_init_exchange(
     const struct cli_coap_exchange_session_data* session_data,
     struct com_writable_buffer response_buffer);
+
+/**
+ * @brief Cleans up any CoAP related resources and resets session state.
+ * @param exchange exchange containing the CoAP data to clean up
+ * @note This function frees the exchange struct and any associated resources.
+ * After calling this function, the exchange pointer should not be used.
+ */
+void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange);
 
 bool cli_coap_exchange_response_is_error(
     const struct cli_coap_exchange* exchange);

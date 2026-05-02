@@ -41,7 +41,7 @@ coap_pdu_code_t srv_coap_process_message_1_result(
     coap_session_t* session) {
   if (message_1_result.status != SRV_EDHOC_MSG1_RESPONDER_OK) {
     const char* error_message =
-        srv_edhoc_handle_message_1_status_code_to_string(
+        srv_edhoc_message_1_responder_status_code_to_string(
             message_1_result.status);
     coap_log_err("Message 1 processing failed: %s\n", error_message);
     return map_message_1_status_to_response(message_1_result.status);

@@ -38,10 +38,10 @@ struct srv_edhoc_message_1_responder_request {
  */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     struct srv_edhoc_message_1_responder_request request,
-    struct srv_edhoc_parameters context_parameters,
+    struct com_edhoc_parameters context_parameters,
     struct com_writable_buffer response);
 
-const char* srv_edhoc_handle_message_1_status_code_to_string(
+const char* srv_edhoc_message_1_responder_status_code_to_string(
     enum srv_edhoc_message_1_responder_status status);
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_HANDLER_H_

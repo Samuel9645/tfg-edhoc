@@ -136,7 +136,7 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
   const struct srv_edhoc_message_1_request request = create_msg1_request(
       MESSAGE_1_SUITE_6_REQUEST, sizeof(MESSAGE_1_SUITE_6_REQUEST));
   use_real_implementations();
-  const struct srv_edhoc_parameters method_3_suite_2_params =
+  const struct com_edhoc_parameters method_3_suite_2_params =
       tst_edhoc_srv_get_method_3_suite_2_params();
 
   const struct srv_edhoc_message_1_process_result result =

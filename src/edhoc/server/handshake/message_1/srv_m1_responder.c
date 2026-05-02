@@ -42,7 +42,7 @@ static struct srv_edhoc_message_1_responder_result invalid_response_buffer(
 
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     const struct srv_edhoc_message_1_responder_request request,
-    const struct srv_edhoc_parameters context_parameters,
+    const struct com_edhoc_parameters context_parameters,
     const struct com_writable_buffer response) {
   if (!com_writable_buffer_is_writable(response)) {
     return invalid_response_buffer();
@@ -76,7 +76,7 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
   return ok(process_result.context, compose_result.buffer);
 }
 
-const char* srv_edhoc_handle_message_1_status_code_to_string(
+const char* srv_edhoc_message_1_responder_status_code_to_string(
     const enum srv_edhoc_message_1_responder_status status) {
   switch (status) {
   case SRV_EDHOC_MSG1_RESPONDER_OK:

@@ -19,11 +19,12 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                coap_pdu_t* response) {
   (void)resource;
   (void)query;
-  const struct srv_edhoc_parameters edhoc_parameters = {
+  const struct com_edhoc_cipher_suite_list supported_suites =
+      COM_EDHOC_ONLY_SUITE_2;
+  const struct com_edhoc_parameters edhoc_parameters = {
       .credentials = &CRED_EDHOC_SRV_CRED,
-      .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
-      .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
-      .selected_cipher_suite = COM_EDHOC_ONLY_SUITE_2.suites[0],
+      .supported_cipher_suites = supported_suites,
+      .selected_cipher_suite = supported_suites.suites[0],
       .methods =
           {
               .data = SUPPORTED_METHODS,

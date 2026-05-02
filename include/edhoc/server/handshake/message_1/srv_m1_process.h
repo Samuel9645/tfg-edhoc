@@ -38,7 +38,7 @@ struct srv_edhoc_message_1_request {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     struct srv_edhoc_message_1_request request,
     struct com_writable_buffer error_buffer,
-    struct srv_edhoc_parameters context_parameters);
+    struct com_edhoc_parameters context_parameters);
 
 enum srv_edhoc_cleanup_context_status {
   SRV_EDHOC_CLEANUP_OK = 0,

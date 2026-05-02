@@ -40,6 +40,16 @@ static const struct com_edhoc_cipher_suite_list* get_cipher_suites_0_2_list(
   return &CIPHER_SUITE_0_2;
 }
 
+void assert_suite_details_are_equal(
+    const struct com_edhoc_cipher_suite_details* current_negotiation_suite,
+    const struct com_edhoc_cipher_suite_details* current_own_suite) {
+  TEST_ASSERT_NOT_NULL(current_negotiation_suite);
+  TEST_ASSERT_NOT_NULL(current_own_suite);
+  TEST_ASSERT_EQUAL_INT32(current_own_suite->metadata->value,
+                          current_negotiation_suite->metadata->value);
+  TEST_ASSERT_EQUAL_PTR(current_own_suite, current_negotiation_suite);
+}
+
 /**
  * @see [RFC 9529
  * 3](https://datatracker.ietf.org/doc/html/rfc9529#name-authentication-with-static-)
@@ -77,12 +87,8 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
                                                  test_buffer);
 
     TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_OK, result.status);
-    TEST_ASSERT_NOT_NULL(result.preferred_suite);
-    TEST_ASSERT_EQUAL_INT(
-        test_cases[i].expected_preferred_suite->metadata->value,
-        result.preferred_suite->metadata->value);
-    TEST_ASSERT_EQUAL_PTR(test_cases[i].expected_preferred_suite,
-                          result.preferred_suite);
+    assert_suite_details_are_equal(result.preferred_suite,
+                                   test_cases[i].expected_preferred_suite);
   }
 }
 
@@ -101,11 +107,8 @@ void test_prioritize_initiator_suite_preference(void) {
                                                test_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_RESP_PREFERRED_SUITES_OK, result.status);
-  TEST_ASSERT_NOT_NULL(result.preferred_suite);
-  TEST_ASSERT_EQUAL_INT(own_supported_suites->suites[0]->metadata->value,
-                        result.preferred_suite->metadata->value);
-  TEST_ASSERT_EQUAL_PTR(own_supported_suites->suites[0],
-                        result.preferred_suite);
+  assert_suite_details_are_equal(result.preferred_suite,
+                                 own_supported_suites->suites[0]);
 }
 
 static const uint8_t ONLY_SUITE_3[] = {TST_PREF_SUITES_ERR_CODE_2,

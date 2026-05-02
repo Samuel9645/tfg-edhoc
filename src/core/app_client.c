@@ -100,6 +100,7 @@ enum com_emulation_status core_run_client(void) {
   const struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
       .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
+      .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
       .methods =
           {
               .data = SUPPORTED_METHODS,

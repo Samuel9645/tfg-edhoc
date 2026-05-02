@@ -40,6 +40,7 @@ static struct srv_edhoc_parameters create_test_params(
     const struct srv_edhoc_methods methods) {
   return (struct srv_edhoc_parameters){.credentials = &DUMMY_TEST_CREDS,
                                        .supported_cipher_suites = suites,
+                                       .preferred_cipher_suites = suites,
                                        .methods = methods};
 }
 
@@ -56,6 +57,6 @@ struct srv_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void) {
 
   return create_test_params(COM_EDHOC_ONLY_SUITE_0, (struct srv_edhoc_methods){
                                                         .data = ONLY_METHOD_0,
-                                                         .size = 1,
-                                                     });
+                                                        .size = 1,
+                                                    });
 }

@@ -22,6 +22,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
   const struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &CRED_EDHOC_SRV_CRED,
       .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
+      .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
       .methods =
           {
               .data = SUPPORTED_METHODS,

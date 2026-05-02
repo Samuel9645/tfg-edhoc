@@ -40,6 +40,11 @@ struct srv_edhoc_validate_parameters_result com_edhoc_validate_parameters(
         "EDHOC parameters validation error: Invalid supported cipher suites",
         error_buffer));
   }
+  if (!com_edhoc_cipher_suites_are_valid(parameters->preferred_cipher_suites)) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Invalid preferred cipher suites",
+        error_buffer));
+  }
   if (parameters->methods.data == NULL || parameters->methods.size == 0) {
     return failure(com_edhoc_add_internal_error_view(
         "EDHOC parameters validation error: Invalid EDHOC methods",

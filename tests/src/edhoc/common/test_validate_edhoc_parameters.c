@@ -41,7 +41,9 @@ void test_fails_on_invalid_parameters(void) {
           .params = {.methods = valid_params.methods,
                      .credentials = valid_params.credentials,
                      .preferred_cipher_suites =
-                         valid_params.preferred_cipher_suites},
+                         valid_params.preferred_cipher_suites,
+                     .selected_cipher_suite =
+                         valid_params.preferred_cipher_suites.suites[0]},
           .expected_error =
               "EDHOC parameters validation error: Invalid supported "
               "cipher suites",
@@ -52,7 +54,9 @@ void test_fails_on_invalid_parameters(void) {
                          valid_params.supported_cipher_suites,
                      .credentials = valid_params.credentials,
                      .preferred_cipher_suites =
-                         valid_params.preferred_cipher_suites},
+                         valid_params.preferred_cipher_suites,
+                     .selected_cipher_suite =
+                         valid_params.preferred_cipher_suites.suites[0]},
           .expected_error =
               "EDHOC parameters validation error: Invalid EDHOC methods",
       },
@@ -62,18 +66,21 @@ void test_fails_on_invalid_parameters(void) {
                          valid_params.supported_cipher_suites,
                      .methods = valid_params.methods,
                      .preferred_cipher_suites =
-                         valid_params.preferred_cipher_suites},
+                         valid_params.preferred_cipher_suites,
+                     .selected_cipher_suite =
+                         valid_params.preferred_cipher_suites.suites[0]},
           .expected_error =
               "EDHOC parameters validation error: Null credentials",
       },
       {
-          .params =
-              {
-                  .supported_cipher_suites =
-                      valid_params.supported_cipher_suites,
-                  .methods = valid_params.methods,
-                  .credentials = valid_params.credentials,
-              },
+          .params = {.supported_cipher_suites =
+                         valid_params.supported_cipher_suites,
+                     .methods = valid_params.methods,
+                     .credentials = valid_params.credentials,
+                     .selected_cipher_suite =
+                         valid_params.preferred_cipher_suites.suites[0]
+
+          },
           .expected_error = "EDHOC parameters validation error: Invalid "
                             "preferred cipher suites",
       },
@@ -82,10 +89,36 @@ void test_fails_on_invalid_parameters(void) {
                          valid_params.supported_cipher_suites,
                      .methods = valid_params.methods,
                      .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
-                     .credentials = valid_params.credentials},
+                     .credentials = valid_params.credentials,
+                     .selected_cipher_suite =
+                         valid_params.preferred_cipher_suites.suites[0]},
           .expected_error =
               "EDHOC parameters validation error: Preferred cipher suites must "
               "be a subset of supported cipher suites",
+      },
+      {
+          .params =
+              {
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .preferred_cipher_suites =
+                      valid_params.preferred_cipher_suites,
+                  .methods = valid_params.methods,
+                  .credentials = valid_params.credentials,
+              },
+          .expected_error = "EDHOC parameters validation error: Invalid "
+                            "selected cipher suite",
+      },
+      {
+          .params = {.supported_cipher_suites =
+                         valid_params.supported_cipher_suites,
+                     .methods = valid_params.methods,
+                     .credentials = valid_params.credentials,
+                     .preferred_cipher_suites =
+                         valid_params.preferred_cipher_suites,
+                     .selected_cipher_suite = &COM_EDHOC_SUITE_2},
+          .expected_error = "EDHOC parameters validation error: Selected "
+                            "cipher suite must be one of the supported ones",
       },
   };
 

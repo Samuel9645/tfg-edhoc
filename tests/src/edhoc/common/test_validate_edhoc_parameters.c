@@ -29,59 +29,66 @@ void test_valid_parameters(void) {
   TEST_ASSERT_TRUE(result.valid_parameters);
 }
 
-void test_invalid_supported_cipher_suites(void) {
+void test_fails_on_invalid_parameters(void) {
   const struct srv_edhoc_parameters valid_params =
       tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct com_edhoc_cipher_suite_list invalid_suites = {
-      .number_of_suites = 1, .suites = NULL};
-  const struct srv_edhoc_parameters params = {
-      .credentials = valid_params.credentials,
-      .supported_cipher_suites = invalid_suites,
-      .methods = valid_params.methods};
 
-  const struct srv_edhoc_validate_parameters_result result =
-      com_edhoc_validate_parameters(&params, error_buffer_view);
+  const struct {
+    struct srv_edhoc_parameters params;
+    const char* expected_error;
+  } test_cases[] = {
+      {
+          .params = {.methods = valid_params.methods,
+                     .credentials = valid_params.credentials,
+                     .preferred_cipher_suites =
+                         valid_params.preferred_cipher_suites},
+          .expected_error =
+              "EDHOC parameters validation error: Invalid supported "
+              "cipher suites",
+      },
 
-  TEST_ASSERT_FALSE(result.valid_parameters);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_message,
-      "EDHOC parameters validation error: Invalid supported cipher suites",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
+      {
+          .params = {.supported_cipher_suites =
+                         valid_params.supported_cipher_suites,
+                     .credentials = valid_params.credentials,
+                     .preferred_cipher_suites =
+                         valid_params.preferred_cipher_suites},
+          .expected_error =
+              "EDHOC parameters validation error: Invalid EDHOC methods",
+      },
 
-void test_invalid_methods(void) {
-  const struct srv_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct srv_edhoc_methods invalid_methods = {.data = NULL, .size = 0};
-  const struct srv_edhoc_parameters params = {
-      .credentials = valid_params.credentials,
-      .supported_cipher_suites = valid_params.supported_cipher_suites,
-      .methods = invalid_methods};
+      {
+          .params = {.supported_cipher_suites =
+                         valid_params.supported_cipher_suites,
+                     .methods = valid_params.methods,
+                     .preferred_cipher_suites =
+                         valid_params.preferred_cipher_suites},
+          .expected_error =
+              "EDHOC parameters validation error: Null credentials",
+      },
+      {
+          .params =
+              {
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .methods = valid_params.methods,
+                  .credentials = valid_params.credentials,
+              },
+          .expected_error = "EDHOC parameters validation error: Invalid "
+                            "preferred cipher suites",
+      }};
 
-  const struct srv_edhoc_validate_parameters_result result =
-      com_edhoc_validate_parameters(&params, error_buffer_view);
+  const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
 
-  TEST_ASSERT_FALSE(result.valid_parameters);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_message,
-      "EDHOC parameters validation error: Invalid EDHOC methods",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
+  for (size_t i = 0; i < test_length; i++) {
+    setUp();
 
-void test_invalid_credentials(void) {
-  const struct srv_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct srv_edhoc_parameters params = {
-      .credentials = NULL,
-      .supported_cipher_suites = valid_params.supported_cipher_suites,
-      .methods = valid_params.methods};
+    const struct srv_edhoc_validate_parameters_result result =
+        com_edhoc_validate_parameters(&test_cases[i].params, error_buffer_view);
 
-  const struct srv_edhoc_validate_parameters_result result =
-      com_edhoc_validate_parameters(&params, error_buffer_view);
-
-  TEST_ASSERT_FALSE(result.valid_parameters);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_message,
-      "EDHOC parameters validation error: Null credentials",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+    TEST_ASSERT_FALSE(result.valid_parameters);
+    tst_edhoc_assert_encoded_error_matches(result.error_message,
+                                           test_cases[i].expected_error,
+                                           EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  }
 }

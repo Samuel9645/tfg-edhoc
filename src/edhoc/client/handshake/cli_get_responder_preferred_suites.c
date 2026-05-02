@@ -38,10 +38,6 @@ static struct cli_edhoc_renegotiation_list merge_suite_list(
   struct cli_edhoc_renegotiation_list result = {0};
   size_t i = 0;
   for (; i < own_initial_preferred_suites.number_of_suites; i++) {
-    if (own_initial_preferred_suites.suites[i]->metadata->value ==
-        preferred_suite->metadata->value) {
-      continue;
-    }
     result.suites[i] = own_initial_preferred_suites.suites[i];
   }
   result.suites[i] = preferred_suite;

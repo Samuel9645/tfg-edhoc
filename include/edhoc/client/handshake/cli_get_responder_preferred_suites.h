@@ -20,14 +20,22 @@ enum cli_edhoc_responder_preferred_suites_status {
   CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_PROCESSING_ERROR
 };
 
+enum { MAX_RENEGOTIATION_SIZE = 10 };
+
+struct cli_edhoc_renegotiation_list {
+  const struct com_edhoc_cipher_suite_details* suites[MAX_RENEGOTIATION_SIZE];
+  size_t number_of_suites;
+};
+
 struct cli_edhoc_responder_preferred_suites_result {
   const enum cli_edhoc_responder_preferred_suites_status status;
-  const struct com_edhoc_cipher_suite_details* preferred_suite;
+  const struct cli_edhoc_renegotiation_list renegotiation_suites;
 };
 
 struct cli_edhoc_responder_preferred_suites_result
 cli_edhoc_get_responder_preferred_suites(
-    const struct com_edhoc_cipher_suite_list* own_supported_suites,
+    struct com_edhoc_cipher_suite_list own_supported_suites,
+    struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
     struct com_readonly_buffer encoded_error_buffer);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_GET_RESPONDER_PREFERRED_SUITES_H_

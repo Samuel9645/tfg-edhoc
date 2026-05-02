@@ -12,10 +12,10 @@
 #include <edhoc.h>
 
 static struct cli_edhoc_responder_preferred_suites_result ok(
-    const struct com_edhoc_cipher_suite_details* preferred_suite) {
+    const struct cli_edhoc_renegotiation_list renegotiation_suites) {
   return (struct cli_edhoc_responder_preferred_suites_result){
       .status = CLI_EDHOC_RESP_PREFERRED_SUITES_OK,
-      .preferred_suite = preferred_suite,
+      .renegotiation_suites = renegotiation_suites,
   };
 }
 
@@ -32,14 +32,32 @@ static struct cli_edhoc_responder_preferred_suites_result failure(
 
 enum { CLI_GET_RESPONDER_SUITES_ERROR_SIZE = 100 };
 
+static struct cli_edhoc_renegotiation_list merge_suite_list(
+    const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
+    const struct com_edhoc_cipher_suite_details* preferred_suite) {
+  struct cli_edhoc_renegotiation_list result = {0};
+  size_t i = 0;
+  for (; i < own_initial_preferred_suites.number_of_suites; i++) {
+    if (own_initial_preferred_suites.suites[i]->metadata->value ==
+        preferred_suite->metadata->value) {
+      continue;
+    }
+    result.suites[i] = own_initial_preferred_suites.suites[i];
+  }
+  result.suites[i] = preferred_suite;
+  result.number_of_suites = i + 1;
+  return result;
+}
+
 struct cli_edhoc_responder_preferred_suites_result
 cli_edhoc_get_responder_preferred_suites(
-    const struct com_edhoc_cipher_suite_list* own_supported_suites,
+    const struct com_edhoc_cipher_suite_list own_supported_suites,
+    const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
     const struct com_readonly_buffer encoded_error_buffer) {
   if (!com_readonly_buffer_has_content(encoded_error_buffer)) {
     return failure(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_EMPTY_ERROR_BUFFER);
   }
-  if (!com_edhoc_cipher_suites_are_valid(own_supported_suites)) {
+  if (!com_edhoc_cipher_suites_are_valid(&own_supported_suites)) {
     return failure(
         CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES);
   }
@@ -53,13 +71,14 @@ cli_edhoc_get_responder_preferred_suites(
                                   &received_info) != EDHOC_SUCCESS) {
     return failure(CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_PROCESSING_ERROR);
   }
-  for (size_t j = 0; j < own_supported_suites->number_of_suites; j++) {
+  for (size_t j = 0; j < own_supported_suites.number_of_suites; j++) {
     const struct com_edhoc_cipher_suite_details* current_suite =
-        own_supported_suites->suites[j];
+        own_supported_suites.suites[j];
     const int32_t own_suite_value = current_suite->metadata->value;
     for (size_t i = 0; i < received_info.written_entries; i++) {
       if (received_info.cipher_suites[i] == own_suite_value) {
-        return ok(current_suite);
+        return ok(
+            merge_suite_list(own_initial_preferred_suites, current_suite));
       }
     }
   }

@@ -60,12 +60,12 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             context, "Context Setup error: Failed to set EDHOC methods",
             error_buffer));
   }
-  const struct com_edhoc_cipher_suite_list supported_suites =
-      edhoc_parameters.supported_cipher_suites;
-  const size_t number_of_suites = supported_suites.number_of_suites;
+  const struct com_edhoc_cipher_suite_list preferred_suites =
+      edhoc_parameters.preferred_cipher_suites;
+  const size_t number_of_suites = preferred_suites.number_of_suites;
   struct edhoc_cipher_suite cipher_suites[number_of_suites];
   for (size_t i = 0; i < number_of_suites; i++) {
-    cipher_suites[i] = *supported_suites.suites[i]->metadata;
+    cipher_suites[i] = *preferred_suites.suites[i]->metadata;
   }
   if (edhoc_set_cipher_suites(context, cipher_suites, number_of_suites) !=
       EDHOC_SUCCESS) {
@@ -87,16 +87,16 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             context, "Context Setup error: Failed to set connection ID",
             error_buffer));
   }
-  const struct com_edhoc_cipher_suite_details* first_suite_details =
-      supported_suites.suites[0];
-  if (edhoc_bind_keys(context, first_suite_details->get_keys()) !=
+  const struct com_edhoc_cipher_suite_details* preferred_suite_details =
+      preferred_suites.suites[0];
+  if (edhoc_bind_keys(context, preferred_suite_details->get_keys()) !=
       EDHOC_SUCCESS) {
     return failure(
         COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS,
         com_edhoc_add_protocol_error_with_description_view(
             context, "Context Setup error: Failed to bind keys", error_buffer));
   }
-  if (edhoc_bind_crypto(context, first_suite_details->get_crypto()) !=
+  if (edhoc_bind_crypto(context, preferred_suite_details->get_crypto()) !=
       EDHOC_SUCCESS) {
     return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO,
                    com_edhoc_add_protocol_error_with_description_view(

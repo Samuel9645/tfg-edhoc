@@ -35,7 +35,7 @@ bool com_edhoc_cipher_suites_are_valid(
   return true;
 }
 
-static const struct edhoc_cipher_suite cipher_suite_0 = {
+static const struct edhoc_cipher_suite CIPHER_SUITE_0 = {
     .value = 0,
     .aead_key_length = 16,
     .aead_tag_length = 8,
@@ -46,7 +46,7 @@ static const struct edhoc_cipher_suite cipher_suite_0 = {
     .ecc_sign_length = 64,
 };
 const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0 = {
-    .metadata = &cipher_suite_0,
+    .metadata = &CIPHER_SUITE_0,
     .get_crypto = edhoc_cipher_suite_0_get_crypto,
     .get_keys = edhoc_cipher_suite_0_get_keys,
 };
@@ -58,7 +58,7 @@ const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0 = {
     .suites = SUITE_0_PTRS,
 };
 
-static const struct edhoc_cipher_suite cipher_suite_2 = {
+static const struct edhoc_cipher_suite CIPHER_SUITE_2 = {
     .value = 2,
     .aead_key_length = 16,
     .aead_tag_length = 8,
@@ -70,7 +70,7 @@ static const struct edhoc_cipher_suite cipher_suite_2 = {
 };
 
 const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_2 = {
-    .metadata = &cipher_suite_2,
+    .metadata = &CIPHER_SUITE_2,
     .get_keys = edhoc_cipher_suite_2_get_keys,
     .get_crypto = edhoc_cipher_suite_2_get_crypto,
 };
@@ -79,5 +79,5 @@ static const struct com_edhoc_cipher_suite_details* SUITE_2_PTRS[] = {
     &COM_EDHOC_SUITE_2};
 const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_2 = {
     .number_of_suites = sizeof(SUITE_2_PTRS) / sizeof(SUITE_2_PTRS[0]),
-    .suites = SUITE_2_PTRS,  // Apunta al array de direcciones
+    .suites = SUITE_2_PTRS,
 };

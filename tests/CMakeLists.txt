@@ -308,9 +308,9 @@ set(EDHOC_PROCESS_ERROR_MOCK
     "-Wl,--wrap=edhoc_message_error_process"
 )
 
-add_unity_test(test_edhoc_get_responder_preferred_suites
-    src/edhoc/server/handshake/test_edhoc_get_responder_preferred_suites.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/cli_get_responder_preferred_suites.c
+add_unity_test(test_edhoc_negotiate_cipher_suites
+    src/edhoc/client/test_edhoc_negotiate_cipher_suites.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/cli_negotiate_cipher_suites.c
     ${EDHOC_CIPHER_SUITES_SOURCES}
     ${EDHOC_PROCESS_ERROR_MOCK}
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c

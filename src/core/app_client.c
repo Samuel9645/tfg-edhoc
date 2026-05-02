@@ -8,7 +8,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_context.h"
 #include "common/com_emulation.h"
-#include "edhoc/client/handshake/cli_get_responder_preferred_suites.h"
+#include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/client/handshake/message_4/cli_m4_process.h"

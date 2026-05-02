@@ -170,6 +170,13 @@ add_unity_test(test_edhoc_setup_context
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
+add_unity_test(test_validate_edhoc_parameters
+    /src/edhoc/common/test_validate_edhoc_parameters.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_parameters.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_cipher_suites.c
+    ${ADD_EDHOC_ERROR_COMMON_SOURCES}
+)
+
 set(MESSAGE_1_PARSER_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.c
     "-Wl,--wrap=edhoc_extract_flow_info"

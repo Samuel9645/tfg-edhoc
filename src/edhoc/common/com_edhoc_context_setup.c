@@ -32,25 +32,11 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
-  const struct com_edhoc_cipher_suite_list supported_suites =
-      edhoc_parameters.supported_cipher_suites;
-  if (!com_edhoc_cipher_suites_are_valid(supported_suites)) {
-    return failure(COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES,
-                   com_edhoc_add_internal_error_view(
-                       "Context Setup error: Invalid supported cipher suites",
-                       error_buffer));
-  }
-  if (edhoc_parameters.methods.data == NULL ||
-      edhoc_parameters.methods.size == 0) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_INVALID_METHODS,
-        com_edhoc_add_internal_error_view(
-            "Context Setup error: Invalid EDHOC methods", error_buffer));
-  }
-  if (edhoc_parameters.credentials == NULL) {
-    return failure(COM_EDHOC_SETUP_CTX_ERR_NULL_CREDENTIALS,
-                   com_edhoc_add_internal_error_view(
-                       "Context Setup error: Null credentials", error_buffer));
+  const struct srv_edhoc_validate_parameters_result validation_result =
+      com_edhoc_validate_parameters(&edhoc_parameters, error_buffer);
+  if (validation_result.valid_parameters == false) {
+    return failure(COM_EDHOC_SETUP_CTX_ERR_INVALID_EDHOC_PARAMETERS,
+                   validation_result.error_message);
   }
 
   if (psa_crypto_init() != PSA_SUCCESS) {
@@ -74,6 +60,8 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             context, "Context Setup error: Failed to set EDHOC methods",
             error_buffer));
   }
+  const struct com_edhoc_cipher_suite_list supported_suites =
+      edhoc_parameters.supported_cipher_suites;
   const size_t number_of_suites = supported_suites.number_of_suites;
   struct edhoc_cipher_suite cipher_suites[number_of_suites];
   for (size_t i = 0; i < number_of_suites; i++) {

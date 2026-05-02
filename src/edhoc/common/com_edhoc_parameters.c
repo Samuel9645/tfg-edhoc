@@ -1,0 +1,53 @@
+/**
+ * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 27/04/2026
+ * @brief Validation of edhoc parameters
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ */
+
+#include "edhoc/common/com_edhoc_parameters.h"
+
+#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
+
+static struct srv_edhoc_validate_parameters_result ok(void) {
+  return (struct srv_edhoc_validate_parameters_result){
+      .valid_parameters = true,
+  };
+}
+
+static struct srv_edhoc_validate_parameters_result failure(
+    const struct com_readonly_buffer error_message) {
+  return (struct srv_edhoc_validate_parameters_result){
+      .valid_parameters = false,
+      .error_message = error_message,
+  };
+}
+
+struct srv_edhoc_validate_parameters_result invalid_error_buffer(void) {
+  return (struct srv_edhoc_validate_parameters_result){.valid_parameters =
+                                                           false};
+}
+
+struct srv_edhoc_validate_parameters_result com_edhoc_validate_parameters(
+    const struct srv_edhoc_parameters* parameters,
+    const struct com_writable_buffer error_buffer) {
+  if (!com_writable_buffer_is_writable(error_buffer)) {
+    return invalid_error_buffer();
+  }
+  if (!com_edhoc_cipher_suites_are_valid(parameters->supported_cipher_suites)) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Invalid supported cipher suites",
+        error_buffer));
+  }
+  if (parameters->methods.data == NULL || parameters->methods.size == 0) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Invalid EDHOC methods",
+        error_buffer));
+  }
+  if (parameters->credentials == NULL) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Null credentials", error_buffer));
+  }
+  return ok();
+}

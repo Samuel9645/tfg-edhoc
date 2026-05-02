@@ -57,58 +57,15 @@ void test_setup_context_fails_on_invalid_error_buffer(void) {
                     result.status);
 }
 
-void test_setup_context_fails_on_null_credentials(void) {
-  const struct srv_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct srv_edhoc_parameters params = {
-      .credentials = NULL,
-      .supported_cipher_suites = valid_params.supported_cipher_suites,
-      .methods = valid_params.methods};
+void test_setup_context_fails_on_invalid_edhoc_parameters(void) {
+  const struct srv_edhoc_parameters params = {0};
 
   const struct com_edhoc_setup_context_result result =
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
 
-  TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_NULL_CREDENTIALS, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Null credentials",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
-
-void test_setup_context_fails_on_invalid_cipher_suites(void) {
-  const struct srv_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct srv_edhoc_parameters params = {
-      .credentials = valid_params.credentials,
-      .supported_cipher_suites = {.number_of_suites = 0},
-      .methods = valid_params.methods};
-
-  const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
-
-  TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_SUPPORTED_SUITES,
+  TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_EDHOC_PARAMETERS,
                     result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer,
-      "Context Setup error: Invalid supported cipher suites",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
-
-void test_setup_context_fails_on_invalid_methods(void) {
-  const struct srv_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
-  const struct srv_edhoc_methods invalid_methods = {.data = NULL, .size = 0};
-  const struct srv_edhoc_parameters params = {
-      .credentials = valid_params.credentials,
-      .supported_cipher_suites = valid_params.supported_cipher_suites,
-      .methods = invalid_methods};
-
-  const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
-
-  TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_METHODS, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Invalid EDHOC methods",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
 }
 
 void test_setup_context_fails_on_psa_crypto_init_failure(void) {

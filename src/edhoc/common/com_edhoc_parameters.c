@@ -29,18 +29,34 @@ struct srv_edhoc_validate_parameters_result invalid_error_buffer(void) {
                                                            false};
 }
 
+static bool preferred_suite_in_supported_suites(
+    const struct com_edhoc_cipher_suite_details* current_preferred_suite,
+    const struct com_edhoc_cipher_suite_list* supported_suites) {
+  bool found_in_supported = false;
+  for (size_t j = 0; j < supported_suites->number_of_suites; j++) {
+    if (current_preferred_suite == supported_suites->suites[j]) {
+      found_in_supported = true;
+    }
+  }
+  return found_in_supported;
+}
+
 struct srv_edhoc_validate_parameters_result com_edhoc_validate_parameters(
     const struct srv_edhoc_parameters* parameters,
     const struct com_writable_buffer error_buffer) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
-  if (!com_edhoc_cipher_suites_are_valid(parameters->supported_cipher_suites)) {
+  const struct com_edhoc_cipher_suite_list* supported_suites =
+      &parameters->supported_cipher_suites;
+  if (!com_edhoc_cipher_suites_are_valid(*supported_suites)) {
     return failure(com_edhoc_add_internal_error_view(
         "EDHOC parameters validation error: Invalid supported cipher suites",
         error_buffer));
   }
-  if (!com_edhoc_cipher_suites_are_valid(parameters->preferred_cipher_suites)) {
+  const struct com_edhoc_cipher_suite_list* preferred_suites =
+      &parameters->preferred_cipher_suites;
+  if (!com_edhoc_cipher_suites_are_valid(*preferred_suites)) {
     return failure(com_edhoc_add_internal_error_view(
         "EDHOC parameters validation error: Invalid preferred cipher suites",
         error_buffer));
@@ -53,6 +69,17 @@ struct srv_edhoc_validate_parameters_result com_edhoc_validate_parameters(
   if (parameters->credentials == NULL) {
     return failure(com_edhoc_add_internal_error_view(
         "EDHOC parameters validation error: Null credentials", error_buffer));
+  }
+  for (size_t i = 0; i < preferred_suites->number_of_suites; i++) {
+    const struct com_edhoc_cipher_suite_details* current_preferred_suite =
+        preferred_suites->suites[i];
+    if (!preferred_suite_in_supported_suites(current_preferred_suite,
+                                             supported_suites)) {
+      return failure(com_edhoc_add_internal_error_view(
+          "EDHOC parameters validation error: Preferred cipher suites must "
+          "be a subset of supported cipher suites",
+          error_buffer));
+    }
   }
   return ok();
 }

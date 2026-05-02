@@ -99,7 +99,7 @@ void test_m1_process_ok_for_valid_data(void) {
 
 static void assert_error_contains_supported_cipher_suites(
     const struct com_readonly_buffer encoded_error_buffer,
-    const struct com_edhoc_cipher_suite_list* expected_cipher_suites) {
+    const struct com_edhoc_cipher_suite_list expected_cipher_suites) {
   enum edhoc_error_code received_code = -1;
   char decoded_error[TST_EDHOC_ADD_ERROR_CAPACITY] = {0};
   struct edhoc_error_info received_info = {
@@ -111,11 +111,11 @@ static void assert_error_contains_supported_cipher_suites(
                                 "CBOR Decode Failed");
   TEST_ASSERT_EQUAL_MESSAGE(EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE,
                             received_code, "Unexpected error code");
-  TEST_ASSERT_EQUAL_MESSAGE(expected_cipher_suites->number_of_suites,
+  TEST_ASSERT_EQUAL_MESSAGE(expected_cipher_suites.number_of_suites,
                             received_info.written_entries,
                             "Number of suites do not match");
-  for (size_t i = 0; i < expected_cipher_suites->number_of_suites; i++) {
-    TEST_ASSERT_EQUAL(expected_cipher_suites->suites[i]->metadata->value,
+  for (size_t i = 0; i < expected_cipher_suites.number_of_suites; i++) {
+    TEST_ASSERT_EQUAL(expected_cipher_suites.suites[i]->metadata->value,
                       received_info.cipher_suites[i]);
   }
 }

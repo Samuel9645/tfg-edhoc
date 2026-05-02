@@ -20,7 +20,7 @@ struct srv_edhoc_methods {
 
 struct srv_edhoc_parameters {
   const struct edhoc_credentials* credentials;
-  const struct com_edhoc_cipher_suite_list* supported_cipher_suites;
+  const struct com_edhoc_cipher_suite_list supported_cipher_suites;
   const struct srv_edhoc_methods methods;
 };
 #endif  // EDHOC_COMMON_COM_EDHOC_PARAMETERS_H_

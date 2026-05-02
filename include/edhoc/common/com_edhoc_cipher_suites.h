@@ -28,12 +28,11 @@ struct com_edhoc_cipher_suite_list {
 /**
  * @brief Check if the cipher suites struct is not NULL and if it contains at
  * least one valid cipher suite details struct.
- * @param list Pointer to the struct containing the cipher suites details to
+ * @param list Struct containing the cipher suites details to
  * check.
  * @return true if the struct is valid, false otherwise.
  */
-bool com_edhoc_cipher_suites_are_valid(
-    const struct com_edhoc_cipher_suite_list* list);
+bool com_edhoc_cipher_suites_are_valid(struct com_edhoc_cipher_suite_list list);
 
 extern const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0;
 extern const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0;

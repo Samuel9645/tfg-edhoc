@@ -22,13 +22,13 @@ static bool suites_details_are_valid(
 }
 
 bool com_edhoc_cipher_suites_are_valid(
-    const struct com_edhoc_cipher_suite_list* list) {
-  if (list == NULL || list->suites == NULL || list->number_of_suites == 0) {
+    const struct com_edhoc_cipher_suite_list list) {
+  if (list.suites == NULL || list.number_of_suites == 0) {
     return false;
   }
 
-  for (size_t i = 0; i < list->number_of_suites; i++) {
-    if (!suites_details_are_valid(list->suites[i])) {
+  for (size_t i = 0; i < list.number_of_suites; i++) {
+    if (!suites_details_are_valid(list.suites[i])) {
       return false;
     }
   }

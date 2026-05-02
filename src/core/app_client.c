@@ -8,6 +8,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_context.h"
 #include "common/com_emulation.h"
+#include "edhoc/client/handshake/cli_get_responder_preferred_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/client/handshake/message_4/cli_m4_process.h"
@@ -98,7 +99,7 @@ enum com_emulation_status core_run_client(void) {
   const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
   const struct srv_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
-      .supported_cipher_suites = &COM_EDHOC_ONLY_SUITE_2,
+      .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
       .methods =
           {
               .data = SUPPORTED_METHODS,

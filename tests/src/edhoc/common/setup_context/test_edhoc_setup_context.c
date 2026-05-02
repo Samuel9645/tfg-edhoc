@@ -79,7 +79,7 @@ void test_setup_context_fails_on_invalid_cipher_suites(void) {
       tst_edhoc_srv_get_method_0_suite_0_params();
   const struct srv_edhoc_parameters params = {
       .credentials = valid_params.credentials,
-      .supported_cipher_suites = NULL,
+      .supported_cipher_suites = {.number_of_suites = 0},
       .methods = valid_params.methods};
 
   const struct com_edhoc_setup_context_result result =

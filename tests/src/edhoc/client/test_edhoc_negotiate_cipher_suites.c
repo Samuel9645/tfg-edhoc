@@ -186,6 +186,11 @@ void test_prioritize_initiator_suite_preference(void) {
   assert_last_suite_is_the_preferred_suite(result, &COM_EDHOC_SUITE_0);
 }
 
+void assert_result_empty(
+    const struct cli_edhoc_suites_negotiation_result result) {
+  TEST_ASSERT_EQUAL_size_t(0, result.renegotiation_suites.number_of_suites);
+}
+
 static const uint8_t ONLY_SUITE_3[] = {TST_PREF_SUITES_ERR_CODE_2,
                                        TST_PREF_SUITES_SUITE_3};
 static const struct com_readonly_buffer ONLY_SUITE_3_BUFFER = {
@@ -198,7 +203,7 @@ void test_gives_no_suites_when_negotiation_cannot_be_made(void) {
                                  ONLY_SUITE_3_BUFFER);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_NO_COMMON_SUITES, result.status);
-  TEST_ASSERT_EQUAL_size_t(0, result.renegotiation_suites.number_of_suites);
+  assert_result_empty(result);
 }
 
 void test_fails_on_invalid_data(void) {
@@ -267,7 +272,7 @@ void test_fails_on_invalid_data(void) {
                                    test_cases[i].buffer);
 
     TEST_ASSERT_EQUAL(test_cases[i].expected_status, result.status);
-    TEST_ASSERT_EQUAL_size_t(0, result.renegotiation_suites.number_of_suites);
+    assert_result_empty(result);
   }
 }
 
@@ -280,5 +285,5 @@ void test_fails_when_error_process_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_ERR_PROCESSING_ERROR,
                     result.status);
-  TEST_ASSERT_EQUAL_size_t(0, result.renegotiation_suites.number_of_suites);
+  assert_result_empty(result);
 }

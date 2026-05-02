@@ -38,10 +38,12 @@ static const struct edhoc_credentials DUMMY_TEST_CREDS = {
 static struct srv_edhoc_parameters create_test_params(
     const struct com_edhoc_cipher_suite_list suites,
     const struct srv_edhoc_methods methods) {
-  return (struct srv_edhoc_parameters){.credentials = &DUMMY_TEST_CREDS,
-                                       .supported_cipher_suites = suites,
-                                       .preferred_cipher_suites = suites,
-                                       .methods = methods};
+  return (struct srv_edhoc_parameters){
+      .credentials = &DUMMY_TEST_CREDS,
+      .supported_cipher_suites = suites,
+      .preferred_cipher_suites = suites,
+      .selected_cipher_suite = suites.suites[0],
+      .methods = methods};
 }
 
 struct srv_edhoc_parameters tst_edhoc_srv_get_method_3_suite_2_params(void) {

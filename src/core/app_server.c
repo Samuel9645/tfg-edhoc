@@ -23,6 +23,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
       .credentials = &CRED_EDHOC_SRV_CRED,
       .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
       .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
+      .selected_cipher_suite = COM_EDHOC_ONLY_SUITE_2.suites[0],
       .methods =
           {
               .data = SUPPORTED_METHODS,

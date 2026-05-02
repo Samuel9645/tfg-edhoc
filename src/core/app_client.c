@@ -101,6 +101,7 @@ enum com_emulation_status core_run_client(void) {
       .credentials = &credentials,
       .supported_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
       .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
+      .selected_cipher_suite = COM_EDHOC_ONLY_SUITE_2.suites[0],
       .methods =
           {
               .data = SUPPORTED_METHODS,

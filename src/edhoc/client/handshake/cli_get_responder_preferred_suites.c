@@ -61,6 +61,15 @@ cli_edhoc_get_responder_preferred_suites(
     return failure(
         CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_SUPPORTED_SUITES);
   }
+  if (!com_edhoc_cipher_suites_are_valid(&own_initial_preferred_suites)) {
+    return failure(
+        CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES);
+  }
+  if (own_initial_preferred_suites.number_of_suites + 1 >
+      MAX_RENEGOTIATION_SIZE) {
+    return failure(
+        CLI_EDHOC_RESP_PREFERRED_SUITES_ERR_INTERNAL_BUFFER_TOO_SMALL);
+  }
 
   enum edhoc_error_code received_code = -1;
   char decoded_error[CLI_GET_RESPONDER_SUITES_ERROR_SIZE] = {0};

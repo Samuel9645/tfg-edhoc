@@ -13,7 +13,7 @@
 #include "edhoc/common/com_edhoc_parameters.h"
 #include "edhoc/common/tst_edhoc_params.h"
 
-static uint8_t error_buffer[100];
+static uint8_t error_buffer[512];
 static const struct com_writable_buffer error_buffer_view = {
     .bytes = error_buffer, .capacity = sizeof(error_buffer)};
 
@@ -76,7 +76,18 @@ void test_fails_on_invalid_parameters(void) {
               },
           .expected_error = "EDHOC parameters validation error: Invalid "
                             "preferred cipher suites",
-      }};
+      },
+      {
+          .params = {.supported_cipher_suites =
+                         valid_params.supported_cipher_suites,
+                     .methods = valid_params.methods,
+                     .preferred_cipher_suites = COM_EDHOC_ONLY_SUITE_2,
+                     .credentials = valid_params.credentials},
+          .expected_error =
+              "EDHOC parameters validation error: Preferred cipher suites must "
+              "be a subset of supported cipher suites",
+      },
+  };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
 

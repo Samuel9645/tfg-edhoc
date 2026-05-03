@@ -133,33 +133,34 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
       free(context);
       return failure_result;
     }
-
     if (edhoc_message_1_process(context, request.payload.bytes,
                                 request.payload.length) == EDHOC_SUCCESS) {
       return ok(context);
     }
-    if (error_code_is_suite_mismatch(context)) {
-      const struct com_edhoc_cipher_suite_details* common_suite =
-          get_common_suite(&edhoc_parameters.supported_cipher_suites, context);
-      if (common_suite == NULL) {
-        const struct srv_edhoc_message_1_process_result failure_result =
-            failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-                    add_cipher_suite_mismatch_error(context, error_buffer));
-        srv_edhoc_cleanup_context(&context);
-        return failure_result;
-      }
-      edhoc_parameters.selected_cipher_suite = common_suite;
-      // WHY DO WE DO THIS?
-      // libedhoc forces this as the Message 1 processing function blindly
-      // selects the last cipher suite in the array as the chosen one instead of
-      // picking the selected_cipher_suite (which is the one that is used in the
-      // bindings of the cryptography methods).
-      retry_suites_array[0] = common_suite;
-      edhoc_parameters.supported_cipher_suites =
-          (const struct com_edhoc_cipher_suite_list){
-              .suites = retry_suites_array, .number_of_suites = 1};
-      edhoc_context_deinit(context);
+    if (!error_code_is_suite_mismatch(context) ||
+        attempt == MAX_ONE_RETRY_ATTEMPT - 1) {
+      break;
     }
+    const struct com_edhoc_cipher_suite_details* common_suite =
+        get_common_suite(&edhoc_parameters.supported_cipher_suites, context);
+    if (common_suite == NULL) {
+      const struct srv_edhoc_message_1_process_result failure_result =
+          failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+                  add_cipher_suite_mismatch_error(context, error_buffer));
+      srv_edhoc_cleanup_context(&context);
+      return failure_result;
+    }
+    edhoc_parameters.selected_cipher_suite = common_suite;
+    // WHY DO WE DO THIS?
+    // libedhoc forces this as the Message 1 processing function blindly
+    // selects the last cipher suite in the array as the chosen one instead of
+    // picking the selected_cipher_suite (which is the one that is used in the
+    // bindings of the cryptography methods).
+    retry_suites_array[0] = common_suite;
+    edhoc_parameters.supported_cipher_suites =
+        (const struct com_edhoc_cipher_suite_list){.suites = retry_suites_array,
+                                                   .number_of_suites = 1};
+    edhoc_context_deinit(context);
   }
   const struct srv_edhoc_message_1_process_result failure_result = failure(
       SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,

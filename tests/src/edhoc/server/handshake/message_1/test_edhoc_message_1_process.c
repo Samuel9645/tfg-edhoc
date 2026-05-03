@@ -97,6 +97,32 @@ void test_m1_process_ok_for_valid_data(void) {
   ensure_context_is_null(result.context);
 }
 
+void test_m1_process_dynamically_bind_suite_details_after_failure(void) {
+  const uint8_t MESSAGE_1_SUITE_0_METHOD_0[] = {
+      0x00, 0x00, 0x58, 0x20, 0x31, 0xf8, 0x2c, 0x7b, 0x5b, 0x9c,
+      0xbb, 0xf0, 0xf1, 0x94, 0xd9, 0x13, 0xcc, 0x12, 0xef, 0x15,
+      0x32, 0xd3, 0x28, 0xef, 0x32, 0x63, 0x2a, 0x48, 0x81, 0xa1,
+      0xc0, 0x70, 0x1e, 0x23, 0x7f, 0x04, 0x2d};
+  tst_com_edhoc_use_real_get_code();
+  const struct srv_edhoc_message_1_request request = create_msg1_request(
+      MESSAGE_1_SUITE_0_METHOD_0, sizeof(MESSAGE_1_SUITE_0_METHOD_0));
+  struct com_edhoc_parameters suites_0_and_2_parameters =
+      tst_edhoc_srv_get_method_0_suites_0_2_params();
+  suites_0_and_2_parameters.selected_cipher_suite = &COM_EDHOC_SUITE_2;
+
+  struct srv_edhoc_message_1_process_result result =
+      srv_edhoc_process_message_1(request, env.error,
+                                  suites_0_and_2_parameters);
+
+  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
+  TEST_ASSERT_NOT_NULL(result.context);
+  const enum srv_edhoc_cleanup_context_status cleanup_status =
+      srv_edhoc_cleanup_context(&result.context);
+  TEST_ASSERT_EQUAL_MESSAGE(SRV_EDHOC_CLEANUP_OK, cleanup_status,
+                            "edhoc_context cleanup failed");
+  ensure_context_is_null(result.context);
+}
+
 static void assert_error_contains_supported_cipher_suites(
     const struct com_readonly_buffer encoded_error_buffer,
     const struct com_edhoc_cipher_suite_list expected_cipher_suites) {

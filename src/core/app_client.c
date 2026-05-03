@@ -233,12 +233,12 @@ enum com_emulation_status core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  const struct cli_edhoc_negotiation_attempt_result result =
-      cli_edhoc_resolve_negotiation(&client_resources, edhoc_parameters,
-                                    SUPPORTED_SUITES, INITIAL_PREFERRED_SUITES,
-                                    payload_buffer);
+  const struct cli_edhoc_negotiation_attempt_result
+      message_1_negotiation_attempt_result = cli_edhoc_resolve_negotiation(
+          &client_resources, edhoc_parameters, SUPPORTED_SUITES,
+          INITIAL_PREFERRED_SUITES, payload_buffer);
 
-  if (result.status != CLI_EDHOC_NEGOTIATION_OK) {
+  if (message_1_negotiation_attempt_result.status != CLI_EDHOC_NEGOTIATION_OK) {
     coap_log_err("Handshake failed after all attempts\n");
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
@@ -246,7 +246,7 @@ enum com_emulation_status core_run_client(void) {
 
   const struct cli_edhoc_message_2_initiator_request
       message_2_initiator_request = {
-          .raw_payload = result.response_payload,
+          .raw_payload = message_1_negotiation_attempt_result.response_payload,
           .edhoc_context = &client_resources.edhoc_context,
       };
   const struct cli_edhoc_message_2_initiator_result message_2_initiator_result =

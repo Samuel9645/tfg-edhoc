@@ -26,7 +26,7 @@ struct srv_edhoc_message_1_request {
  * processing, including credentials.
  * @param[in] error_buffer Metadata of the buffer (pointer and capacity) to
  * write into
- * @param[in] context_parameters Parameters to initialize the EDHOC context
+ * @param[in] edhoc_parameters Parameters to initialize the EDHOC context
  * @return Struct containing status code and allocated EDHOC context on success,
  * or error code with NULL context and a view of the written error message on
  * failure.
@@ -38,7 +38,7 @@ struct srv_edhoc_message_1_request {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     struct srv_edhoc_message_1_request request,
     struct com_writable_buffer error_buffer,
-    struct com_edhoc_parameters context_parameters);
+    struct com_edhoc_parameters edhoc_parameters);
 
 enum srv_edhoc_cleanup_context_status {
   SRV_EDHOC_CLEANUP_OK = 0,

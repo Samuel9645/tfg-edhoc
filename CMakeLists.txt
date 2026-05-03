@@ -57,7 +57,6 @@ set(BASE_SOURCES
 
 set(MESSAGE_1_PROCESS_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
 )
 
@@ -68,7 +67,6 @@ set(MESSAGE_2_COMPOSE_SOURCES
 set(MESSAGE_1_RESPONDER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process_errors.c
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_2_COMPOSE_SOURCES}
 )

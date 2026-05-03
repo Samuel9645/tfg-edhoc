@@ -30,7 +30,7 @@ struct cli_edhoc_renegotiation_list {
 
 struct cli_edhoc_suites_negotiation_result {
   const enum cli_edhoc_suites_negotiation_status status;
-  const struct cli_edhoc_renegotiation_list renegotiation_suites;
+  struct cli_edhoc_renegotiation_list renegotiation_suites;
   const struct com_edhoc_cipher_suite_details* const selected_suite;
 };
 

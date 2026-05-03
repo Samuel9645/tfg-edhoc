@@ -98,17 +98,17 @@ void test_m1_process_ok_for_valid_data(void) {
 }
 
 void test_m1_process_dynamically_bind_suite_details_after_failure(void) {
-  const uint8_t MESSAGE_1_SUITE_0_METHOD_0[] = {
+  const uint8_t MESSAGE_1_SUITE_0_REQUEST[] = {
       0x00, 0x00, 0x58, 0x20, 0x31, 0xf8, 0x2c, 0x7b, 0x5b, 0x9c,
       0xbb, 0xf0, 0xf1, 0x94, 0xd9, 0x13, 0xcc, 0x12, 0xef, 0x15,
       0x32, 0xd3, 0x28, 0xef, 0x32, 0x63, 0x2a, 0x48, 0x81, 0xa1,
       0xc0, 0x70, 0x1e, 0x23, 0x7f, 0x04, 0x2d};
-  tst_com_edhoc_use_real_get_code();
   const struct srv_edhoc_message_1_request request = create_msg1_request(
-      MESSAGE_1_SUITE_0_METHOD_0, sizeof(MESSAGE_1_SUITE_0_METHOD_0));
+      MESSAGE_1_SUITE_0_REQUEST, sizeof(MESSAGE_1_SUITE_0_REQUEST));
   struct com_edhoc_parameters suites_0_and_2_parameters =
       tst_edhoc_srv_get_method_0_suites_0_2_params();
   suites_0_and_2_parameters.selected_cipher_suite = &COM_EDHOC_SUITE_2;
+  tst_com_edhoc_use_real_get_code();
 
   struct srv_edhoc_message_1_process_result result =
       srv_edhoc_process_message_1(request, env.error,

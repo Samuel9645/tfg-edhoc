@@ -144,7 +144,7 @@ cli_edhoc_resolve_negotiation(
     return result;
   }
   if (result.status == CLI_EDHOC_NEGOTIATION_RENEGOTIATE) {
-    const struct cli_edhoc_suites_negotiation_result negotiation_result =
+    struct cli_edhoc_suites_negotiation_result negotiation_result =
         cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
                                    result.response_payload);
     if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {

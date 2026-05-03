@@ -15,7 +15,66 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
-#include "edhoc/server/handshake/message_1/srv_m1_process_errors.h"
+
+static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
+  enum edhoc_error_code error;
+  if (edhoc_error_get_code(context, &error) != EDHOC_SUCCESS) {
+    error = EDHOC_ERROR_CODE_UNSPECIFIED_ERROR;
+  }
+  return error == EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
+}
+
+enum { SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE = 8 };
+
+static struct com_readonly_buffer add_cipher_suite_mismatch_error(
+    const struct edhoc_context* context,
+    const struct com_writable_buffer response_data) {
+  int32_t peer_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
+  size_t peer_length = 0;
+  int32_t own_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
+  size_t own_length = 0;
+  if (edhoc_error_get_cipher_suites(
+          context, own_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE, &own_length,
+          peer_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE,
+          &peer_length) != EDHOC_SUCCESS) {
+    return com_edhoc_add_protocol_error_with_description_view(
+        context,
+        "Message 1 Process error: Fatal: wrong cipher suite error but failed "
+        "to get cipher suites",
+        response_data);
+  }
+  const struct edhoc_error_info error_info = {
+      .cipher_suites = own_suites,
+      .total_entries = SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE,
+      .written_entries = own_length,
+  };
+  return com_edhoc_add_protocol_error_view(context, &error_info, response_data);
+}
+
+static const struct com_edhoc_cipher_suite_details* get_common_suite(
+    const struct com_edhoc_cipher_suite_list* supported_suites,
+    const struct edhoc_context* context) {
+  int32_t peer_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
+  size_t peer_length = 0;
+  int32_t own_suites[SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE] = {0};
+  size_t own_length = 0;
+  if (edhoc_error_get_cipher_suites(
+          context, own_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE, &own_length,
+          peer_suites, SRV_EDHOC_CIPHER_SUITES_ARRAY_SIZE,
+          &peer_length) != EDHOC_SUCCESS) {
+    return NULL;
+  }
+  for (size_t i = 0; i < supported_suites->number_of_suites; i++) {
+    const struct com_edhoc_cipher_suite_details* current_supported_suite =
+        supported_suites->suites[i];
+    for (size_t j = 0; j < peer_length; j++) {
+      if (current_supported_suite->metadata->value == peer_suites[j]) {
+        return current_supported_suite;
+      }
+    }
+  }
+  return NULL;
+}
 
 static struct srv_edhoc_message_1_process_result ok(
     struct edhoc_context* context) {
@@ -43,7 +102,7 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     const struct com_writable_buffer error_buffer,
-    const struct com_edhoc_parameters context_parameters) {
+    struct com_edhoc_parameters edhoc_parameters) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }
@@ -62,27 +121,52 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
             "Message 1 Process error: Context calloc failed", error_buffer));
   }
 
-  const struct com_edhoc_setup_context_result setup_context_result =
-      com_edhoc_setup_context(context, context_parameters, error_buffer);
-  if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
-    const struct srv_edhoc_message_1_process_result failure_result =
-        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-                setup_context_result.error_buffer);
-    free(context);
-    return failure_result;
-  }
+  enum { MAX_ONE_RETRY_ATTEMPT = 2 };
+  const struct com_edhoc_cipher_suite_details* retry_suites_array[] = {NULL};
+  for (int attempt = 0; attempt < MAX_ONE_RETRY_ATTEMPT; attempt++) {
+    const struct com_edhoc_setup_context_result setup_context_result =
+        com_edhoc_setup_context(context, edhoc_parameters, error_buffer);
+    if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
+      const struct srv_edhoc_message_1_process_result failure_result =
+          failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
+                  setup_context_result.error_buffer);
+      free(context);
+      return failure_result;
+    }
 
-  if (edhoc_message_1_process(context, request.payload.bytes,
-                              request.payload.length) != EDHOC_SUCCESS) {
-    const struct srv_edhoc_message_1_process_result failure_result =
-        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
-                srv_edhoc_message_1_process_add_protocol_error(
-                    context, "Message 1 Process error: Processing failed",
-                    error_buffer));
-    srv_edhoc_cleanup_context(&context);
-    return failure_result;
+    if (edhoc_message_1_process(context, request.payload.bytes,
+                                request.payload.length) == EDHOC_SUCCESS) {
+      return ok(context);
+    }
+    if (error_code_is_suite_mismatch(context)) {
+      const struct com_edhoc_cipher_suite_details* common_suite =
+          get_common_suite(&edhoc_parameters.supported_cipher_suites, context);
+      if (common_suite == NULL) {
+        const struct srv_edhoc_message_1_process_result failure_result =
+            failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+                    add_cipher_suite_mismatch_error(context, error_buffer));
+        srv_edhoc_cleanup_context(&context);
+        return failure_result;
+      }
+      edhoc_parameters.selected_cipher_suite = common_suite;
+      // WHY DO WE DO THIS?
+      // libedhoc forces this as the Message 1 processing function blindly
+      // selects the last cipher suite in the array as the chosen one instead of
+      // picking the selected_cipher_suite (which is the one that is used in the
+      // bindings of the cryptography methods).
+      retry_suites_array[0] = common_suite;
+      edhoc_parameters.supported_cipher_suites =
+          (const struct com_edhoc_cipher_suite_list){
+              .suites = retry_suites_array, .number_of_suites = 1};
+      edhoc_context_deinit(context);
+    }
   }
-  return ok(context);
+  const struct srv_edhoc_message_1_process_result failure_result = failure(
+      SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+      com_edhoc_add_protocol_error_with_description_view(
+          context, "Message 1 Process error: Processing failed", error_buffer));
+  srv_edhoc_cleanup_context(&context);
+  return failure_result;
 }
 
 enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(

@@ -55,25 +55,17 @@ struct com_edhoc_parameters tst_edhoc_srv_get_method_3_suite_2_params(void) {
           .size = sizeof(ONLY_METHOD_3) / sizeof(ONLY_METHOD_3[0])});
 }
 
-struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void) {
-  static const enum edhoc_method ONLY_METHOD_0[] = {EDHOC_METHOD_0};
+static const enum edhoc_method ONLY_METHOD_0_PTR[] = {EDHOC_METHOD_0};
 
-  return create_test_params(
-      COM_EDHOC_ONLY_SUITE_0,
-      (struct com_edhoc_methods){
-          .data = ONLY_METHOD_0,
-          .size = sizeof(ONLY_METHOD_0) / sizeof(ONLY_METHOD_0[0]),
-      });
+static const struct com_edhoc_methods ONLY_METHOD_0 = {
+    .data = ONLY_METHOD_0_PTR,
+    .size = sizeof(ONLY_METHOD_0_PTR) / sizeof(ONLY_METHOD_0_PTR[0]),
+};
+
+struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void) {
+  return create_test_params(COM_EDHOC_ONLY_SUITE_0, ONLY_METHOD_0);
 }
 
 struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suites_0_2_params(void) {
-  static const enum edhoc_method METHODS_0_AND_2[] = {EDHOC_METHOD_0,
-                                                      EDHOC_METHOD_2};
-
-  return create_test_params(
-      COM_EDHOC_ONLY_SUITE_0,
-      (struct com_edhoc_methods){
-          .data = METHODS_0_AND_2,
-          .size = sizeof(METHODS_0_AND_2) / sizeof(METHODS_0_AND_2[0]),
-      });
+  return create_test_params(COM_EDHOC_SUITES_2_0, ONLY_METHOD_0);
 }

@@ -143,29 +143,29 @@ cli_edhoc_resolve_negotiation(
     coap_log_err("Failed to perform initial EDHOC M1-M2 exchange\n");
     return result;
   }
-  if (result.status == CLI_EDHOC_NEGOTIATION_RENEGOTIATE) {
-    struct cli_edhoc_suites_negotiation_result negotiation_result =
-        cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
-                                   result.response_payload);
-    if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
-      return failure();
-    }
-    const struct com_edhoc_parameters retry_params = {
-        .credentials = edhoc_parameters.credentials,
-        .methods = edhoc_parameters.methods,
-        .supported_cipher_suites =
-            {
-                .number_of_suites =
-                    negotiation_result.renegotiation_suites.number_of_suites,
-                .suites = negotiation_result.renegotiation_suites.suites,
-            },
-        .selected_cipher_suite = negotiation_result.selected_suite};
-    cli_reset_edhoc_context(client_resources);
-
-    return cli_edhoc_perform_negotiation_attempt(client_resources, retry_params,
-                                                 payload_buffer);
+  if (result.status != CLI_EDHOC_NEGOTIATION_RENEGOTIATE) {
+    return result;
   }
-  return result;
+  struct cli_edhoc_suites_negotiation_result negotiation_result =
+      cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
+                                 result.response_payload);
+  if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
+    return failure();
+  }
+  const struct com_edhoc_parameters retry_params = {
+      .credentials = edhoc_parameters.credentials,
+      .methods = edhoc_parameters.methods,
+      .supported_cipher_suites =
+          {
+              .number_of_suites =
+                  negotiation_result.renegotiation_suites.number_of_suites,
+              .suites = negotiation_result.renegotiation_suites.suites,
+          },
+      .selected_cipher_suite = negotiation_result.selected_suite};
+  cli_reset_edhoc_context(client_resources);
+
+  return cli_edhoc_perform_negotiation_attempt(client_resources, retry_params,
+                                               payload_buffer);
 }
 
 enum com_emulation_status core_run_client(void) {

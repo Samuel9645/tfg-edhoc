@@ -29,7 +29,7 @@ enum {
 };
 
 // WHY DO WE NEED THIS?
-// libedhoc only supports cipher suites 0 and 2. Since we want to verify order
+// libedhoc (v3.16) only supports cipher suites 0 and 2. Since we want to verify order
 // preservation so we need a dummy suite just for testing the behavior
 static const struct edhoc_cipher_suite DUMMY_SUITE = {
     .value = 4,
@@ -163,7 +163,7 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
 }
 
 void test_prioritize_initiator_suite_preference(void) {
-  // This case seems imposible but since libedhoc only support cipher suites 0
+  // This case seems imposible but since libedhoc (v3.16) only support cipher suites 0
   // and 2, and we are only checking that the order is preserved, is valid
   const uint8_t SUITES_3_2_0[] = {
       TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_3,

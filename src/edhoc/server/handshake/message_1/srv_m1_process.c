@@ -152,7 +152,7 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     }
     edhoc_parameters.selected_cipher_suite = common_suite;
     // WHY DO WE DO THIS?
-    // libedhoc forces this as the Message 1 processing function blindly
+    // libedhoc (v3.16) forces this as the Message 1 processing function blindly
     // selects the last cipher suite in the array as the chosen one instead of
     // picking the selected_cipher_suite (which is the one that is used in the
     // bindings of the cryptography methods).

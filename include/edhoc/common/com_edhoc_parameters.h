@@ -22,7 +22,7 @@ struct com_edhoc_methods {
 struct com_edhoc_parameters {
   const struct edhoc_credentials* credentials;
   // WHY THIS ISN'T CONST?
-  // libedhoc forces this as the Message 1 processing function blindly selects
+  // libedhoc (v3.16) forces this as the Message 1 processing function blindly selects
   // the last cipher suite in the array as the chosen one instead of picking the
   // selected_cipher_suite (which is the one that is used in the bindings of the
   // cryptography methods)

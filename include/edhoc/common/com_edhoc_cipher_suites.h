@@ -18,10 +18,10 @@ struct com_edhoc_cipher_suite_details {
 };
 
 // WHY THIS ISN'T THE FIELDS CONST?
-// libedhoc forces this as the Message 1 processing function blindly selects
-// the last cipher suite in the array as the chosen one instead of picking the
-// selected_cipher_suite (which is the one that is used in the bindings of the
-// cryptography methods).
+// libedhoc (v3.16) forces this as the Message 1 processing function blindly
+// selects the last cipher suite in the array as the chosen one instead of
+// picking the selected_cipher_suite (which is the one that is used in the
+// bindings of the cryptography methods).
 // So we need to override the data of the supported list
 struct com_edhoc_cipher_suite_list {
   // WHY ARE WE USING DOUBLE POINTERS?

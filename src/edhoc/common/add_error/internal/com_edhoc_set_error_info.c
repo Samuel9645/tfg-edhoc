@@ -14,7 +14,7 @@ void com_edhoc_set_error_info(struct edhoc_error_info* error_info,
   memset(error_info, 0, sizeof(*error_info));
   const size_t error_message_length = strlen(error_message);
   // WHY DO WE DO THIS CAST?
-  // libedhoc marks the text_string as a regular char* but it does not modify it
+  // libedhoc (v3.16) marks the text_string as a regular char* but it does not modify it
   // in any of the usages, so this may be an oversight of the library
   error_info->text_string = (char*)error_message;
   error_info->total_entries = error_message_length;

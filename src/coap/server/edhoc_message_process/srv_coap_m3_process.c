@@ -32,7 +32,7 @@ coap_pdu_code_t srv_coap_process_message_3_result(
     const char* error_message =
         srv_edhoc_handle_message_3_status_code_to_string(
             message_3_result.status);
-    coap_log_err("Message 3 processing failed: %s\n", error_message);
+    coap_log_err("Message 3 responder failed: %s\n", error_message);
   }
   return map_message_3_status_to_response(message_3_result.status);
 }

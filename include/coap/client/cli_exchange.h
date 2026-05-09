@@ -74,9 +74,6 @@ struct cli_coap_exchange* cli_coap_init_exchange(
  */
 void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange);
 
-bool cli_coap_exchange_response_is_error(
-    const struct cli_coap_exchange* exchange);
-
 /**
  * @brief Send EDHOC payload in a CoAP POST request.
  *
@@ -93,6 +90,7 @@ enum status_coap cli_coap_exchange_send(
 struct cli_coap_wait_and_get_result {
   const enum status_coap status;
   const struct com_readonly_buffer response;
+  const bool response_is_error;
 };
 
 /**
@@ -100,7 +98,8 @@ struct cli_coap_wait_and_get_result {
  *
  * @param[in,out] exchange Initialized exchange state.
  * @return Struct containing status code and view of response payload on
- * success, empty view on failure.
+ * success with a flag telling whether the response is an error, or empty view
+ * on failure.
  *
  * @note For CoAP error responses, the EDHOC error payload is still copied to
  * response_data when present and valid.

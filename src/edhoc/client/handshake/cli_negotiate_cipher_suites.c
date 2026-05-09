@@ -87,3 +87,17 @@ struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
   }
   return no_common_suites();
 }
+
+bool cli_edhoc_error_suggests_renegotiation(
+    const struct com_readonly_buffer encoded_error_buffer) {
+  enum edhoc_error_code received_code = -1;
+  char decoded_error[CLI_GET_RESPONDER_SUITES_ERROR_SIZE] = {0};
+  struct edhoc_error_info received_info = {
+      .text_string = decoded_error, .total_entries = sizeof(decoded_error)};
+  if (edhoc_message_error_process(encoded_error_buffer.bytes,
+                                  encoded_error_buffer.length, &received_code,
+                                  &received_info) != EDHOC_SUCCESS) {
+    return false;
+  }
+  return received_code == EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
+}

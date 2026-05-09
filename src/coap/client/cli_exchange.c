@@ -80,16 +80,6 @@ void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange) {
   free(exchange);
 }
 
-bool cli_coap_exchange_response_is_error(
-    const struct cli_coap_exchange* exchange) {
-  if (exchange == NULL) {
-    coap_log_err(
-        "FATAL ERROR: exchange is NULL when checking if it is an error\n");
-    return true;
-  }
-  return exchange->response_is_error;
-}
-
 bool cli_coap_exchange_session_data_is_valid(
     const struct cli_coap_exchange_session_data* session_data) {
   return session_data != NULL && session_data->context != NULL &&
@@ -178,10 +168,12 @@ enum status_coap cli_coap_exchange_send(
 }
 
 static struct cli_coap_wait_and_get_result wait_and_get_ok(
-    const struct com_readonly_buffer response_data) {
+    const struct com_readonly_buffer response_data,
+    const bool response_is_error) {
   return (struct cli_coap_wait_and_get_result){
       .status = STATUS_COAP_OK,
       .response = response_data,
+      .response_is_error = response_is_error,
   };
 }
 
@@ -208,5 +200,5 @@ struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     coap_log_err("no response received\n");
     return wait_and_get_failure();
   }
-  return wait_and_get_ok(response_buffer);
+  return wait_and_get_ok(response_buffer, exchange->response_is_error);
 }

@@ -35,6 +35,16 @@ struct cli_edhoc_suites_negotiation_result {
 };
 
 /**
+ * @brief Checks if the Message 1 response error suggests renegotiation of
+ * cipher suites
+ * @param encoded_error_buffer View of the error response to Message 1
+ * @return true if error buffer contains cipher suite mismatch error, false
+ * otherwise
+ */
+bool cli_edhoc_error_suggests_renegotiation(
+    struct com_readonly_buffer encoded_error_buffer);
+
+/**
  * @brief Negotiates suites based on the initiator supported suites and the
  * given responder suites inside the encoded error buffer.
  * @param own_supported_suites List of cipher suites supported by the

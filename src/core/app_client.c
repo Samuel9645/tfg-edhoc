@@ -69,6 +69,7 @@ enum cli_first_interaction_status {
   CLI_EDHOC_NEGOTIATION_ERR
 };
 
+// ReSharper disable once CppClassNeverUsed
 struct cli_edhoc_negotiation_attempt_result {
   enum cli_first_interaction_status status;
   struct com_readonly_buffer response_payload;
@@ -120,7 +121,8 @@ cli_edhoc_perform_negotiation_attempt(
     coap_log_err("Failed get Message 1 response\n");
     return failure();
   }
-  if (cli_coap_exchange_response_is_error(exchange)) {
+  if (wait_and_get_result.response_is_error &&
+      cli_edhoc_error_suggests_renegotiation(wait_and_get_result.response)) {
     coap_log_info(
         "Received error response to Message 1, attempting renegotiation\n");
     return renegotiation(wait_and_get_result);
@@ -225,13 +227,6 @@ enum com_emulation_status core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  if (com_edhoc_setup_context(&client_resources.edhoc_context, edhoc_parameters,
-                              payload_buffer)
-          .status != COM_EDHOC_SETUP_CTX_OK) {
-    coap_log_err("Failed to initialize EDHOC context\n");
-    return COM_EMULATION_FAILURE;
-  }
-
   const struct cli_edhoc_negotiation_attempt_result
       message_1_negotiation_attempt_result = cli_edhoc_resolve_negotiation(
           &client_resources, edhoc_parameters, SUPPORTED_SUITES,
@@ -275,6 +270,10 @@ enum com_emulation_status core_run_client(void) {
       cli_coap_exchange_wait_and_get(exchange);
   if (wait_and_get_result2.status != STATUS_COAP_OK) {
     coap_log_err("Failed to receive EDHOC message 4\n");
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+  if (wait_and_get_result2.response_is_error) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }

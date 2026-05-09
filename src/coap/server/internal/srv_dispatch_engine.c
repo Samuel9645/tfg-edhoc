@@ -2,7 +2,6 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
-#include "edhoc/edhoc_config.h"
 
 /**
  * @brief Validate all required dependency function pointers are non-NULL.

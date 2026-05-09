@@ -16,7 +16,6 @@
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
 #include "edhoc/credentials/cred_pub_data.h"
-#include "edhoc/edhoc_config.h"
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {

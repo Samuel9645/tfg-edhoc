@@ -22,7 +22,6 @@
 #include "edhoc/common/add_error/mocks/tst_mock_edhoc_get_code.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 #include "edhoc/common/tst_edhoc_params.h"
-#include "edhoc/edhoc_config.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_context_init.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_message_1_process.h"

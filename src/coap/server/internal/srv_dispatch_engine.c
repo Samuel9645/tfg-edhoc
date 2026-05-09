@@ -2,6 +2,7 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
+#include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
 /**
  * @brief Validate all required dependency function pointers are non-NULL.
@@ -49,6 +50,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
   };
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
+  coap_pdu_code_t final_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
   if (edhoc_ctx == NULL) {
     const struct srv_edhoc_message_1_responder_request request = {
         .raw_payload = parsed_request};
@@ -58,18 +60,27 @@ static coap_pdu_code_t route_and_process_edhoc_message(
                                 deps->add_response_payload)) {
       return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
-    return deps->process_message_1_result(message_1_result, session);
+    final_code = deps->process_message_1_result(message_1_result, session);
+  } else {
+    const struct srv_edhoc_message_3_responder_request handler_request = {
+        .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
+    const struct srv_edhoc_message_3_responder_result message_3_result =
+        deps->respond_to_message_3(handler_request, response_buffer);
+    if (!add_payload_if_present(response, message_3_result.response,
+                                deps->add_response_payload)) {
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    }
+    final_code = deps->process_message_3_result(message_3_result);
   }
-
-  const struct srv_edhoc_message_3_responder_request handler_request = {
-      .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
-  const struct srv_edhoc_message_3_responder_result message_3_result =
-      deps->respond_to_message_3(handler_request, response_buffer);
-  if (!add_payload_if_present(response, message_3_result.response,
-                              deps->add_response_payload)) {
-    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  if (final_code == COAP_RESPONSE_CODE_INTERNAL_ERROR ||
+      final_code == COAP_RESPONSE_CODE_BAD_REQUEST) {
+    coap_log_warn("EDHOC failure: Aborting session context\n");
+    if (edhoc_ctx != NULL) {
+      srv_edhoc_cleanup_context(&edhoc_ctx);
+      coap_session_set_app_data2(session, NULL, NULL);
+    }
   }
-  return deps->process_message_3_result(message_3_result);
+  return final_code;
 }
 
 void srv_coap_dispatch_post_with_dependencies(

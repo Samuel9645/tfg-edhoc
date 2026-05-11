@@ -35,24 +35,14 @@ static int dummy_verify_credentials(
 static const struct edhoc_credentials DUMMY_TEST_CREDS = {
     .fetch = dummy_fetch_credentials, .verify = dummy_verify_credentials};
 
-static struct com_edhoc_parameters create_test_params(
+struct com_edhoc_parameters tst_edhoc_create_test_params(
     const struct com_edhoc_cipher_suite_list suites,
-    const struct com_edhoc_methods methods) {
-  return (struct com_edhoc_parameters){
-      .credentials = &DUMMY_TEST_CREDS,
-      .supported_cipher_suites = suites,
-      .selected_cipher_suite = suites.suites[0],
-      .methods = methods};
-}
-
-struct com_edhoc_parameters tst_edhoc_srv_get_method_3_suite_2_params(void) {
-  static const enum edhoc_method ONLY_METHOD_3[] = {EDHOC_METHOD_3};
-
-  return create_test_params(
-      COM_EDHOC_ONLY_SUITE_2,
-      (struct com_edhoc_methods){
-          .data = ONLY_METHOD_3,
-          .size = sizeof(ONLY_METHOD_3) / sizeof(ONLY_METHOD_3[0])});
+    const struct com_edhoc_methods methods,
+    const struct com_edhoc_cipher_suite_details* selected_suite) {
+  return (struct com_edhoc_parameters){.credentials = &DUMMY_TEST_CREDS,
+                                       .supported_cipher_suites = suites,
+                                       .selected_cipher_suite = selected_suite,
+                                       .methods = methods};
 }
 
 static const enum edhoc_method ONLY_METHOD_0_PTR[] = {EDHOC_METHOD_0};
@@ -62,10 +52,7 @@ static const struct com_edhoc_methods ONLY_METHOD_0 = {
     .size = sizeof(ONLY_METHOD_0_PTR) / sizeof(ONLY_METHOD_0_PTR[0]),
 };
 
-struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suite_0_params(void) {
-  return create_test_params(COM_EDHOC_ONLY_SUITE_0, ONLY_METHOD_0);
-}
-
-struct com_edhoc_parameters tst_edhoc_srv_get_method_0_suites_0_2_params(void) {
-  return create_test_params(COM_EDHOC_SUITES_2_0, ONLY_METHOD_0);
+struct com_edhoc_parameters tst_edhoc_get_method_0_suite_0_params(void) {
+  return tst_edhoc_create_test_params(COM_EDHOC_ONLY_SUITE_0, ONLY_METHOD_0,
+                                      &COM_EDHOC_SUITE_0);
 }

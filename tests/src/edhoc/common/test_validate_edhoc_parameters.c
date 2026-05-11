@@ -21,7 +21,7 @@ void setUp(void) { memset(error_buffer, 0, sizeof(error_buffer)); }
 
 void test_valid_parameters(void) {
   const struct com_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
 
   const struct com_edhoc_validate_parameters_result result =
       com_edhoc_validate_parameters(&valid_params, error_buffer_view);
@@ -31,7 +31,7 @@ void test_valid_parameters(void) {
 
 void test_fails_on_invalid_parameters(void) {
   const struct com_edhoc_parameters valid_params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
 
   const struct {
     struct com_edhoc_parameters params;

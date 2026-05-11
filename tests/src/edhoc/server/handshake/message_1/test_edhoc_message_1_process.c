@@ -85,7 +85,7 @@ void test_m1_process_ok_for_valid_data(void) {
 
   struct srv_edhoc_message_1_process_result result =
       srv_edhoc_process_message_1(request, env.error,
-                                  tst_edhoc_srv_get_method_0_suite_0_params());
+                                  tst_edhoc_get_method_0_suite_0_params());
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.context);
@@ -135,8 +135,15 @@ void test_m1_process_reports_cipher_suite_mismatch(void) {
   const struct srv_edhoc_message_1_request request = create_msg1_request(
       MESSAGE_1_SUITE_6_REQUEST, sizeof(MESSAGE_1_SUITE_6_REQUEST));
   use_real_implementations();
+
+  const enum edhoc_method ONLY_METHOD_3[] = {EDHOC_METHOD_3};
   const struct com_edhoc_parameters method_3_suite_2_params =
-      tst_edhoc_srv_get_method_3_suite_2_params();
+      tst_edhoc_create_test_params(
+          COM_EDHOC_ONLY_SUITE_2,
+          (struct com_edhoc_methods){
+              .data = ONLY_METHOD_3,
+              .size = sizeof(ONLY_METHOD_3) / sizeof(ONLY_METHOD_3[0])},
+          &COM_EDHOC_SUITE_2);
 
   const struct srv_edhoc_message_1_process_result result =
       srv_edhoc_process_message_1(request, env.error, method_3_suite_2_params);
@@ -166,9 +173,9 @@ void test_m1_process_fails_on_invalid_data(void) {
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
     reset_mock_results();
     const struct srv_edhoc_message_1_process_result result =
-        srv_edhoc_process_message_1(
-            test_cases[i].request, test_cases[i].response,
-            tst_edhoc_srv_get_method_0_suite_0_params());
+        srv_edhoc_process_message_1(test_cases[i].request,
+                                    test_cases[i].response,
+                                    tst_edhoc_get_method_0_suite_0_params());
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
@@ -197,9 +204,8 @@ void test_m1_process_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_process_result result =
-        srv_edhoc_process_message_1(
-            create_valid_request(), env.error,
-            tst_edhoc_srv_get_method_0_suite_0_params());
+        srv_edhoc_process_message_1(create_valid_request(), env.error,
+                                    tst_edhoc_get_method_0_suite_0_params());
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

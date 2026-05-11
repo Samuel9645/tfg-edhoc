@@ -60,9 +60,9 @@ void test_responder_ok_for_valid_data(void) {
   tst_srv_edhoc_m2_set_compose_ok();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(
-          create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
-          env.response);
+      srv_edhoc_respond_to_message_1(create_valid_request(),
+                                     tst_edhoc_get_method_0_suite_0_params(),
+                                     env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_OK, result.status);
   tst_srv_edhoc_m2_compose_assert_writes_message_in_buffer(result.response);
@@ -87,7 +87,7 @@ void test_responder_reports_failure_when_receiving_message_3(void) {}
 void test_responder_fails_on_invalid_data(void) {
   const struct com_writable_buffer empty_response = {0};
   const struct com_edhoc_parameters valid_parameters =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   const struct srv_edhoc_message_1_responder_request valid_request =
       create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
@@ -129,9 +129,9 @@ void test_responder_fails_when_parser_reports_invalid_request_buffer(void) {
   };
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(
-          invalid_request, tst_edhoc_srv_get_method_0_suite_0_params(),
-          env.response);
+      srv_edhoc_respond_to_message_1(invalid_request,
+                                     tst_edhoc_get_method_0_suite_0_params(),
+                                     env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -143,9 +143,9 @@ void test_responder_fails_when_parser_reports_prefix_extraction_failure(void) {
   tst_srv_edhoc_m1_set_extract_failed();
 
   const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(
-          create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
-          env.response);
+      srv_edhoc_respond_to_message_1(create_valid_request(),
+                                     tst_edhoc_get_method_0_suite_0_params(),
+                                     env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
                     result.status);
@@ -190,9 +190,9 @@ void test_responder_fails_on_library_errors(void) {
     cases[i].setup_scenario();
 
     const struct srv_edhoc_message_1_responder_result result =
-        srv_edhoc_respond_to_message_1(
-            create_valid_request(), tst_edhoc_srv_get_method_0_suite_0_params(),
-            env.response);
+        srv_edhoc_respond_to_message_1(create_valid_request(),
+                                       tst_edhoc_get_method_0_suite_0_params(),
+                                       env.response);
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);

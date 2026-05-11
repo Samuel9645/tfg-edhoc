@@ -36,7 +36,7 @@ void setUp(void) { reset_env(); }
 
 void test_setup_context_ok_with_valid_parameters(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
 
   const struct com_edhoc_setup_context_result result =
       com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
@@ -48,7 +48,7 @@ void test_setup_context_fails_on_invalid_error_buffer(void) {
   const struct com_writable_buffer invalid_buffer = {.bytes = NULL,
                                                      .capacity = 0};
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
 
   const struct com_edhoc_setup_context_result result =
       com_edhoc_setup_context(&env.context, params, invalid_buffer);
@@ -70,7 +70,7 @@ void test_setup_context_fails_on_invalid_edhoc_parameters(void) {
 
 void test_setup_context_fails_on_psa_crypto_init_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_psa_crypto_init_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -85,7 +85,7 @@ void test_setup_context_fails_on_psa_crypto_init_failure(void) {
 
 void test_setup_context_fails_on_edhoc_context_init_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_context_init_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -100,7 +100,7 @@ void test_setup_context_fails_on_edhoc_context_init_failure(void) {
 
 void test_setup_context_fails_on_set_methods_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_set_methods_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -114,7 +114,7 @@ void test_setup_context_fails_on_set_methods_failure(void) {
 
 void test_setup_context_fails_on_set_cipher_suites_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_set_cipher_suites_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -128,7 +128,7 @@ void test_setup_context_fails_on_set_cipher_suites_failure(void) {
 
 void test_setup_context_fails_on_set_connection_id_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_set_connection_id_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -142,7 +142,7 @@ void test_setup_context_fails_on_set_connection_id_failure(void) {
 
 void test_setup_context_fails_on_bind_keys_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_bind_keys_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -156,7 +156,7 @@ void test_setup_context_fails_on_bind_keys_failure(void) {
 
 void test_setup_context_fails_on_bind_crypto_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_bind_crypto_failure();
 
   const struct com_edhoc_setup_context_result result =
@@ -170,7 +170,7 @@ void test_setup_context_fails_on_bind_crypto_failure(void) {
 
 void test_setup_context_fails_on_bind_credentials_failure(void) {
   const struct com_edhoc_parameters params =
-      tst_edhoc_srv_get_method_0_suite_0_params();
+      tst_edhoc_get_method_0_suite_0_params();
   tst_com_set_edhoc_bind_credentials_failure();
 
   const struct com_edhoc_setup_context_result result =

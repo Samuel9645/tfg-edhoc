@@ -36,7 +36,7 @@ static int client_credential_verify(void* user_context,
       CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
 }
 
-static const struct edhoc_credentials credentials = {
+static const struct edhoc_credentials CREDENTIALS = {
     .fetch = client_credential_fetch,
     .verify = client_credential_verify,
 };
@@ -201,7 +201,7 @@ enum com_emulation_status core_run_client(void) {
   const struct com_edhoc_cipher_suite_list INITIAL_PREFERRED_SUITES =
       COM_EDHOC_ONLY_SUITE_0;
   const struct com_edhoc_parameters edhoc_parameters = {
-      .credentials = &credentials,
+      .credentials = &CREDENTIALS,
       .supported_cipher_suites = INITIAL_PREFERRED_SUITES,
       .selected_cipher_suite = INITIAL_PREFERRED_SUITES.suites[0],
       .methods =

@@ -32,6 +32,14 @@ void test_valid_parameters(void) {
 void test_fails_on_invalid_parameters(void) {
   const struct com_edhoc_parameters valid_params =
       tst_edhoc_get_method_0_suite_0_params();
+  const struct com_edhoc_cipher_suite_list duplicated_cipher_suites = {
+      .suites =
+          (const struct com_edhoc_cipher_suite_details*[]){
+              valid_params.supported_cipher_suites.suites[0],
+              valid_params.supported_cipher_suites.suites[0],
+          },
+      .number_of_suites = 2,
+  };
 
   const struct {
     struct com_edhoc_parameters params;
@@ -86,7 +94,12 @@ void test_fails_on_invalid_parameters(void) {
           .expected_error = "EDHOC parameters validation error: Selected "
                             "cipher suite must be one of the supported ones",
       },
-  };
+      {.params = {.supported_cipher_suites = duplicated_cipher_suites,
+                  .methods = valid_params.methods,
+                  .credentials = valid_params.credentials,
+                  .selected_cipher_suite = valid_params.selected_cipher_suite},
+       .expected_error = "EDHOC parameters validation error: Duplicated cipher "
+                         "suites in supported list"}};
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
 

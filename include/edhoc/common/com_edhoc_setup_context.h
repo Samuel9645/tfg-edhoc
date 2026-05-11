@@ -29,14 +29,21 @@ struct com_edhoc_setup_context_result {
  * Initializes PSA crypto and configures EDHOC context with cipher suite,
  * methods, and credentials.
  * @param[in] context Pointer to uninitialized edhoc_context
- * @param[in] edhoc_parameters Parameters including credentials and supported
- * cipher suites for the EDHOC handshake.
+ * @param[in] edhoc_parameters Parameters including credentials and
+ * cipher suites data for the EDHOC handshake. The selected cipher suite is
+ * added at the end of the suites lists, the last cipher suite is the selected
+ * one in both the initiator and responder.
  * @param[in] error_buffer Writable buffer to write error messages in case of
  * failure.
  * @return Struct containing the status of the operation and a view of the
  * filled buffer on failure, empty view with success code on success
  * @note This function uses edhoc_context_init, so the context needs to be
  * deinitialized with edhoc_context_deinit after use to free resources.
+ * @note Adding the selected suite at the end does not affect the negotiation
+ * with the responder, since the order of the responder suites is irrelevant in
+ * that process.
+ * @see [RFC
+ * 9528 6.3](https://datatracker.ietf.org/doc/html/rfc9528#name-wrong-selected-cipher-suite)
  */
 struct com_edhoc_setup_context_result com_edhoc_setup_context(
     struct edhoc_context* context, struct com_edhoc_parameters edhoc_parameters,

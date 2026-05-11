@@ -105,9 +105,20 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
       edhoc_parameters.supported_cipher_suites;
   const size_t number_of_suites = supported_suites.number_of_suites;
   struct edhoc_cipher_suite cipher_suites[number_of_suites];
+  const struct com_edhoc_cipher_suite_details* selected_cipher_suite_details =
+      edhoc_parameters.selected_cipher_suite;
+  const struct edhoc_cipher_suite* selected_suite =
+      selected_cipher_suite_details->metadata;
+  size_t write_index = 0;
   for (size_t i = 0; i < number_of_suites; i++) {
-    cipher_suites[i] = *supported_suites.suites[i]->metadata;
+    const struct edhoc_cipher_suite* current_supported_suite =
+        supported_suites.suites[i]->metadata;
+    if (current_supported_suite == selected_suite) {
+      continue;
+    }
+    cipher_suites[write_index++] = *current_supported_suite;
   }
+  cipher_suites[number_of_suites - 1] = *selected_suite;
   if (edhoc_set_cipher_suites(context, cipher_suites, number_of_suites) !=
       EDHOC_SUCCESS) {
     return failure(
@@ -128,16 +139,14 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             context, "Context Setup error: Failed to set connection ID",
             error_buffer));
   }
-  const struct com_edhoc_cipher_suite_details* preferred_suite_details =
-      edhoc_parameters.selected_cipher_suite;
-  if (edhoc_bind_keys(context, preferred_suite_details->get_keys()) !=
+  if (edhoc_bind_keys(context, selected_cipher_suite_details->get_keys()) !=
       EDHOC_SUCCESS) {
     return failure(
         COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS,
         com_edhoc_add_protocol_error_with_description_view(
             context, "Context Setup error: Failed to bind keys", error_buffer));
   }
-  if (edhoc_bind_crypto(context, preferred_suite_details->get_crypto()) !=
+  if (edhoc_bind_crypto(context, selected_cipher_suite_details->get_crypto()) !=
       EDHOC_SUCCESS) {
     return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO,
                    com_edhoc_add_protocol_error_with_description_view(

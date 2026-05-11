@@ -21,12 +21,13 @@ struct com_edhoc_methods {
 
 struct com_edhoc_parameters {
   const struct edhoc_credentials* credentials;
-  // WHY THIS ISN'T CONST?
-  // libedhoc (v3.16) forces this as the Message 1 processing function blindly selects
-  // the last cipher suite in the array as the chosen one instead of picking the
-  // selected_cipher_suite (which is the one that is used in the bindings of the
-  // cryptography methods)
-  struct com_edhoc_cipher_suite_list supported_cipher_suites;
+  /**
+   * @brief list of supported suites in order of preference
+   */
+  const struct com_edhoc_cipher_suite_list supported_cipher_suites;
+  /**
+   * @brief Pointer to the selected suite (must be one of the supported ones)
+   */
   const struct com_edhoc_cipher_suite_details* selected_cipher_suite;
   const struct com_edhoc_methods methods;
 };

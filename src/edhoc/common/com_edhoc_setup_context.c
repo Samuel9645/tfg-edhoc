@@ -25,7 +25,7 @@ enum {
   COM_EDHOC_MAX_INT_CID = 23
 };
 
-static int8_t global_cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
+static int8_t cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
 
 /**
  * @brief Gets the next valid one byte connection identifier of the session
@@ -40,10 +40,10 @@ static int8_t global_cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
  * @return Connection Identifier of the new session.
  */
 static int8_t get_next_single_byte_integer_cid(void) {
-  const int8_t assigned = global_cid_counter;
-  global_cid_counter++;
-  if (global_cid_counter > COM_EDHOC_MAX_INT_CID) {
-    global_cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
+  const int8_t assigned = cid_counter;
+  cid_counter++;
+  if (cid_counter > COM_EDHOC_MAX_INT_CID) {
+    cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
   }
   return assigned;
 }

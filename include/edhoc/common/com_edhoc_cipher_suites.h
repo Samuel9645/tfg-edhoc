@@ -17,18 +17,12 @@ struct com_edhoc_cipher_suite_details {
   const struct edhoc_crypto* (*get_crypto)(void);
 };
 
-// WHY THIS ISN'T THE FIELDS CONST?
-// libedhoc (v3.16) forces this as the Message 1 processing function blindly
-// selects the last cipher suite in the array as the chosen one instead of
-// picking the selected_cipher_suite (which is the one that is used in the
-// bindings of the cryptography methods).
-// So we need to override the data of the supported list
 struct com_edhoc_cipher_suite_list {
   // WHY ARE WE USING DOUBLE POINTERS?
   // This ensures that only global cipher suites are being used
   // and prevents copying errors
-  const struct com_edhoc_cipher_suite_details** suites;
-  size_t number_of_suites;
+  const struct com_edhoc_cipher_suite_details* const* suites;
+  const size_t number_of_suites;
 };
 
 /**

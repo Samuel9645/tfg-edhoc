@@ -51,11 +51,12 @@ const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0 = {
     .get_keys = edhoc_cipher_suite_0_get_keys,
 };
 
-static const struct com_edhoc_cipher_suite_details* SUITE_0_PTRS[] = {
-    &COM_EDHOC_SUITE_0};
+static const struct com_edhoc_cipher_suite_details* const
+    ONLY_SUITE_0_DETAILS[] = {&COM_EDHOC_SUITE_0};
 const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0 = {
-    .number_of_suites = sizeof(SUITE_0_PTRS) / sizeof(SUITE_0_PTRS[0]),
-    .suites = SUITE_0_PTRS,
+    .number_of_suites =
+        sizeof(ONLY_SUITE_0_DETAILS) / sizeof(ONLY_SUITE_0_DETAILS[0]),
+    .suites = ONLY_SUITE_0_DETAILS,
 };
 
 static const struct edhoc_cipher_suite CIPHER_SUITE_2 = {
@@ -75,17 +76,20 @@ const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_2 = {
     .get_crypto = edhoc_cipher_suite_2_get_crypto,
 };
 
-static const struct com_edhoc_cipher_suite_details* SUITE_2_PTRS[] = {
+static const struct com_edhoc_cipher_suite_details* const
+    ONLY_SUITE_2_DETAILS[] = {
     &COM_EDHOC_SUITE_2};
 const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_2 = {
-    .number_of_suites = sizeof(SUITE_2_PTRS) / sizeof(SUITE_2_PTRS[0]),
-    .suites = SUITE_2_PTRS,
+    .number_of_suites =
+        sizeof(ONLY_SUITE_2_DETAILS) / sizeof(ONLY_SUITE_2_DETAILS[0]),
+    .suites = ONLY_SUITE_2_DETAILS,
 };
 
-static const struct com_edhoc_cipher_suite_details* SUITE_0_2_PTRS[] = {
+static const struct com_edhoc_cipher_suite_details* const SUITE_0_2_DETAILS[] = {
     &COM_EDHOC_SUITE_0, &COM_EDHOC_SUITE_2};
 
 const struct com_edhoc_cipher_suite_list COM_EDHOC_SUITES_2_0 = {
-    .number_of_suites = sizeof(SUITE_0_2_PTRS) / sizeof(SUITE_0_2_PTRS[0]),
-    .suites = SUITE_0_2_PTRS,
+    .number_of_suites =
+        sizeof(SUITE_0_2_DETAILS) / sizeof(SUITE_0_2_DETAILS[0]),
+    .suites = SUITE_0_2_DETAILS,
 };

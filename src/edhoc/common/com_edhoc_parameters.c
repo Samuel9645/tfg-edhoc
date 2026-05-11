@@ -41,6 +41,19 @@ static bool suite_in_suites_list(
   return found_in_supported;
 }
 
+bool duplicated_suites_in(
+    const struct com_edhoc_cipher_suite_list* supported_suites) {
+  for (size_t i = 0; i < supported_suites->number_of_suites; i++) {
+    for (size_t j = i + 1; j < supported_suites->number_of_suites; j++) {
+      if (supported_suites->suites[i]->metadata ==
+          supported_suites->suites[j]->metadata) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
     const struct com_edhoc_parameters* parameters,
     const struct com_writable_buffer error_buffer) {
@@ -68,18 +81,12 @@ struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
         "EDHOC parameters validation error: Invalid selected cipher suite",
         error_buffer));
   }
-  for (size_t i = 0; i < supported_suites->number_of_suites; i++) {
-    for (size_t j = i + 1; j < supported_suites->number_of_suites; j++) {
-      if (supported_suites->suites[i]->metadata ==
-          supported_suites->suites[j]->metadata) {
-        return failure(com_edhoc_add_internal_error_view(
-            "EDHOC parameters validation error: Duplicated cipher "
-            "suites in supported list",
-            error_buffer));
-      }
-    }
+  if (duplicated_suites_in(supported_suites)) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Duplicated cipher "
+        "suites in supported list",
+        error_buffer));
   }
-
   if (!suite_in_suites_list(parameters->selected_cipher_suite,
                             supported_suites)) {
     return failure(com_edhoc_add_internal_error_view(

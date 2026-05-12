@@ -178,7 +178,7 @@ add_unity_test(test_validate_edhoc_parameters
 )
 
 set(MESSAGE_1_EXTRACT_MOCK
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.c
+    src/coap/server/extract_edhoc_message/mocks/tst_srv_mock_edhoc_extract_flow_info.c
     "-Wl,--wrap=edhoc_extract_flow_info"
 )
 
@@ -251,7 +251,7 @@ add_unity_test(test_send_message_1
 )
 
 set(MESSAGE_3_EXTRACT_MOCK
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_extract_deps.c
+    src/coap/server/extract_edhoc_message/mocks/tst_srv_mock_m3_extract_deps.c
 )
 
 add_unity_test(test_coap_extract_message_3

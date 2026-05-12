@@ -20,7 +20,7 @@ void tst_srv_edhoc_m1_set_extract_failed(void) {
   use_real_extract_flow = false;
 }
 
-void tst_srv_edhoc_m1_reset_extract_mock(void) { use_real_extract_flow = true; }
+void tst_srv_edhoc_reset_extract_mock(void) { use_real_extract_flow = true; }
 
 extern int __real_edhoc_extract_flow_info(  // NOLINT(*-reserved-identifier)
                                             // we need this

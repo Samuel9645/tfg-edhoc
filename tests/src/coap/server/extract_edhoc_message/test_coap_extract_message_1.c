@@ -28,7 +28,7 @@ static struct {
     .error_buffer_view = {.capacity = TST_M1_EXTRACT_ERROR_BUFFER_SIZE}};
 
 void setUp(void) {
-  tst_srv_edhoc_m1_reset_extract_mock();
+  tst_srv_edhoc_reset_extract_mock();
   memset(test_env.error_message, 0, TST_M1_EXTRACT_ERROR_BUFFER_SIZE);
   test_env.error_buffer_view.bytes = test_env.error_message;
 }

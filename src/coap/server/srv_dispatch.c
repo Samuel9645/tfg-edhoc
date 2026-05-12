@@ -1,5 +1,6 @@
 #include "coap/server/srv_dispatch.h"
 
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_response.h"
 #include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
@@ -13,6 +14,7 @@ static const struct srv_coap_dispatch_deps
         .parse_edhoc_request = com_coap_parse_edhoc_request,
         .add_edhoc_response_options = com_coap_add_edhoc_response_options,
         .extract_message_1 = srv_coap_extract_message_1,
+        .extract_message_3 = srv_coap_extract_message_3,
         .respond_to_message_1 = srv_edhoc_respond_to_message_1,
         .process_message_1_result = srv_coap_process_message_1_result,
         .respond_to_message_3 = srv_edhoc_respond_to_message_3,

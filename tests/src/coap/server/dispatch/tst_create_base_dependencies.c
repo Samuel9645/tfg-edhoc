@@ -9,6 +9,7 @@ struct srv_coap_dispatch_deps test_srv_coap_dispatch_create_base_dependencies(
       .add_edhoc_response_options = stb_srv_coap_add_options_success,
       .respond_to_message_1 = stb_srv_edhoc_m1_responder_ok,
       .extract_message_1 = stb_srv_coap_extract_message_1_ok,
+      .extract_message_3 = stb_srv_coap_extract_message_3_ok,
       .process_message_1_result = stb_srv_coap_process_m1_ok,
       .respond_to_message_3 = stb_srv_edhoc_m3_responder_ok,
       .process_message_3_result = stb_srv_coap_process_m3_ok,

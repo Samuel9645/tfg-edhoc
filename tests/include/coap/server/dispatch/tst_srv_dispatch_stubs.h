@@ -11,6 +11,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
@@ -44,6 +45,17 @@ struct srv_coap_extract_message_1_result stb_srv_coap_extract_message_1_ok(
 struct srv_coap_extract_message_1_result
 stb_srv_coap_extract_message_1_format_failure(
     struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response);
+
+struct srv_coap_extract_message_3_result stb_srv_coap_extract_message_3_ok(
+    struct com_readonly_buffer request_buffer,
+    const struct edhoc_context* edhoc_ctx,
+    struct com_writable_buffer error_response);
+
+struct srv_coap_extract_message_3_result
+stb_srv_coap_extract_message_3_format_failure(
+    struct com_readonly_buffer request_buffer,
+    const struct edhoc_context* edhoc_ctx,
     struct com_writable_buffer error_response);
 
 struct srv_edhoc_message_1_responder_result

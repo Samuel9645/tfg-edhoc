@@ -177,7 +177,7 @@ add_unity_test(test_validate_edhoc_parameters
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
 )
 
-set(MESSAGE_1_PARSER_MOCK
+set(MESSAGE_1_EXTRACT_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.c
     "-Wl,--wrap=edhoc_extract_flow_info"
 )
@@ -185,7 +185,7 @@ set(MESSAGE_1_PARSER_MOCK
 add_unity_test(test_coap_extract_message_1
     src/coap/server/extract_edhoc_message/test_coap_extract_message_1.c
     ${COAP_EXTRACT_MESSAGE_1_SOURCES}
-    ${MESSAGE_1_PARSER_MOCK}
+    ${MESSAGE_1_EXTRACT_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
     ${COMMON_SRV_SOURCES}
 )
@@ -235,18 +235,15 @@ add_unity_test(test_edhoc_message_1_responder
 )
 
 
-set(MESSAGE_3_PARSER_MOCK
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_parser_deps.c
-
+set(MESSAGE_3_EXTRACT_MOCK
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_extract_deps.c
 )
 
-add_unity_test(test_edhoc_message_3_parser
-    src/edhoc/server/handshake/message_3/test_edhoc_message_3_parser.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
-    ${MESSAGE_3_PARSER_MOCK}
+add_unity_test(test_coap_extract_message_3
+    src/coap/server/extract_edhoc_message/test_coap_extract_message_3.c
+    ${COAP_EXTRACT_MESSAGE_3_SOURCES}
+    ${MESSAGE_3_EXTRACT_MOCK}
     ${ADD_EDHOC_ERROR_COMMON_SOURCES}
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
     ${COMMON_SRV_SOURCES}
 )
 
@@ -285,8 +282,6 @@ add_unity_test(test_edhoc_message_4_compose
 add_unity_test(test_edhoc_message_3_responder
     src/edhoc/server/handshake/message_3/test_edhoc_message_3_responder.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_responder.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
-    ${MESSAGE_3_PARSER_MOCK}
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${MESSAGE_3_PROCESS_MOCKS}
     ${MESSAGE_4_COMPOSE_MOCKS}

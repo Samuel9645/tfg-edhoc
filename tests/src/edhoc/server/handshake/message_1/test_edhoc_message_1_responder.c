@@ -49,8 +49,8 @@ void setUp(void) {
 
 static struct srv_edhoc_message_1_responder_request create_valid_request(void) {
   return (struct srv_edhoc_message_1_responder_request){
-      .raw_payload = {.bytes = DUMMY_REQUEST_BUFFER,
-                      .length = TST_SRV_EDHOC_HND_BUF_LEN}};
+      .message_1 = {.bytes = DUMMY_REQUEST_BUFFER,
+                    .length = TST_SRV_EDHOC_HND_BUF_LEN}};
 }
 
 void test_responder_ok_for_valid_data(void) {
@@ -89,7 +89,7 @@ void test_responder_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_1_responder_request valid_request =
       create_valid_request();
   const struct srv_edhoc_message_1_responder_request empty_payload_request = {
-      .raw_payload = {.bytes = NULL, .length = 0}};
+      .message_1 = {.bytes = NULL, .length = 0}};
   const struct com_edhoc_parameters empty_params = {0};
 
   const struct {

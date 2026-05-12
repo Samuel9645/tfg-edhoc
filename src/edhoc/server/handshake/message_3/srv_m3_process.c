@@ -54,16 +54,15 @@ struct srv_edhoc_message_3_process_result srv_edhoc_process_message_3(
                    com_edhoc_add_internal_error_view(
                        "Message 3 Process error: Null context", error_buffer));
   }
-  if (!com_readonly_buffer_has_content(request.parsed_message_3)) {
+  if (!com_readonly_buffer_has_content(request.message_3)) {
     return failure(
         SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3,
         com_edhoc_add_internal_error_view(
             "Message 3 Process error: Empty parsed message", error_buffer));
   }
 
-  if (edhoc_message_3_process(
-          request.edhoc_context, request.parsed_message_3.bytes,
-          request.parsed_message_3.length) != EDHOC_SUCCESS) {
+  if (edhoc_message_3_process(request.edhoc_context, request.message_3.bytes,
+                              request.message_3.length) != EDHOC_SUCCESS) {
     return failure(
         SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
         add_processing_error_to_buffer(request.edhoc_context, error_buffer));

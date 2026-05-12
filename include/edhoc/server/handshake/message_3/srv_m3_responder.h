@@ -17,7 +17,7 @@
 #include "edhoc/server/handshake/message_3/srv_m3_responder_result.h"
 
 struct srv_edhoc_message_3_responder_request {
-  struct com_readonly_buffer raw_payload;
+  struct com_readonly_buffer message_3;
   struct edhoc_context* edhoc_context;
 };
 
@@ -25,7 +25,7 @@ struct srv_edhoc_message_3_responder_request {
  * @brief Handle EDHOC Message 3 and compose Message 4.
  *
  * @param[in] request Session/request metadata for Message 3 responder,
- * including raw CoAP payload and EDHOC context.
+ * including Message 3  and EDHOC context.
  * @param[in] response Response buffer view used as input.
  * @return Struct containing status code and the composed Message 4 buffer on
  * success, or error code and error buffer on failure.

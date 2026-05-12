@@ -29,9 +29,8 @@ static struct {
   struct com_writable_buffer error;
 } env = {
     .error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-         .valid_request = {
-             .parsed_message_3 = {.bytes = DUMMY_REQUEST_BUFFER,
-                                  .length = sizeof(DUMMY_REQUEST_BUFFER)}}};
+         .valid_request = {.message_3 = {.bytes = DUMMY_REQUEST_BUFFER,
+                                    .length = sizeof(DUMMY_REQUEST_BUFFER)}}};
 
 void setUp(void) {
   tst_srv_edhoc_m3_reset_process_mock();
@@ -54,12 +53,12 @@ void test_process_ok_for_valid_data(void) {
 
 void test_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_3_request no_context = {
-      .parsed_message_3 = env.valid_request.parsed_message_3};
+      .message_3 = env.valid_request.message_3};
   const struct srv_edhoc_message_3_request no_buffer = {.edhoc_context =
                                                             &env.context};
   const struct srv_edhoc_message_3_request empty_request = {
       .edhoc_context = &env.context,
-      .parsed_message_3 = {.bytes = DUMMY_REQUEST_BUFFER, .length = 0}};
+      .message_3 = {.bytes = DUMMY_REQUEST_BUFFER, .length = 0}};
   const struct com_writable_buffer empty_error = {0};
 
   const struct {

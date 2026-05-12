@@ -15,6 +15,7 @@
 
 #include "coap/common/internal/com_parse_edhoc_request_builders.h"
 #include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.h"
+#include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m3_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
@@ -44,6 +45,29 @@ stb_srv_coap_parse_edhoc_request_fail(
   (void)data_buffer;
   return srv_coap_internal_parse_edhoc_failure(
       COM_COAP_PARSE_EDHOC_REQ_ERR_UNSUPPORTED_FORMAT);
+}
+
+struct srv_coap_extract_message_3_result stb_srv_coap_extract_message_3_ok(
+    struct com_readonly_buffer request_buffer,
+    const struct edhoc_context* edhoc_ctx,
+    struct com_writable_buffer error_response) {
+  (void)request_buffer;
+  (void)edhoc_ctx;
+  (void)error_response;
+  return srv_coap_parse_message_3_ok(DUMMY_READONLY_BUFFER);
+}
+
+struct srv_coap_extract_message_3_result
+stb_srv_coap_extract_message_3_format_failure(
+    struct com_readonly_buffer request_buffer,
+    const struct edhoc_context* edhoc_ctx,
+    struct com_writable_buffer error_response) {
+  (void)request_buffer;
+  (void)edhoc_ctx;
+  (void)error_response;
+  return srv_coap_parse_message_3_failure(
+      SRV_COAP_EXTRACT_MSG3_ERR_CON_ID_EXTRACTION_FAILED,
+      DUMMY_READONLY_BUFFER);
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};

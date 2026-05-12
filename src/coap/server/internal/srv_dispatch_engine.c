@@ -3,6 +3,7 @@
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
 /**
@@ -14,7 +15,7 @@
 static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
   return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
-         deps->extract_message_1 != NULL &&
+         deps->extract_message_1 != NULL && deps->extract_message_3 != NULL &&
          deps->respond_to_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
          deps->respond_to_message_3 != NULL &&
@@ -62,7 +63,7 @@ static coap_pdu_code_t route_and_process_edhoc_message(
           parsed_message_1.status);
     }
     const struct srv_edhoc_message_1_responder_request request = {
-        .raw_payload = parsed_message_1.buffer};
+        .message_1 = parsed_message_1.buffer};
     const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->respond_to_message_1(request, edhoc_parameters, response_buffer);
     if (!add_payload_if_present(response, message_1_result.response,
@@ -71,8 +72,17 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     }
     final_code = deps->process_message_1_result(message_1_result, session);
   } else {
+    const struct srv_coap_extract_message_3_result parsed_message_3 =
+        deps->extract_message_3(parsed_request, edhoc_ctx, response_buffer);
+    if (parsed_message_3.status != SRV_COAP_EXTRACT_MSG3_OK) {
+      coap_log_err("failed to parse Message 3\n");
+      return srv_coap_map_extract_message_3_to_pdu_code(
+          parsed_message_3.status);
+    }
     const struct srv_edhoc_message_3_responder_request handler_request = {
-        .edhoc_context = edhoc_ctx, .raw_payload = parsed_request};
+        .edhoc_context = edhoc_ctx,
+        .message_3 = parsed_message_3.buffer,
+    };
     const struct srv_edhoc_message_3_responder_result message_3_result =
         deps->respond_to_message_3(handler_request, response_buffer);
     if (!add_payload_if_present(response, message_3_result.response,

@@ -17,7 +17,7 @@
 
 // TODO: maybe inline this struct
 struct srv_edhoc_message_1_responder_request {
-  struct com_readonly_buffer raw_payload;
+  struct com_readonly_buffer message_1;
 };
 
 /**

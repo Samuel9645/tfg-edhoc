@@ -49,7 +49,7 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
   }
 
   const struct srv_edhoc_message_1_request process_request = {
-      .payload = request.raw_payload,
+      .payload = request.message_1,
   };
   struct srv_edhoc_message_1_process_result process_result =
       srv_edhoc_process_message_1(process_request, response,

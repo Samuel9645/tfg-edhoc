@@ -234,6 +234,21 @@ add_unity_test(test_edhoc_message_1_responder
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )
 
+set(COAP_SEND_MOCK
+    src/coap/client/mocks/tst_mock_exchange_coap_send_deps.c
+    "-Wl,--wrap=cli_coap_exchange_send"
+    "-Wl,--wrap=edhoc_prepend_flow"
+    "-Wl,--wrap=edhoc_prepend_recalculate_size"
+    "-Wl,--wrap=edhoc_prepend_connection_id"
+)
+
+add_unity_test(test_send_message_1
+    src/coap/client/test_cli_exchange_message_1_send.c
+    ${CLIENT_EXCHANGE_SOURCES}
+    ${COMMON_COAP_SOURCES}
+    ${COAP_SEND_MOCK}
+    ${COMMON_SOURCES}
+)
 
 set(MESSAGE_3_EXTRACT_MOCK
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_extract_deps.c
@@ -333,9 +348,7 @@ add_unity_test(test_edhoc_message_2_process
 
 set(CLIENT_MESSAGE_3_COMPOSE_MOCKS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/mocks/message_3/tst_cli_mock_edhoc_message_3_compose.c
-    "-Wl,--wrap=edhoc_prepend_connection_id"
     "-Wl,--wrap=edhoc_message_3_compose"
-    "-Wl,--wrap=edhoc_prepend_recalculate_size"
 )
 
 set(CLIENT_MESSAGE_3_COMPOSE_SOURCES
@@ -347,6 +360,14 @@ add_unity_test(test_edhoc_message_3_compose
     ${CLIENT_MESSAGE_3_COMPOSE_SOURCES}
     ${CLIENT_MESSAGE_3_COMPOSE_MOCKS}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
+)
+
+add_unity_test(test_send_message_3
+    src/coap/client/test_cli_exchange_message_3_send.c
+    ${CLIENT_EXCHANGE_SOURCES}
+    ${COMMON_COAP_SOURCES}
+    ${COAP_SEND_MOCK}
+    ${COMMON_SOURCES}
 )
 
 set(CLIENT_MESSAGE_4_PROCESS_MOCKS

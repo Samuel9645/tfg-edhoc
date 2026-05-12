@@ -21,7 +21,6 @@ struct srv_coap_extract_message_3_result srv_coap_extract_message_3(
   if (!com_writable_buffer_is_writable(error_response)) {
     return srv_coap_parse_message_3_invalid_error_buffer();
   }
-
   if (!com_readonly_buffer_has_content(request_buffer)) {
     return srv_coap_parse_message_3_failure(
         SRV_COAP_EXTRACT_MSG3_ERR_EMPTY_REQUEST_BUFFER,

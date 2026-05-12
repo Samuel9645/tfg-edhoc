@@ -12,10 +12,8 @@
 
 void tst_cli_edhoc_m1_compose_reset_mock(void);
 void tst_cli_edhoc_m1_compose_set_compose_ok(void);
-void tst_cli_edhoc_m1_compose_set_prepend_flow_failure(void);
 void tst_cli_edhoc_m1_compose_set_compose_failure(void);
 void tst_cli_edhoc_m1_compose_set_compose_empty_length(void);
-void tst_cli_edhoc_m1_compose_set_recalculate_size_failure(void);
 void tst_cli_edhoc_m1_compose_assert_writes_message_in_buffer(
     struct com_readonly_buffer message_1);
 

@@ -3,6 +3,7 @@
 #define COAP_CLIENT_CLI_EXCHANGE_H_
 
 #include <coap3/coap.h>
+#include <edhoc.h>
 #include <stdbool.h>
 
 #include "coap/coap_config.h"
@@ -106,5 +107,44 @@ struct cli_coap_wait_and_get_result {
  */
 struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     const struct cli_coap_exchange* exchange);
+
+/**
+ * @brief Send EDHOC Message 1 with CoAP transport wrapper (flow byte prefix).
+ *
+ * This function takes a pure EDHOC Message 1, adds the CoAP-specific flow
+ * prefix (0xf5 byte), and sends it via the exchange. The message is sent with
+ * a CoAP POST request.
+ *
+ * @param[in] exchange Initialized exchange state with active CoAP session.
+ * @param[in] message_1 Pure EDHOC Message 1 (without any prefix).
+ * @return STATUS_COAP_OK on success, STATUS_COAP_ERR on failure.
+ *
+ * @see [RFC 9528
+ * Section 5.2](https://datatracker.ietf.org/doc/html/rfc9528/#section-5.2) for
+ * EDHOC Message 1 specification.
+ */
+enum status_coap cli_exchange_send_message_1(
+    struct cli_coap_exchange* exchange, struct com_readonly_buffer message_1);
+
+/**
+ * @brief Send EDHOC Message 3 with CoAP transport wrapper (Connection ID
+ * prefix).
+ *
+ * This function takes a pure EDHOC Message 3, adds the server's Connection ID
+ * as a prefix (extracted from the EDHOC context), and sends it via the
+ * exchange. The message is sent with a CoAP POST request.
+ *
+ * @param[in] exchange Initialized exchange state with active CoAP session.
+ * @param[in] context The EDHOC context containing the peer Connection ID.
+ * @param[in] message_3 Pure EDHOC Message 3 (without any prefix).
+ * @return STATUS_COAP_OK on success, STATUS_COAP_ERR on failure.
+ *
+ * @see [RFC 9528
+ * Section 5.4](https://datatracker.ietf.org/doc/html/rfc9528/#section-5.4) for
+ * EDHOC Message 3 specification.
+ */
+enum status_coap cli_exchange_send_message_3(
+    struct cli_coap_exchange* exchange, const struct edhoc_context* context,
+    struct com_readonly_buffer message_3);
 
 #endif  // COAP_CLIENT_CLI_EXCHANGE_H_

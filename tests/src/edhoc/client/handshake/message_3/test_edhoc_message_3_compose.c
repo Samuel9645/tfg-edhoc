@@ -57,19 +57,6 @@ void test_compose_message_3_fails_on_null_context(void) {
       EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
-void test_compose_message_3_fails_when_prepend_connection_id_fails(void) {
-  tst_cli_edhoc_m3_compose_set_prepend_connection_id_failure();
-
-  const struct cli_edhoc_message_3_compose_result result =
-      cli_edhoc_compose_message_3(&env.context, env.compose);
-
-  TEST_ASSERT_EQUAL(CLI_EDHOC_MSG3_COMPOSE_ERR_CONNECTION_ID_PREPEND_FAILED,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Compose error: Failed to prepend connection id",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
-
 void test_compose_message_3_fails_when_edhoc_compose_fails(void) {
   tst_cli_edhoc_m3_compose_set_compose_failure();
 
@@ -80,20 +67,6 @@ void test_compose_message_3_fails_when_edhoc_compose_fails(void) {
                     result.status);
   tst_edhoc_assert_encoded_error_matches(
       result.buffer, "Message 3 Compose error: Failed to compose EDHOC message",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
-
-void test_compose_message_3_fails_when_size_recalculation_fails(void) {
-  tst_cli_edhoc_m3_compose_set_recalculate_size_failure();
-
-  const struct cli_edhoc_message_3_compose_result result =
-      cli_edhoc_compose_message_3(&env.context, env.compose);
-
-  TEST_ASSERT_EQUAL(CLI_EDHOC_MSG3_COMPOSE_ERR_PREPEND_RECALCULATION_FAILED,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer,
-      "Message 3 Compose error: Failed to recalculate prepended message size",
       EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 

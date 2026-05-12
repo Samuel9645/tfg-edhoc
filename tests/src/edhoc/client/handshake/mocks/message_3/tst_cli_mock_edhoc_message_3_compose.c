@@ -16,17 +16,10 @@
 #include "common/tst_report_mock_error.h"
 
 static bool use_real_message_3_compose = true;
-static int prepend_connection_id_result = EDHOC_SUCCESS;
 static int message_3_compose_result = EDHOC_SUCCESS;
-static int recalculate_size_result = EDHOC_SUCCESS;
 static const uint8_t TST_DEFAULT_M3_PAYLOAD[] = {0x20, 0x21, 0x22, 0x23};
 static const uint8_t* compose_payload = TST_DEFAULT_M3_PAYLOAD;
 static size_t compose_payload_length = sizeof(TST_DEFAULT_M3_PAYLOAD);
-
-void tst_cli_edhoc_m3_compose_set_prepend_connection_id_failure(void) {
-  use_real_message_3_compose = false;
-  prepend_connection_id_result = EDHOC_ERROR_INVALID_ARGUMENT;
-}
 
 void tst_cli_edhoc_m3_compose_set_compose_failure(void) {
   use_real_message_3_compose = false;
@@ -44,16 +37,9 @@ void tst_cli_edhoc_m3_compose_set_compose_ok(void) {
   message_3_compose_result = EDHOC_SUCCESS;
 }
 
-void tst_cli_edhoc_m3_compose_set_recalculate_size_failure(void) {
-  use_real_message_3_compose = false;
-  recalculate_size_result = EDHOC_ERROR_INVALID_ARGUMENT;
-}
-
 void tst_cli_edhoc_m3_compose_reset_mock(void) {
   use_real_message_3_compose = true;
-  prepend_connection_id_result = EDHOC_SUCCESS;
   message_3_compose_result = EDHOC_SUCCESS;
-  recalculate_size_result = EDHOC_SUCCESS;
   compose_payload = TST_DEFAULT_M3_PAYLOAD;
   compose_payload_length = sizeof(TST_DEFAULT_M3_PAYLOAD);
 }
@@ -63,22 +49,6 @@ void tst_cli_edhoc_m3_compose_assert_writes_message_in_buffer(
   TEST_ASSERT_EQUAL_size_t(compose_payload_length, message_3.length);
   TEST_ASSERT_EQUAL_HEX8_ARRAY(compose_payload, message_3.bytes,
                                compose_payload_length);
-}
-
-int __wrap_edhoc_prepend_connection_id(  // NOLINT(*-reserved-identifier)
-                                         // we need this
-    struct edhoc_prepended_fields* prepended_fields,
-    const struct edhoc_connection_id* conn_id) {
-  (void)conn_id;
-  if (prepend_connection_id_result != EDHOC_SUCCESS) {
-    return prepend_connection_id_result;
-  }
-  if (prepended_fields == NULL) {
-    return EDHOC_ERROR_INVALID_ARGUMENT;
-  }
-  prepended_fields->edhoc_message_ptr = prepended_fields->buffer;
-  prepended_fields->edhoc_message_size = prepended_fields->buffer_size;
-  return EDHOC_SUCCESS;
 }
 
 static int mocked_message_3_compose(const struct edhoc_context* edhoc_context,
@@ -126,15 +96,3 @@ int __wrap_edhoc_message_3_compose(  // NOLINT(*-reserved-identifier)
                                   message_3_length);
 }
 
-int __wrap_edhoc_prepend_recalculate_size(  // NOLINT(*-reserved-identifier)
-                                            // we need this
-    struct edhoc_prepended_fields* prepended_fields) {
-  if (recalculate_size_result != EDHOC_SUCCESS) {
-    return recalculate_size_result;
-  }
-  if (prepended_fields == NULL) {
-    return EDHOC_ERROR_INVALID_ARGUMENT;
-  }
-  prepended_fields->buffer_size = prepended_fields->edhoc_message_size;
-  return EDHOC_SUCCESS;
-}

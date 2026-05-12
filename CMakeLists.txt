@@ -39,17 +39,21 @@ set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
     ${EDHOC_CIPHER_SUITES_SOURCES}
 )
 
+set(COMMON_COAP_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_parse_edhoc_request.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/com_parse_edhoc_request_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
+)
+
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_get_data.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_parse_edhoc_request.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/com_parse_edhoc_request_builders.c
+    ${COMMON_COAP_SOURCES}
     ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
     ${ADD_EDHOC_ERROR_SOURCES}
 )
@@ -111,12 +115,16 @@ set(SERVER_SOURCES
     ${SERVER_SPECIFIC_SOURCES}
 )
 
-set(CLIENT_SPECIFIC_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_client.c
+set(CLIENT_EXCHANGE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_resources.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_log_error.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_exchange.c
+)
+
+set(CLIENT_SPECIFIC_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_client.c
+    ${CLIENT_EXCHANGE_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/cli_negotiate_cipher_suites.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_process.c

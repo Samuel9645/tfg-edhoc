@@ -1,27 +1,15 @@
 #include "coap/client/cli_exchange.h"
 
-#include <edhoc.h>
+#include <edhoc_helpers.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "coap/client/cli_log_error.h"
 #include "coap/client/cli_utils.h"
+#include "coap/client/internal/cli_exchange_internal.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_response.h"
-
-// ReSharper disable once CppClassNeverUsed it is used, it is opaque
-struct cli_coap_exchange {
-  struct cli_coap_exchange_session_data session_data;
-  bool have_response;
-  bool response_is_error;
-  struct com_writable_buffer incoming_response_buffer;
-
-  struct {
-    const uint8_t* bytes;
-    size_t length;
-  } internal_parsed_response;
-};
 
 static struct com_readonly_buffer get_readonly_buffer(
     const struct cli_coap_exchange* exchange) {
@@ -91,36 +79,6 @@ bool cli_coap_exchange_request_data_is_valid(
   return com_readonly_buffer_has_content(request_data.buffer);
 }
 
-struct cli_coap_exchange* cli_coap_init_exchange(
-    const struct cli_coap_exchange_session_data* session_data,
-    const struct com_writable_buffer response_buffer) {
-  if (!cli_coap_exchange_session_data_is_valid(session_data)) {
-    coap_log_err("invalid arguments to exchange_init\n");
-    return NULL;
-  }
-
-  struct cli_coap_exchange* exchange =
-      calloc(1, sizeof(struct cli_coap_exchange));
-  if (exchange == NULL) {
-    coap_log_err("failed calloc cli_coap_exchange\n");
-    return NULL;
-  }
-  exchange->session_data = *session_data;
-  // This is used to bypass the const limitation
-  memcpy(&exchange->incoming_response_buffer, &response_buffer,
-         sizeof(struct com_writable_buffer));
-  void* previous_session_data =
-      coap_session_set_app_data2(session_data->session, exchange, NULL);
-  if (previous_session_data != NULL) {
-    coap_log_warn(
-        "Cleaning up previous exchange from failed negotiation attempt...\n");
-    free(previous_session_data);
-  }
-  coap_register_response_handler(session_data->context,
-                                 coap_client_coap_response_handler);
-  return exchange;
-}
-
 void reset(struct cli_coap_exchange* exchange) {
   if (exchange == NULL) {
     return;
@@ -131,7 +89,7 @@ void reset(struct cli_coap_exchange* exchange) {
   exchange->internal_parsed_response.length = 0;
 }
 
-enum status_coap cli_coap_exchange_send(
+static enum status_coap default_send(
     struct cli_coap_exchange* exchange,
     const struct cli_coap_exchange_request request_data) {
   reset(exchange);
@@ -165,6 +123,48 @@ enum status_coap cli_coap_exchange_send(
   coap_show_pdu(COAP_LOG_WARN, request_pdu);
   return cli_coap_send_coap_request(exchange->session_data.session,
                                     request_pdu);
+}
+
+struct cli_coap_exchange* cli_coap_init_exchange(
+    const struct cli_coap_exchange_session_data* session_data,
+    const struct com_writable_buffer response_buffer) {
+  if (!cli_coap_exchange_session_data_is_valid(session_data)) {
+    coap_log_err("invalid arguments to exchange_init\n");
+    return NULL;
+  }
+
+  struct cli_coap_exchange* exchange =
+      calloc(1, sizeof(struct cli_coap_exchange));
+  if (exchange == NULL) {
+    coap_log_err("failed calloc cli_coap_exchange\n");
+    return NULL;
+  }
+  exchange->session_data = *session_data;
+  exchange->send_data = default_send;
+  // This is used to bypass the const limitation
+  memcpy(&exchange->incoming_response_buffer, &response_buffer,
+         sizeof(struct com_writable_buffer));
+  void* previous_session_data =
+      coap_session_set_app_data2(session_data->session, exchange, NULL);
+  if (previous_session_data != NULL) {
+    coap_log_warn(
+        "Cleaning up previous exchange from failed negotiation attempt...\n");
+    free(previous_session_data);
+  }
+  coap_register_response_handler(session_data->context,
+                                 coap_client_coap_response_handler);
+  return exchange;
+}
+
+enum status_coap cli_coap_exchange_send(
+    struct cli_coap_exchange* exchange,
+    const struct cli_coap_exchange_request request_data) {
+  if (exchange->send_data == NULL) {
+    coap_log_err(
+        "INTERNAL ERROR: exchange send_data function pointer is NULL\n");
+    return STATUS_COAP_ERR;
+  }
+  return exchange->send_data(exchange, request_data);
 }
 
 static struct cli_coap_wait_and_get_result wait_and_get_ok(
@@ -201,4 +201,110 @@ struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
     return wait_and_get_failure();
   }
   return wait_and_get_ok(response_buffer, exchange->response_is_error);
+}
+
+enum status_coap cli_exchange_send_message_1(
+    struct cli_coap_exchange* exchange,
+    const struct com_readonly_buffer message_1) {
+  if (exchange == NULL) {
+    coap_log_err("Failed to send Message 1: exchange is NULL\n");
+    return STATUS_COAP_ERR;
+  }
+  if (!com_readonly_buffer_has_content(message_1)) {
+    coap_log_err("Failed to send Message 1: message buffer is empty\n");
+    return STATUS_COAP_ERR;
+  }
+  if (message_1.length >= CONFIG_COAP_MAX_PDU_SIZE) {
+    coap_log_err(
+        "Failed to send Message 1: message size exceeds max PDU size\n");
+    return STATUS_COAP_ERR;
+  }
+
+  uint8_t prepended_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
+  struct edhoc_prepended_fields prepended_fields = {
+      .buffer = prepended_buffer,
+      .buffer_size = sizeof(prepended_buffer),
+      .edhoc_message_ptr = prepended_buffer,
+      .edhoc_message_size = sizeof(prepended_buffer),
+  };
+
+  if (edhoc_prepend_flow(&prepended_fields) != EDHOC_SUCCESS) {
+    coap_log_err("Failed to send Message 1: failed to prepend flow\n");
+    return STATUS_COAP_ERR;
+  }
+  if (prepended_fields.edhoc_message_size < message_1.length) {
+    coap_log_err("Failed to send Message 1: buffer too small for message\n");
+    return STATUS_COAP_ERR;
+  }
+  memcpy(prepended_fields.edhoc_message_ptr, message_1.bytes, message_1.length);
+  prepended_fields.edhoc_message_size = message_1.length;
+  if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
+    coap_log_err(
+        "Failed to send Message 1: failed to recalculate prepended size\n");
+    return STATUS_COAP_ERR;
+  }
+  const struct com_readonly_buffer prepended_message = {
+      .bytes = prepended_fields.buffer,
+      .length = prepended_fields.buffer_size,
+  };
+  const struct cli_coap_exchange_request request_data = {
+      .buffer = prepended_message,
+      .content_format = CONFIG_COAP_CONTENT_CID_EDHOC,
+  };
+  return cli_coap_exchange_send(exchange, request_data);
+}
+
+enum status_coap cli_exchange_send_message_3(
+    struct cli_coap_exchange* exchange, const struct edhoc_context* context,
+    const struct com_readonly_buffer message_3) {
+  if (exchange == NULL) {
+    coap_log_err("Failed to send Message 3: exchange is NULL\n");
+    return STATUS_COAP_ERR;
+  }
+  if (context == NULL) {
+    coap_log_err("Failed to send Message 3: context is NULL\n");
+    return STATUS_COAP_ERR;
+  }
+  if (!com_readonly_buffer_has_content(message_3)) {
+    coap_log_err("Failed to send Message 3: message buffer is empty\n");
+    return STATUS_COAP_ERR;
+  }
+  if (message_3.length >= CONFIG_COAP_MAX_PDU_SIZE) {
+    coap_log_err(
+        "Failed to send Message 3: message size exceeds max PDU size\n");
+    return STATUS_COAP_ERR;
+  }
+
+  uint8_t prepended_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
+  struct edhoc_prepended_fields prepended_fields = {
+      .buffer = prepended_buffer,
+      .buffer_size = sizeof(prepended_buffer),
+      .edhoc_message_ptr = prepended_buffer,
+      .edhoc_message_size = sizeof(prepended_buffer),
+  };
+  if (edhoc_prepend_connection_id(
+          &prepended_fields, &context->private_peer_cid) != EDHOC_SUCCESS) {
+    coap_log_err("Failed to send Message 3: failed to prepend connection id\n");
+    return STATUS_COAP_ERR;
+  }
+  if (prepended_fields.edhoc_message_size < message_3.length) {
+    coap_log_err("Failed to send Message 3: buffer too small for message\n");
+    return STATUS_COAP_ERR;
+  }
+  memcpy(prepended_fields.edhoc_message_ptr, message_3.bytes, message_3.length);
+  prepended_fields.edhoc_message_size = message_3.length;
+  if (edhoc_prepend_recalculate_size(&prepended_fields) != EDHOC_SUCCESS) {
+    coap_log_err(
+        "Failed to send Message 3: failed to recalculate prepended size\n");
+    return STATUS_COAP_ERR;
+  }
+  const struct com_readonly_buffer prepended_message = {
+      .bytes = prepended_fields.buffer,
+      .length = prepended_fields.buffer_size,
+  };
+  const struct cli_coap_exchange_request request_data = {
+      .buffer = prepended_message,
+      .content_format = CONFIG_COAP_CONTENT_CID_EDHOC,
+  };
+  return cli_coap_exchange_send(exchange, request_data);
 }

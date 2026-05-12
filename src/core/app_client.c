@@ -112,7 +112,8 @@ cli_edhoc_perform_negotiation_attempt(
     return failure();
   }
   struct cli_coap_exchange* exchange = resources->exchange;
-  if (!send_message(exchange, compose_result.buffer)) {
+  if (cli_exchange_send_message_1(exchange, compose_result.buffer) !=
+      STATUS_COAP_OK) {
     return failure();
   }
   const struct cli_coap_wait_and_get_result wait_and_get_result =
@@ -260,7 +261,9 @@ enum com_emulation_status core_run_client(void) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (!send_message(exchange, message_2_initiator_result.request)) {
+  if (cli_exchange_send_message_3(exchange, &client_resources.edhoc_context,
+                                  message_2_initiator_result.request) !=
+      STATUS_COAP_OK) {
     coap_log_err("Failed to send EDHOC message 3\n");
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

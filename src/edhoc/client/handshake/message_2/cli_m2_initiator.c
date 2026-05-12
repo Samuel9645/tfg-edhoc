@@ -26,7 +26,7 @@ static struct cli_edhoc_message_2_initiator_result failure(
     const struct com_readonly_buffer request) {
   return (struct cli_edhoc_message_2_initiator_result){
       .status = status,
-      .request = request,
+      .buffer = request,
   };
 }
 
@@ -34,7 +34,7 @@ static struct cli_edhoc_message_2_initiator_result ok(
     const struct com_readonly_buffer request) {
   return (struct cli_edhoc_message_2_initiator_result){
       .status = CLI_EDHOC_MSG2_INITIATOR_OK,
-      .request = request,
+      .buffer = request,
   };
 }
 

@@ -22,7 +22,7 @@ enum cli_edhoc_message_2_initiator_status {
 
 struct cli_edhoc_message_2_initiator_result {
   const enum cli_edhoc_message_2_initiator_status status;
-  const struct com_readonly_buffer request;
+  const struct com_readonly_buffer buffer;
 };
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_INITIATOR_RESULT_H_

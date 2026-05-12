@@ -26,6 +26,8 @@ struct cli_edhoc_message_2_initiator_request {
  * @param[in] request Message 2 request metadata and EDHOC context.
  * @param[in] response_buffer Metadata of the buffer (pointer and capacity) to
  * write into
+ * @return The result of processing Message 2 and composing Message 3, including
+ * status and buffers with the composed message or error information.
  */
 struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
     struct cli_edhoc_message_2_initiator_request request,

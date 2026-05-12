@@ -44,7 +44,7 @@ void test_message_2_initiator_ok(void) {
       cli_edhoc_respond_to_message_2(env.request, env.request_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_OK, result.status);
-  tst_cli_edhoc_m3_compose_assert_writes_message_in_buffer(result.request);
+  tst_cli_edhoc_m3_compose_assert_writes_message_in_buffer(result.buffer);
 }
 
 void test_message_2_initiator_fails_on_invalid_request_buffer(void) {
@@ -65,7 +65,7 @@ void test_message_2_initiator_fails_when_message_2_process_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.request);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
 
 void test_message_2_initiator_fails_when_message_3_compose_fails(void) {
@@ -76,5 +76,5 @@ void test_message_2_initiator_fails_when_message_3_compose_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.request);
+  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }

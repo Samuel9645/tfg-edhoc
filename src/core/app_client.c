@@ -257,13 +257,13 @@ enum com_emulation_status core_run_client(void) {
   if (message_2_initiator_result.status != CLI_EDHOC_MSG2_INITIATOR_OK) {
     coap_log_err("%s", cli_edhoc_respond_to_message_2_status_code_to_string(
                            message_2_initiator_result.status));
-    send_message(exchange, message_2_initiator_result.request);
+    send_message(exchange, message_2_initiator_result.buffer);
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  struct com_readonly_buffer message_3 = message_2_initiator_result.buffer;
   if (cli_exchange_send_message_3(exchange, &client_resources.edhoc_context,
-                                  message_2_initiator_result.request) !=
-      STATUS_COAP_OK) {
+                                  message_3) != STATUS_COAP_OK) {
     coap_log_err("Failed to send EDHOC message 3\n");
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;

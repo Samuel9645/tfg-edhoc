@@ -20,6 +20,10 @@ typedef enum status_coap (*srv_coap_add_edhoc_response_options_fn)(
     coap_pdu_t* response,
     enum config_coap_content_format_edhoc_values content_format);
 
+typedef struct srv_coap_extract_message_1_result (*srv_coap_parse_message_1_fn)(
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response);
+
 typedef struct srv_edhoc_message_1_responder_result (
     *srv_edhoc_m1_responder_fn)(
     struct srv_edhoc_message_1_responder_request request_data,
@@ -62,6 +66,9 @@ struct srv_coap_dispatch_deps {
 
   /** Adds EDHOC-specific content-format option to outgoing CoAP response. */
   srv_coap_add_edhoc_response_options_fn add_edhoc_response_options;
+
+  /** Parses Message 1, removing the CBOR prefix */
+  srv_coap_parse_message_1_fn extract_message_1;
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   srv_edhoc_m1_responder_fn respond_to_message_1;

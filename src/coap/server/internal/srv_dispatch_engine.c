@@ -2,6 +2,7 @@
 
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
 /**
@@ -13,6 +14,7 @@
 static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
   return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
+         deps->extract_message_1 != NULL &&
          deps->respond_to_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
          deps->respond_to_message_3 != NULL &&
@@ -52,8 +54,15 @@ static coap_pdu_code_t route_and_process_edhoc_message(
   struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
   coap_pdu_code_t final_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
   if (edhoc_ctx == NULL) {
+    const struct srv_coap_extract_message_1_result parsed_message_1 =
+        deps->extract_message_1(parsed_request, response_buffer);
+    if (parsed_message_1.status != SRV_COAP_EXTRACT_MSG1_OK) {
+      coap_log_err("failed to parse Message 1\n");
+      return srv_coap_map_extract_message_1_to_pdu_code(
+          parsed_message_1.status);
+    }
     const struct srv_edhoc_message_1_responder_request request = {
-        .raw_payload = parsed_request};
+        .raw_payload = parsed_message_1.buffer};
     const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->respond_to_message_1(request, edhoc_parameters, response_buffer);
     if (!add_payload_if_present(response, message_1_result.response,

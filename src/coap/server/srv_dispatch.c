@@ -4,13 +4,15 @@
 #include "coap/common/com_coap_response.h"
 #include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
 #include "coap/server/edhoc_message_process/srv_coap_m3_process.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static const struct srv_coap_dispatch_deps
-    coap_server_edhoc_dispatch_default_deps = {
+    COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS = {
         .parse_edhoc_request = com_coap_parse_edhoc_request,
         .add_edhoc_response_options = com_coap_add_edhoc_response_options,
+        .extract_message_1 = srv_coap_extract_message_1,
         .respond_to_message_1 = srv_edhoc_respond_to_message_1,
         .process_message_1_result = srv_coap_process_message_1_result,
         .respond_to_message_3 = srv_edhoc_respond_to_message_3,
@@ -24,5 +26,5 @@ void srv_coap_dispatch_edhoc_post(
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
   srv_coap_dispatch_post_with_dependencies(
       session, request, edhoc_parameters, response,
-      &coap_server_edhoc_dispatch_default_deps);
+      &COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS);
 }

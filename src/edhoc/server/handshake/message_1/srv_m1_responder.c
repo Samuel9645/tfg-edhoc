@@ -11,7 +11,7 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 
-#include "edhoc/server/handshake/message_1/srv_m1_parser.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
 
@@ -48,15 +48,8 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     return invalid_response_buffer();
   }
 
-  const struct srv_edhoc_parse_message_1_result parse_result =
-      srv_edhoc_parse_message_1(request.raw_payload, response);
-  if (parse_result.status != SRV_EDHOC_MSG1_PARSE_OK) {
-    return failure(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
-                   parse_result.buffer);
-  }
-
   const struct srv_edhoc_message_1_request process_request = {
-      .payload = parse_result.buffer,
+      .payload = request.raw_payload,
   };
   struct srv_edhoc_message_1_process_result process_result =
       srv_edhoc_process_message_1(process_request, response,

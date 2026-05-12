@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "coap/common/internal/com_parse_edhoc_request_builders.h"
+#include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
@@ -71,6 +72,25 @@ void* stb_srv_coap_get_session_null(const coap_session_t* session) {
 void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
   (void)session;
   return &dummy_edhoc_context_for_stub;
+}
+
+struct srv_coap_extract_message_1_result stb_srv_coap_extract_message_1_ok(
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response) {
+  (void)request_buffer;
+  (void)error_response;
+  return srv_coap_parse_message_1_ok(DUMMY_READONLY_BUFFER);
+}
+
+struct srv_coap_extract_message_1_result
+stb_srv_coap_extract_message_1_format_failure(
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response) {
+  (void)request_buffer;
+  (void)error_response;
+  return srv_coap_parse_message_1_failure(
+      SRV_COAP_EXTRACT_MSG1_ERR_UNSUPPORTED_FORWARD_FLOW,
+      DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_message_1_responder_result

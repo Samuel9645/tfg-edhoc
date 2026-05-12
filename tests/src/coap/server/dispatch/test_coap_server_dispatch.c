@@ -82,6 +82,18 @@ void test_server_responds_with_internal_error_on_server_side_failure(void) {
                     coap_pdu_get_code(dummy_response));
 }
 
+void test_server_responds_with_bad_request_on_parse_m1_failure(void) {
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.extract_message_1 = stb_srv_coap_extract_message_1_format_failure;
+
+  srv_coap_dispatch_post_with_dependencies(
+      dummy_session, dummy_request, tst_edhoc_get_method_0_suite_0_params(),
+      dummy_response, &deps);
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
+                    coap_pdu_get_code(dummy_response));
+}
+
 void test_server_responds_with_bad_request_if_context_already_exists_for_message_1(
     void) {
   struct srv_coap_dispatch_deps deps =

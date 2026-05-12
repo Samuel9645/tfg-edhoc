@@ -65,7 +65,6 @@ set(MESSAGE_2_COMPOSE_SOURCES
 
 set(MESSAGE_1_RESPONDER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_responder.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_parser.c
     ${MESSAGE_1_PROCESS_SOURCES}
     ${MESSAGE_2_COMPOSE_SOURCES}
 )
@@ -84,11 +83,17 @@ set(MESSAGE_3_RESPONDER_SOURCES
     ${MESSAGE_4_COMPOSE_SOURCES}
 )
 
+set(COAP_EXTRACT_MESSAGE_1_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/srv_coap_extract_m1.c
+)
+
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${MESSAGE_1_RESPONDER_SOURCES}
     ${MESSAGE_3_RESPONDER_SOURCES}
+    ${COAP_EXTRACT_MESSAGE_1_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/server/handshake/message_3/srv_m3_parser.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m1_process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m3_process.c

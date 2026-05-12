@@ -37,6 +37,15 @@ void* stb_srv_coap_get_session_null(const coap_session_t* session);
 
 void* stb_srv_coap_get_session_valid(const coap_session_t* session);
 
+struct srv_coap_extract_message_1_result stb_srv_coap_extract_message_1_ok(
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response);
+
+struct srv_coap_extract_message_1_result
+stb_srv_coap_extract_message_1_format_failure(
+    struct com_readonly_buffer request_buffer,
+    struct com_writable_buffer error_response);
+
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
     struct srv_edhoc_message_1_responder_request request_data,

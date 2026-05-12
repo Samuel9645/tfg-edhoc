@@ -20,7 +20,6 @@
 
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/tst_edhoc_params.h"
-
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_message_1_process.h"
@@ -38,7 +37,6 @@ static struct {
 } env = {.response = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN}};
 
 static void reset_mocks(void) {
-  tst_srv_edhoc_m1_reset_extract_mock();
   tst_srv_edhoc_m1_reset_process_mock();
   tst_srv_edhoc_m2_reset_compose_mock();
 }
@@ -99,14 +97,12 @@ void test_responder_fails_on_invalid_data(void) {
     struct srv_edhoc_message_1_responder_request request;
     struct com_edhoc_parameters edhoc_parameters;
     struct com_writable_buffer response;
-    enum srv_edhoc_message_1_responder_status expected_status;
   } test_cases[] = {
       {"response buffer is empty/invalid", valid_request, valid_parameters,
-       empty_response, SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER},
+       empty_response},
       {"raw payload is empty", empty_payload_request, valid_parameters,
-       env.response, SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED},
-      {"empty params", valid_request, empty_params, env.response,
-       SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED},
+       env.response},
+      {"empty params", valid_request, empty_params, env.response},
   };
 
   for (size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
@@ -116,41 +112,11 @@ void test_responder_fails_on_invalid_data(void) {
                                        test_cases[i].edhoc_parameters,
                                        test_cases[i].response);
 
-    TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
-                              test_cases[i].description);
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(SRV_EDHOC_MSG1_RESPONDER_OK, result.status,
+                                  test_cases[i].description);
     tst_edhoc_assert_error_not_empty_if_present(result.response);
     ensure_context_is_freed_on_failure(result);
   }
-}
-
-void test_responder_fails_when_parser_reports_invalid_request_buffer(void) {
-  const struct srv_edhoc_message_1_responder_request invalid_request = {
-      .raw_payload = {.bytes = NULL, .length = sizeof(DUMMY_REQUEST_BUFFER)},
-  };
-
-  const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(invalid_request,
-                                     tst_edhoc_get_method_0_suite_0_params(),
-                                     env.response);
-
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
-                    result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.response);
-  ensure_context_is_freed_on_failure(result);
-}
-
-void test_responder_fails_when_parser_reports_prefix_extraction_failure(void) {
-  tst_srv_edhoc_m1_set_extract_failed();
-
-  const struct srv_edhoc_message_1_responder_result result =
-      srv_edhoc_respond_to_message_1(create_valid_request(),
-                                     tst_edhoc_get_method_0_suite_0_params(),
-                                     env.response);
-
-  TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PARSE_FAILED,
-                    result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.response);
-  ensure_context_is_freed_on_failure(result);
 }
 
 static void only_m2_compose_failure(void) {

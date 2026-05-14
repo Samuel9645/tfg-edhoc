@@ -10,7 +10,7 @@ After implementing a feature, add the documentation into`.ai/docs`.
 After refactoring, update the documentation in `.ai/docs` and reflect the
 changes.
 
-Use TDD cycle:
+Use TDD cycle for new features:
 
 1. write test, commit,
 2. implement minimal code to pass it, commit if tests pass

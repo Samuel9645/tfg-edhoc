@@ -94,16 +94,30 @@ void test_server_responds_with_bad_request_on_parse_m1_failure(void) {
                     coap_pdu_get_code(dummy_response));
 }
 
-void test_server_responds_with_bad_request_on_parse_m3_failure(void) {
+void test_server_responds_with_internal_error_on_extract_cid_failure(void) {
   struct srv_coap_dispatch_deps deps =
       test_srv_coap_dispatch_create_base_dependencies();
   deps.get_session_app_data = stb_srv_coap_get_session_valid;
-  deps.extract_message_3 = stb_srv_coap_extract_message_3_format_failure;
+  deps.extract_cid = stb_srv_coap_extract_cid_failure;
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_session, dummy_request, tst_edhoc_get_method_0_suite_0_params(),
       dummy_response, &deps);
-  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
+                    coap_pdu_get_code(dummy_response));
+}
+
+void test_server_responds_with_internal_error_on_connection_id_validation_failure(
+    void) {
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.get_session_app_data = stb_srv_coap_get_session_valid;
+  deps.connection_id_is_expected = stb_srv_coap_connection_id_is_expected_false;
+
+  srv_coap_dispatch_post_with_dependencies(
+      dummy_session, dummy_request, tst_edhoc_get_method_0_suite_0_params(),
+      dummy_response, &deps);
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
 

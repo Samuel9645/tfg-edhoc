@@ -2,7 +2,8 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 12/05/2026
- * @brief Module to extract EDHOC Message 3 from a CoAP request payload.
+ * @brief Module to extract and validate EDHOC connection identifiers from
+ * Message 3 CoAP request payloads.
  * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
@@ -15,40 +16,50 @@
 
 #include "common/com_data_models.h"
 
-enum srv_coap_extract_message_3_status {
-  SRV_COAP_EXTRACT_MSG3_OK = 0,
-  SRV_COAP_EXTRACT_MSG3_ERR_INVALID_ERROR_BUFFER,
-  SRV_COAP_EXTRACT_MSG3_ERR_EMPTY_REQUEST_BUFFER,
-  SRV_COAP_EXTRACT_MSG3_ERR_NULL_EDHOC_CONTEXT,
-  SRV_COAP_EXTRACT_MSG3_ERR_CON_ID_EXTRACTION_FAILED,
-  SRV_COAP_EXTRACT_MSG3_ERR_UNEXPECTED_CONNECTION_ID,
+enum srv_coap_extract_cid_status {
+  SRV_COAP_EXTRACT_CID_OK = 0,
+  SRV_COAP_EXTRACT_CID_ERR_EMPTY_BUFFER,
+  SRV_COAP_EXTRACT_CID_ERR_EXTRACT,
 };
 
-struct srv_coap_extract_message_3_result {
-  const enum srv_coap_extract_message_3_status status;
-  const struct com_readonly_buffer buffer;
+struct srv_coap_extract_connection_id_result {
+  const enum srv_coap_extract_cid_status status;
+  const struct edhoc_connection_id cid;
+  const struct com_readonly_buffer message_payload;
 };
 
 /**
- * @brief Extracts EDHOC Message 3 from the raw request buffer and validates
- * the connection ID against the provided EDHOC context.
- * @param[in] request_buffer Input buffer containing the request payload.
- * @param[in] edhoc_ctx EDHOC context used to validate the connection ID.
- * @param[in] error_response Metadata of the buffer (pointer and capacity) to
- * write into.
- * @return Result struct containing the extracted Message 3 payload on success,
- * or an error code and encoded error buffer on failure.
+ * @brief Extracts the connection identifier from an EDHOC Message 3 payload.
+ *
+ * Decodes and removes the leading connection identifier from the request
+ * buffer, leaving the remaining EDHOC message in the result. The operation
+ * follows the CoAP EDHOC message encoding defined in RFC 9528 A.2.
+ *
+ * @param[in] request_buffer Input buffer containing the raw Message 3 payload
+ *  with connection ID prefix.
+ * @return Result struct with the status of the extraction, the extracted
+ * connection ID (if successful), and the remaining message payload after
+ * removing the connection ID.
  */
-struct srv_coap_extract_message_3_result srv_coap_extract_message_3(
-    struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer error_response);
+struct srv_coap_extract_connection_id_result srv_coap_extract_connection_id(
+    struct com_readonly_buffer request_buffer);
 
-coap_pdu_code_t srv_coap_map_extract_message_3_to_pdu_code(
-    enum srv_coap_extract_message_3_status status);
-
-bool srv_edhoc_is_message_3(struct com_readonly_buffer request_buffer,
-                            const struct edhoc_context* context);
+/**
+ * @brief Validates that an extracted connection ID matches the EDHOC context.
+ *
+ * Compares the extracted connection identifier with the private connection ID
+ * stored in the EDHOC context to ensure the message is for the expected
+ * session.
+ *
+ * @param[in] extracted_cid The connection identifier extracted from the
+ * incoming message.
+ * @param[in] edhoc_ctx EDHOC context containing the expected connection ID
+ * (private_cid field). Must be non-NULL.
+ * @return true if extracted_cid equals the context's private_cid, false
+ * otherwise or if edhoc_ctx is NULL.
+ */
+bool srv_coap_connection_id_is_expected(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx);
 
 #endif  // COAP_SERVER_EXTRACT_EDHOC_MESSAGE_SRV_COAP_EXTRACT_M3_H_
-

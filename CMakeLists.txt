@@ -92,7 +92,7 @@ set(COAP_EXTRACT_MESSAGE_1_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/srv_coap_extract_m1.c
 )
 set(COAP_EXTRACT_MESSAGE_3_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/internal/srv_coap_extract_m3_result_builders.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/internal/srv_coap_extract_cid_result_builders.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/srv_coap_extract_m3.c
 )
 

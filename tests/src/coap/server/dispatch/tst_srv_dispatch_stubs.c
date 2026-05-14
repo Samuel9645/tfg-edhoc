@@ -14,8 +14,8 @@
 #include <string.h>
 
 #include "coap/common/internal/com_parse_edhoc_request_builders.h"
+#include "coap/server/extract_edhoc_message/internal/srv_coap_extract_cid_result_builders.h"
 #include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.h"
-#include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m3_result_builders.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
@@ -23,6 +23,10 @@ static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
 static const struct com_readonly_buffer DUMMY_READONLY_BUFFER = {
     .bytes = DUMMY_PAYLOAD,
     .length = sizeof(DUMMY_PAYLOAD),
+};
+static const struct edhoc_connection_id DUMMY_CONNECTION_ID = {
+    .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER,
+    .int_value = 0,
 };
 
 struct com_coap_parse_edhoc_request_result stb_srv_coap_parse_edhoc_request_ok(
@@ -47,27 +51,34 @@ stb_srv_coap_parse_edhoc_request_fail(
       COM_COAP_PARSE_EDHOC_REQ_ERR_UNSUPPORTED_FORMAT);
 }
 
-struct srv_coap_extract_message_3_result stb_srv_coap_extract_message_3_ok(
-    struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer error_response) {
+struct srv_coap_extract_connection_id_result stb_srv_coap_extract_cid_ok(
+    struct com_readonly_buffer request_buffer) {
   (void)request_buffer;
-  (void)edhoc_ctx;
-  (void)error_response;
-  return srv_coap_parse_message_3_ok(DUMMY_READONLY_BUFFER);
+  return srv_coap_extract_connection_id_ok(DUMMY_CONNECTION_ID,
+                                           DUMMY_READONLY_BUFFER);
 }
 
-struct srv_coap_extract_message_3_result
-stb_srv_coap_extract_message_3_format_failure(
-    struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer error_response) {
+struct srv_coap_extract_connection_id_result stb_srv_coap_extract_cid_failure(
+    struct com_readonly_buffer request_buffer) {
   (void)request_buffer;
+  return srv_coap_extract_connection_id_failure(
+      SRV_COAP_EXTRACT_CID_ERR_EXTRACT);
+}
+
+bool stb_srv_coap_connection_id_is_expected_true(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx) {
+  (void)extracted_cid;
   (void)edhoc_ctx;
-  (void)error_response;
-  return srv_coap_parse_message_3_failure(
-      SRV_COAP_EXTRACT_MSG3_ERR_CON_ID_EXTRACTION_FAILED,
-      DUMMY_READONLY_BUFFER);
+  return true;
+}
+
+bool stb_srv_coap_connection_id_is_expected_false(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx) {
+  (void)extracted_cid;
+  (void)edhoc_ctx;
+  return false;
 }
 
 static struct edhoc_context dummy_edhoc_context_for_stub = {0};
@@ -95,6 +106,7 @@ void* stb_srv_coap_get_session_null(const coap_session_t* session) {
 
 void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
   (void)session;
+  dummy_edhoc_context_for_stub.private_cid = DUMMY_CONNECTION_ID;
   return &dummy_edhoc_context_for_stub;
 }
 

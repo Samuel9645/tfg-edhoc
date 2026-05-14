@@ -3,10 +3,10 @@
 
 #include <coap3/coap.h>
 
-#include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
+#include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "common/com_data_models.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
@@ -25,6 +25,13 @@ typedef struct srv_coap_extract_message_1_result (*srv_coap_parse_message_1_fn)(
     struct com_readonly_buffer request_buffer,
     struct com_writable_buffer error_response);
 
+typedef struct srv_coap_extract_connection_id_result (*srv_coap_extract_cid_fn)(
+    struct com_readonly_buffer request_buffer);
+
+typedef bool (*srv_coap_connection_id_is_expected_fn)(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx);
+
 typedef struct srv_edhoc_message_1_responder_result (
     *srv_edhoc_m1_responder_fn)(
     struct srv_edhoc_message_1_responder_request request_data,
@@ -39,11 +46,6 @@ typedef struct srv_edhoc_message_3_responder_result (
     *srv_edhoc_m3_responder_fn)(
     struct srv_edhoc_message_3_responder_request request_data,
     struct com_writable_buffer response_data);
-
-typedef struct srv_coap_extract_message_3_result (
-    *srv_coap_extract_message_3_fn)(struct com_readonly_buffer request_buffer,
-                                    const struct edhoc_context* edhoc_ctx,
-                                    struct com_writable_buffer error_response);
 
 typedef coap_pdu_code_t (*srv_edhoc_m3_process_result_fn)(
     struct srv_edhoc_message_3_responder_result message_3_result);
@@ -76,8 +78,11 @@ struct srv_coap_dispatch_deps {
   /** Parses Message 1, removing the CBOR prefix */
   srv_coap_parse_message_1_fn extract_message_1;
 
-  /** Parses Message 3, removing the connection ID prefix. */
-  srv_coap_extract_message_3_fn extract_message_3;
+  /** Extracts the connection ID and the remaining Message 3 payload. */
+  srv_coap_extract_cid_fn extract_cid;
+
+  /** Validates that the extracted connection ID matches the EDHOC context. */
+  srv_coap_connection_id_is_expected_fn connection_id_is_expected;
 
   /** Processes EDHOC Message 1 and generates Message 2 response. */
   srv_edhoc_m1_responder_fn respond_to_message_1;

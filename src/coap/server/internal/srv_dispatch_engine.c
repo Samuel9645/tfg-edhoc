@@ -15,7 +15,8 @@
 static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
   return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
-         deps->extract_message_1 != NULL && deps->extract_message_3 != NULL &&
+         deps->extract_message_1 != NULL && deps->extract_cid != NULL &&
+         deps->connection_id_is_expected != NULL &&
          deps->respond_to_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
          deps->respond_to_message_3 != NULL &&
@@ -72,16 +73,19 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     }
     final_code = deps->process_message_1_result(message_1_result, session);
   } else {
-    const struct srv_coap_extract_message_3_result parsed_message_3 =
-        deps->extract_message_3(parsed_request, edhoc_ctx, response_buffer);
-    if (parsed_message_3.status != SRV_COAP_EXTRACT_MSG3_OK) {
-      coap_log_err("failed to parse Message 3\n");
-      return srv_coap_map_extract_message_3_to_pdu_code(
-          parsed_message_3.status);
+    const struct srv_coap_extract_connection_id_result extracted_cid =
+        deps->extract_cid(parsed_request);
+    if (extracted_cid.status != SRV_COAP_EXTRACT_CID_OK) {
+      coap_log_err("failed to extract Message 3 connection ID\n");
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    }
+    if (!deps->connection_id_is_expected(&extracted_cid.cid, edhoc_ctx)) {
+      coap_log_err("unexpected Message 3 connection ID\n");
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
     const struct srv_edhoc_message_3_responder_request handler_request = {
         .edhoc_context = edhoc_ctx,
-        .message_3 = parsed_message_3.buffer,
+        .message_3 = extracted_cid.message_payload,
     };
     const struct srv_edhoc_message_3_responder_result message_3_result =
         deps->respond_to_message_3(handler_request, response_buffer);

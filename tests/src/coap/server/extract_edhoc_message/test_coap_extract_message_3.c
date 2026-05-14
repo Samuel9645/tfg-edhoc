@@ -2,7 +2,7 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 02/04/2026
- * @brief Tests for the extract of the CoAP requests for EDHOC server message 3.
+ * @brief Tests for CID extraction and validation from EDHOC Message 3.
  * @see [RFC 9528](https://datatracker.ietf.org/doc/html/rfc9528)
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  * @see [Helper Unity
@@ -14,110 +14,81 @@
 #include <unity.h>
 
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/mocks/message_3/tst_srv_mock_m3_extract_deps.h"
 
-enum { TEST_MSG_3_PAYLOAD_LENGTH = 5, TST_M3_EXTRACT_ERROR_BUFFER_SIZE = 256 };
+enum { TEST_MSG_3_PAYLOAD_LENGTH = 5 };
 
 static const uint8_t REQUEST_BUFFER[TEST_MSG_3_PAYLOAD_LENGTH] = {0};
 
 static struct {
   struct com_readonly_buffer valid_request;
   struct edhoc_context context;
-  uint8_t error_message[TST_M3_EXTRACT_ERROR_BUFFER_SIZE];
-  struct com_writable_buffer error_buffer_view;
-} test_env = {
-    .valid_request = {.bytes = REQUEST_BUFFER,
-                      .length = TEST_MSG_3_PAYLOAD_LENGTH},
-    .error_buffer_view = {.capacity = TST_M3_EXTRACT_ERROR_BUFFER_SIZE}};
+} test_env = {.valid_request = {.bytes = REQUEST_BUFFER,
+                                .length = TEST_MSG_3_PAYLOAD_LENGTH}};
 
-void setUp(void) {
-  tst_srv_edhoc_message_3_extract_reset_stub_results();
-  memset(test_env.error_message, 0, TST_M3_EXTRACT_ERROR_BUFFER_SIZE);
-  test_env.error_buffer_view.bytes = test_env.error_message;
-}
+void setUp(void) { tst_srv_edhoc_message_3_extract_reset_stub_results(); }
 
-void test_extract_advances_pointers_on_success(void) {
+void test_extract_connection_id_advances_pointers_on_success(void) {
   const uint8_t* advanced_pointed = REQUEST_BUFFER + 2;
   const int reduced_length = TEST_MSG_3_PAYLOAD_LENGTH - 2;
   tst_srv_m3_extract_set_success_data(
       (struct edhoc_extracted_fields){.edhoc_message_ptr = advanced_pointed,
                                       .edhoc_message_size = reduced_length});
 
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(test_env.valid_request, &test_env.context,
-                                 test_env.error_buffer_view);
+  const struct srv_coap_extract_connection_id_result result =
+      srv_coap_extract_connection_id(test_env.valid_request);
 
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_OK, result.status);
-  TEST_ASSERT_EQUAL_PTR(advanced_pointed, result.buffer.bytes);
-  TEST_ASSERT_EQUAL(reduced_length, result.buffer.length);
+  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_CID_OK, result.status);
+  TEST_ASSERT_EQUAL_PTR(advanced_pointed, result.message_payload.bytes);
+  TEST_ASSERT_EQUAL(reduced_length, result.message_payload.length);
 }
 
-void test_extract_fails_and_populates_error_when_buffer_is_invalid(void) {
+void test_extract_connection_id_fails_on_empty_buffer(void) {
   const struct com_readonly_buffer invalid_buf = {.bytes = NULL, .length = 5};
 
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(invalid_buf, &test_env.context,
-                                 test_env.error_buffer_view);
+  const struct srv_coap_extract_connection_id_result result =
+      srv_coap_extract_connection_id(invalid_buf);
 
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_ERR_EMPTY_REQUEST_BUFFER,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Extract error: Empty request buffer",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_CID_ERR_EMPTY_BUFFER, result.status);
 }
 
-void test_extract_fails_and_populates_error_when_context_is_null(void) {
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(test_env.valid_request, NULL,
-                                 test_env.error_buffer_view);
-
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_ERR_NULL_EDHOC_CONTEXT,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Extract error: Null context",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-}
-
-void test_extract_fails_and_populates_error_when_connection_id_extraction_fails(
-    void) {
+void test_extract_connection_id_fails_on_extraction_error(void) {
   tst_srv_m3_extract_set_extraction_failure();
 
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(test_env.valid_request, &test_env.context,
-                                 test_env.error_buffer_view);
+  const struct srv_coap_extract_connection_id_result result =
+      srv_coap_extract_connection_id(test_env.valid_request);
 
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_ERR_CON_ID_EXTRACTION_FAILED,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Extract error: Connection ID extraction failed",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_CID_ERR_EXTRACT, result.status);
 }
 
-void test_extract_fails_and_populates_error_on_connection_id_mismatch(void) {
+void test_connection_id_is_expected_returns_true_on_match(void) {
+  const struct edhoc_connection_id extracted_cid = {
+      .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER, .int_value = 5};
+  test_env.context.private_cid = extracted_cid;
+
+  const bool result =
+      srv_coap_connection_id_is_expected(&extracted_cid, &test_env.context);
+
+  TEST_ASSERT_TRUE(result);
+}
+
+void test_connection_id_is_expected_returns_false_on_mismatch(void) {
   tst_srv_m3_extract_set_cid_mismatch();
 
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(test_env.valid_request, &test_env.context,
-                                 test_env.error_buffer_view);
+  const struct edhoc_connection_id extracted_cid = {
+      .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER, .int_value = 5};
 
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_ERR_UNEXPECTED_CONNECTION_ID,
-                    result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Extract error: Unexpected connection ID",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
+  const bool result =
+      srv_coap_connection_id_is_expected(&extracted_cid, &test_env.context);
+
+  TEST_ASSERT_FALSE(result);
 }
 
-void test_extract_fails_on_invalid_error_buffer(void) {
-  const struct com_writable_buffer invalid_error_buffer = {.bytes = NULL,
-                                                           .capacity = 0};
+void test_connection_id_is_expected_returns_false_on_null_context(void) {
+  const struct edhoc_connection_id extracted_cid = {
+      .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER, .int_value = 5};
 
-  const struct srv_coap_extract_message_3_result result =
-      srv_coap_extract_message_3(test_env.valid_request, &test_env.context,
-                                 invalid_error_buffer);
+  const bool result = srv_coap_connection_id_is_expected(&extracted_cid, NULL);
 
-  TEST_ASSERT_EQUAL(SRV_COAP_EXTRACT_MSG3_ERR_INVALID_ERROR_BUFFER,
-                    result.status);
-  TEST_ASSERT_NULL(result.buffer.bytes);
-  TEST_ASSERT_EQUAL(0, result.buffer.length);
+  TEST_ASSERT_FALSE(result);
 }

@@ -47,16 +47,19 @@ stb_srv_coap_extract_message_1_format_failure(
     struct com_readonly_buffer request_buffer,
     struct com_writable_buffer error_response);
 
-struct srv_coap_extract_message_3_result stb_srv_coap_extract_message_3_ok(
-    struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer error_response);
+struct srv_coap_extract_connection_id_result stb_srv_coap_extract_cid_ok(
+    struct com_readonly_buffer request_buffer);
 
-struct srv_coap_extract_message_3_result
-stb_srv_coap_extract_message_3_format_failure(
-    struct com_readonly_buffer request_buffer,
-    const struct edhoc_context* edhoc_ctx,
-    struct com_writable_buffer error_response);
+struct srv_coap_extract_connection_id_result stb_srv_coap_extract_cid_failure(
+    struct com_readonly_buffer request_buffer);
+
+bool stb_srv_coap_connection_id_is_expected_true(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx);
+
+bool stb_srv_coap_connection_id_is_expected_false(
+    const struct edhoc_connection_id* extracted_cid,
+    const struct edhoc_context* edhoc_ctx);
 
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(

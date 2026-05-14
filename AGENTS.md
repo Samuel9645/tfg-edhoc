@@ -24,6 +24,8 @@ Refactor commit: refactor(scope-description): <description of the refactor>
 
 Rules
 
+- Vendored dependencies live in `externals/` (`libcoap`, `libedhoc`,
+  `unity`); wire new code through CMake instead of adding ad-hoc downloads.
 - Prefer `*_result` structs (status + small payload).
 - For large objects initialization functions (e.g. `struct edhoc_context`)
   return pointer and document ownership: caller must call
@@ -33,6 +35,9 @@ Rules
 - Use clear prefixes (`com_`, `srv_`, `cli_`, `edhoc_`) and avoid abbreviations:
   prefer descriptive, semantic names (e.g. `com_edhoc_setup_context_result` not
   `ces_ctx_res`).
+- App targets and tests build with `-Wall -Wextra -Wpedantic -Werror` plus
+  AddressSanitizer/UndefinedBehaviorSanitizer; keep new code warning-free and
+  sanitizer-clean.
 
 WSL
 
@@ -42,6 +47,8 @@ WSL
 
 Layers
 
+- Core app entry points: `src/core/`, `include/app/` (`core_run_client()` and
+  `core_run_server()`).
 - EDHOC: `src/edhoc/`, `include/edhoc/` (protocol logic only).
 - Transport/CoAP: `src/coap/`, `include/coap/` (wire parsing/serialization).
 - Common: shared models/helpers.
@@ -54,6 +61,12 @@ RFC & errors
 
 Tests
 
+- Unity test runners are generated from `tests/CMakeLists.txt` with
+  `ruby externals/unity/auto/generate_test_runner.rb`.
+- `ENABLE_UNITY_TESTS` defaults to `ON` in `cmake_configs/testing_config.cmake`;
+  configure a build directory, then run `ctest --test-dir <build-dir>`.
+- Test binaries already inherit `ASAN_OPTIONS=halt_on_error=1:abort_on_error=1`
+  and `UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_stacktrace=1`.
 - Tests use `--wrap` mocks; helpers should return `*_result` where possible.
 
 Tiny examples

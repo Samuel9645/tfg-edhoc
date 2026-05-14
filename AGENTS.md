@@ -2,13 +2,22 @@
 
 Keep it minimal.
 
-Always add the plans into the `.ai/plans` folder before starting the
-implementation.
+## Workflow & Artifact Locations
 
-After implementing a feature, add the documentation into`.ai/docs`.
+**Use prompts** in `.github/prompts/`:
 
-After refactoring, update the documentation in `.ai/docs` and reflect the
-changes.
+- `discovery.prompt.md` → saves to `.ai/workspace/prds/<topic>.md`
+- `plan.prompt.md` → saves to `.ai/workspace/plans/<topic>.md`
+- `execute.prompt.md` → saves to `.ai/workspace/summaries/<topic>.md`
+- `review.prompt.md` → reads from `.ai/workspace/summaries/<topic>.md`
+
+**Sequence**:
+
+1. Discover (PRD) → Plan (checklist) → Execute (implement) → Review (validate) → Document (`.ai/docs/`)
+
+**After implementing** a feature, add the documentation into `.ai/docs/`.
+
+**After refactoring**, update the documentation in `.ai/docs/` and reflect the changes.
 
 Use TDD cycle for new features:
 
@@ -94,20 +103,20 @@ Refs: `include/edhoc/common/com_edhoc_setup_context.h`,
 ## WSL tools troubleshooting
 
 - Troubleshooting `apply_patch`:
-    - `apply_patch` can fail with "File not found" even if the path worked
+  - `apply_patch` can fail with "File not found" even if the path worked
       earlier. This often comes from using a different path format or improper
       escaping of backslashes in the tool call.
-    - If `apply_patch` fails, try the UNC WSL path (
+  - If `apply_patch` fails, try the UNC WSL path (
       `\\wsl.localhost\\Ubuntu-24.04\\home\\jhon\\cuarto\\tfg\\libedhoc_mio\\AGENTS.md`)
       and ensure backslashes are escaped where required by the tool schema.
 
 - Preparing to use `insert_edit_into_file`:
-    - `insert_edit_into_file` requires three fields: `filePath` (absolute),
+  - `insert_edit_into_file` requires three fields: `filePath` (absolute),
       `code` (the new file content as a string), and `explanation`.
-    - This tool is suited for full-content replacements (e.g., `AGENTS.md`).
+  - This tool is suited for full-content replacements (e.g., `AGENTS.md`).
       When switching to it, prepare the replacement content and a short
       explanation of the edit.
-    - Use a UNC path for the `filePath` and keep the `code` minimal to save
+  - Use a UNC path for the `filePath` and keep the `code` minimal to save
       tokens.
 
 - Quick checklist when a patch fails:

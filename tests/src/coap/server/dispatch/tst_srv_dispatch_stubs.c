@@ -99,6 +99,57 @@ enum status_coap stb_srv_coap_add_options_fail(
   return STATUS_COAP_ERR;
 }
 
+bool stb_srv_coap_is_message_1_true(struct com_readonly_buffer parsed_request) {
+  (void)parsed_request;
+  return true;
+}
+
+bool stb_srv_coap_is_message_1_false(
+    struct com_readonly_buffer parsed_request) {
+  (void)parsed_request;
+  return false;
+}
+
+enum srv_session_set_status stb_srv_session_set_context_ok(
+    const struct edhoc_connection_id* cid, struct edhoc_context* context) {
+  (void)cid;
+  (void)context;
+  return SRV_SESSION_SET_OK;
+}
+
+enum srv_session_set_status stb_srv_session_set_context_duplicate_cid(
+    const struct edhoc_connection_id* cid, struct edhoc_context* context) {
+  (void)cid;
+  (void)context;
+  return SRV_SESSION_SET_ERR_DUPLICATE_CID;
+}
+
+struct srv_session_get_result stb_srv_session_get_context_ok(
+    const struct edhoc_connection_id* cid) {
+  (void)cid;
+  return (struct srv_session_get_result){
+      .status = SRV_SESSION_GET_OK, .context = &dummy_edhoc_context_for_stub};
+}
+
+struct srv_session_get_result stb_srv_session_get_context_not_found(
+    const struct edhoc_connection_id* cid) {
+  (void)cid;
+  return (struct srv_session_get_result){
+      .status = SRV_SESSION_GET_ERR_NOT_FOUND, .context = NULL};
+}
+
+enum srv_session_remove_status stb_srv_session_remove_context_ok(
+    const struct edhoc_connection_id* cid) {
+  (void)cid;
+  return SRV_SESSION_REMOVE_OK;
+}
+
+enum srv_session_remove_status stb_srv_session_remove_context_not_found(
+    const struct edhoc_connection_id* cid) {
+  (void)cid;
+  return SRV_SESSION_REMOVE_ERR_NOT_FOUND;
+}
+
 void* stb_srv_coap_get_session_null(const coap_session_t* session) {
   (void)session;
   return NULL;
@@ -154,18 +205,14 @@ struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(
-    const struct srv_edhoc_message_1_responder_result message_1_result,
-    coap_session_t* session) {
+    const struct srv_edhoc_message_1_responder_result message_1_result) {
   (void)message_1_result;
-  (void)session;
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
-    const struct srv_edhoc_message_1_responder_result message_1_result,
-    coap_session_t* session) {
+    const struct srv_edhoc_message_1_responder_result message_1_result) {
   (void)message_1_result;
-  (void)session;
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 

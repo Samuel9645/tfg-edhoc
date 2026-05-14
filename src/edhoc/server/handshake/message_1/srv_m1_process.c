@@ -116,21 +116,22 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
                   error_buffer);
     const struct srv_edhoc_message_1_process_result failure_result =
         failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS, process_error);
-    srv_edhoc_cleanup_context(&context);
+    srv_edhoc_cleanup_context(context);
+    context = NULL;
     return failure_result;
   }
   return ok(context);
 }
 
 enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
-    struct edhoc_context** context) {
-  if (*context == NULL) {
+    struct edhoc_context* context) {
+  if (context == NULL) {
     return SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT;
   }
-  if (edhoc_context_deinit(*context) != EDHOC_SUCCESS) {
+  if (edhoc_context_deinit(context) != EDHOC_SUCCESS) {
     return SRV_EDHOC_CLEANUP_ERR_DEINIT;
   }
-  free(*context);
-  *context = NULL;
+  free(context);
+  context = NULL;
   return SRV_EDHOC_CLEANUP_OK;
 }

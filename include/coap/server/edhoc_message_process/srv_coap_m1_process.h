@@ -15,20 +15,12 @@
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
 /**
- * @brief Process Message 1 EDHOC result and map it to the corresponding CoAP
- * response code.
- *
- * On success, this function binds the allocated EDHOC context to the CoAP
- * session app-data and returns 2.04 (Changed). On failure, it logs the mapped
- * error and returns 4.00 (Bad Request) or 5.00 (Internal Server Error)
- * depending on the result code.
- *
+ * @brief Process Message 1 EDHOC result (logging failures) and map it to the
+ * corresponding CoAP response code.
  * @param[in] message_1_result Message 1 processing result from the EDHOC layer.
- * @param[in,out] session CoAP session where app-data is set on success.
  * @return Mapped CoAP response code for the operation.
  */
 coap_pdu_code_t srv_coap_process_message_1_result(
-    struct srv_edhoc_message_1_responder_result message_1_result,
-    coap_session_t* session);
+    struct srv_edhoc_message_1_responder_result message_1_result);
 
 #endif  // COAP_SERVER_EDHOC_MAPPER_SRV_M1_MAPPER_H_

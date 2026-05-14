@@ -15,21 +15,21 @@
 static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
   return deps != NULL && deps->parse_edhoc_request != NULL &&
          deps->add_edhoc_response_options != NULL &&
-         deps->extract_message_1 != NULL && deps->extract_cid != NULL &&
-         deps->connection_id_is_expected != NULL &&
+         deps->is_message_1 != NULL && deps->extract_message_1 != NULL &&
+         deps->extract_cid != NULL && deps->connection_id_is_expected != NULL &&
          deps->respond_to_message_1 != NULL &&
          deps->process_message_1_result != NULL &&
          deps->respond_to_message_3 != NULL &&
          deps->process_message_3_result != NULL &&
          deps->add_response_payload != NULL &&
-         deps->get_session_app_data != NULL;
+         deps->set_context_by_cid != NULL && deps->get_context_by_cid != NULL &&
+         deps->remove_context_by_cid != NULL;
 }
 
 static bool srv_dispatch_has_invalid_deps_or_args(
-    const coap_session_t* session, const coap_pdu_t* request,
-    const coap_pdu_t* response, const struct srv_coap_dispatch_deps* deps) {
-  return session == NULL || request == NULL || response == NULL ||
-         !dispatch_deps_are_valid(deps);
+    const coap_pdu_t* request, const coap_pdu_t* response,
+    const struct srv_coap_dispatch_deps* deps) {
+  return request == NULL || response == NULL || !dispatch_deps_are_valid(deps);
 }
 
 static bool add_payload_if_present(
@@ -43,9 +43,8 @@ static bool add_payload_if_present(
   return true;
 }
 
-// TODO: maybe only pass the specific deps instead of all
 static coap_pdu_code_t route_and_process_edhoc_message(
-    coap_session_t* session, const struct com_readonly_buffer parsed_request,
+    const struct com_readonly_buffer parsed_request,
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
   uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
@@ -53,9 +52,8 @@ static coap_pdu_code_t route_and_process_edhoc_message(
       .bytes = response_payload,
       .capacity = CONFIG_COAP_MAX_PDU_SIZE,
   };
-  struct edhoc_context* edhoc_ctx = deps->get_session_app_data(session);
-  coap_pdu_code_t final_code = COAP_RESPONSE_CODE_INTERNAL_ERROR;
-  if (edhoc_ctx == NULL) {
+
+  if (deps->is_message_1(parsed_request)) {
     const struct srv_coap_extract_message_1_result parsed_message_1 =
         deps->extract_message_1(parsed_request, response_buffer);
     if (parsed_message_1.status != SRV_COAP_EXTRACT_MSG1_OK) {
@@ -67,50 +65,80 @@ static coap_pdu_code_t route_and_process_edhoc_message(
         .message_1 = parsed_message_1.buffer};
     const struct srv_edhoc_message_1_responder_result message_1_result =
         deps->respond_to_message_1(request, edhoc_parameters, response_buffer);
+    struct edhoc_context* edhoc_context = message_1_result.edhoc_ctx;
     if (!add_payload_if_present(response, message_1_result.response,
                                 deps->add_response_payload)) {
+      srv_edhoc_cleanup_context(edhoc_context);
       return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
-    final_code = deps->process_message_1_result(message_1_result, session);
-  } else {
-    const struct srv_coap_extract_connection_id_result extracted_cid =
-        deps->extract_cid(parsed_request);
-    if (extracted_cid.status != SRV_COAP_EXTRACT_CID_OK) {
-      coap_log_err("failed to extract Message 3 connection ID\n");
+    const coap_pdu_code_t process_m1_code =
+        deps->process_message_1_result(message_1_result);
+    if (process_m1_code != COAP_RESPONSE_CODE_CHANGED) {
+      srv_edhoc_cleanup_context(edhoc_context);
+      return process_m1_code;
+    }
+    if (edhoc_context == NULL) {
+      coap_log_err(
+          "SHOULD NEVER HAPPEN: Message 1 process success but context is "
+          "NULL\n");
       return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
-    if (!deps->connection_id_is_expected(&extracted_cid.cid, edhoc_ctx)) {
-      coap_log_err("unexpected Message 3 connection ID\n");
+    if (deps->set_context_by_cid(&edhoc_context->private_cid, edhoc_context) !=
+        SRV_SESSION_SET_OK) {
+      coap_log_err("failed to store context in session dictionary\n");
+      srv_edhoc_cleanup_context(edhoc_context);
       return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
-    const struct srv_edhoc_message_3_responder_request handler_request = {
-        .edhoc_context = edhoc_ctx,
-        .message_3 = extracted_cid.message_payload,
-    };
-    const struct srv_edhoc_message_3_responder_result message_3_result =
-        deps->respond_to_message_3(handler_request, response_buffer);
-    if (!add_payload_if_present(response, message_3_result.response,
-                                deps->add_response_payload)) {
-      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
-    }
-    final_code = deps->process_message_3_result(message_3_result);
+    return process_m1_code;
   }
-  if (final_code == COAP_RESPONSE_CODE_INTERNAL_ERROR ||
-      final_code == COAP_RESPONSE_CODE_BAD_REQUEST) {
-    coap_log_warn("EDHOC failure: Aborting session context\n");
-    if (edhoc_ctx != NULL) {
-      srv_edhoc_cleanup_context(&edhoc_ctx);
-      coap_session_set_app_data2(session, NULL, NULL);
-    }
+  const struct srv_coap_extract_connection_id_result
+      extract_connection_id_result = deps->extract_cid(parsed_request);
+  if (extract_connection_id_result.status != SRV_COAP_EXTRACT_CID_OK) {
+    coap_log_err("failed to extract Message 3 connection ID\n");
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
-  return final_code;
+
+  const struct edhoc_connection_id extracted_cid =
+      extract_connection_id_result.cid;
+  const struct srv_session_get_result get_result =
+      deps->get_context_by_cid(&extracted_cid);
+  if (get_result.status != SRV_SESSION_GET_OK) {
+    coap_log_err("context not found in session dictionary\n");
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  }
+  struct edhoc_context* edhoc_context = get_result.context;
+  if (!deps->connection_id_is_expected(&extracted_cid, edhoc_context)) {
+    coap_log_err("unexpected Message 3 connection ID\n");
+    return COAP_RESPONSE_CODE_BAD_REQUEST;
+  }
+
+  const struct srv_edhoc_message_3_responder_request handler_request = {
+      .edhoc_context = edhoc_context,
+      .message_3 = extract_connection_id_result.message_payload,
+  };
+  const struct srv_edhoc_message_3_responder_result message_3_result =
+      deps->respond_to_message_3(handler_request, response_buffer);
+  if (!add_payload_if_present(response, message_3_result.response,
+                              deps->add_response_payload)) {
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
+
+  const coap_pdu_code_t process_message_3_code =
+      deps->process_message_3_result(message_3_result);
+  if (process_message_3_code != COAP_RESPONSE_CODE_CHANGED) {
+    coap_log_warn(
+        "EDHOC Message 3 failure: Removing context from dictionary\n");
+    deps->remove_context_by_cid(&extracted_cid);
+    srv_edhoc_cleanup_context(edhoc_context);
+  }
+  return process_message_3_code;
 }
 
 void srv_coap_dispatch_post_with_dependencies(
-    coap_session_t* session, const coap_pdu_t* request,
+    const coap_pdu_t* request,
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
     const struct srv_coap_dispatch_deps* deps) {
-  if (srv_dispatch_has_invalid_deps_or_args(session, request, response, deps)) {
+  if (srv_dispatch_has_invalid_deps_or_args(request, response, deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
     if (response != NULL) {
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
@@ -139,6 +167,6 @@ void srv_coap_dispatch_post_with_dependencies(
     return;
   }
   coap_pdu_set_code(response, route_and_process_edhoc_message(
-                                  session, parse_edhoc_result.parsed_request,
+                                  parse_edhoc_result.parsed_request,
                                   edhoc_parameters, response, deps));
 }

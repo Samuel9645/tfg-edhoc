@@ -90,10 +90,9 @@ void test_m1_process_ok_for_valid_data(void) {
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG1_PROCESS_OK, result.status);
   TEST_ASSERT_NOT_NULL(result.context);
   const enum srv_edhoc_cleanup_context_status cleanup_status =
-      srv_edhoc_cleanup_context(&result.context);
+      srv_edhoc_cleanup_context(result.context);
   TEST_ASSERT_EQUAL_MESSAGE(SRV_EDHOC_CLEANUP_OK, cleanup_status,
                             "edhoc_context cleanup failed");
-  ensure_context_is_null(result.context);
 }
 
 static void assert_error_contains_supported_cipher_suites(

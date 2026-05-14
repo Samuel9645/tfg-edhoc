@@ -1,3 +1,4 @@
+// ReSharper disable CppParameterMayBeConstPtrOrRef
 #include "app/app_server.h"
 
 #include <coap3/coap.h>
@@ -17,6 +18,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
                                const coap_pdu_t* request,
                                const coap_string_t* query,
                                coap_pdu_t* response) {
+  (void)session;
   (void)resource;
   (void)query;
   const struct com_edhoc_cipher_suite_list supported_suites =
@@ -31,7 +33,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
   };
-  srv_coap_dispatch_edhoc_post(session, request, edhoc_parameters, response);
+  srv_coap_dispatch_edhoc_post(request, edhoc_parameters, response);
 }
 
 enum com_emulation_status core_run_server(void) {

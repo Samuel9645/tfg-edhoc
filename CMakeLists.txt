@@ -105,6 +105,7 @@ set(SERVER_SPECIFIC_SOURCES
     ${COAP_EXTRACT_MESSAGE_3_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m1_process.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/edhoc_message_process/srv_coap_m3_process.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_session.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_dispatch.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/internal/srv_dispatch_engine.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_srv.c

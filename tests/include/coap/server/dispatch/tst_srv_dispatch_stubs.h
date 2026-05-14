@@ -12,6 +12,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
+#include "coap/server/internal/srv_session.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
@@ -34,9 +35,27 @@ enum status_coap stb_srv_coap_add_options_fail(
     coap_pdu_t* response,
     enum config_coap_content_format_edhoc_values content_format);
 
-void* stb_srv_coap_get_session_null(const coap_session_t* session);
+bool stb_srv_coap_is_message_1_true(struct com_readonly_buffer parsed_request);
 
-void* stb_srv_coap_get_session_valid(const coap_session_t* session);
+bool stb_srv_coap_is_message_1_false(struct com_readonly_buffer parsed_request);
+
+enum srv_session_set_status stb_srv_session_set_context_ok(
+    const struct edhoc_connection_id* cid, struct edhoc_context* context);
+
+enum srv_session_set_status stb_srv_session_set_context_duplicate_cid(
+    const struct edhoc_connection_id* cid, struct edhoc_context* context);
+
+struct srv_session_get_result stb_srv_session_get_context_ok(
+    const struct edhoc_connection_id* cid);
+
+struct srv_session_get_result stb_srv_session_get_context_not_found(
+    const struct edhoc_connection_id* cid);
+
+enum srv_session_remove_status stb_srv_session_remove_context_ok(
+    const struct edhoc_connection_id* cid);
+
+enum srv_session_remove_status stb_srv_session_remove_context_not_found(
+    const struct edhoc_connection_id* cid);
 
 struct srv_coap_extract_message_1_result stb_srv_coap_extract_message_1_ok(
     struct com_readonly_buffer request_buffer,
@@ -73,12 +92,10 @@ struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
     struct com_writable_buffer response_data);
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(
-    struct srv_edhoc_message_1_responder_result message_1_result,
-    coap_session_t* session);
+    struct srv_edhoc_message_1_responder_result message_1_result);
 
 coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
-    struct srv_edhoc_message_1_responder_result message_1_result,
-    coap_session_t* session);
+    struct srv_edhoc_message_1_responder_result message_1_result);
 
 struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
     struct srv_edhoc_message_3_responder_request request_data,

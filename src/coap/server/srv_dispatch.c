@@ -7,12 +7,14 @@
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
+#include "coap/server/internal/srv_session.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static const struct srv_coap_dispatch_deps
     COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS = {
         .parse_edhoc_request = com_coap_parse_edhoc_request,
         .add_edhoc_response_options = com_coap_add_edhoc_response_options,
+        .is_message_1 = srv_edhoc_is_message_1,
         .extract_message_1 = srv_coap_extract_message_1,
         .extract_cid = srv_coap_extract_connection_id,
         .connection_id_is_expected = srv_coap_connection_id_is_expected,
@@ -21,13 +23,15 @@ static const struct srv_coap_dispatch_deps
         .respond_to_message_3 = srv_edhoc_respond_to_message_3,
         .process_message_3_result = srv_coap_process_message_3_result,
         .add_response_payload = com_coap_add_response_payload,
-        .get_session_app_data = coap_session_get_app_data,
+        .set_context_by_cid = srv_session_set_context_by_cid,
+        .get_context_by_cid = srv_session_get_context_by_cid,
+        .remove_context_by_cid = srv_session_remove_context_by_cid,
 };
 
 void srv_coap_dispatch_edhoc_post(
-    coap_session_t* session, const coap_pdu_t* request,
+    const coap_pdu_t* request,
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
   srv_coap_dispatch_post_with_dependencies(
-      session, request, edhoc_parameters, response,
+      request, edhoc_parameters, response,
       &COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS);
 }

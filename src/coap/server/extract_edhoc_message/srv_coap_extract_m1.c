@@ -81,5 +81,8 @@ bool srv_edhoc_is_message_1(const struct com_readonly_buffer request_buffer) {
       .buffer = request_buffer.bytes,
       .buffer_size = request_buffer.length,
   };
-  return edhoc_extract_flow_info(&extracted_fields) == EDHOC_SUCCESS;
+  if (edhoc_extract_flow_info(&extracted_fields) != EDHOC_SUCCESS) {
+    return false;
+  }
+  return extracted_fields.is_forward_flow;
 }

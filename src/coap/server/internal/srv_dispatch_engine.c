@@ -120,6 +120,8 @@ static coap_pdu_code_t route_and_process_edhoc_message(
       deps->respond_to_message_3(handler_request, response_buffer);
   if (!add_payload_if_present(response, message_3_result.response,
                               deps->add_response_payload)) {
+    srv_edhoc_cleanup_context(edhoc_context);
+    deps->remove_context_by_cid(&extracted_cid);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 

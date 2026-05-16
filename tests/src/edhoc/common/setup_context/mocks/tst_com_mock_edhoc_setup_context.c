@@ -188,6 +188,30 @@ void tst_com_use_real_edhoc_bind_crypto(void) {
   edhoc_bind_crypto_result = EDHOC_SUCCESS;
 }
 
+static bool use_real_edhoc_set_user_context = true;
+static int edhoc_set_user_context_result = EDHOC_SUCCESS;
+
+extern int __real_edhoc_set_user_context(  // NOLINT(*-reserved-identifier)
+    struct edhoc_context* edhoc_context, void* user_context);
+
+int __wrap_edhoc_set_user_context(  // NOLINT(*-reserved-identifier)
+    struct edhoc_context* edhoc_context, void* user_context) {
+  if (use_real_edhoc_set_user_context) {
+    return __real_edhoc_set_user_context(edhoc_context, user_context);
+  }
+  return edhoc_set_user_context_result;
+}
+
+void tst_com_set_edhoc_set_user_context_failure(void) {
+  use_real_edhoc_set_user_context = false;
+  edhoc_set_user_context_result = EDHOC_ERROR_INVALID_ARGUMENT;
+}
+
+void tst_com_use_real_edhoc_set_user_context(void) {
+  use_real_edhoc_set_user_context = true;
+  edhoc_bind_crypto_result = EDHOC_SUCCESS;
+}
+
 static bool use_real_edhoc_bind_credentials = true;
 static int edhoc_bind_credentials_result = EDHOC_SUCCESS;
 
@@ -213,27 +237,13 @@ void tst_com_use_real_edhoc_bind_credentials(void) {
 }
 
 void tst_com_reset_setup_context_mock(void) {
-  use_real_psa_crypto_init = true;
-  psa_crypto_init_result = PSA_SUCCESS;
-
-  use_real_edhoc_context_init = true;
-  edhoc_context_init_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_set_methods = true;
-  edhoc_set_methods_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_set_cipher_suites = true;
-  edhoc_set_cipher_suites_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_set_connection_id = true;
-  edhoc_set_connection_id_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_bind_keys = true;
-  edhoc_bind_keys_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_bind_crypto = true;
-  edhoc_bind_crypto_result = EDHOC_SUCCESS;
-
-  use_real_edhoc_bind_credentials = true;
-  edhoc_bind_credentials_result = EDHOC_SUCCESS;
+  tst_com_use_real_psa_crypto_init();
+  tst_com_use_real_edhoc_context_init();
+  tst_com_use_real_edhoc_set_methods();
+  tst_com_use_real_edhoc_set_cipher_suites();
+  tst_com_use_real_edhoc_set_connection_id();
+  tst_com_use_real_edhoc_bind_keys();
+  tst_com_use_real_edhoc_bind_crypto();
+  tst_com_use_real_edhoc_set_user_context();
+  tst_com_use_real_edhoc_bind_credentials();
 }

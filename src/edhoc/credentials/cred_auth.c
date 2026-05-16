@@ -1,7 +1,6 @@
 #include "edhoc/credentials/cred_auth.h"
 
-#include <edhoc_cipher_suite_2.h>
-#include <edhoc_values.h>
+#include <edhoc.h>
 
 #include "edhoc/common/com_edhoc_setup_context.h"
 
@@ -31,9 +30,10 @@ int cred_edhoc_auth_fetch(void* user_context,
   initialize_credential_key(credentials, own_public_key, own_public_key_length,
                             own_key_id);
 
-  if (edhoc_cipher_suite_2_key_import(
-          user_context, EDHOC_KT_SIGNATURE, own_private_key,
-          own_private_key_length, credentials->priv_key_id) != EDHOC_SUCCESS) {
+  const struct edhoc_keys* keys = user_context;
+  if (keys->import_key(user_context, EDHOC_KT_SIGNATURE, own_private_key,
+                       own_private_key_length,
+                       credentials->priv_key_id) != EDHOC_SUCCESS) {
     return EDHOC_ERROR_CREDENTIALS_FAILURE;
   }
 

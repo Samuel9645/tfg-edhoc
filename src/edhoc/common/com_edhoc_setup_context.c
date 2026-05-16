@@ -139,12 +139,20 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
             context, "Context Setup error: Failed to set connection ID",
             error_buffer));
   }
-  if (edhoc_bind_keys(context, selected_cipher_suite_details->get_keys()) !=
-      EDHOC_SUCCESS) {
+
+  const struct edhoc_keys* keys = selected_cipher_suite_details->get_keys();
+  if (edhoc_bind_keys(context, keys) != EDHOC_SUCCESS) {
     return failure(
         COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS,
         com_edhoc_add_protocol_error_with_description_view(
             context, "Context Setup error: Failed to bind keys", error_buffer));
+  }
+  if (edhoc_set_user_context(context, (void*)keys) != EDHOC_SUCCESS) {
+    return failure(
+        COM_EDHOC_SETUP_CTX_ERR_SET_USER_CONTEXT,
+        com_edhoc_add_protocol_error_with_description_view(
+            context, "Context Setup error: Failed to set user context",
+            error_buffer));
   }
   if (edhoc_bind_crypto(context, selected_cipher_suite_details->get_crypto()) !=
       EDHOC_SUCCESS) {

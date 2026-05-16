@@ -16,6 +16,7 @@ enum com_edhoc_setup_context_status {
   COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES,
   COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID,
   COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS,
+  COM_EDHOC_SETUP_CTX_ERR_SET_USER_CONTEXT,
   COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO,
   COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS,
 };
@@ -42,6 +43,10 @@ struct com_edhoc_setup_context_result {
  * @note Adding the selected suite at the end does not affect the negotiation
  * with the responder, since the order of the responder suites is irrelevant in
  * that process.
+ * @note In order for the credential related functions to access the proper
+ * cipher suite import or destroy key methods, a pointer to the edhoc_keys
+ * struct is saved in the EDHOC user context, allowing the usage in the
+ * cred_edhoc_auth_fetch function
  * @see [RFC
  * 9528 6.3](https://datatracker.ietf.org/doc/html/rfc9528#name-wrong-selected-cipher-suite)
  */

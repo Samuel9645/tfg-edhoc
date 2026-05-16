@@ -30,6 +30,9 @@ void tst_com_use_real_edhoc_set_connection_id(void);
 void tst_com_set_edhoc_bind_keys_failure(void);
 void tst_com_use_real_edhoc_bind_keys(void);
 
+void tst_com_set_edhoc_set_user_context_failure(void);
+void tst_com_use_real_edhoc_set_user_context(void);
+
 void tst_com_set_edhoc_bind_crypto_failure(void);
 void tst_com_use_real_edhoc_bind_crypto(void);
 

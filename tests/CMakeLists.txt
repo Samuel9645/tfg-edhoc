@@ -156,6 +156,7 @@ set(SETUP_CONTEXT_MOCK
     "-Wl,--wrap=edhoc_set_connection_id"
     "-Wl,--wrap=edhoc_bind_keys"
     "-Wl,--wrap=edhoc_bind_crypto"
+    "-Wl,--wrap=edhoc_set_user_context"
     "-Wl,--wrap=edhoc_bind_credentials"
 )
 

@@ -32,8 +32,7 @@
  * @param[in] port Port number to resolve.
  * @param[in] scheme_hint_bits Scheme hint bits for protocol selection.
  * @param[out] destination_address Output resolved socket address.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
- * failure.
+ * @return Status code indicating the result of the operation
  *
  * @note On failure, the output destination_address is not modified.
  *

@@ -10,8 +10,7 @@
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] listen_address_string Local address to bind (for example: "::").
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
- * failure.
+ * @return Status code indicating the result of the operation
  */
 enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
                                           const char* listen_address_string);
@@ -21,8 +20,7 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] multicast_address_string Multicast group address.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
- * failure.
+ * @return Status code indicating the result of the operation
  */
 enum status_coap srv_coap_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string);
@@ -33,8 +31,7 @@ enum status_coap srv_coap_join_multicast_group(
  * @param[in] coap_context Active CoAP context.
  * @param[in] resource_path Resource URI path.
  * @param[in] resource_handler POST handler function.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
- * failure.
+ * @return Status code indicating the result of the operation
  */
 enum status_coap srv_coap_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
@@ -46,8 +43,7 @@ enum status_coap srv_coap_add_post_resource(
  * @param[in] coap_context Active CoAP context.
  * @param[in] resource_path Resource URI path.
  * @param[in] resource_handler GET handler function.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
- * failure.
+ * @return Status code indicating the result of the operation
  */
 enum status_coap srv_coap_add_get_resource(
     coap_context_t* coap_context, const char* resource_path,

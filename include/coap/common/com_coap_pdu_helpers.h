@@ -11,7 +11,7 @@
  * @param[in,out] response CoAP response PDU.
  * @param[in] payload Payload buffer.
  * @param[in] payload_len Payload length.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE on failure
+ * @return Status code indicating the result of the operation
  */
 enum status_coap com_coap_add_payload_to_pdu(coap_pdu_t* response,
                                              const uint8_t* payload,

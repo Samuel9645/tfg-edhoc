@@ -131,8 +131,7 @@ struct cli_coap_prepare_pdu_result cli_coap_prepare_get_request(
  *
  * @param[in] coap_session Active CoAP session.
  * @param[in] request_pdu Prepared request PDU.
- * @return CP_STATUS_SUCCESS on success, CP_STATUS_FAILURE onon
- * failure.
+ * @return Status code indicating the result of the operation
  */
 enum status_coap cli_coap_send_coap_request(coap_session_t* coap_session,
                                             coap_pdu_t* request_pdu);

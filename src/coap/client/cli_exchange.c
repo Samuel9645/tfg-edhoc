@@ -9,7 +9,7 @@
 #include "coap/client/cli_utils.h"
 #include "coap/client/internal/cli_exchange_internal.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
-#include "coap/common/com_coap_response.h"
+#include "coap/common/com_coap_pdu_helpers.h"
 
 static struct com_readonly_buffer get_readonly_buffer(
     const struct cli_coap_exchange* exchange) {
@@ -112,8 +112,8 @@ static enum status_coap default_send(
   }
 
   coap_pdu_t* request_pdu = prepare_pdu_result.pdu;
-  if (com_coap_add_response_payload(request_pdu, request_data.buffer.bytes,
-                                    request_data.buffer.length) ==
+  if (com_coap_add_payload_to_pdu(request_pdu, request_data.buffer.bytes,
+                                  request_data.buffer.length) ==
       STATUS_COAP_ERR) {
     coap_log_err("cannot add payload to request PDU\n");
     coap_delete_pdu(request_pdu);

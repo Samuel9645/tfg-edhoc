@@ -44,7 +44,7 @@ set(COMMON_COAP_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_helpers.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_parse_edhoc_request.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/internal/com_parse_edhoc_request_builders.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_response.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_pdu_helpers.c
 )
 
 set(BASE_SOURCES

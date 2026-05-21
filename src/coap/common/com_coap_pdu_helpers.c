@@ -1,19 +1,11 @@
-#include "coap/common/com_coap_response.h"
-
-#include <stdbool.h>
+#include "coap/common/com_coap_pdu_helpers.h"
 
 #include "coap/common/com_coap_helpers.h"
 
-static bool coap_common_response_payload_is_valid(const coap_pdu_t* response,
-                                                  const uint8_t* payload,
-                                                  const size_t payload_len) {
-  return response != NULL && payload != NULL && payload_len > 0;
-}
-
-enum status_coap com_coap_add_response_payload(coap_pdu_t* response,
-                                               const uint8_t* payload,
-                                               const size_t payload_len) {
-  if (!coap_common_response_payload_is_valid(response, payload, payload_len)) {
+enum status_coap com_coap_add_payload_to_pdu(coap_pdu_t* response,
+                                             const uint8_t* payload,
+                                             const size_t payload_len) {
+  if (response == NULL || payload == NULL || payload_len == 0) {
     coap_log_err("invalid response payload arguments\n");
     return STATUS_COAP_ERR;
   }
@@ -25,7 +17,7 @@ enum status_coap com_coap_add_response_payload(coap_pdu_t* response,
   return STATUS_COAP_OK;
 }
 
-enum status_coap com_coap_add_edhoc_response_options(
+enum status_coap com_coap_add_edhoc_options_to_pdu(
     coap_pdu_t* response,
     const enum config_coap_content_format_edhoc_values content_format) {
   if (response == NULL) {

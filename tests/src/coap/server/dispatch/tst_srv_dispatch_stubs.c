@@ -16,6 +16,7 @@
 #include "coap/common/internal/com_parse_edhoc_request_builders.h"
 #include "coap/server/extract_edhoc_message/internal/srv_coap_extract_cid_result_builders.h"
 #include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.h"
+#include "coap/server/internal/srv_dispatch_engine.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
@@ -246,6 +247,20 @@ coap_pdu_code_t stb_srv_coap_process_m3_protocol_failure(
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
+enum status_coap stb_srv_oscore_bind_session_failure(
+    coap_context_t* coap_context, struct edhoc_context* edhoc_context) {
+  (void)coap_context;
+  (void)edhoc_context;
+  return STATUS_COAP_ERR;
+}
+
+enum status_coap stb_srv_oscore_bind_session_ok(
+    coap_context_t* coap_context, struct edhoc_context* edhoc_context) {
+  (void)coap_context;
+  (void)edhoc_context;
+  return STATUS_COAP_OK;
+}
+
 enum status_coap stb_srv_coap_add_payload_ok(coap_pdu_t* response,
                                              const uint8_t* payload,
                                              size_t payload_len) {
@@ -262,4 +277,24 @@ enum status_coap stb_srv_coap_add_payload_failure(coap_pdu_t* response,
   (void)payload;
   (void)payload_len;
   return STATUS_COAP_ERR;
+}
+
+struct srv_coap_dispatch_deps test_srv_coap_dispatch_create_base_dependencies(
+    void) {
+  return (struct srv_coap_dispatch_deps){
+      .parse_edhoc_request = stb_srv_coap_parse_edhoc_request_ok,
+      .add_edhoc_response_options = stb_srv_coap_add_options_success,
+      .is_message_1 = stb_srv_coap_is_message_1_true,
+      .get_context_by_cid = stb_srv_session_get_context_ok,
+      .remove_context_by_cid = stb_srv_session_remove_context_ok,
+      .set_context_by_cid = stb_srv_session_set_context_ok,
+      .respond_to_message_1 = stb_srv_edhoc_m1_responder_ok,
+      .extract_message_1 = stb_srv_coap_extract_message_1_ok,
+      .extract_cid = stb_srv_coap_extract_cid_ok,
+      .connection_id_is_expected = stb_srv_coap_connection_id_is_expected_true,
+      .process_message_1_result = stb_srv_coap_process_m1_ok,
+      .respond_to_message_3 = stb_srv_edhoc_m3_responder_ok,
+      .process_message_3_result = stb_srv_coap_process_m3_ok,
+      .add_response_payload = stb_srv_coap_add_payload_ok,
+      .bind_oscore_session = stb_srv_oscore_bind_session_ok};
 }

@@ -65,6 +65,9 @@ typedef struct srv_session_get_result (*srv_session_get_context_fn)(
 typedef enum srv_session_remove_status (*srv_session_remove_context_fn)(
     const struct edhoc_connection_id* cid);
 
+typedef enum status_coap (*srv_oscore_bind_session_fn)(
+    coap_context_t* coap_context, struct edhoc_context* edhoc_context);
+
 struct srv_coap_dispatch_deps {
   srv_coap_parse_edhoc_request_fn parse_edhoc_request;
   srv_coap_add_edhoc_response_options_fn add_edhoc_response_options;
@@ -80,10 +83,12 @@ struct srv_coap_dispatch_deps {
   srv_session_set_context_fn set_context_by_cid;
   srv_session_get_context_fn get_context_by_cid;
   srv_session_remove_context_fn remove_context_by_cid;
+  srv_oscore_bind_session_fn bind_oscore_session;
 };
 
 void srv_coap_dispatch_post_with_dependencies(
     const coap_pdu_t* request, struct com_edhoc_parameters edhoc_parameters,
-    coap_pdu_t* response, const struct srv_coap_dispatch_deps* deps);
+    coap_pdu_t* response, const struct srv_coap_dispatch_deps* deps,
+    coap_context_t* context);
 
 #endif  // COAP_SERVER_INTERNAL_dispatch_engine_H_

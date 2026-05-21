@@ -8,6 +8,7 @@
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
 #include "coap/server/internal/srv_session.h"
+#include "coap/server/oscore/srv_oscore_bind_session.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static const struct srv_coap_dispatch_deps
@@ -26,12 +27,13 @@ static const struct srv_coap_dispatch_deps
         .set_context_by_cid = srv_session_set_context_by_cid,
         .get_context_by_cid = srv_session_get_context_by_cid,
         .remove_context_by_cid = srv_session_remove_context_by_cid,
-};
+        .bind_oscore_session = srv_oscore_bind_session};
 
 void srv_coap_dispatch_edhoc_post(
     const coap_pdu_t* request,
-    const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
+    const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
+    coap_context_t* context) {
   srv_coap_dispatch_post_with_dependencies(
       request, edhoc_parameters, response,
-      &COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS);
+      &COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS, context);
 }

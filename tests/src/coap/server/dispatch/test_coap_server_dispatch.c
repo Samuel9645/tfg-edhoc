@@ -13,15 +13,16 @@
  * scripts](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityHelperScriptsGuide.md)
  */
 #include <coap3/coap.h>
+#include <coap3/coap_net_internal.h>
 #include <edhoc.h>
 #include <unity.h>
 
-#include "coap/server/dispatch/tst_create_base_dependencies.h"
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 #include "edhoc/common/tst_edhoc_params.h"
 
 static coap_pdu_t* dummy_request = NULL;
 static coap_pdu_t* dummy_response = NULL;
+static coap_context_t dummy_context = {0};
 
 void setUp(void) {
   coap_startup();
@@ -49,7 +50,7 @@ void test_changed_response_for_valid_message_1(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
@@ -61,7 +62,7 @@ void test_bad_request_for_malformed_edhoc_message(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -73,7 +74,7 @@ void test_internal_error_on_server_side_failure(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -85,7 +86,7 @@ void test_bad_request_on_parse_m1_failure(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -98,7 +99,7 @@ void test_internal_error_on_extract_cid_failure(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -113,7 +114,7 @@ void test_internal_error_if_context_already_exists_for_message_1(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -126,7 +127,7 @@ void test_error_when_message_1_processing_fails(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
@@ -141,7 +142,7 @@ void test_internal_error_if_adding_response_payload_fails(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }
@@ -156,7 +157,7 @@ void test_bad_request_for_message_3_without_active_context(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -168,7 +169,7 @@ void test_changed_response_for_valid_message_3(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
 }
@@ -182,7 +183,7 @@ void test_bad_request_for_unrecognized_message_format(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
 }
@@ -196,7 +197,7 @@ void test_internal_error_when_session_storage_is_full(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
@@ -211,7 +212,7 @@ void test_bad_request_when_session_not_found_for_message_3(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
                     coap_pdu_get_code(dummy_response));
@@ -227,8 +228,23 @@ void test_bad_request_when_connection_id_mismatch_occurs(void) {
 
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
-      &deps);
+      &deps, &dummy_context);
 
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_BAD_REQUEST,
+                    coap_pdu_get_code(dummy_response));
+}
+
+void test_internal_error_when_oscore_binding_fails(void) {
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+
+  deps.is_message_1 = stb_srv_coap_is_message_1_false;
+  deps.bind_oscore_session = stb_srv_oscore_bind_session_failure;
+
+  srv_coap_dispatch_post_with_dependencies(
+      dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
+      &deps, &dummy_context);
+
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }

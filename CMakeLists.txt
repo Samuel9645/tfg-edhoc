@@ -96,10 +96,15 @@ set(COAP_EXTRACT_MESSAGE_3_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/extract_edhoc_message/srv_coap_extract_m3.c
 )
 
+set(SERVER_OSCORE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/oscore/srv_oscore_bind_session.c
+)
+
 set(SERVER_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/srv_utils.c
     ${MESSAGE_1_RESPONDER_SOURCES}
+    ${SERVER_OSCORE_SOURCES}
     ${MESSAGE_3_RESPONDER_SOURCES}
     ${COAP_EXTRACT_MESSAGE_1_SOURCES}
     ${COAP_EXTRACT_MESSAGE_3_SOURCES}

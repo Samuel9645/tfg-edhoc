@@ -13,6 +13,7 @@
  * configuration and processing, such as credentials and supported cipher
  * suites.
  * @param[in,out] response Outgoing response PDU.
+ * @param context
  *
  * @note Response payloads are included for both success (2.04 Changed) and
  * error responses (4.00 Bad Request, 5.00 Internal Server Error) per RFC 9528
@@ -20,6 +21,7 @@
  */
 void srv_coap_dispatch_edhoc_post(const coap_pdu_t* request,
                                   struct com_edhoc_parameters edhoc_parameters,
-                                  coap_pdu_t* response);
+                                  coap_pdu_t* response,
+                                  coap_context_t* context);
 
 #endif  // COAP_SERVER_SRV_DISPATCH_H_

@@ -4,6 +4,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
+#include "coap/server/oscore/srv_oscore_bind_session.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
 /**
@@ -23,13 +24,8 @@ static bool dispatch_deps_are_valid(const struct srv_coap_dispatch_deps* deps) {
          deps->process_message_3_result != NULL &&
          deps->add_response_payload != NULL &&
          deps->set_context_by_cid != NULL && deps->get_context_by_cid != NULL &&
-         deps->remove_context_by_cid != NULL;
-}
-
-static bool srv_dispatch_has_invalid_deps_or_args(
-    const coap_pdu_t* request, const coap_pdu_t* response,
-    const struct srv_coap_dispatch_deps* deps) {
-  return request == NULL || response == NULL || !dispatch_deps_are_valid(deps);
+         deps->remove_context_by_cid != NULL &&
+         deps->bind_oscore_session != NULL;
 }
 
 static bool add_payload_if_present(
@@ -46,7 +42,7 @@ static bool add_payload_if_present(
 static coap_pdu_code_t route_and_process_edhoc_message(
     const struct com_readonly_buffer parsed_request,
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
-    const struct srv_coap_dispatch_deps* deps) {
+    const struct srv_coap_dispatch_deps* deps, coap_context_t* context) {
   uint8_t response_payload[CONFIG_COAP_MAX_PDU_SIZE] = {0};
   const struct com_writable_buffer response_buffer = {
       .bytes = response_payload,
@@ -120,8 +116,8 @@ static coap_pdu_code_t route_and_process_edhoc_message(
       deps->respond_to_message_3(handler_request, response_buffer);
   if (!add_payload_if_present(response, message_3_result.response,
                               deps->add_response_payload)) {
-    srv_edhoc_cleanup_context(edhoc_context);
     deps->remove_context_by_cid(&extracted_cid);
+    srv_edhoc_cleanup_context(edhoc_context);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
 
@@ -133,15 +129,30 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     deps->remove_context_by_cid(&extracted_cid);
     srv_edhoc_cleanup_context(edhoc_context);
   }
+  if (deps->bind_oscore_session(context, edhoc_context) != STATUS_COAP_OK) {
+    coap_log_err("failed to bind OSCORE session\n");
+    deps->remove_context_by_cid(&extracted_cid);
+    srv_edhoc_cleanup_context(edhoc_context);
+    return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+  }
   return process_message_3_code;
 }
 
 void srv_coap_dispatch_post_with_dependencies(
     const coap_pdu_t* request,
     const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
-    const struct srv_coap_dispatch_deps* deps) {
-  if (srv_dispatch_has_invalid_deps_or_args(request, response, deps)) {
+    const struct srv_coap_dispatch_deps* deps, coap_context_t* context) {
+  if (!dispatch_deps_are_valid(deps)) {
     coap_log_err("FATAL: Missing dependencies in dispatcher!\n");
+    if (response != NULL) {
+      coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
+    }
+    return;
+  }
+  if (request == NULL || response == NULL || context == NULL) {
+    coap_log_err(
+        "Invalid arguments: request, response, and session must be "
+        "non-NULL\n");
     if (response != NULL) {
       coap_pdu_set_code(response, COAP_RESPONSE_CODE_INTERNAL_ERROR);
     }
@@ -170,5 +181,5 @@ void srv_coap_dispatch_post_with_dependencies(
   }
   coap_pdu_set_code(response, route_and_process_edhoc_message(
                                   parse_edhoc_result.parsed_request,
-                                  edhoc_parameters, response, deps));
+                                  edhoc_parameters, response, deps, context));
 }

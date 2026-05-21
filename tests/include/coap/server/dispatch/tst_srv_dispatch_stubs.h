@@ -12,6 +12,7 @@
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_status.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
+#include "coap/server/internal/srv_dispatch_engine.h"
 #include "coap/server/internal/srv_session.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
@@ -112,6 +113,12 @@ coap_pdu_code_t stb_srv_coap_process_m3_ok(
 coap_pdu_code_t stb_srv_coap_process_m3_protocol_failure(
     struct srv_edhoc_message_3_responder_result message_3_result);
 
+enum status_coap stb_srv_oscore_bind_session_ok(
+    coap_context_t* coap_context, struct edhoc_context* edhoc_context);
+
+enum status_coap stb_srv_oscore_bind_session_failure(
+    coap_context_t* coap_context, struct edhoc_context* edhoc_context);
+
 enum status_coap stb_srv_coap_add_payload_ok(coap_pdu_t* response,
                                              const uint8_t* payload,
                                              size_t payload_len);
@@ -119,5 +126,8 @@ enum status_coap stb_srv_coap_add_payload_ok(coap_pdu_t* response,
 enum status_coap stb_srv_coap_add_payload_failure(coap_pdu_t* response,
                                                   const uint8_t* payload,
                                                   size_t payload_len);
+
+struct srv_coap_dispatch_deps test_srv_coap_dispatch_create_base_dependencies(
+    void);
 
 #endif  // COAP_SERVER_DISPATCH_STUBS_H_

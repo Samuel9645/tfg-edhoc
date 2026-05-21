@@ -121,6 +121,10 @@ set(SERVER_SOURCES
     ${SERVER_SPECIFIC_SOURCES}
 )
 
+set(CLIENT_OSCORE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/oscore/cli_oscore_create_session.c
+)
+
 set(CLIENT_EXCHANGE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_resources.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/cli_utils.c
@@ -137,6 +141,7 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_initiator.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
+    ${CLIENT_OSCORE_SOURCES}
 )
 
 set(CLIENT_SOURCES

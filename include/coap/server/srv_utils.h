@@ -28,6 +28,19 @@ enum status_coap srv_coap_join_multicast_group(
     coap_context_t* coap_context, const char* multicast_address_string);
 
 /**
+ * @brief Add a POST resource and register its request handler.
+ *
+ * @param[in] coap_context Active CoAP context.
+ * @param[in] resource_path Resource URI path.
+ * @param[in] resource_handler POST handler function.
+ * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
+ * failure.
+ */
+enum status_coap srv_coap_add_post_resource(
+    coap_context_t* coap_context, const char* resource_path,
+    coap_method_handler_t resource_handler);
+
+/**
  * @brief Add a GET resource and register its request handler.
  *
  * @param[in] coap_context Active CoAP context.
@@ -36,7 +49,7 @@ enum status_coap srv_coap_join_multicast_group(
  * @return CP_STATUS_SUCCESS on success, CP_STATUS_ERROR on
  * failure.
  */
-enum status_coap srv_coap_add_post_resource(
+enum status_coap srv_coap_add_get_resource(
     coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler);
 

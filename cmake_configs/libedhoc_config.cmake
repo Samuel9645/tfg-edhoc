@@ -1,3 +1,6 @@
+# https://kamil-kielbasa.github.io/libedhoc/api.html#edhoc-logging
+set(CONFIG_LIBEDHOC_LOG_LEVEL 2)
+
 # Silence Mbed TLS (libedhoc)
 set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)

@@ -8,6 +8,7 @@
  */
 
 #include "coap/server/edhoc_message_process/srv_coap_m3_process.h"
+
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static coap_pdu_code_t map_message_3_status_to_response(
@@ -20,7 +21,6 @@ static coap_pdu_code_t map_message_3_status_to_response(
     return COAP_RESPONSE_CODE_BAD_REQUEST;
 
   case SRV_EDHOC_MSG3_RESPONDER_ERR_INVALID_RESPONSE_BUFFER:
-  case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE:
   default:
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
@@ -33,6 +33,8 @@ coap_pdu_code_t srv_coap_process_message_3_result(
         srv_edhoc_handle_message_3_status_code_to_string(
             message_3_result.status);
     coap_log_err("Message 3 responder failed: %s\n", error_message);
+  } else {
+    coap_log_info("Message 3 process completed successfully\n");
   }
   return map_message_3_status_to_response(message_3_result.status);
 }

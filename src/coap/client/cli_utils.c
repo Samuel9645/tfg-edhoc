@@ -89,8 +89,9 @@ struct cli_coap_create_session_result cli_coap_create_session(
   return create_session_success(session);
 }
 
-static coap_pdu_t* create_post_request_pdu(coap_session_t* coap_session) {
-  coap_pdu_t* pdu = coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_CODE_POST,
+static coap_pdu_t* create_request_pdu(coap_session_t* coap_session,
+                                      const coap_pdu_code_t message_code) {
+  coap_pdu_t* pdu = coap_pdu_init(COAP_MESSAGE_CON, message_code,
                                   coap_new_message_id(coap_session),
                                   coap_session_max_pdu_size(coap_session));
   if (pdu == NULL) {
@@ -152,7 +153,8 @@ static struct cli_coap_prepare_pdu_result prepare_pdu_ok(coap_pdu_t* pdu) {
 struct cli_coap_prepare_pdu_result cli_coap_prepare_post_request(
     const struct cli_coap_session_config config, coap_session_t* coap_session,
     const enum config_coap_content_format_edhoc_values content_format) {
-  coap_pdu_t* request_pdu = create_post_request_pdu(coap_session);
+  coap_pdu_t* request_pdu =
+      create_request_pdu(coap_session, COAP_REQUEST_CODE_POST);
   if (request_pdu == NULL) {
     coap_log_err("cannot create PDU\n");
     return prepare_pdu_result_failure(CLI_COAP_PREPARE_PDU_ERR_CREATE_PDU);
@@ -173,6 +175,30 @@ struct cli_coap_prepare_pdu_result cli_coap_prepare_post_request(
   }
   coap_delete_optlist(optlist);
   return prepare_pdu_ok(request_pdu);
+}
+
+struct cli_coap_prepare_pdu_result cli_coap_prepare_get_request(
+    const struct cli_coap_session_config config, coap_session_t* coap_session) {
+  coap_pdu_t* request_pdu =
+      create_request_pdu(coap_session, COAP_REQUEST_CODE_GET);
+
+  // 3. Reutilizamos tus funciones del archivo para inyectar la URI
+  // automáticamente
+  coap_optlist_t* optlist = NULL;  // Lista vacía, no añadimos payloads de EDHOC
+  if (add_uri_into_pdu(config.uri, config.address, &optlist, request_pdu) ==
+      0) {
+    coap_log_err("cannot add URI options to GET PDU\n");
+    coap_delete_pdu(request_pdu);
+    if (optlist != NULL)
+      coap_delete_optlist(optlist);
+    return (struct cli_coap_prepare_pdu_result){
+        .status = CLI_COAP_PREPARE_PDU_ERR_ADD_URI_OPTS, .pdu = NULL};
+  }
+
+  if (optlist != NULL)
+    coap_delete_optlist(optlist);
+  return (struct cli_coap_prepare_pdu_result){.status = CLI_COAP_PREPARE_PDU_OK,
+                                              .pdu = request_pdu};
 }
 
 enum status_coap cli_coap_send_coap_request(coap_session_t* coap_session,

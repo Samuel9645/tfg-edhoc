@@ -129,10 +129,12 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     deps->remove_context_by_cid(&extracted_cid);
     srv_edhoc_cleanup_context(edhoc_context);
   }
-  if (deps->bind_oscore_session(context, edhoc_context) != STATUS_COAP_OK) {
+  const enum status_coap bind_status =
+      deps->bind_oscore_session(context, edhoc_context);
+  deps->remove_context_by_cid(&extracted_cid);
+  srv_edhoc_cleanup_context(edhoc_context);
+  if (bind_status != STATUS_COAP_OK) {
     coap_log_err("failed to bind OSCORE session\n");
-    deps->remove_context_by_cid(&extracted_cid);
-    srv_edhoc_cleanup_context(edhoc_context);
     return COAP_RESPONSE_CODE_INTERNAL_ERROR;
   }
   return process_message_3_code;

@@ -5,13 +5,14 @@
 #include "coap/client/cli_exchange.h"
 #include "coap/client/cli_resources.h"
 #include "coap/client/cli_utils.h"
+#include "coap/client/oscore/cli_oscore_create_session.h"
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_context.h"
+#include "coap/common/com_coap_get_data.h"
 #include "common/com_emulation.h"
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
-#include "edhoc/client/handshake/message_4/cli_m4_process.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
@@ -61,6 +62,44 @@ static bool send_message(struct cli_coap_exchange* exchange,
     return false;
   }
   return true;
+}
+
+static bool temperature_received = false;
+
+static coap_response_t client_temperature_handler(
+    // ReSharper disable once CppParameterMayBeConstPtrOrRef
+    coap_session_t* session, const coap_pdu_t* sent, const coap_pdu_t* received,
+    const coap_mid_t id) {
+  (void)session;
+  (void)sent;
+  (void)id;
+
+  const coap_pdu_code_t received_pdu_code = coap_pdu_get_code(received);
+
+  if (received_pdu_code != COAP_RESPONSE_CODE_CONTENT) {
+    coap_log_debug("Ignoring package with code: %d)\n", received_pdu_code);
+    return COAP_RESPONSE_OK;
+  }
+
+  coap_log_info("Response received from server!\n");
+  uint8_t response_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
+  const struct com_writable_buffer response_data = {
+      .bytes = response_buffer, .capacity = sizeof(response_buffer)};
+  const struct com_coap_get_data_result get_data_result =
+      com_coap_get_data(received, response_data);
+  if (get_data_result.status != COM_COAP_GET_DATA_OK) {
+    coap_log_err("Failed to get response data\n");
+    return COAP_RESPONSE_FAIL;
+  }
+  if (!com_readonly_buffer_has_content(get_data_result.data)) {
+    coap_log_err("Response data is empty\n");
+    return COAP_RESPONSE_FAIL;
+  }
+  coap_log_info("Received response data: %.*s\n",
+                (int)get_data_result.data.length,
+                (const char*)get_data_result.data.bytes);
+  temperature_received = true;
+  return COAP_RESPONSE_OK;
 }
 
 enum cli_first_interaction_status {
@@ -128,6 +167,7 @@ cli_edhoc_perform_negotiation_attempt(
         "Received error response to Message 1, attempting renegotiation\n");
     return renegotiation(wait_and_get_result);
   }
+  coap_log_info("Received response to Message 1, proceeding with handshake\n");
   return ok(wait_and_get_result);
 }
 
@@ -172,7 +212,7 @@ cli_edhoc_resolve_negotiation(
 
 enum com_emulation_status core_run_client(void) {
   coap_startup();
-  coap_set_log_level(COAP_LOG_DEBUG);
+  coap_set_log_level(COAP_LOG_INFO);
 
   static const char CLIENT_COAP_URI[] =
       "coap://localhost:5683/.well-known/edhoc";
@@ -261,6 +301,8 @@ enum com_emulation_status core_run_client(void) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  coap_log_info(
+      "Message 2 process and Message 3 compose completed successfully\n");
   struct com_readonly_buffer message_3 = message_2_initiator_result.buffer;
   if (cli_exchange_send_message_3(exchange, &client_resources.edhoc_context,
                                   message_3) != STATUS_COAP_OK) {
@@ -268,28 +310,62 @@ enum com_emulation_status core_run_client(void) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  coap_log_info(
+      "EDHOC Client: Handshake finished successfully. Activating OSCORE...\n");
 
-  const struct cli_coap_wait_and_get_result wait_and_get_result2 =
-      cli_coap_exchange_wait_and_get(exchange);
-  if (wait_and_get_result2.status != STATUS_COAP_OK) {
-    coap_log_err("Failed to receive EDHOC message 4\n");
+  const char CLIENT_TEMPERATURE_URI[] =
+      "coap://localhost:5683/sensors/temperature";
+  struct cli_coap_parse_and_resolve_result parse_temp_uri_result =
+      cli_coap_parse_and_resolve_coap_uri(CLIENT_TEMPERATURE_URI);
+  if (parse_temp_uri_result.status != CLI_COAP_PARSE_AND_RESOLVE_OK) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (wait_and_get_result2.response_is_error) {
+
+  coap_session_t* oscore_session = cli_oscore_create_session(
+      create_context_result.context, &client_resources.edhoc_context,
+      &parse_temp_uri_result.address);
+
+  if (oscore_session == NULL) {
+    coap_log_err("Client failed to establish OSCORE session context\n");
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  const struct cli_edhoc_message_4_process_result message_4_result =
-      cli_edhoc_process_message_4(&client_resources.edhoc_context,
-                                  wait_and_get_result2.response,
-                                  payload_buffer);
-  if (message_4_result.status != CLI_EDHOC_MSG4_PROCESS_OK) {
-    coap_log_err("Failed to process EDHOC message 4\n");
-    send_message(exchange, message_4_result.error_buffer);
+  coap_register_response_handler(create_context_result.context,
+                                 client_temperature_handler);
+
+  coap_log_info("Sending encrypted GET to /sensors/temperature\n");
+
+  struct cli_coap_session_config endpoint_configuration = {
+      .uri = &parse_temp_uri_result.uri,
+      .address = &parse_temp_uri_result.address};
+  struct cli_coap_prepare_pdu_result prepare_result =
+      cli_coap_prepare_get_request(endpoint_configuration, oscore_session);
+
+  if (prepare_result.status != CLI_COAP_PREPARE_PDU_OK) {
+    coap_session_release(oscore_session);
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+
+  temperature_received = false;
+  if (cli_coap_send_coap_request(oscore_session, prepare_result.pdu) !=
+      STATUS_COAP_OK) {
+    coap_delete_pdu(prepare_result.pdu);
+    coap_session_release(oscore_session);
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+
+  cli_coap_wait_for_coap_response(create_context_result.context, oscore_session,
+                                  &temperature_received);
+  if (!temperature_received) {
+    coap_log_err("Key Confirmation Failed: No encrypted response received.\n");
+    coap_session_release(oscore_session);
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+  coap_session_release(oscore_session);
   cli_cleanup_resources(&client_resources);
   return COM_EMULATION_SUCCESS;
 }

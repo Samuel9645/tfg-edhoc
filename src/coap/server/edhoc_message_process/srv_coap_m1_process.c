@@ -34,6 +34,10 @@ coap_pdu_code_t srv_coap_process_message_1_result(
         srv_edhoc_message_1_responder_status_code_to_string(
             message_1_result.status);
     coap_log_err("Message 1 responder failed: %s\n", error_message);
+  } else {
+    coap_log_info(
+        "Message 1 process and Message 2 compose completed successfully\n");
   }
+
   return map_message_1_status_to_response(message_1_result.status);
 }

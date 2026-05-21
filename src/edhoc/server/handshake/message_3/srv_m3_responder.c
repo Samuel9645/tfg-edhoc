@@ -55,14 +55,7 @@ struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
     return failure(SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS,
                    process_result.error_buffer);
   }
-
-  const struct srv_edhoc_message_4_compose_result compose_result =
-      srv_edhoc_compose_message_4(request.edhoc_context, response);
-  if (compose_result.status != SRV_EDHOC_MSG4_COMPOSE_OK) {
-    return failure(SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE,
-                   compose_result.buffer);
-  }
-  return ok(compose_result.buffer);
+  return ok((struct com_readonly_buffer){.bytes = response.bytes, .length = 0});
 }
 
 const char* srv_edhoc_handle_message_3_status_code_to_string(
@@ -72,12 +65,8 @@ const char* srv_edhoc_handle_message_3_status_code_to_string(
     return "ok";
   case SRV_EDHOC_MSG3_RESPONDER_ERR_INVALID_RESPONSE_BUFFER:
     return "invalid response buffer";
-  case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PARSE:
-    return "message 3 parse failed";
   case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS:
     return "message 3 process failed";
-  case SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE:
-    return "message 4 compose failed";
   default:
     return "unknown";
   }

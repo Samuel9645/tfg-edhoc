@@ -113,6 +113,20 @@ struct cli_coap_prepare_pdu_result cli_coap_prepare_post_request(
     enum config_coap_content_format_edhoc_values content_format);
 
 /**
+ * @brief Build a GET request PDU and its URI options.
+ * @param[in] config Session configuration parameters containing URI and
+ * destination address.
+ * @param[in] coap_session Active CoAP session.
+ * @return Struct containing the status of the operation and the prepared PDU on
+ * success, NULL pdu pointer on failure
+ * @note On failure, only the PDU is freed.
+ *  @warning Cleanups the optlist on both success and failure paths. Callers
+ * should not attempt to use or free the optlist after calling this function.
+ */
+struct cli_coap_prepare_pdu_result cli_coap_prepare_get_request(
+    struct cli_coap_session_config config, coap_session_t* coap_session);
+
+/**
  * @brief Send a prepared CoAP request.
  *
  * @param[in] coap_session Active CoAP session.

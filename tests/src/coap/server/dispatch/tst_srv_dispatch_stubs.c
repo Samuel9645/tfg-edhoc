@@ -232,7 +232,7 @@ stb_srv_edhoc_m3_responder_protocol_failure(
   (void)request_data;
   (void)response_data;
   return srv_edhoc_message_3_responder_failure(
-      SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE, DUMMY_READONLY_BUFFER);
+      SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS, DUMMY_READONLY_BUFFER);
 }
 
 coap_pdu_code_t stb_srv_coap_process_m3_ok(

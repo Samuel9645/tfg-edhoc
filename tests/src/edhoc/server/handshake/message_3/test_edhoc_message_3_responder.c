@@ -17,7 +17,6 @@
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 #include "edhoc/server/handshake/mocks/message_3/tst_srv_mock_edhoc_message_3_process.h"
-#include "edhoc/server/handshake/mocks/message_4/tst_srv_mock_edhoc_message_4_compose.h"
 
 enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 
@@ -35,7 +34,6 @@ static struct {
 
 static void reset_mocks(void) {
   tst_srv_edhoc_m3_reset_process_mock();
-  tst_srv_edhoc_m4_reset_compose_mock();
 }
 
 void setUp(void) {
@@ -48,13 +46,11 @@ void setUp(void) {
 
 void test_responder_ok_for_valid_data(void) {
   tst_srv_edhoc_m3_set_process_ok();
-  tst_srv_edhoc_m4_set_compose_ok();
 
   const struct srv_edhoc_message_3_responder_result result =
       srv_edhoc_respond_to_message_3(env.valid_request, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_RESPONDER_OK, result.status);
-  tst_srv_edhoc_m4_compose_assert_writes_message_in_buffer(result.response);
 }
 
 void test_responder_fails_on_invalid_data(void) {
@@ -108,11 +104,6 @@ void test_responder_fails_on_library_errors(void) {
   } cases[] = {
       {"message 3 processing fails", tst_srv_edhoc_m3_set_process_failure,
        SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS},
-      {"message 4 composition fails", tst_srv_edhoc_m4_set_compose_failure,
-       SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE},
-      {"message 4 composition produces empty buffer",
-       tst_srv_edhoc_m4_compose_set_compose_empty_length,
-       SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_4_COMPOSE},
   };
 
   for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {

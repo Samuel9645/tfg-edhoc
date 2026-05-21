@@ -64,9 +64,9 @@ enum status_coap srv_coap_join_multicast_group(
   return STATUS_COAP_OK;
 }
 
-enum status_coap srv_coap_add_post_resource(
+static enum status_coap add_resource(
     coap_context_t* coap_context, const char* resource_path,
-    const coap_method_handler_t resource_handler) {
+    const coap_method_handler_t resource_handler, const coap_request_t method) {
   if (coap_context == NULL || resource_path == NULL ||
       resource_handler == NULL) {
     return STATUS_COAP_ERR;
@@ -81,9 +81,23 @@ enum status_coap srv_coap_add_post_resource(
     return STATUS_COAP_ERR;
   }
 
-  coap_register_request_handler(resource, COAP_REQUEST_POST, resource_handler);
+  coap_register_request_handler(resource, method, resource_handler);
   coap_add_resource(coap_context, resource);
   return STATUS_COAP_OK;
+}
+
+enum status_coap srv_coap_add_post_resource(
+    coap_context_t* coap_context, const char* resource_path,
+    const coap_method_handler_t resource_handler) {
+  return add_resource(coap_context, resource_path, resource_handler,
+                      COAP_REQUEST_POST);
+}
+
+enum status_coap srv_coap_add_get_resource(
+    coap_context_t* coap_context, const char* resource_path,
+    const coap_method_handler_t resource_handler) {
+  return add_resource(coap_context, resource_path, resource_handler,
+                      COAP_REQUEST_GET);
 }
 
 enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context) {

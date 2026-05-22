@@ -25,7 +25,7 @@ struct srv_edhoc_message_1_responder_request {
  *
  * @param[in] request Session/request metadata for Message 1 responder,
  * including raw CoAP payload and credentials.
- * @param[in] context_parameters Parameters to use when creating the EDHOC
+ * @param[in] edhoc_parameters Parameters to use when creating the EDHOC
  * context in the processing phase
  * @param[in] response Response buffer metadata for Message 2.
  * @return Struct containing status code, allocated EDHOC context and Message 2
@@ -38,7 +38,7 @@ struct srv_edhoc_message_1_responder_request {
  */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
     struct srv_edhoc_message_1_responder_request request,
-    struct com_edhoc_parameters context_parameters,
+    struct com_edhoc_parameters edhoc_parameters,
     struct com_writable_buffer response);
 
 const char* srv_edhoc_message_1_responder_status_code_to_string(

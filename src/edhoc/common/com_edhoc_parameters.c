@@ -81,6 +81,11 @@ struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
         "EDHOC parameters validation error: Invalid selected cipher suite",
         error_buffer));
   }
+  if (parameters->generate_connection_id == NULL) {
+    return failure(com_edhoc_add_internal_error_view(
+        "EDHOC parameters validation error: Null connection ID generator",
+        error_buffer));
+  }
   if (duplicated_suites_in(supported_suites)) {
     return failure(com_edhoc_add_internal_error_view(
         "EDHOC parameters validation error: Duplicated cipher "

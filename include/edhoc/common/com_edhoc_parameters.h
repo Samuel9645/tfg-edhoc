@@ -30,6 +30,7 @@ struct com_edhoc_parameters {
    */
   const struct com_edhoc_cipher_suite_details* selected_cipher_suite;
   const struct com_edhoc_methods methods;
+  int8_t (*const generate_connection_id)(void);
 };
 
 struct com_edhoc_validate_parameters_result {

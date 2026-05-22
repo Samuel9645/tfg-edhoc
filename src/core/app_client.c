@@ -14,6 +14,7 @@
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_generate_connection_id.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
 #include "edhoc/credentials/cred_pub_data.h"
@@ -203,7 +204,8 @@ cli_edhoc_resolve_negotiation(
                   negotiation_result.renegotiation_suites.number_of_suites,
               .suites = negotiation_result.renegotiation_suites.suites,
           },
-      .selected_cipher_suite = negotiation_result.selected_suite};
+      .selected_cipher_suite = negotiation_result.selected_suite,
+      .generate_connection_id = edhoc_parameters.generate_connection_id};
   cli_reset_edhoc_context(client_resources);
 
   return cli_edhoc_perform_negotiation_attempt(client_resources, retry_params,
@@ -250,6 +252,7 @@ enum com_emulation_status core_run_client(void) {
               .data = SUPPORTED_METHODS,
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
+      .generate_connection_id = com_generate_odd_cid,
   };
 
   struct cli_resources client_resources = {0};

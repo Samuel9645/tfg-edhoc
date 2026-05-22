@@ -15,6 +15,7 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_generate_connection_id.h"
 
 static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
   enum edhoc_error_code error;
@@ -77,7 +78,7 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     const struct com_writable_buffer error_buffer,
-    const struct com_edhoc_parameters edhoc_parameters) {
+    struct com_edhoc_parameters edhoc_parameters) {
   if (!com_writable_buffer_is_writable(error_buffer)) {
     return invalid_error_buffer();
   }

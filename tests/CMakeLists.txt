@@ -75,17 +75,10 @@ endfunction()
 # 4. REGISTER TESTS WITH GRANULAR CONTROL
 # ==============================================================================
 
-set(EDHOC_CORE_ERROR_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_internal_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_protocol_error.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/internal/com_edhoc_set_error_info.c
-)
-
 set(COMMON_SOURCES
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/tst_edhoc_params.c
-    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
-    ${EDHOC_CORE_ERROR_SOURCES}
+    ${COMMON_EDHOC_SOURCES}
 )
 
 set(COMMON_SRV_SOURCES

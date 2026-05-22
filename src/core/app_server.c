@@ -9,6 +9,7 @@
 #include "coap/server/srv_utils.h"
 #include "common/com_emulation.h"
 #include "common/com_session_resources.h"
+#include "edhoc/common/com_generate_connection_id.h"
 #include "edhoc/credentials/cred_srv.h"
 
 static const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
@@ -32,6 +33,7 @@ static void edhoc_post_handler(coap_resource_t* resource,
               .data = SUPPORTED_METHODS,
               .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
           },
+      .generate_connection_id = com_generate_even_cid,
   };
   srv_coap_dispatch_edhoc_post(request, edhoc_parameters, response,
                                coap_session_get_context(session));

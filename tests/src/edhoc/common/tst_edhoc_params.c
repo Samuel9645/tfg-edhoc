@@ -13,6 +13,7 @@
 #include <edhoc.h>
 
 #include "edhoc/common/com_edhoc_cipher_suites.h"
+#include "edhoc/common/com_generate_connection_id.h"
 
 static int dummy_fetch_credentials(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -39,10 +40,12 @@ struct com_edhoc_parameters tst_edhoc_create_test_params(
     const struct com_edhoc_cipher_suite_list suites,
     const struct com_edhoc_methods methods,
     const struct com_edhoc_cipher_suite_details* selected_suite) {
-  return (struct com_edhoc_parameters){.credentials = &DUMMY_TEST_CREDS,
-                                       .supported_cipher_suites = suites,
-                                       .selected_cipher_suite = selected_suite,
-                                       .methods = methods};
+  return (struct com_edhoc_parameters){
+      .credentials = &DUMMY_TEST_CREDS,
+      .supported_cipher_suites = suites,
+      .selected_cipher_suite = selected_suite,
+      .methods = methods,
+      .generate_connection_id = com_generate_even_cid};
 }
 
 static const enum edhoc_method ONLY_METHOD_0_PTR[] = {EDHOC_METHOD_0};

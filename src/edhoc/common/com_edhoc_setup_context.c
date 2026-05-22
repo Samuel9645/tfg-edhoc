@@ -7,47 +7,6 @@
 #include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
 #include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 
-/**
- * @brief The range of valid CIDs for the session, using single byte ids,
- * according to RFC 9528.
- * @see [RFC
- * 9528 3.3.2](https://datatracker.ietf.org/doc/html/rfc9528#name-representation-of-byte-stri)
- */
-enum {
-  // WHY DON'T WE USE THIS?
-  // libedhoc (v3.16) doesn't decode integers when specifying
-  // EDHOC_CID_TYPE_ONE_BYTE_INTEGER, but it simply cast them, without encoding
-  // it, meaning that we cannot use negative values since these are different
-  // from the CBOR representation.
-  COM_EDHOC_MIN_INT_CID = -24,
-
-  COM_EDHOC_LIBEDHOC_MIN_INT_CID = 0,
-  COM_EDHOC_MAX_INT_CID = 23
-};
-
-static int8_t cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
-
-/**
- * @brief Gets the next valid one byte connection identifier of the session
- * @see [RFC
- * 9528 3.3.2](https://datatracker.ietf.org/doc/html/rfc9528#name-representation-of-byte-stri)
- * @see [RFC
- * 9528 3.3.3](https://datatracker.ietf.org/doc/html/rfc9528#name-use-of-connection-identifie)
- * @warning This is a simulation so wrapping the value is fine since the session
- * will never have more than 48 messages, but in a real implementation this
- * should be implemented in a way that guarantees uniqueness of the CID for the
- * session, as explained in RFC 9528 3.3.3.
- * @return Connection Identifier of the new session.
- */
-static int8_t get_next_single_byte_integer_cid(void) {
-  const int8_t assigned = cid_counter;
-  cid_counter++;
-  if (cid_counter > COM_EDHOC_MAX_INT_CID) {
-    cid_counter = COM_EDHOC_LIBEDHOC_MIN_INT_CID;
-  }
-  return assigned;
-}
-
 static struct com_edhoc_setup_context_result invalid_error_buffer(void) {
   return (struct com_edhoc_setup_context_result){
       .status = COM_EDHOC_SETUP_CTX_ERR_INVALID_ERROR_BUFFER};
@@ -129,7 +88,7 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
   }
   const struct edhoc_connection_id connection_id = {
       .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER,
-      .int_value = get_next_single_byte_integer_cid(),
+      .int_value = edhoc_parameters.generate_connection_id(),
       .bstr_length = 0,
   };
   if (edhoc_set_connection_id(context, &connection_id) != EDHOC_SUCCESS) {

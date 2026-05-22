@@ -46,31 +46,43 @@ void test_fails_on_invalid_parameters(void) {
     const char* expected_error;
   } test_cases[] = {
       {
-          .params = {.methods = valid_params.methods,
-                     .credentials = valid_params.credentials,
-                     .selected_cipher_suite =
-                         valid_params.supported_cipher_suites.suites[0]},
+          .params =
+              {
+                  .methods = valid_params.methods,
+                  .credentials = valid_params.credentials,
+                  .selected_cipher_suite =
+                      valid_params.supported_cipher_suites.suites[0],
+                  .generate_connection_id = valid_params.generate_connection_id,
+              },
           .expected_error =
               "EDHOC parameters validation error: Invalid supported "
               "cipher suites",
       },
 
       {
-          .params = {.supported_cipher_suites =
-                         valid_params.supported_cipher_suites,
-                     .credentials = valid_params.credentials,
-                     .selected_cipher_suite =
-                         valid_params.supported_cipher_suites.suites[0]},
+          .params =
+              {
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .credentials = valid_params.credentials,
+                  .selected_cipher_suite =
+                      valid_params.supported_cipher_suites.suites[0],
+                  .generate_connection_id = valid_params.generate_connection_id,
+              },
           .expected_error =
               "EDHOC parameters validation error: Invalid EDHOC methods",
       },
 
       {
-          .params = {.supported_cipher_suites =
-                         valid_params.supported_cipher_suites,
-                     .methods = valid_params.methods,
-                     .selected_cipher_suite =
-                         valid_params.supported_cipher_suites.suites[0]},
+          .params =
+              {
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .methods = valid_params.methods,
+                  .selected_cipher_suite =
+                      valid_params.supported_cipher_suites.suites[0],
+                  .generate_connection_id = valid_params.generate_connection_id,
+              },
           .expected_error =
               "EDHOC parameters validation error: Null credentials",
       },
@@ -81,25 +93,49 @@ void test_fails_on_invalid_parameters(void) {
                       valid_params.supported_cipher_suites,
                   .methods = valid_params.methods,
                   .credentials = valid_params.credentials,
+                  .generate_connection_id = valid_params.generate_connection_id,
               },
           .expected_error = "EDHOC parameters validation error: Invalid "
                             "selected cipher suite",
       },
       {
-          .params = {.supported_cipher_suites =
-                         valid_params.supported_cipher_suites,
-                     .methods = valid_params.methods,
-                     .credentials = valid_params.credentials,
-                     .selected_cipher_suite = &COM_EDHOC_SUITE_2},
+          .params =
+              {
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .methods = valid_params.methods,
+                  .credentials = valid_params.credentials,
+                  .selected_cipher_suite = &COM_EDHOC_SUITE_2,
+                  .generate_connection_id = valid_params.generate_connection_id,
+              },
           .expected_error = "EDHOC parameters validation error: Selected "
                             "cipher suite must be one of the supported ones",
       },
-      {.params = {.supported_cipher_suites = duplicated_cipher_suites,
+      {.params =
+           {
+               .supported_cipher_suites = duplicated_cipher_suites,
+               .methods = valid_params.methods,
+               .credentials = valid_params.credentials,
+               .selected_cipher_suite = valid_params.selected_cipher_suite,
+               .generate_connection_id = valid_params.generate_connection_id,
+           },
+       .expected_error = "EDHOC parameters validation error: Duplicated cipher "
+                         "suites in supported list"},
+      {
+          .params =
+              {
                   .methods = valid_params.methods,
                   .credentials = valid_params.credentials,
-                  .selected_cipher_suite = valid_params.selected_cipher_suite},
-       .expected_error = "EDHOC parameters validation error: Duplicated cipher "
-                         "suites in supported list"}};
+                  .supported_cipher_suites =
+                      valid_params.supported_cipher_suites,
+                  .selected_cipher_suite =
+                      valid_params.supported_cipher_suites.suites[0],
+
+              },
+          .expected_error =
+              "EDHOC parameters validation error: Null connection ID generator",
+      },
+  };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
 

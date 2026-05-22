@@ -33,10 +33,21 @@ set(EDHOC_CIPHER_SUITES_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_cipher_suites.c
 )
 
+set(EDHOC_GENERATE_CID_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_generate_connection_id.c
+)
+
 set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup_context.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_parameters.c
     ${EDHOC_CIPHER_SUITES_SOURCES}
+)
+
+set(COMMON_EDHOC_SOURCES
+    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
+    ${ADD_EDHOC_ERROR_SOURCES}
+    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
+    ${EDHOC_GENERATE_CID_SOURCES}
 )
 
 set(COMMON_COAP_SOURCES
@@ -54,8 +65,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c
     ${COMMON_COAP_SOURCES}
-    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
-    ${ADD_EDHOC_ERROR_SOURCES}
+    ${COMMON_EDHOC_SOURCES}
 )
 
 set(MESSAGE_1_PROCESS_SOURCES

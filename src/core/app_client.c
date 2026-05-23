@@ -313,8 +313,7 @@ enum com_emulation_status core_run_client(void) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  coap_log_info(
-      "EDHOC Client: Handshake finished successfully. Activating OSCORE...\n");
+  coap_log_info("Handshake finished successfully. Activating OSCORE...\n");
 
   const char CLIENT_TEMPERATURE_URI[] =
       "coap://localhost:5683/sensors/temperature";

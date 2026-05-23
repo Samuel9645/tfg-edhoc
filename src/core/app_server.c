@@ -77,8 +77,8 @@ enum com_emulation_status core_run_server(void) {
     com_cleanup_resources(&server_resources);
     return COM_EMULATION_FAILURE;
   }
-  if (srv_coap_add_get_resource(server_resources.coap_context,
-                                "sensors/temperature",
+  if (srv_coap_add_oscore_only_get_resource(
+          server_resources.coap_context, "sensors/temperature",
                                 temperature_get_handler) != STATUS_COAP_OK) {
     com_cleanup_resources(&server_resources);
     return COM_EMULATION_FAILURE;

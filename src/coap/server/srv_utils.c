@@ -64,9 +64,10 @@ enum status_coap srv_coap_join_multicast_group(
   return STATUS_COAP_OK;
 }
 
-static enum status_coap add_resource(
+static enum status_coap add_resource_with_extra_flags(
     coap_context_t* coap_context, const char* resource_path,
-    const coap_method_handler_t resource_handler, const coap_request_t method) {
+    const coap_method_handler_t resource_handler, const coap_request_t method,
+    const int extra_flags) {
   if (coap_context == NULL || resource_path == NULL ||
       resource_handler == NULL) {
     return STATUS_COAP_ERR;
@@ -75,7 +76,7 @@ static enum status_coap add_resource(
   enum { MEMORY_HANDLING_FLAGS = 0 };
 
   coap_resource_t* resource = coap_resource_init(
-      coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS);
+      coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS | extra_flags);
   if (resource == NULL) {
     coap_log_err("cannot create resource\n");
     return STATUS_COAP_ERR;
@@ -86,6 +87,13 @@ static enum status_coap add_resource(
   return STATUS_COAP_OK;
 }
 
+static enum status_coap add_resource(
+    coap_context_t* coap_context, const char* resource_path,
+    const coap_method_handler_t resource_handler, const coap_request_t method) {
+  return add_resource_with_extra_flags(coap_context, resource_path,
+                                       resource_handler, method, 0);
+}
+
 enum status_coap srv_coap_add_post_resource(
     coap_context_t* coap_context, const char* resource_path,
     const coap_method_handler_t resource_handler) {
@@ -93,11 +101,12 @@ enum status_coap srv_coap_add_post_resource(
                       COAP_REQUEST_POST);
 }
 
-enum status_coap srv_coap_add_get_resource(
+enum status_coap srv_coap_add_oscore_only_get_resource(
     coap_context_t* coap_context, const char* resource_path,
     const coap_method_handler_t resource_handler) {
-  return add_resource(coap_context, resource_path, resource_handler,
-                      COAP_REQUEST_GET);
+  return add_resource_with_extra_flags(coap_context, resource_path,
+                                       resource_handler, COAP_REQUEST_GET,
+                                       COAP_RESOURCE_FLAGS_OSCORE_ONLY);
 }
 
 enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context) {

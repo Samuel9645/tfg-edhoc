@@ -38,14 +38,15 @@ enum status_coap srv_coap_add_post_resource(
     coap_method_handler_t resource_handler);
 
 /**
- * @brief Add a GET resource and register its request handler.
+ * @brief Add a GET resource and register its request handler, only allowing
+ * OSCORE protected requests.
  *
  * @param[in] coap_context Active CoAP context.
  * @param[in] resource_path Resource URI path.
  * @param[in] resource_handler GET handler function.
  * @return Status code indicating the result of the operation
  */
-enum status_coap srv_coap_add_get_resource(
+enum status_coap srv_coap_add_oscore_only_get_resource(
     coap_context_t* coap_context, const char* resource_path,
     coap_method_handler_t resource_handler);
 
@@ -53,8 +54,7 @@ enum status_coap srv_coap_add_get_resource(
  * @brief Run the server I/O loop.
  *
  * @param[in] coap_context Active CoAP context.
- * @return CP_STATUS_SUCCESS on graceful stop, CP_STATUS_ERROR
- * on I/O failure.
+ * @return Error code on failure.
  */
 enum status_coap srv_coap_run_input_output_loop(coap_context_t* coap_context);
 

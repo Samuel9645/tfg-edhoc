@@ -102,6 +102,6 @@ enum status_coap srv_oscore_bind_session(coap_context_t* coap_context,
     coap_delete_oscore_conf(oscore_configuration);
     return STATUS_COAP_ERR;
   }
-  coap_log_info("OSCORE: Context successfully binded.\n");
+  coap_log_info("OSCORE Context successfully binded.\n");
   return STATUS_COAP_OK;
 }

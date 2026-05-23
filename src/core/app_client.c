@@ -138,9 +138,8 @@ static struct cli_edhoc_negotiation_attempt_result
 cli_edhoc_perform_negotiation_attempt(
     struct cli_resources* resources, const struct com_edhoc_parameters params,
     const struct com_writable_buffer payload_buffer) {
-  if (com_edhoc_setup_context(&resources->edhoc_context, params,
-                              cli_resources_get_payload(resources))
-          .status != COM_EDHOC_SETUP_CTX_OK) {
+  if (com_edhoc_setup_context(&resources->edhoc_context, params).status !=
+      COM_EDHOC_SETUP_CTX_OK) {
     coap_log_err("Failed to initialize EDHOC context\n");
     return failure();
   }

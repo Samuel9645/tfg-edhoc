@@ -13,9 +13,8 @@
 #include <stdlib.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_logging.h"
 
 static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
   enum edhoc_error_code error;
@@ -33,13 +32,16 @@ static struct srv_edhoc_message_1_process_result ok(
   };
 }
 
-static struct srv_edhoc_message_1_process_result failure(
-    const enum srv_edhoc_message_1_process_status status,
+static struct srv_edhoc_message_1_process_result internal_failure(
+    const enum srv_edhoc_message_1_process_status status) {
+  return (struct srv_edhoc_message_1_process_result){.status = status};
+}
+
+static struct srv_edhoc_message_1_process_result suite_mismatch_failure(
     const struct com_readonly_buffer error_buffer) {
   return (struct srv_edhoc_message_1_process_result){
-      .status = status,
-      .error_buffer = error_buffer,
-  };
+      .status = SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS,
+      .error_buffer = error_buffer};
 }
 
 static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
@@ -51,31 +53,27 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct srv_edhoc_message_1_request request,
     const struct com_writable_buffer error_buffer,
-    struct com_edhoc_parameters edhoc_parameters) {
-  if (!com_writable_buffer_is_writable(error_buffer)) {
-    return invalid_error_buffer();
-  }
+    const struct com_edhoc_parameters edhoc_parameters) {
   if (!com_readonly_buffer_has_content(request.payload)) {
-    return failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER,
-        com_edhoc_add_internal_error_view(
-            "Message 1 Process error: Empty request buffer", error_buffer));
+    com_edhoc_log_error("Message 1 Process error: Empty request buffer");
+    return internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER);
+  }
+  if (!com_writable_buffer_is_writable(error_buffer)) {
+    com_edhoc_log_error("Message 1 Process error: Invalid error buffer");
+    return invalid_error_buffer();
   }
 
   struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
   if (context == NULL) {
-    return failure(
-        SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC,
-        com_edhoc_add_internal_error_view(
-            "Message 1 Process error: Context calloc failed", error_buffer));
+    com_edhoc_log_error("Message 1 Process error: Context calloc failed");
+    return internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC);
   }
 
   const struct com_edhoc_setup_context_result setup_context_result =
-      com_edhoc_setup_context(context, edhoc_parameters, error_buffer);
+      com_edhoc_setup_context(context, edhoc_parameters);
   if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
     const struct srv_edhoc_message_1_process_result failure_result =
-        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP,
-                setup_context_result.error_buffer);
+        internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP);
     free(context);
     return failure_result;
   }
@@ -85,11 +83,11 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     const struct com_readonly_buffer process_error =
         error_code_is_suite_mismatch(context)
             ? com_edhoc_add_cipher_suite_mismatch_error(context, error_buffer)
-            : com_edhoc_add_protocol_error_with_description_view(
-                  context, "Message 1 Process error: Processing failed",
-                  error_buffer);
+            : (com_edhoc_log_error(
+                   "Message 1 Process error: Processing failed"),
+               (struct com_readonly_buffer){0});
     const struct srv_edhoc_message_1_process_result failure_result =
-        failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS, process_error);
+        suite_mismatch_failure(process_error);
     srv_edhoc_cleanup_context(context);
     context = NULL;
     return failure_result;

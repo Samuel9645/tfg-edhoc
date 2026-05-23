@@ -14,7 +14,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 #include "edhoc/server/handshake/mocks/message_3/tst_srv_mock_edhoc_message_3_process.h"
 
@@ -83,7 +82,6 @@ void test_responder_fails_on_invalid_data(void) {
 
     TEST_ASSERT_NOT_EQUAL_MESSAGE(SRV_EDHOC_MSG3_RESPONDER_OK, result.status,
                                   test_cases[i].description);
-    tst_edhoc_assert_error_not_empty_if_present(result.response);
   }
 }
 
@@ -115,6 +113,5 @@ void test_responder_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(result.response);
   }
 }

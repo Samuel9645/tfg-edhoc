@@ -12,7 +12,6 @@
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 #include "edhoc/server/handshake/message_3/srv_m3_process.h"
-#include "edhoc/server/handshake/message_4/srv_m4_compose.h"
 
 static struct srv_edhoc_message_3_responder_result ok(
     const struct com_readonly_buffer response) {
@@ -22,13 +21,9 @@ static struct srv_edhoc_message_3_responder_result ok(
   };
 }
 
-static struct srv_edhoc_message_3_responder_result failure(
-    const enum srv_edhoc_message_3_responder_status status,
-    const struct com_readonly_buffer error_response) {
+static struct srv_edhoc_message_3_responder_result process_failure(void) {
   return (struct srv_edhoc_message_3_responder_result){
-      .status = status,
-      .response = error_response,
-  };
+      .status = SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS};
 }
 
 static struct srv_edhoc_message_3_responder_result invalid_response_buffer(
@@ -50,10 +45,9 @@ struct srv_edhoc_message_3_responder_result srv_edhoc_respond_to_message_3(
       .edhoc_context = request.edhoc_context,
   };
   const struct srv_edhoc_message_3_process_result process_result =
-      srv_edhoc_process_message_3(process_request, response);
+      srv_edhoc_process_message_3(process_request);
   if (process_result.status != SRV_EDHOC_MSG3_PROCESS_OK) {
-    return failure(SRV_EDHOC_MSG3_RESPONDER_ERR_MESSAGE_3_PROCESS,
-                   process_result.error_buffer);
+    return process_failure();
   }
   return ok((struct com_readonly_buffer){.bytes = response.bytes, .length = 0});
 }

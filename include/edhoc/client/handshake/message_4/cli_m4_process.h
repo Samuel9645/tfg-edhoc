@@ -21,13 +21,9 @@
  *
  * @param[in] context Initialized EDHOC context.
  * @param[in] message_4 Message 4 payload descriptor from peer.
- * @param[in] error_buffer Metadata of the buffer (pointer and capacity) to
- * write into
- * @return Result wrapper containing status and error view on failure, empty on
- * success.
+ * @return Result wrapper containing the status.
  */
 struct cli_edhoc_message_4_process_result cli_edhoc_process_message_4(
-    struct edhoc_context* context, struct com_readonly_buffer message_4,
-    struct com_writable_buffer error_buffer);
+    struct edhoc_context* context, struct com_readonly_buffer message_4);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_CLI_M4_PROCESS_H_

@@ -15,7 +15,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_4/srv_m4_compose.h"
 #include "edhoc/server/handshake/mocks/message_4/tst_srv_mock_edhoc_message_4_compose.h"
 
@@ -67,8 +66,6 @@ void test_compose_fails_on_invalid_data(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
-
-    tst_edhoc_assert_error_not_empty_if_present(result.buffer);
     tst_srv_edhoc_m4_reset_compose_mock();
   }
 }
@@ -88,7 +85,6 @@ void test_compose_fails_on_library_compose_failure(void) {
       srv_edhoc_compose_message_4(&env.context, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
 
 void test_compose_fails_when_composition_produces_empty_buffer(void) {
@@ -98,5 +94,4 @@ void test_compose_fails_when_composition_produces_empty_buffer(void) {
       srv_edhoc_compose_message_4(&env.context, env.response);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }

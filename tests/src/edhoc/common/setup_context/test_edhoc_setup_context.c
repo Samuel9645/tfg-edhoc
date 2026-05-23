@@ -11,7 +11,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/common/setup_context/mocks/tst_com_mock_edhoc_setup_context.h"
 #include "edhoc/common/tst_edhoc_params.h"
@@ -22,9 +21,7 @@ static uint8_t error_buffer[TST_SETUP_CONTEXT_BUFFER_SIZE];
 
 static struct {
   struct edhoc_context context;
-  const struct com_writable_buffer error_buffer_view;
-} env = {.error_buffer_view = {.bytes = error_buffer,
-                               .capacity = sizeof(error_buffer)}};
+} env = {0};
 
 static void reset_env(void) {
   tst_com_reset_setup_context_mock();
@@ -39,33 +36,19 @@ void test_ok_with_valid_parameters(void) {
       tst_edhoc_get_method_0_suite_0_params();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_OK, result.status);
-}
-
-void test_fails_on_invalid_error_buffer(void) {
-  const struct com_writable_buffer invalid_buffer = {.bytes = NULL,
-                                                     .capacity = 0};
-  const struct com_edhoc_parameters params =
-      tst_edhoc_get_method_0_suite_0_params();
-
-  const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, invalid_buffer);
-
-  TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_ERROR_BUFFER,
-                    result.status);
 }
 
 void test_fails_on_invalid_edhoc_parameters(void) {
   const struct com_edhoc_parameters params = {0};
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_INVALID_EDHOC_PARAMETERS,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
 }
 
 void test_fails_on_psa_crypto_init_failure(void) {
@@ -74,13 +57,9 @@ void test_fails_on_psa_crypto_init_failure(void) {
   tst_com_set_psa_crypto_init_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_PSA_INIT, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer,
-      "Context Setup error: PSA crypto initialization failed",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_edhoc_context_init_failure(void) {
@@ -89,13 +68,9 @@ void test_fails_on_edhoc_context_init_failure(void) {
   tst_com_set_edhoc_context_init_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer,
-      "Context Setup error: EDHOC context initialization failed",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_set_methods_failure(void) {
@@ -104,12 +79,9 @@ void test_fails_on_set_methods_failure(void) {
   tst_com_set_edhoc_set_methods_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_METHODS, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to set EDHOC methods",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_set_cipher_suites_failure(void) {
@@ -118,12 +90,9 @@ void test_fails_on_set_cipher_suites_failure(void) {
   tst_com_set_edhoc_set_cipher_suites_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to set cipher suites",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_set_connection_id_failure(void) {
@@ -132,12 +101,9 @@ void test_fails_on_set_connection_id_failure(void) {
   tst_com_set_edhoc_set_connection_id_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to set connection ID",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_bind_keys_failure(void) {
@@ -146,12 +112,9 @@ void test_fails_on_bind_keys_failure(void) {
   tst_com_set_edhoc_bind_keys_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to bind keys",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_set_user_context_failure(void) {
@@ -160,12 +123,9 @@ void test_fails_on_set_user_context_failure(void) {
   tst_com_set_edhoc_set_user_context_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_SET_USER_CONTEXT, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to set user context",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_bind_crypto_failure(void) {
@@ -174,12 +134,9 @@ void test_fails_on_bind_crypto_failure(void) {
   tst_com_set_edhoc_bind_crypto_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to bind crypto",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_fails_on_bind_credentials_failure(void) {
@@ -188,10 +145,7 @@ void test_fails_on_bind_credentials_failure(void) {
   tst_com_set_edhoc_bind_credentials_failure();
 
   const struct com_edhoc_setup_context_result result =
-      com_edhoc_setup_context(&env.context, params, env.error_buffer_view);
+      com_edhoc_setup_context(&env.context, params);
 
   TEST_ASSERT_EQUAL(COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Context Setup error: Failed to bind credentials",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

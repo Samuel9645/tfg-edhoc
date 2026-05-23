@@ -46,18 +46,17 @@ struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
   }
 
   const struct cli_edhoc_message_2_process_result process_result =
-      cli_edhoc_process_message_2(request.edhoc_context, request.raw_payload,
-                                  response_buffer);
+      cli_edhoc_process_message_2(request.edhoc_context, request.raw_payload);
   if (process_result.status != CLI_EDHOC_MSG2_PROCESS_OK) {
     return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
-                   process_result.error_buffer);
+                   (struct com_readonly_buffer){0});
   }
 
   const struct cli_edhoc_message_3_compose_result compose_result =
       cli_edhoc_compose_message_3(request.edhoc_context, response_buffer);
   if (compose_result.status != CLI_EDHOC_MSG3_COMPOSE_OK) {
     return failure(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
-                   compose_result.buffer);
+                   (struct com_readonly_buffer){0});
   }
 
   return ok(compose_result.buffer);

@@ -14,7 +14,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/server/handshake/message_3/srv_m3_process.h"
 #include "edhoc/server/handshake/mocks/message_3/tst_srv_mock_edhoc_message_3_process.h"
 
@@ -23,19 +22,14 @@ enum { TST_SRV_EDHOC_HND_BUF_LEN = 256 };
 static const uint8_t DUMMY_REQUEST_BUFFER[TST_SRV_EDHOC_HND_BUF_LEN] = {0};
 
 static struct {
-  uint8_t error_buffer_data[TST_SRV_EDHOC_HND_BUF_LEN];
   struct edhoc_context context;
   struct srv_edhoc_message_3_request valid_request;
-  struct com_writable_buffer error;
 } env = {
-    .error = {.capacity = TST_SRV_EDHOC_HND_BUF_LEN},
-         .valid_request = {.message_3 = {.bytes = DUMMY_REQUEST_BUFFER,
+    .valid_request = {.message_3 = {.bytes = DUMMY_REQUEST_BUFFER,
                                     .length = sizeof(DUMMY_REQUEST_BUFFER)}}};
 
 void setUp(void) {
   tst_srv_edhoc_m3_reset_process_mock();
-  memset(env.error_buffer_data, 0, sizeof(env.error_buffer_data));
-  env.error.bytes = env.error_buffer_data;
   env.valid_request.edhoc_context = &env.context;
   env.context = (struct edhoc_context){0};
 }
@@ -44,11 +38,9 @@ void test_process_ok_for_valid_data(void) {
   tst_srv_edhoc_m3_set_process_ok();
 
   const struct srv_edhoc_message_3_process_result result =
-      srv_edhoc_process_message_3(env.valid_request, env.error);
+      srv_edhoc_process_message_3(env.valid_request);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_OK, result.status);
-  TEST_ASSERT_EQUAL_UINT32_MESSAGE(0, result.error_buffer.length,
-                                   "process should not write an error payload");
 }
 
 void test_process_fails_on_invalid_data(void) {
@@ -59,21 +51,17 @@ void test_process_fails_on_invalid_data(void) {
   const struct srv_edhoc_message_3_request empty_request = {
       .edhoc_context = &env.context,
       .message_3 = {.bytes = DUMMY_REQUEST_BUFFER, .length = 0}};
-  const struct com_writable_buffer empty_error = {0};
 
   const struct {
     const char* description;
     struct srv_edhoc_message_3_request request;
-    struct com_writable_buffer error_buffer;
     enum srv_edhoc_message_3_process_status expected_status;
   } test_cases[] = {
-      {"error buffer is empty/invalid", env.valid_request, empty_error,
-       SRV_EDHOC_MSG3_PROCESS_ERR_INVALID_ERROR_BUFFER},
-      {"context is NULL", no_context, env.error,
+      {"context is NULL", no_context,
        SRV_EDHOC_MSG3_PROCESS_ERR_NULL_EDHOC_CONTEXT},
-      {"request buffer is NULL", no_buffer, env.error,
+      {"request buffer is NULL", no_buffer,
        SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
-      {"request payload is empty (len 0)", empty_request, env.error,
+      {"request payload is empty (len 0)", empty_request,
        SRV_EDHOC_MSG3_PROCESS_ERR_EMPTY_PARSED_MESSAGE_3},
   };
 
@@ -81,12 +69,10 @@ void test_process_fails_on_invalid_data(void) {
     tst_srv_edhoc_m3_reset_process_mock();
 
     const struct srv_edhoc_message_3_process_result result =
-        srv_edhoc_process_message_3(test_cases[i].request,
-                                    test_cases[i].error_buffer);
+        srv_edhoc_process_message_3(test_cases[i].request);
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
-    tst_edhoc_assert_error_not_empty_if_present(result.error_buffer);
   }
 }
 
@@ -94,11 +80,8 @@ void test_process_fails_on_library_errors(void) {
   tst_srv_edhoc_m3_set_process_failure();
 
   const struct srv_edhoc_message_3_process_result result =
-      srv_edhoc_process_message_3(env.valid_request, env.error);
+      srv_edhoc_process_message_3(env.valid_request);
 
   TEST_ASSERT_EQUAL(SRV_EDHOC_MSG3_PROCESS_ERR_EDHOC_MESSAGE_3_PROCESS_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.error_buffer, "Message 3 Process error: Processing failed",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

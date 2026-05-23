@@ -10,7 +10,6 @@
 
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/mocks/message_1/tst_cli_mock_edhoc_message_1_compose.h"
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 
 enum { TST_CLI_M1_COMPOSE_BUF_LEN = 128 };
 
@@ -55,9 +54,6 @@ void test_compose_message_1_fails_when_edhoc_compose_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE,
                     result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 1 Compose error: Failed to compose EDHOC message",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_1_fails_when_composition_produces_empty_buffer(void) {
@@ -67,7 +63,4 @@ void test_compose_message_1_fails_when_composition_produces_empty_buffer(void) {
       cli_edhoc_compose_message_1(&env.context, env.compose);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 1 Compose error: Empty compose result",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

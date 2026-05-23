@@ -13,6 +13,7 @@
 void com_edhoc_log_error(const char* message) {
   if (message == NULL) {
     fprintf(stderr, "[EDHOC_LOCAL_ERR] NULL error message provided\n");
+    return;
   }
   fprintf(stderr, "[EDHOC_LOCAL_ERR] %s\n", message);
 }

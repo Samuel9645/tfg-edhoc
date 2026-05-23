@@ -11,7 +11,6 @@
 #ifndef COAP_SERVER_EXTRACT_EDHOC_MESSAGE_SRV_COAP_EXTRACT_M3_H_
 #define COAP_SERVER_EXTRACT_EDHOC_MESSAGE_SRV_COAP_EXTRACT_M3_H_
 
-#include <coap3/coap.h>
 #include <edhoc.h>
 
 #include "common/com_data_models.h"

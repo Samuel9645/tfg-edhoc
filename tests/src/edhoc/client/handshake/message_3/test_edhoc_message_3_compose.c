@@ -10,7 +10,6 @@
 
 #include "edhoc/client/handshake/message_3/cli_m3_compose.h"
 #include "edhoc/client/handshake/mocks/message_3/tst_cli_mock_edhoc_message_3_compose.h"
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 
 enum { TST_CLI_M3_COMPOSE_BUF_LEN = 128 };
 
@@ -52,9 +51,6 @@ void test_compose_message_3_fails_on_null_context(void) {
       cli_edhoc_compose_message_3(NULL, env.compose);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Compose error: Null context",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_3_fails_when_edhoc_compose_fails(void) {
@@ -65,9 +61,6 @@ void test_compose_message_3_fails_when_edhoc_compose_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
                     result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Compose error: Failed to compose EDHOC message",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }
 
 void test_compose_message_3_fails_when_composition_produces_empty_buffer(void) {
@@ -77,7 +70,4 @@ void test_compose_message_3_fails_when_composition_produces_empty_buffer(void) {
       cli_edhoc_compose_message_3(&env.context, env.compose);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG3_COMPOSE_ERR_EMPTY_COMPOSE, result.status);
-  tst_edhoc_assert_encoded_error_matches(
-      result.buffer, "Message 3 Compose error: Empty compose result",
-      EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
 }

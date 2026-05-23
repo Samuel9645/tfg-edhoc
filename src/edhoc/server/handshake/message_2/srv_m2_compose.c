@@ -10,8 +10,7 @@
 
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/com_logging.h"
 
 static struct srv_edhoc_message_2_compose_result ok(
     const struct com_readonly_buffer buffer) {
@@ -22,25 +21,14 @@ static struct srv_edhoc_message_2_compose_result ok(
 }
 
 static struct srv_edhoc_message_2_compose_result failure(
-    const enum srv_edhoc_message_2_compose_status status,
-    const struct com_readonly_buffer error) {
-  return (struct srv_edhoc_message_2_compose_result){
-      .status = status,
-      .buffer = error,
-  };
+    const enum srv_edhoc_message_2_compose_status status) {
+  return (struct srv_edhoc_message_2_compose_result){.status = status};
 }
 
 static struct srv_edhoc_message_2_compose_result invalid_compose_buffer(void) {
   return (struct srv_edhoc_message_2_compose_result){
       .status = SRV_EDHOC_MSG2_COMPOSE_ERR_INVALID_COMPOSE_BUFFER,
   };
-}
-
-static struct com_readonly_buffer add_compose_error_to_buffer(
-    const struct edhoc_context* context,
-    const struct com_writable_buffer buffer) {
-  return com_edhoc_add_protocol_error_with_description_view(
-      context, "Message 2 Compose error: Composition failed", buffer);
 }
 
 struct srv_edhoc_message_2_compose_result srv_edhoc_compose_message_2(
@@ -50,26 +38,22 @@ struct srv_edhoc_message_2_compose_result srv_edhoc_compose_message_2(
     return invalid_compose_buffer();
   }
   if (context == NULL) {
-    return failure(
-        SRV_EDHOC_MSG2_COMPOSE_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view(
-            "Message 2 Compose error: Null context", compose_buffer));
+    com_edhoc_log_error("Message 2 Compose error: Null context");
+    return failure(SRV_EDHOC_MSG2_COMPOSE_ERR_NULL_CONTEXT);
   }
 
   size_t written_length = 0;
   if (edhoc_message_2_compose(context, compose_buffer.bytes,
                               compose_buffer.capacity,
                               &written_length) != EDHOC_SUCCESS) {
-    return failure(SRV_EDHOC_MSG2_COMPOSE_ERR_COMPOSE,
-                   add_compose_error_to_buffer(context, compose_buffer));
+    com_edhoc_log_error("Message 2 Compose error: Composition failed");
+    return failure(SRV_EDHOC_MSG2_COMPOSE_ERR_COMPOSE);
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, written_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    return failure(
-        SRV_EDHOC_MSG2_COMPOSE_ERR_EMPTY_COMPOSE,
-        com_edhoc_add_internal_error_view(
-            "Message 2 Compose error: Empty compose result", compose_buffer));
+    com_edhoc_log_error("Message 2 Compose error: Empty compose result");
+    return failure(SRV_EDHOC_MSG2_COMPOSE_ERR_EMPTY_COMPOSE);
   }
   return ok(conversion_result.buffer);
 }

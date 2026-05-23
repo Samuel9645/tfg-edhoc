@@ -8,7 +8,7 @@
 
 #include "edhoc/common/com_edhoc_parameters.h"
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
+#include "edhoc/common/com_logging.h"
 
 static struct com_edhoc_validate_parameters_result ok(void) {
   return (struct com_edhoc_validate_parameters_result){
@@ -16,15 +16,7 @@ static struct com_edhoc_validate_parameters_result ok(void) {
   };
 }
 
-static struct com_edhoc_validate_parameters_result failure(
-    const struct com_readonly_buffer error_message) {
-  return (struct com_edhoc_validate_parameters_result){
-      .valid_parameters = false,
-      .error_message = error_message,
-  };
-}
-
-struct com_edhoc_validate_parameters_result invalid_error_buffer(void) {
+static struct com_edhoc_validate_parameters_result failure(void) {
   return (struct com_edhoc_validate_parameters_result){.valid_parameters =
                                                            false};
 }
@@ -55,49 +47,45 @@ bool duplicated_suites_in(
 }
 
 struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
-    const struct com_edhoc_parameters* parameters,
-    const struct com_writable_buffer error_buffer) {
-  if (!com_writable_buffer_is_writable(error_buffer)) {
-    return invalid_error_buffer();
-  }
+    const struct com_edhoc_parameters* parameters) {
   const struct com_edhoc_cipher_suite_list* supported_suites =
       &parameters->supported_cipher_suites;
   if (!com_edhoc_cipher_suites_are_valid(*supported_suites)) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Invalid supported cipher suites",
-        error_buffer));
+    com_edhoc_log_error(
+        "EDHOC parameters validation error: Invalid supported cipher suites");
+    return failure();
   }
   if (parameters->methods.data == NULL || parameters->methods.size == 0) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Invalid EDHOC methods",
-        error_buffer));
+    com_edhoc_log_error(
+        "EDHOC parameters validation error: Invalid EDHOC methods");
+    return failure();
   }
   if (parameters->credentials == NULL) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Null credentials", error_buffer));
+    com_edhoc_log_error("EDHOC parameters validation error: Null credentials");
+    return failure();
   }
   if (parameters->selected_cipher_suite == NULL) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Invalid selected cipher suite",
-        error_buffer));
+    com_edhoc_log_error(
+        "EDHOC parameters validation error: Invalid selected cipher suite");
+    return failure();
   }
   if (parameters->generate_connection_id == NULL) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Null connection ID generator",
-        error_buffer));
+    com_edhoc_log_error(
+        "EDHOC parameters validation error: Null connection ID generator");
+    return failure();
   }
   if (duplicated_suites_in(supported_suites)) {
-    return failure(com_edhoc_add_internal_error_view(
-        "EDHOC parameters validation error: Duplicated cipher "
-        "suites in supported list",
-        error_buffer));
+    com_edhoc_log_error(
+        "EDHOC parameters validation error: Duplicated cipher suites in "
+        "supported list");
+    return failure();
   }
   if (!suite_in_suites_list(parameters->selected_cipher_suite,
                             supported_suites)) {
-    return failure(com_edhoc_add_internal_error_view(
+    com_edhoc_log_error(
         "EDHOC parameters validation error: Selected cipher suite must be one "
-        "of the supported ones",
-        error_buffer));
+        "of the supported ones");
+    return failure();
   }
   return ok();
 }

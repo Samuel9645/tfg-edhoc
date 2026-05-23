@@ -3,7 +3,6 @@
 
 #include <edhoc.h>
 
-#include "common/com_data_models.h"
 #include "edhoc/common/com_edhoc_parameters.h"
 
 enum com_edhoc_setup_context_status {
@@ -23,7 +22,6 @@ enum com_edhoc_setup_context_status {
 
 struct com_edhoc_setup_context_result {
   const enum com_edhoc_setup_context_status status;
-  const struct com_readonly_buffer error_buffer;
 };
 
 /**
@@ -34,10 +32,7 @@ struct com_edhoc_setup_context_result {
  * cipher suites data for the EDHOC handshake. The selected cipher suite is
  * added at the end of the suites lists, the last cipher suite is the selected
  * one in both the initiator and responder.
- * @param[in] error_buffer Writable buffer to write error messages in case of
- * failure.
- * @return Struct containing the status of the operation and a view of the
- * filled buffer on failure, empty view with success code on success
+ * @return Struct containing the status of the operation.
  * @note This function uses edhoc_context_init, so the context needs to be
  * deinitialized with edhoc_context_deinit after use to free resources.
  * @note Adding the selected suite at the end does not affect the negotiation
@@ -51,7 +46,7 @@ struct com_edhoc_setup_context_result {
  * 9528 6.3](https://datatracker.ietf.org/doc/html/rfc9528#name-wrong-selected-cipher-suite)
  */
 struct com_edhoc_setup_context_result com_edhoc_setup_context(
-    struct edhoc_context* context, struct com_edhoc_parameters edhoc_parameters,
-    struct com_writable_buffer error_buffer);
+    struct edhoc_context* context,
+    struct com_edhoc_parameters edhoc_parameters);
 
 #endif  // EDHOC_COMMON_EDHOC_SETUP_H_

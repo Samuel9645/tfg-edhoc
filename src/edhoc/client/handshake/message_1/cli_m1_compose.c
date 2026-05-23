@@ -11,8 +11,7 @@
 #include <edhoc.h>
 #include <edhoc_helpers.h>
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/com_logging.h"
 
 static struct cli_edhoc_message_1_compose_result ok(
     const struct com_readonly_buffer message_1) {
@@ -21,19 +20,8 @@ static struct cli_edhoc_message_1_compose_result ok(
 }
 
 static struct cli_edhoc_message_1_compose_result protocol_failure(
-    const enum cli_edhoc_message_1_compose_status status,
-    const struct com_readonly_buffer buffer) {
-  return (struct cli_edhoc_message_1_compose_result){
-      .status = status,
-      .buffer = buffer,
-  };
-}
-
-static struct cli_edhoc_message_1_compose_result empty_compose_failure(
-    const struct com_readonly_buffer error_buffer) {
-  return (struct cli_edhoc_message_1_compose_result){
-      .status = CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE,
-      .buffer = error_buffer};
+    const enum cli_edhoc_message_1_compose_status status) {
+  return (struct cli_edhoc_message_1_compose_result){.status = status};
 }
 
 static struct cli_edhoc_message_1_compose_result invalid_compose_buffer(void) {
@@ -52,17 +40,15 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
   if (edhoc_message_1_compose(context, compose_buffer.bytes,
                               compose_buffer.capacity,
                               &message_1_length) != EDHOC_SUCCESS) {
-    return protocol_failure(
-        CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Message 1 Compose error: Failed to compose EDHOC message",
-            compose_buffer));
+    com_edhoc_log_error(
+        "Message 1 Compose error: Failed to compose EDHOC message");
+    return protocol_failure(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE);
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, message_1_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    return empty_compose_failure(com_edhoc_add_internal_error_view(
-        "Message 1 Compose error: Empty compose result", compose_buffer));
+    com_edhoc_log_error("Message 1 Compose error: Empty compose result");
+    return protocol_failure(CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE);
   }
   return ok(conversion_result.buffer);
 }

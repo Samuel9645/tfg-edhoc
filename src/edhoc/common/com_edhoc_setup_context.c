@@ -4,13 +4,7 @@
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
-
-static struct com_edhoc_setup_context_result invalid_error_buffer(void) {
-  return (struct com_edhoc_setup_context_result){
-      .status = COM_EDHOC_SETUP_CTX_ERR_INVALID_ERROR_BUFFER};
-}
+#include "edhoc/common/com_logging.h"
 
 static struct com_edhoc_setup_context_result ok(void) {
   return (struct com_edhoc_setup_context_result){
@@ -19,46 +13,33 @@ static struct com_edhoc_setup_context_result ok(void) {
 }
 
 static struct com_edhoc_setup_context_result failure(
-    const enum com_edhoc_setup_context_status status,
-    const struct com_readonly_buffer error_buffer) {
-  return (struct com_edhoc_setup_context_result){.status = status,
-                                                 .error_buffer = error_buffer};
+    const enum com_edhoc_setup_context_status status) {
+  return (struct com_edhoc_setup_context_result){.status = status};
 }
 
 struct com_edhoc_setup_context_result com_edhoc_setup_context(
     struct edhoc_context* context,
-    const struct com_edhoc_parameters edhoc_parameters,
-    const struct com_writable_buffer error_buffer) {
-  if (!com_writable_buffer_is_writable(error_buffer)) {
-    return invalid_error_buffer();
-  }
+    const struct com_edhoc_parameters edhoc_parameters) {
   const struct com_edhoc_validate_parameters_result validation_result =
-      com_edhoc_validate_parameters(&edhoc_parameters, error_buffer);
+      com_edhoc_validate_parameters(&edhoc_parameters);
   if (validation_result.valid_parameters == false) {
-    return failure(COM_EDHOC_SETUP_CTX_ERR_INVALID_EDHOC_PARAMETERS,
-                   validation_result.error_message);
+    return failure(COM_EDHOC_SETUP_CTX_ERR_INVALID_EDHOC_PARAMETERS);
   }
 
   if (psa_crypto_init() != PSA_SUCCESS) {
-    return failure(COM_EDHOC_SETUP_CTX_ERR_PSA_INIT,
-                   com_edhoc_add_internal_error_view(
-                       "Context Setup error: PSA crypto initialization failed",
-                       error_buffer));
+    com_edhoc_log_error(
+        "Context Setup error: PSA crypto initialization failed");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_PSA_INIT);
   }
   if (edhoc_context_init(context) != EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT,
-        com_edhoc_add_internal_error_view(
-            "Context Setup error: EDHOC context initialization failed",
-            error_buffer));
+    com_edhoc_log_error(
+        "Context Setup error: EDHOC context initialization failed");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_CONTEXT_INIT);
   }
   if (edhoc_set_methods(context, edhoc_parameters.methods.data,
                         edhoc_parameters.methods.size) != EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_SET_METHODS,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to set EDHOC methods",
-            error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to set EDHOC methods");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_SET_METHODS);
   }
   const struct com_edhoc_cipher_suite_list supported_suites =
       edhoc_parameters.supported_cipher_suites;
@@ -80,11 +61,8 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
   cipher_suites[number_of_suites - 1] = *selected_suite;
   if (edhoc_set_cipher_suites(context, cipher_suites, number_of_suites) !=
       EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to set cipher suites",
-            error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to set cipher suites");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_SET_CIPHER_SUITES);
   }
   const struct edhoc_connection_id connection_id = {
       .encode_type = EDHOC_CID_TYPE_ONE_BYTE_INTEGER,
@@ -92,41 +70,28 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
       .bstr_length = 0,
   };
   if (edhoc_set_connection_id(context, &connection_id) != EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to set connection ID",
-            error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to set connection ID");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_SET_CONNECTION_ID);
   }
 
   const struct edhoc_keys* keys = selected_cipher_suite_details->get_keys();
   if (edhoc_bind_keys(context, keys) != EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to bind keys", error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to bind keys");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_KEYS);
   }
   if (edhoc_set_user_context(context, (void*)keys) != EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_SET_USER_CONTEXT,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to set user context",
-            error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to set user context");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_SET_USER_CONTEXT);
   }
   if (edhoc_bind_crypto(context, selected_cipher_suite_details->get_crypto()) !=
       EDHOC_SUCCESS) {
-    return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO,
-                   com_edhoc_add_protocol_error_with_description_view(
-                       context, "Context Setup error: Failed to bind crypto",
-                       error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to bind crypto");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CRYPTO);
   }
   if (edhoc_bind_credentials(context, edhoc_parameters.credentials) !=
       EDHOC_SUCCESS) {
-    return failure(
-        COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Context Setup error: Failed to bind credentials",
-            error_buffer));
+    com_edhoc_log_error("Context Setup error: Failed to bind credentials");
+    return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS);
   }
   return ok();
 }

@@ -63,7 +63,7 @@ struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
   if (compose_result.status != SRV_EDHOC_MSG2_COMPOSE_OK) {
     srv_edhoc_cleanup_context(process_result.context);
     return failure(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED,
-                   compose_result.buffer);
+                   (struct com_readonly_buffer){0});
   }
   return ok(process_result.context, compose_result.buffer);
 }

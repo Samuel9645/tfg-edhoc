@@ -10,11 +10,8 @@
 #ifndef EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_CLI_M4_PROCESS_RESULT_H_
 #define EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_CLI_M4_PROCESS_RESULT_H_
 
-#include "common/com_data_models.h"
-
 enum cli_edhoc_message_4_process_status {
   CLI_EDHOC_MSG4_PROCESS_OK = 0,
-  CLI_EDHOC_MSG4_PROCESS_ERR_INVALID_ERROR_BUFFER,
   CLI_EDHOC_MSG4_PROCESS_ERR_NULL_CONTEXT,
   CLI_EDHOC_MSG4_PROCESS_ERR_EMPTY_MESSAGE_4,
   CLI_EDHOC_MSG4_PROCESS_ERR_EDHOC_MESSAGE_4_PROCESS_FAILED,
@@ -23,7 +20,6 @@ enum cli_edhoc_message_4_process_status {
 
 struct cli_edhoc_message_4_process_result {
   const enum cli_edhoc_message_4_process_status status;
-  const struct com_readonly_buffer error_buffer;
 };
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_4_CLI_M4_PROCESS_RESULT_H_

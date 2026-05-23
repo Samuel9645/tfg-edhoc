@@ -9,13 +9,10 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/com_edhoc_parameters.h"
 #include "edhoc/common/tst_edhoc_params.h"
 
 static uint8_t error_buffer[512];
-static const struct com_writable_buffer error_buffer_view = {
-    .bytes = error_buffer, .capacity = sizeof(error_buffer)};
 
 void setUp(void) { memset(error_buffer, 0, sizeof(error_buffer)); }
 
@@ -24,7 +21,7 @@ void test_valid_parameters(void) {
       tst_edhoc_get_method_0_suite_0_params();
 
   const struct com_edhoc_validate_parameters_result result =
-      com_edhoc_validate_parameters(&valid_params, error_buffer_view);
+      com_edhoc_validate_parameters(&valid_params);
 
   TEST_ASSERT_TRUE(result.valid_parameters);
 }
@@ -43,7 +40,6 @@ void test_fails_on_invalid_parameters(void) {
 
   const struct {
     struct com_edhoc_parameters params;
-    const char* expected_error;
   } test_cases[] = {
       {
           .params =
@@ -54,9 +50,7 @@ void test_fails_on_invalid_parameters(void) {
                       valid_params.supported_cipher_suites.suites[0],
                   .generate_connection_id = valid_params.generate_connection_id,
               },
-          .expected_error =
-              "EDHOC parameters validation error: Invalid supported "
-              "cipher suites",
+
       },
 
       {
@@ -69,8 +63,7 @@ void test_fails_on_invalid_parameters(void) {
                       valid_params.supported_cipher_suites.suites[0],
                   .generate_connection_id = valid_params.generate_connection_id,
               },
-          .expected_error =
-              "EDHOC parameters validation error: Invalid EDHOC methods",
+
       },
 
       {
@@ -83,8 +76,7 @@ void test_fails_on_invalid_parameters(void) {
                       valid_params.supported_cipher_suites.suites[0],
                   .generate_connection_id = valid_params.generate_connection_id,
               },
-          .expected_error =
-              "EDHOC parameters validation error: Null credentials",
+
       },
       {
           .params =
@@ -95,8 +87,7 @@ void test_fails_on_invalid_parameters(void) {
                   .credentials = valid_params.credentials,
                   .generate_connection_id = valid_params.generate_connection_id,
               },
-          .expected_error = "EDHOC parameters validation error: Invalid "
-                            "selected cipher suite",
+
       },
       {
           .params =
@@ -108,8 +99,7 @@ void test_fails_on_invalid_parameters(void) {
                   .selected_cipher_suite = &COM_EDHOC_SUITE_2,
                   .generate_connection_id = valid_params.generate_connection_id,
               },
-          .expected_error = "EDHOC parameters validation error: Selected "
-                            "cipher suite must be one of the supported ones",
+
       },
       {.params =
            {
@@ -119,8 +109,7 @@ void test_fails_on_invalid_parameters(void) {
                .selected_cipher_suite = valid_params.selected_cipher_suite,
                .generate_connection_id = valid_params.generate_connection_id,
            },
-       .expected_error = "EDHOC parameters validation error: Duplicated cipher "
-                         "suites in supported list"},
+      },
       {
           .params =
               {
@@ -132,8 +121,7 @@ void test_fails_on_invalid_parameters(void) {
                       valid_params.supported_cipher_suites.suites[0],
 
               },
-          .expected_error =
-              "EDHOC parameters validation error: Null connection ID generator",
+
       },
   };
 
@@ -143,11 +131,8 @@ void test_fails_on_invalid_parameters(void) {
     setUp();
 
     const struct com_edhoc_validate_parameters_result result =
-        com_edhoc_validate_parameters(&test_cases[i].params, error_buffer_view);
+        com_edhoc_validate_parameters(&test_cases[i].params);
 
     TEST_ASSERT_FALSE(result.valid_parameters);
-    tst_edhoc_assert_encoded_error_matches(result.error_message,
-                                           test_cases[i].expected_error,
-                                           EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
   }
 }

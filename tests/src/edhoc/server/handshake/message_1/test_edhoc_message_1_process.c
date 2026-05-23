@@ -17,7 +17,6 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/add_error/common/tst_edhoc_add_error_capacity.h"
 #include "edhoc/common/add_error/mocks/tst_mock_edhoc_get_code.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
@@ -178,8 +177,6 @@ void test_m1_process_fails_on_invalid_data(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(test_cases[i].expected_status, result.status,
                               test_cases[i].description);
-
-    tst_edhoc_assert_error_not_empty_if_present(result.error_buffer);
     ensure_context_is_null(result.context);
   }
 }
@@ -187,13 +184,12 @@ void test_m1_process_fails_on_invalid_data(void) {
 void test_m1_process_fails_on_library_errors(void) {
   const struct {
     const char* description;
-    const char* expected_error_description;
     void (*setup_scenario)(void);
     enum srv_edhoc_message_1_process_status expected_status;
   } cases[] = {
-      {"setup fails", NULL, tst_srv_edhoc_m1_set_context_init_failure,
+      {NULL, tst_srv_edhoc_m1_set_context_init_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP},
-      {"processing fails", "Message 1 Process error: Processing failed",
+      {"Message 1 Process error: Processing failed",
        tst_srv_edhoc_m1_set_process_failure,
        SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_PROCESS},
   };
@@ -208,12 +204,5 @@ void test_m1_process_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    if (cases[i].expected_error_description == NULL) {
-      tst_edhoc_assert_encoded_error_is_not_empty(result.error_buffer);
-    } else {
-      tst_edhoc_assert_encoded_error_matches(
-          result.error_buffer, cases[i].expected_error_description,
-          EDHOC_ERROR_CODE_UNSPECIFIED_ERROR);
-    }
   }
 }

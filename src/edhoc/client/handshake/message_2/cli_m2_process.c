@@ -8,8 +8,7 @@
 
 #include "edhoc/client/handshake/message_2/cli_m2_process.h"
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/com_logging.h"
 
 static struct cli_edhoc_message_2_process_result ok(void) {
   return (struct cli_edhoc_message_2_process_result){
@@ -17,50 +16,28 @@ static struct cli_edhoc_message_2_process_result ok(void) {
   };
 }
 
-static struct cli_edhoc_message_2_process_result process_protocol_failure(
-    const struct com_readonly_buffer error_buffer) {
-  return (struct cli_edhoc_message_2_process_result){
-      .status = CLI_EDHOC_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED,
-      .error_buffer = error_buffer,
-  };
-}
-
-static struct cli_edhoc_message_2_process_result invalid_error_buffer(void) {
-  return (struct cli_edhoc_message_2_process_result){
-      .status = CLI_EDHOC_MSG2_PROCESS_ERR_INVALID_ERROR_BUFFER};
-}
-
 static struct cli_edhoc_message_2_process_result internal_failure(
-    const enum cli_edhoc_message_2_process_status status,
-    const struct com_readonly_buffer error_buffer) {
-  return (struct cli_edhoc_message_2_process_result){
-      .status = status, .error_buffer = error_buffer};
+    const enum cli_edhoc_message_2_process_status status) {
+  return (struct cli_edhoc_message_2_process_result){.status = status};
 }
 
 struct cli_edhoc_message_2_process_result cli_edhoc_process_message_2(
-    struct edhoc_context* context, const struct com_readonly_buffer message_2,
-    const struct com_writable_buffer error_buffer) {
-  if (!com_writable_buffer_is_writable(error_buffer)) {
-    return invalid_error_buffer();
-  }
+    struct edhoc_context* context, const struct com_readonly_buffer message_2) {
   if (context == NULL) {
-    return internal_failure(
-        CLI_EDHOC_MSG2_PROCESS_ERR_NULL_CONTEXT,
-        com_edhoc_add_internal_error_view(
-            "Message 2 Process error: Null context", error_buffer));
+    com_edhoc_log_error("Message 2 Process error: Null context");
+    return internal_failure(CLI_EDHOC_MSG2_PROCESS_ERR_NULL_CONTEXT);
   }
   if (!com_readonly_buffer_has_content(message_2)) {
-    return internal_failure(
-        CLI_EDHOC_MSG2_PROCESS_ERR_EMPTY_MESSAGE_2,
-        com_edhoc_add_internal_error_view(
-            "Message 2 Process error: Empty message", error_buffer));
+    com_edhoc_log_error("Message 2 Process error: Empty message");
+    return internal_failure(CLI_EDHOC_MSG2_PROCESS_ERR_EMPTY_MESSAGE_2);
   }
 
   if (edhoc_message_2_process(context, message_2.bytes, message_2.length) !=
       EDHOC_SUCCESS) {
-    return process_protocol_failure(
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Message 2 Process error: Failed to process EDHOC message", error_buffer));
+    com_edhoc_log_error(
+        "Message 2 Process error: Failed to process EDHOC message");
+    return internal_failure(
+        CLI_EDHOC_MSG2_PROCESS_ERR_EDHOC_MESSAGE_2_PROCESS_FAILED);
   }
   return ok();
 }

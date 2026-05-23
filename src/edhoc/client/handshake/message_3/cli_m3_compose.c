@@ -12,8 +12,7 @@
 
 #include <edhoc_helpers.h>
 
-#include "edhoc/common/add_error/com_edhoc_add_internal_error.h"
-#include "edhoc/common/add_error/com_edhoc_add_protocol_error.h"
+#include "edhoc/common/com_logging.h"
 
 static struct cli_edhoc_message_3_compose_result ok(
     const struct com_readonly_buffer message_3) {
@@ -24,19 +23,8 @@ static struct cli_edhoc_message_3_compose_result ok(
 }
 
 static struct cli_edhoc_message_3_compose_result protocol_failure(
-    const enum cli_edhoc_message_3_compose_status status,
-    const struct com_readonly_buffer error_buffer) {
-  return (struct cli_edhoc_message_3_compose_result){
-      .status = status,
-      .buffer = error_buffer,
-  };
-}
-
-static struct cli_edhoc_message_3_compose_result empty_compose_failure(
-    const struct com_readonly_buffer error_buffer) {
-  return (struct cli_edhoc_message_3_compose_result){
-      .status = CLI_EDHOC_MSG3_COMPOSE_ERR_EMPTY_COMPOSE,
-      .buffer = error_buffer};
+    const enum cli_edhoc_message_3_compose_status status) {
+  return (struct cli_edhoc_message_3_compose_result){.status = status};
 }
 
 static struct cli_edhoc_message_3_compose_result invalid_compose_buffer(void) {
@@ -45,13 +33,9 @@ static struct cli_edhoc_message_3_compose_result invalid_compose_buffer(void) {
   };
 }
 
-static struct cli_edhoc_message_3_compose_result null_context_failure(
-    const struct com_writable_buffer compose_buffer) {
+static struct cli_edhoc_message_3_compose_result null_context_failure(void) {
   return (struct cli_edhoc_message_3_compose_result){
-      .status = CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT,
-      .buffer = com_edhoc_add_internal_error_view(
-          "Message 3 Compose error: Null context", compose_buffer),
-  };
+      .status = CLI_EDHOC_MSG3_COMPOSE_ERR_NULL_CONTEXT};
 }
 
 struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
@@ -61,24 +45,24 @@ struct cli_edhoc_message_3_compose_result cli_edhoc_compose_message_3(
     return invalid_compose_buffer();
   }
   if (context == NULL) {
-    return null_context_failure(compose_buffer);
+    com_edhoc_log_error("Message 3 Compose error: Null context");
+    return null_context_failure();
   }
 
   size_t message_3_length = compose_buffer.capacity;
   if (edhoc_message_3_compose(context, compose_buffer.bytes,
                               compose_buffer.capacity,
                               &message_3_length) != EDHOC_SUCCESS) {
+    com_edhoc_log_error(
+        "Message 3 Compose error: Failed to compose EDHOC message");
     return protocol_failure(
-        CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED,
-        com_edhoc_add_protocol_error_with_description_view(
-            context, "Message 3 Compose error: Failed to compose EDHOC message",
-            compose_buffer));
+        CLI_EDHOC_MSG3_COMPOSE_ERR_EDHOC_MESSAGE_3_COMPOSE_FAILED);
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, message_3_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    return empty_compose_failure(com_edhoc_add_internal_error_view(
-        "Message 3 Compose error: Empty compose result", compose_buffer));
+    com_edhoc_log_error("Message 3 Compose error: Empty compose result");
+    return protocol_failure(CLI_EDHOC_MSG3_COMPOSE_ERR_EMPTY_COMPOSE);
   }
   return ok(conversion_result.buffer);
 }

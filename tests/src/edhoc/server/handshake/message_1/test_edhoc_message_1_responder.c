@@ -18,10 +18,8 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 #include "edhoc/common/tst_edhoc_params.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"
-#include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_extract_flow_info.h"
 #include "edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_message_1_process.h"
 #include "edhoc/server/handshake/mocks/message_2/tst_srv_mock_edhoc_message_2_compose.h"
 
@@ -114,7 +112,6 @@ void test_responder_fails_on_invalid_data(void) {
 
     TEST_ASSERT_NOT_EQUAL_MESSAGE(SRV_EDHOC_MSG1_RESPONDER_OK, result.status,
                                   test_cases[i].description);
-    tst_edhoc_assert_error_not_empty_if_present(result.response);
     ensure_context_is_freed_on_failure(result);
   }
 }
@@ -162,7 +159,6 @@ void test_responder_fails_on_library_errors(void) {
 
     TEST_ASSERT_EQUAL_MESSAGE(cases[i].expected_status, result.status,
                               cases[i].description);
-    tst_edhoc_assert_encoded_error_is_not_empty(result.response);
     ensure_context_is_freed_on_failure(result);
   }
 }

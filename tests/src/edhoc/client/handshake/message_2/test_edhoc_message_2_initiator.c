@@ -11,7 +11,6 @@
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/client/handshake/mocks/message_2/tst_cli_mock_edhoc_message_2_process.h"
 #include "edhoc/client/handshake/mocks/message_3/tst_cli_mock_edhoc_message_3_compose.h"
-#include "edhoc/common/add_error/common/tst_edhoc_add_error_assertions.h"
 
 enum { TST_CLI_M2_INITIATOR_REQ_BUF_LEN = 128 };
 
@@ -65,7 +64,6 @@ void test_message_2_initiator_fails_when_message_2_process_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_2_PROCESS,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }
 
 void test_message_2_initiator_fails_when_message_3_compose_fails(void) {
@@ -76,5 +74,4 @@ void test_message_2_initiator_fails_when_message_3_compose_fails(void) {
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
                     result.status);
-  tst_edhoc_assert_encoded_error_is_not_empty(result.buffer);
 }

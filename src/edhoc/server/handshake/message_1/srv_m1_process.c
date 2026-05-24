@@ -13,7 +13,6 @@
 #include <stdlib.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.h"
-#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/common/com_logging.h"
 
 static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
@@ -24,11 +23,9 @@ static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
   return error == EDHOC_ERROR_CODE_WRONG_SELECTED_CIPHER_SUITE;
 }
 
-static struct srv_edhoc_message_1_process_result ok(
-    struct edhoc_context* context) {
+static struct srv_edhoc_message_1_process_result ok(void) {
   return (struct srv_edhoc_message_1_process_result){
       .status = SRV_EDHOC_MSG1_PROCESS_OK,
-      .context = context,
   };
 }
 
@@ -50,11 +47,17 @@ static struct srv_edhoc_message_1_process_result invalid_error_buffer(void) {
   };
 }
 
+static struct srv_edhoc_message_1_process_result null_context_failure(void) {
+  return (struct srv_edhoc_message_1_process_result){
+      .status = SRV_EDHOC_MSG1_PROCESS_ERR_NULL_CONTEXT,
+  };
+}
+
 struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
-    const struct srv_edhoc_message_1_request request,
-    const struct com_writable_buffer error_buffer,
-    const struct com_edhoc_parameters edhoc_parameters) {
-  if (!com_readonly_buffer_has_content(request.payload)) {
+    const struct com_readonly_buffer request,
+    struct edhoc_context* edhoc_context,
+    const struct com_writable_buffer error_buffer) {
+  if (!com_readonly_buffer_has_content(request)) {
     com_edhoc_log_error("Message 1 Process error: Empty request buffer");
     return internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER);
   }
@@ -63,36 +66,23 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     return invalid_error_buffer();
   }
 
-  struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
-  if (context == NULL) {
-    com_edhoc_log_error("Message 1 Process error: Context calloc failed");
-    return internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_CALLOC);
+  if (edhoc_context == NULL) {
+    com_edhoc_log_error("Message 1 Process error: Null context");
+    return null_context_failure();
   }
 
-  const struct com_edhoc_setup_context_result setup_context_result =
-      com_edhoc_setup_context(context, edhoc_parameters);
-  if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
-    const struct srv_edhoc_message_1_process_result failure_result =
-        internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_EDHOC_CONTEXT_SETUP);
-    free(context);
-    return failure_result;
-  }
-
-  if (edhoc_message_1_process(context, request.payload.bytes,
-                              request.payload.length) != EDHOC_SUCCESS) {
+  if (edhoc_message_1_process(edhoc_context, request.bytes, request.length) !=
+      EDHOC_SUCCESS) {
     const struct com_readonly_buffer process_error =
-        error_code_is_suite_mismatch(context)
-            ? com_edhoc_add_cipher_suite_mismatch_error(context, error_buffer)
+        error_code_is_suite_mismatch(edhoc_context)
+            ? com_edhoc_add_cipher_suite_mismatch_error(edhoc_context,
+                                                        error_buffer)
             : (com_edhoc_log_error(
                    "Message 1 Process error: Processing failed"),
                (struct com_readonly_buffer){0});
-    const struct srv_edhoc_message_1_process_result failure_result =
-        suite_mismatch_failure(process_error);
-    srv_edhoc_cleanup_context(context);
-    context = NULL;
-    return failure_result;
+    return suite_mismatch_failure(process_error);
   }
-  return ok(context);
+  return ok();
 }
 
 enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
@@ -100,10 +90,11 @@ enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
   if (context == NULL) {
     return SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT;
   }
-  if (edhoc_context_deinit(context) != EDHOC_SUCCESS) {
-    return SRV_EDHOC_CLEANUP_ERR_DEINIT;
-  }
+  const int deinit_failed = edhoc_context_deinit(context) != EDHOC_SUCCESS;
   free(context);
-  context = NULL;
-  return SRV_EDHOC_CLEANUP_OK;
+  return deinit_failed
+             ? (com_edhoc_log_error(
+                    "Cleanup error: Failed to deinitialize EDHOC context"),
+                SRV_EDHOC_CLEANUP_ERR_DEINIT)
+             : SRV_EDHOC_CLEANUP_OK;
 }

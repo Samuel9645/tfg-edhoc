@@ -17,6 +17,7 @@
 #include <edhoc.h>
 #include <unity.h>
 
+#include "coap/server/dispatch/mocks/srv_mock_dispatch_deps.h"
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 #include "edhoc/common/tst_edhoc_params.h"
 
@@ -27,6 +28,7 @@ static coap_context_t dummy_context = {0};
 void setUp(void) {
   coap_startup();
   coap_set_log_level(COAP_LOG_CRIT);
+  tst_srv_dispatch_reset_mock();
   dummy_request = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
   dummy_response = coap_pdu_init(COAP_MESSAGE_CON, COAP_EMPTY_CODE, 0, 0);
 }
@@ -53,6 +55,7 @@ void test_changed_response_for_valid_message_1(void) {
       &deps, &dummy_context);
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_CHANGED,
                     coap_pdu_get_code(dummy_response));
+  srv_dispatch_cleanup_last_context();
 }
 
 void test_bad_request_for_malformed_edhoc_message(void) {
@@ -75,6 +78,34 @@ void test_internal_error_on_server_side_failure(void) {
   srv_coap_dispatch_post_with_dependencies(
       dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
       &deps, &dummy_context);
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
+                    coap_pdu_get_code(dummy_response));
+}
+
+void test_internal_error_when_message_1_context_allocation_fails(void) {
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.is_message_1 = stb_srv_coap_is_message_1_true;
+  tst_srv_set_calloc_failure();
+
+  srv_coap_dispatch_post_with_dependencies(
+      dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
+      &deps, &dummy_context);
+
+  TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
+                    coap_pdu_get_code(dummy_response));
+}
+
+void test_internal_error_when_message_1_context_setup_fails(void) {
+  struct srv_coap_dispatch_deps deps =
+      test_srv_coap_dispatch_create_base_dependencies();
+  deps.is_message_1 = stb_srv_coap_is_message_1_true;
+  tst_srv_set_setup_context_failure();
+
+  srv_coap_dispatch_post_with_dependencies(
+      dummy_request, tst_edhoc_get_method_0_suite_0_params(), dummy_response,
+      &deps, &dummy_context);
+
   TEST_ASSERT_EQUAL(COAP_RESPONSE_CODE_INTERNAL_ERROR,
                     coap_pdu_get_code(dummy_response));
 }

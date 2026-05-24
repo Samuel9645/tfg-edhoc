@@ -72,7 +72,6 @@ set(BASE_SOURCES
 set(MESSAGE_1_PROCESS_SOURCES
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/srv_m1_process.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.c
-    ${EDHOC_CONTEXT_INITIALIZATION_SOURCES}
 )
 
 set(MESSAGE_2_COMPOSE_SOURCES

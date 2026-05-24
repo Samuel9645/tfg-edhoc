@@ -15,30 +15,17 @@
 #include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
-// TODO: maybe inline this struct
-struct srv_edhoc_message_1_responder_request {
-  struct com_readonly_buffer message_1;
-};
-
 /**
  * @brief Handle EDHOC Message 1 and compose Message 2.
  *
- * @param[in] request Session/request metadata for Message 1 responder,
- * including raw CoAP payload and credentials.
- * @param[in] edhoc_parameters Parameters to use when creating the EDHOC
- * context in the processing phase
+ * @param[in] message_1 Buffer metadata for the EDHOC Message 1 request.
+ * @param[in] edhoc_context EDHOC context created and configured by the caller.
  * @param[in] response Response buffer metadata for Message 2.
- * @return Struct containing status code, allocated EDHOC context and Message 2
- * in the buffer on success, or error code, NULL context and error buffer on
- * failure.
- * @warning This function dynamically allocates the EDHOC context using
- * calloc(). On success, the caller assumes ownership of this memory and is
- * responsible for freeing it. On failure, the function safely cleans up after
- * itself and returns a NULL pointer.
+ * @return Struct containing status code and Message 2 in the buffer on success,
+ * or error code and error buffer on failure.
  */
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
-    struct srv_edhoc_message_1_responder_request request,
-    struct com_edhoc_parameters edhoc_parameters,
+    struct com_readonly_buffer message_1, struct edhoc_context* edhoc_context,
     struct com_writable_buffer response);
 
 const char* srv_edhoc_message_1_responder_status_code_to_string(

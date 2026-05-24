@@ -24,13 +24,6 @@ enum srv_edhoc_message_1_responder_status {
 struct srv_edhoc_message_1_responder_result {
   const enum srv_edhoc_message_1_responder_status status;
   const struct com_readonly_buffer response;
-  /**
-   * Pointer to the allocated EDHOC context on success, NULL on failure.
-   * @warning The caller is responsible for freeing the allocated context (only
-   * on success) using the helper in the Message 1 process module to clean up
-   * the library context when no longer needed.
-   */
-  struct edhoc_context* edhoc_ctx;
 };
 
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_RESULT_H_

@@ -16,11 +16,10 @@
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
 
 static struct srv_edhoc_message_1_responder_result ok(
-    struct edhoc_context* context, const struct com_readonly_buffer response) {
+    const struct com_readonly_buffer response) {
   return (struct srv_edhoc_message_1_responder_result){
       .status = SRV_EDHOC_MSG1_RESPONDER_OK,
       .response = response,
-      .edhoc_ctx = context,
   };
 }
 
@@ -41,31 +40,27 @@ static struct srv_edhoc_message_1_responder_result invalid_response_buffer(
 }
 
 struct srv_edhoc_message_1_responder_result srv_edhoc_respond_to_message_1(
-    const struct srv_edhoc_message_1_responder_request request,
-    const struct com_edhoc_parameters edhoc_parameters,
+    const struct com_readonly_buffer message_1,
+    struct edhoc_context* edhoc_context,
     const struct com_writable_buffer response) {
   if (!com_writable_buffer_is_writable(response)) {
     return invalid_response_buffer();
   }
 
-  const struct srv_edhoc_message_1_request process_request = {
-      .payload = request.message_1,
-  };
   const struct srv_edhoc_message_1_process_result process_result =
-      srv_edhoc_process_message_1(process_request, response, edhoc_parameters);
+      srv_edhoc_process_message_1(message_1, edhoc_context, response);
   if (process_result.status != SRV_EDHOC_MSG1_PROCESS_OK) {
     return failure(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_1_PROCESS_FAILED,
                    process_result.error_buffer);
   }
 
   const struct srv_edhoc_message_2_compose_result compose_result =
-      srv_edhoc_compose_message_2(process_result.context, response);
+      srv_edhoc_compose_message_2(edhoc_context, response);
   if (compose_result.status != SRV_EDHOC_MSG2_COMPOSE_OK) {
-    srv_edhoc_cleanup_context(process_result.context);
     return failure(SRV_EDHOC_MSG1_RESPONDER_ERR_MESSAGE_2_COMPOSE_FAILED,
                    (struct com_readonly_buffer){0});
   }
-  return ok(process_result.context, compose_result.buffer);
+  return ok(compose_result.buffer);
 }
 
 const char* srv_edhoc_message_1_responder_status_code_to_string(

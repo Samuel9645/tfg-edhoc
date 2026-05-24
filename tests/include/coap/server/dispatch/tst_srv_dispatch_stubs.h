@@ -43,6 +43,8 @@ bool stb_srv_coap_is_message_1_false(struct com_readonly_buffer parsed_request);
 enum srv_session_set_status stb_srv_session_set_context_ok(
     const struct edhoc_connection_id* cid, struct edhoc_context* context);
 
+void srv_dispatch_cleanup_last_context(void);
+
 enum srv_session_set_status stb_srv_session_set_context_duplicate_cid(
     const struct edhoc_connection_id* cid, struct edhoc_context* context);
 
@@ -83,13 +85,13 @@ bool stb_srv_coap_connection_id_is_expected_false(
 
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
-    struct srv_edhoc_message_1_responder_request request_data,
-    struct com_edhoc_parameters edhoc_parameters,
+    struct com_readonly_buffer request_data,
+    struct edhoc_context* edhoc_context,
     struct com_writable_buffer response_data);
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
-    struct srv_edhoc_message_1_responder_request request_data,
-    struct com_edhoc_parameters edhoc_parameters,
+    struct com_readonly_buffer request_data,
+    struct edhoc_context* edhoc_context,
     struct com_writable_buffer response_data);
 
 coap_pdu_code_t stb_srv_coap_process_m1_ok(

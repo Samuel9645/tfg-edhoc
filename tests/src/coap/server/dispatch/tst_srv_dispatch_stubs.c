@@ -11,6 +11,7 @@
 // parameters
 #include "coap/server/dispatch/tst_srv_dispatch_stubs.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "coap/common/internal/com_parse_edhoc_request_builders.h"
@@ -18,6 +19,7 @@
 #include "coap/server/extract_edhoc_message/internal/srv_coap_extract_m1_result_builders.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
+#include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.h"
 
 static uint8_t DUMMY_PAYLOAD[] = {0x01, 0x02, 0x03};
@@ -82,8 +84,6 @@ bool stb_srv_coap_connection_id_is_expected_false(
   return false;
 }
 
-static struct edhoc_context dummy_edhoc_context_for_stub = {0};
-
 enum status_coap stb_srv_coap_add_options_success(
     coap_pdu_t* response,
     const enum config_coap_content_format_edhoc_values content_format) {
@@ -111,13 +111,6 @@ bool stb_srv_coap_is_message_1_false(
   return false;
 }
 
-enum srv_session_set_status stb_srv_session_set_context_ok(
-    const struct edhoc_connection_id* cid, struct edhoc_context* context) {
-  (void)cid;
-  (void)context;
-  return SRV_SESSION_SET_OK;
-}
-
 enum srv_session_set_status stb_srv_session_set_context_duplicate_cid(
     const struct edhoc_connection_id* cid, struct edhoc_context* context) {
   (void)cid;
@@ -128,8 +121,18 @@ enum srv_session_set_status stb_srv_session_set_context_duplicate_cid(
 struct srv_session_get_result stb_srv_session_get_context_ok(
     const struct edhoc_connection_id* cid) {
   (void)cid;
-  return (struct srv_session_get_result){
-      .status = SRV_SESSION_GET_OK, .context = &dummy_edhoc_context_for_stub};
+  // ReSharper disable once CppDFAMemoryLeak this is cleaned using
+  // srv_dispatch_cleanup_last_context
+  struct edhoc_context* context = calloc(1, sizeof(struct edhoc_context));
+  if (context == NULL) {
+    return (struct srv_session_get_result){
+        .status = SRV_SESSION_GET_ERR_NOT_FOUND, .context = NULL};
+  }
+  context->private_cid = DUMMY_CONNECTION_ID;
+  // ReSharper disable once CppDFAMemoryLeak this is cleaned using
+  // srv_dispatch_cleanup_last_context
+  return (struct srv_session_get_result){.status = SRV_SESSION_GET_OK,
+                                         .context = context};
 }
 
 struct srv_session_get_result stb_srv_session_get_context_not_found(
@@ -149,17 +152,6 @@ enum srv_session_remove_status stb_srv_session_remove_context_not_found(
     const struct edhoc_connection_id* cid) {
   (void)cid;
   return SRV_SESSION_REMOVE_ERR_NOT_FOUND;
-}
-
-void* stb_srv_coap_get_session_null(const coap_session_t* session) {
-  (void)session;
-  return NULL;
-}
-
-void* stb_srv_coap_get_session_valid(const coap_session_t* session) {
-  (void)session;
-  dummy_edhoc_context_for_stub.private_cid = DUMMY_CONNECTION_ID;
-  return &dummy_edhoc_context_for_stub;
 }
 
 struct srv_coap_extract_message_1_result stb_srv_coap_extract_message_1_ok(
@@ -183,42 +175,52 @@ stb_srv_coap_extract_message_1_format_failure(
 
 struct srv_edhoc_message_1_responder_result
 stb_srv_edhoc_m1_responder_protocol_failure(
-    const struct srv_edhoc_message_1_responder_request request_data,
-    const struct com_edhoc_parameters edhoc_parameters,
-    const struct com_writable_buffer response_data) {
+    struct com_readonly_buffer request_data,
+    struct edhoc_context* edhoc_context,
+    struct com_writable_buffer response_data) {
   (void)request_data;
+  (void)edhoc_context;
   (void)response_data;
-  (void)edhoc_parameters;
   return srv_edhoc_message_1_responder_failure(
       SRV_EDHOC_MSG1_RESPONDER_ERR_INVALID_RESPONSE_BUFFER,
       DUMMY_READONLY_BUFFER);
 }
 
 struct srv_edhoc_message_1_responder_result stb_srv_edhoc_m1_responder_ok(
-    const struct srv_edhoc_message_1_responder_request request_data,
-    const struct com_edhoc_parameters edhoc_parameters,
-    const struct com_writable_buffer response_data) {
+    struct com_readonly_buffer request_data,
+    struct edhoc_context* edhoc_context,
+    struct com_writable_buffer response_data) {
   (void)request_data;
+  (void)edhoc_context;
   (void)response_data;
-  (void)edhoc_parameters;
-  return srv_edhoc_message_1_responder_ok(&dummy_edhoc_context_for_stub,
-                                          DUMMY_READONLY_BUFFER);
+  return srv_edhoc_message_1_responder_ok(DUMMY_READONLY_BUFFER);
 }
 
+static struct edhoc_context* last_captured_context = NULL;
+
+enum srv_session_set_status stb_srv_session_set_context_capture_ok(
+    const struct edhoc_connection_id* cid, struct edhoc_context* context) {
+  (void)cid;
+  last_captured_context = context;
+  return SRV_SESSION_SET_OK;
+}
+
+void srv_dispatch_cleanup_last_context(void) { free(last_captured_context); }
+
 coap_pdu_code_t stb_srv_coap_process_m1_ok(
-    const struct srv_edhoc_message_1_responder_result message_1_result) {
+    struct srv_edhoc_message_1_responder_result message_1_result) {
   (void)message_1_result;
   return COAP_RESPONSE_CODE_CHANGED;
 }
 
 coap_pdu_code_t stb_srv_coap_process_m1_protocol_failure(
-    const struct srv_edhoc_message_1_responder_result message_1_result) {
+    struct srv_edhoc_message_1_responder_result message_1_result) {
   (void)message_1_result;
   return COAP_RESPONSE_CODE_BAD_REQUEST;
 }
 
 struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
-    const struct srv_edhoc_message_3_responder_request request_data,
+    struct srv_edhoc_message_3_responder_request request_data,
     struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
@@ -227,7 +229,7 @@ struct srv_edhoc_message_3_responder_result stb_srv_edhoc_m3_responder_ok(
 
 struct srv_edhoc_message_3_responder_result
 stb_srv_edhoc_m3_responder_protocol_failure(
-    const struct srv_edhoc_message_3_responder_request request_data,
+    struct srv_edhoc_message_3_responder_request request_data,
     struct com_writable_buffer response_data) {
   (void)request_data;
   (void)response_data;
@@ -287,7 +289,7 @@ struct srv_coap_dispatch_deps test_srv_coap_dispatch_create_base_dependencies(
       .is_message_1 = stb_srv_coap_is_message_1_true,
       .get_context_by_cid = stb_srv_session_get_context_ok,
       .remove_context_by_cid = stb_srv_session_remove_context_ok,
-      .set_context_by_cid = stb_srv_session_set_context_ok,
+      .set_context_by_cid = stb_srv_session_set_context_capture_ok,
       .respond_to_message_1 = stb_srv_edhoc_m1_responder_ok,
       .extract_message_1 = stb_srv_coap_extract_message_1_ok,
       .extract_cid = stb_srv_coap_extract_cid_ok,

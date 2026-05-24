@@ -10,7 +10,7 @@
 #include "edhoc/server/handshake/message_1/srv_m1_responder_result.h"
 
 struct srv_edhoc_message_1_responder_result srv_edhoc_message_1_responder_ok(
-    struct edhoc_context* context, struct com_readonly_buffer message_2);
+    struct com_readonly_buffer message_2);
 
 struct srv_edhoc_message_1_responder_result
 srv_edhoc_message_1_responder_invalid_response_buffer_failure(void);

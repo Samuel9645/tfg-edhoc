@@ -185,18 +185,12 @@ add_unity_test(test_coap_extract_message_1
 )
 
 
-set(EDHOC_CONTENT_INIT_MOCK
-    src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_context_init.c
-    "-Wl,--wrap=edhoc_context_init"
-)
-
 set(EDHOC_MESSAGE_1_PROCESS_MOCK
     src/edhoc/server/handshake/mocks/message_1/tst_srv_mock_edhoc_message_1_process.c
     "-Wl,--wrap=edhoc_message_1_process"
 )
 
 set(MESSAGE_1_PROCESS_MOCKS
-    ${EDHOC_CONTENT_INIT_MOCK}
     ${EDHOC_MESSAGE_1_PROCESS_MOCK}
 )
 
@@ -396,8 +390,11 @@ add_unity_test(test_coap_server_dispatch
     ${SERVER_SOURCES}
     ${COMMON_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/tst_srv_dispatch_stubs.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/dispatch/mocks/srv_mock_dispatch_deps.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.c
+    "-Wl,--wrap=calloc"
+    "-Wl,--wrap=com_edhoc_setup_context"
 )
 
 add_unity_test(test_integration

@@ -37,10 +37,9 @@ typedef bool (*srv_coap_connection_id_is_expected_fn)(
     const struct edhoc_context* edhoc_ctx);
 
 typedef struct srv_edhoc_message_1_responder_result (
-    *srv_edhoc_m1_responder_fn)(
-    struct srv_edhoc_message_1_responder_request request_data,
-    struct com_edhoc_parameters edhoc_parameters,
-    struct com_writable_buffer response_data);
+    *srv_edhoc_m1_responder_fn)(struct com_readonly_buffer request_data,
+                                struct edhoc_context* edhoc_context,
+                                struct com_writable_buffer response_data);
 
 typedef coap_pdu_code_t (*srv_edhoc_m1_process_result_fn)(
     struct srv_edhoc_message_1_responder_result message_1_result);

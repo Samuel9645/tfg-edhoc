@@ -1,10 +1,13 @@
 #include "srv_dispatch_engine.h"
 
+#include <stdlib.h>
+
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/server/oscore/srv_oscore_bind_session.h"
+#include "edhoc/common/com_edhoc_setup_context.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
 /**
@@ -50,18 +53,32 @@ static coap_pdu_code_t route_and_process_edhoc_message(
   };
 
   if (deps->is_message_1(parsed_request)) {
+    struct edhoc_context* edhoc_context =
+        calloc(1, sizeof(struct edhoc_context));
+    if (edhoc_context == NULL) {
+      coap_log_err("failed to allocate EDHOC context\n");
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    }
+
+    const struct com_edhoc_setup_context_result setup_context_result =
+        com_edhoc_setup_context(edhoc_context, edhoc_parameters);
+    if (setup_context_result.status != COM_EDHOC_SETUP_CTX_OK) {
+      coap_log_err("failed to setup EDHOC context\n");
+      srv_edhoc_cleanup_context(edhoc_context);
+      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
+    }
     const struct srv_coap_extract_message_1_result parsed_message_1 =
         deps->extract_message_1(parsed_request, response_buffer);
     if (parsed_message_1.status != SRV_COAP_EXTRACT_MSG1_OK) {
       coap_log_err("failed to parse Message 1\n");
+      srv_edhoc_cleanup_context(edhoc_context);
       return srv_coap_map_extract_message_1_to_pdu_code(
           parsed_message_1.status);
     }
-    const struct srv_edhoc_message_1_responder_request request = {
-        .message_1 = parsed_message_1.buffer};
+
     const struct srv_edhoc_message_1_responder_result message_1_result =
-        deps->respond_to_message_1(request, edhoc_parameters, response_buffer);
-    struct edhoc_context* edhoc_context = message_1_result.edhoc_ctx;
+        deps->respond_to_message_1(parsed_message_1.buffer, edhoc_context,
+                                   response_buffer);
     if (!add_payload_if_present(response, message_1_result.response,
                                 deps->add_response_payload)) {
       srv_edhoc_cleanup_context(edhoc_context);
@@ -72,12 +89,6 @@ static coap_pdu_code_t route_and_process_edhoc_message(
     if (process_m1_code != COAP_RESPONSE_CODE_CHANGED) {
       srv_edhoc_cleanup_context(edhoc_context);
       return process_m1_code;
-    }
-    if (edhoc_context == NULL) {
-      coap_log_err(
-          "SHOULD NEVER HAPPEN: Message 1 process success but context is "
-          "NULL\n");
-      return COAP_RESPONSE_CODE_INTERNAL_ERROR;
     }
     if (deps->set_context_by_cid(&edhoc_context->private_cid, edhoc_context) !=
         SRV_SESSION_SET_OK) {
@@ -105,6 +116,8 @@ static coap_pdu_code_t route_and_process_edhoc_message(
   struct edhoc_context* edhoc_context = get_result.context;
   if (!deps->connection_id_is_expected(&extracted_cid, edhoc_context)) {
     coap_log_err("unexpected Message 3 connection ID\n");
+    deps->remove_context_by_cid(&extracted_cid);
+    srv_edhoc_cleanup_context(edhoc_context);
     return COAP_RESPONSE_CODE_BAD_REQUEST;
   }
 
@@ -124,10 +137,10 @@ static coap_pdu_code_t route_and_process_edhoc_message(
   const coap_pdu_code_t process_message_3_code =
       deps->process_message_3_result(message_3_result);
   if (process_message_3_code != COAP_RESPONSE_CODE_CHANGED) {
-    coap_log_warn(
-        "EDHOC Message 3 failure: Removing context from dictionary\n");
+    coap_log_err("EDHOC Message 3 failure: Removing context from dictionary\n");
     deps->remove_context_by_cid(&extracted_cid);
     srv_edhoc_cleanup_context(edhoc_context);
+    return process_message_3_code;
   }
   const enum status_coap bind_status =
       deps->bind_oscore_session(context, edhoc_context);

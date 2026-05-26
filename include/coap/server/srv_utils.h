@@ -16,16 +16,6 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
                                           const char* listen_address_string);
 
 /**
- * @brief Join a multicast group for discovery traffic.
- *
- * @param[in] coap_context Active CoAP context.
- * @param[in] multicast_address_string Multicast group address.
- * @return Status code indicating the result of the operation
- */
-enum status_coap srv_coap_join_multicast_group(
-    coap_context_t* coap_context, const char* multicast_address_string);
-
-/**
  * @brief Add a POST resource and register its request handler.
  *
  * @param[in] coap_context Active CoAP context.

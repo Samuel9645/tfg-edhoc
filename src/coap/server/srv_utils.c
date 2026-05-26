@@ -48,22 +48,6 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
   return STATUS_COAP_OK;
 }
 
-enum status_coap srv_coap_join_multicast_group(
-    coap_context_t* coap_context, const char* multicast_address_string) {
-  if (coap_context == NULL || multicast_address_string == NULL) {
-    return STATUS_COAP_ERR;
-  }
-
-  const int join_result =
-      coap_join_mcast_group_intf(coap_context, multicast_address_string, NULL);
-  if (join_result < 0) {
-    coap_log_warn("cannot join multicast group %s\n", multicast_address_string);
-    return STATUS_COAP_ERR;
-  }
-
-  return STATUS_COAP_OK;
-}
-
 static enum status_coap add_resource_with_extra_flags(
     coap_context_t* coap_context, const char* resource_path,
     const coap_method_handler_t resource_handler, const coap_request_t method,

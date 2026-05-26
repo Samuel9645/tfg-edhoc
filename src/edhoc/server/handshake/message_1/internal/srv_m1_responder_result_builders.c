@@ -7,8 +7,6 @@
 
 #include "edhoc/server/handshake/message_1/internal/srv_m1_responder_result_builders.h"
 
-#include <stddef.h>
-
 struct srv_edhoc_message_1_responder_result srv_edhoc_message_1_responder_ok(
     const struct com_readonly_buffer message_2) {
   return (struct srv_edhoc_message_1_responder_result){

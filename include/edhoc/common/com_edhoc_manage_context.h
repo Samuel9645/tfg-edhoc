@@ -1,3 +1,11 @@
+/**
+ * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 04/04/2026
+ * @brief Module to manage EDHOC context creation and cleanup
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ * @see [libedhoc](https://github.com/kamil-kielbasa/libedhoc)
+ */
 #ifndef EDHOC_COMMON_EDHOC_SETUP_H_
 #define EDHOC_COMMON_EDHOC_SETUP_H_
 
@@ -48,5 +56,19 @@ struct com_edhoc_setup_context_result {
 struct com_edhoc_setup_context_result com_edhoc_setup_context(
     struct edhoc_context* context,
     struct com_edhoc_parameters edhoc_parameters);
+
+enum srv_edhoc_cleanup_context_status {
+  SRV_EDHOC_CLEANUP_OK = 0,
+  SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT,
+  SRV_EDHOC_CLEANUP_ERR_DEINIT
+};
+
+/**
+ * @brief Deinitializes and frees the memory associated with the given context
+ * @param context pointer to the context to clean up.
+ * @note On NULL pointer does nothing
+ */
+enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
+    struct edhoc_context* context);
 
 #endif  // EDHOC_COMMON_EDHOC_SETUP_H_

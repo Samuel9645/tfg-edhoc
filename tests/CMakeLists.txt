@@ -141,7 +141,7 @@ set(HANDSHAKE_ERROR_SUPPORT_SOURCES
 )
 
 set(SETUP_CONTEXT_MOCK
-    src/edhoc/common/setup_context/mocks/tst_com_mock_edhoc_setup_context.c
+    src/edhoc/common/manage_context/mocks/tst_com_mock_edhoc_setup_context.c
     "-Wl,--wrap=psa_crypto_init"
     "-Wl,--wrap=edhoc_context_init"
     "-Wl,--wrap=edhoc_set_methods"
@@ -153,13 +153,13 @@ set(SETUP_CONTEXT_MOCK
     "-Wl,--wrap=edhoc_bind_credentials"
 )
 
-set(SETUP_CONTEXT_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup_context.c
+set(MANAGE_CONTEXT_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/edhoc/common/com_edhoc_manage_context.c
 )
 
-add_unity_test(test_edhoc_setup_context
-    src/edhoc/common/setup_context/test_edhoc_setup_context.c
-    ${SETUP_CONTEXT_SOURCES}
+add_unity_test(test_edhoc_manage_context
+    src/edhoc/common/manage_context/test_edhoc_manage_context.c
+    ${MANAGE_CONTEXT_SOURCES}
     ${SETUP_CONTEXT_MOCK}
     ${HANDSHAKE_ERROR_SUPPORT_SOURCES}
 )

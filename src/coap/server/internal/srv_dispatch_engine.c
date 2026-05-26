@@ -7,8 +7,7 @@
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/server/oscore/srv_oscore_bind_session.h"
-#include "edhoc/common/com_edhoc_setup_context.h"
-#include "edhoc/server/handshake/message_1/srv_m1_process.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 
 /**
  * @brief Validate all required dependency function pointers are non-NULL.

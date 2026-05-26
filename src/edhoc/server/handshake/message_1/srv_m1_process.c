@@ -10,7 +10,6 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
-#include <stdlib.h>
 
 #include "edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.h"
 #include "edhoc/common/com_logging.h"
@@ -83,18 +82,4 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     return suite_mismatch_failure(process_error);
   }
   return ok();
-}
-
-enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
-    struct edhoc_context* context) {
-  if (context == NULL) {
-    return SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT;
-  }
-  const int deinit_failed = edhoc_context_deinit(context) != EDHOC_SUCCESS;
-  free(context);
-  return deinit_failed
-             ? (com_edhoc_log_error(
-                    "Cleanup error: Failed to deinitialize EDHOC context"),
-                SRV_EDHOC_CLEANUP_ERR_DEINIT)
-             : SRV_EDHOC_CLEANUP_OK;
 }

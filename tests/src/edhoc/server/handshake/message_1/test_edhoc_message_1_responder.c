@@ -18,7 +18,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 #include "edhoc/common/tst_edhoc_params.h"
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 #include "edhoc/server/handshake/message_1/srv_m1_responder.h"

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 
 static bool use_real_calloc = true;
 static bool use_real_setup_context = true;

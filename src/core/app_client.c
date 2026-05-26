@@ -13,7 +13,7 @@
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 #include "edhoc/common/com_generate_connection_id.h"
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"

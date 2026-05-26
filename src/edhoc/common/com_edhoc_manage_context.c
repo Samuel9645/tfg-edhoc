@@ -1,8 +1,16 @@
-
-#include "edhoc/common/com_edhoc_setup_context.h"
+/**
+ * @file
+ * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
+ * @since 04/04/2026
+ * @brief Module to manage EDHOC context creation and cleanup
+ * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
+ * @see [libedhoc](https://github.com/kamil-kielbasa/libedhoc)
+ */
+#include "edhoc/common/com_edhoc_manage_context.h"
 
 #include <edhoc_cipher_suite_2.h>
 #include <psa/crypto.h>
+#include <stdlib.h>
 
 #include "edhoc/common/com_logging.h"
 
@@ -94,4 +102,18 @@ struct com_edhoc_setup_context_result com_edhoc_setup_context(
     return failure(COM_EDHOC_SETUP_CTX_ERR_BIND_CREDENTIALS);
   }
   return ok();
+}
+
+enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
+    struct edhoc_context* context) {
+  if (context == NULL) {
+    return SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT;
+  }
+  const int deinit_failed = edhoc_context_deinit(context) != EDHOC_SUCCESS;
+  free(context);
+  return deinit_failed
+             ? (com_edhoc_log_error(
+                    "Cleanup error: Failed to deinitialize EDHOC context"),
+                SRV_EDHOC_CLEANUP_ERR_DEINIT)
+             : SRV_EDHOC_CLEANUP_OK;
 }

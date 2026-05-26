@@ -30,18 +30,4 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     struct com_readonly_buffer request, struct edhoc_context* edhoc_context,
     struct com_writable_buffer error_buffer);
 
-enum srv_edhoc_cleanup_context_status {
-  SRV_EDHOC_CLEANUP_OK = 0,
-  SRV_EDHOC_CLEANUP_ERR_NULL_CONTEXT,
-  SRV_EDHOC_CLEANUP_ERR_DEINIT
-};
-
-/**
- * @brief Deinitializes and frees the memory associated with the given context
- * @param context pointer to the context to clean up.
- * @note On NULL pointer does nothing
- */
-enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(
-    struct edhoc_context* context);
-
 #endif  // EDHOC_SERVER_HANDSHAKE_MESSAGE_1_SRV_M1_PROCESS_H_

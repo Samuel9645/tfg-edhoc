@@ -38,7 +38,7 @@ set(EDHOC_GENERATE_CID_SOURCES
 )
 
 set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_setup_context.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_manage_context.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_parameters.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_logging.c
     ${EDHOC_CIPHER_SUITES_SOURCES}

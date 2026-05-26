@@ -96,7 +96,7 @@ struct edhoc_process_result {
 // on success: caller -> edhoc_context_deinit(edhoc_context); free(edhoc_context);
 ```
 
-Refs: `include/edhoc/common/com_edhoc_setup_context.h`,
+Refs: `include/edhoc/common/com_edhoc_manage_context.h`,
 `include/edhoc/server/handshake/message_1/srv_m1_process_result.h`,
 `src/coap/common/internal/com_parse_edhoc_request_builders.c`.
 

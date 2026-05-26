@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "common/com_session_resources.h"
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 
 void cli_reset_edhoc_context(struct cli_resources* resources) {
   if (resources == NULL) {

@@ -11,7 +11,7 @@
 #include <string.h>
 #include <unity.h>
 
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 #include "edhoc/common/setup_context/mocks/tst_com_mock_edhoc_setup_context.h"
 #include "edhoc/common/tst_edhoc_params.h"
 

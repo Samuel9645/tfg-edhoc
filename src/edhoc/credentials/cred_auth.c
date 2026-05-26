@@ -1,8 +1,5 @@
 #include "edhoc/credentials/cred_auth.h"
 
-#include <edhoc.h>
-
-#include "edhoc/common/com_edhoc_setup_context.h"
 
 static void initialize_credential_key(struct edhoc_auth_creds* credentials,
                                       const uint8_t* public_key,

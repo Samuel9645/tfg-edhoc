@@ -15,7 +15,7 @@
 #include "coap/client/cli_exchange.h"
 #include "coap/client/internal/cli_exchange_internal.h"
 #include "coap/client/mocks/tst_mock_exchange_coap_send_deps.h"
-#include "edhoc/common/com_edhoc_setup_context.h"
+#include "edhoc/common/com_edhoc_manage_context.h"
 
 void setUp(void) { tst_cli_prepend_reset_all_mocks(); }
 

@@ -13,7 +13,7 @@
 #ifndef EDHOC_CREDENTIALS_CRED_AUTH_H_
 #define EDHOC_CREDENTIALS_CRED_AUTH_H_
 
-#include <edhoc_context.h>
+#include <edhoc.h>
 
 /**
  * @brief Fetch and setup authentication credentials

@@ -60,7 +60,7 @@ set(COMMON_COAP_SOURCES
 )
 
 set(COMMON_OSCORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/oscore/internal/common/com_oscore_get_algorithms.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/oscore/internal/common/com_oscore_get_configuration.c
 )
 
 set(BASE_SOURCES

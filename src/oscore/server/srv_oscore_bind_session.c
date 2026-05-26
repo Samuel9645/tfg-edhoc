@@ -8,94 +8,24 @@
  */
 #include "oscore/server/srv_oscore_bind_session.h"
 
-#include <stdio.h>
 #include <string.h>
 
-#include "oscore/internal/common/com_oscore_get_algorithms.h"
-
-static void bytes_to_hex_string(const uint8_t* bytes, const size_t length,
-                                char* output, const size_t hex_multiplier) {
-  for (size_t i = 0; i < length; i++) {
-    sprintf(output + i * hex_multiplier, "%02x", bytes[i]);
-  }
-}
+#include "oscore/internal/common/com_oscore_get_configuration.h"
 
 enum status_coap srv_oscore_bind_session(coap_context_t* coap_context,
                                          struct edhoc_context* edhoc_context) {
-  enum {
-    EDHOC_AES_CCM_KEY_SIZE_BYTES = 16,
-    EDHOC_OSCORE_SALT_SIZE_BYTES = 8,
-    EDHOC_MAX_CONNECTION_ID_SIZE_BYTES = 8
-  };
-
-  enum { HEX_CHARS_PER_BYTE = 2, STRING_TERMINATOR_SPACE = 1 };
-
-  enum {
-    OSCORE_SECRET_HEX_BUF_SIZE =
-        EDHOC_AES_CCM_KEY_SIZE_BYTES * HEX_CHARS_PER_BYTE +
-        STRING_TERMINATOR_SPACE,
-    OSCORE_SALT_HEX_BUF_SIZE =
-        EDHOC_OSCORE_SALT_SIZE_BYTES * HEX_CHARS_PER_BYTE +
-        STRING_TERMINATOR_SPACE,
-    OSCORE_ID_HEX_BUF_SIZE =
-        EDHOC_MAX_CONNECTION_ID_SIZE_BYTES * HEX_CHARS_PER_BYTE +
-        STRING_TERMINATOR_SPACE,
-    OSCORE_CONFIG_CSV_MAX_SIZE = 512
-  };
-
-  if (coap_context == NULL || edhoc_context == NULL) {
-    return STATUS_COAP_ERR;
-  }
-
-  uint8_t master_secret[EDHOC_AES_CCM_KEY_SIZE_BYTES];
-  uint8_t master_salt[EDHOC_OSCORE_SALT_SIZE_BYTES];
-  uint8_t sender_id[EDHOC_MAX_CONNECTION_ID_SIZE_BYTES];
-  uint8_t recipient_id[EDHOC_MAX_CONNECTION_ID_SIZE_BYTES];
-  size_t sender_id_len = 0;
-  size_t recipient_id_len = 0;
-
-  if (edhoc_export_oscore_session(
-          edhoc_context, master_secret, sizeof(master_secret), master_salt,
-          sizeof(master_salt), sender_id, sizeof(sender_id), &sender_id_len,
-          recipient_id, sizeof(recipient_id),
-          &recipient_id_len) != EDHOC_SUCCESS) {
+  char configuration_text[COM_OSCORE_CONFIG_CSV_MAX_SIZE] = {0};
+  const bool config_generated = com_oscore_build_config(
+      edhoc_context,
+      (struct com_writable_char_buffer){
+          .data = configuration_text, .capacity = sizeof(configuration_text)});
+  if (config_generated == false) {
     coap_log_err(
-        "OSCORE Binding: Failed to export secrets from EDHOC context (Err: "
-        ")\n");
+        "OSCORE Binding: Failed to generate OSCORE configuration from EDHOC "
+        "context\n");
     return STATUS_COAP_ERR;
   }
 
-  char secret_hex[OSCORE_SECRET_HEX_BUF_SIZE] = {0};
-  char salt_hex[OSCORE_SALT_HEX_BUF_SIZE] = {0};
-  char sender_hex[OSCORE_ID_HEX_BUF_SIZE] = {0};
-  char recipient_hex[OSCORE_ID_HEX_BUF_SIZE] = {0};
-
-  bytes_to_hex_string(master_secret, sizeof(master_secret), secret_hex,
-                      HEX_CHARS_PER_BYTE);
-  bytes_to_hex_string(master_salt, sizeof(master_salt), salt_hex,
-                      HEX_CHARS_PER_BYTE);
-  bytes_to_hex_string(sender_id, sender_id_len, sender_hex, HEX_CHARS_PER_BYTE);
-  bytes_to_hex_string(recipient_id, recipient_id_len, recipient_hex,
-                      HEX_CHARS_PER_BYTE);
-  const struct srv_oscore_algorithms algorithms =
-      com_oscore_get_algorithms(edhoc_context);
-  if (!algorithms.success) {
-    coap_log_err(
-        "OSCORE Binding: Unsupported cipher suite for OSCORE session "
-        "derivation\n");
-    return STATUS_COAP_ERR;
-  }
-
-  char configuration_text[OSCORE_CONFIG_CSV_MAX_SIZE] = {0};
-  snprintf(configuration_text, sizeof(configuration_text),
-           "master_secret,hex,%s\n"
-           "master_salt,hex,%s\n"
-           "sender_id,hex,%s\n"
-           "recipient_id,hex,%s\n"
-           "aead_alg,text,%s\n"
-           "hkdf_alg,text,%s\n",
-           secret_hex, salt_hex, sender_hex, recipient_hex,
-           algorithms.aead_algorithm, algorithms.hkdf_algorithm);
   const coap_str_const_t* configuration_data =
       coap_make_str_const(configuration_text);
 

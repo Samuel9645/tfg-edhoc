@@ -6,10 +6,12 @@
  * current CoAP context using EDHOC
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
-#include "../../../include/oscore/server/srv_oscore_bind_session.h"
+#include "oscore/server/srv_oscore_bind_session.h"
 
 #include <stdio.h>
 #include <string.h>
+
+#include "oscore/internal/common/com_oscore_get_algorithms.h"
 
 static void bytes_to_hex_string(const uint8_t* bytes, const size_t length,
                                 char* output, const size_t hex_multiplier) {
@@ -75,14 +77,25 @@ enum status_coap srv_oscore_bind_session(coap_context_t* coap_context,
   bytes_to_hex_string(sender_id, sender_id_len, sender_hex, HEX_CHARS_PER_BYTE);
   bytes_to_hex_string(recipient_id, recipient_id_len, recipient_hex,
                       HEX_CHARS_PER_BYTE);
+  const struct srv_oscore_algorithms algorithms =
+      com_oscore_get_algorithms(edhoc_context);
+  if (!algorithms.success) {
+    coap_log_err(
+        "OSCORE Binding: Unsupported cipher suite for OSCORE session "
+        "derivation\n");
+    return STATUS_COAP_ERR;
+  }
 
   char configuration_text[OSCORE_CONFIG_CSV_MAX_SIZE] = {0};
   snprintf(configuration_text, sizeof(configuration_text),
            "master_secret,hex,%s\n"
            "master_salt,hex,%s\n"
            "sender_id,hex,%s\n"
-           "recipient_id,hex,%s\n",
-           secret_hex, salt_hex, sender_hex, recipient_hex);
+           "recipient_id,hex,%s\n"
+           "aead_alg,text,%s\n"
+           "hkdf_alg,text,%s\n",
+           secret_hex, salt_hex, sender_hex, recipient_hex,
+           algorithms.aead_algorithm, algorithms.hkdf_algorithm);
   const coap_str_const_t* configuration_data =
       coap_make_str_const(configuration_text);
 

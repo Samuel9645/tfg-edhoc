@@ -59,6 +59,10 @@ set(COMMON_COAP_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_pdu_helpers.c
 )
 
+set(COMMON_OSCORE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/oscore/internal/common/com_oscore_get_algorithms.c
+)
+
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
@@ -67,6 +71,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c
     ${COMMON_COAP_SOURCES}
     ${COMMON_EDHOC_SOURCES}
+    ${COMMON_OSCORE_SOURCES}
 )
 
 set(MESSAGE_1_PROCESS_SOURCES

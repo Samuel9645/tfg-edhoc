@@ -7,9 +7,9 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #include <stdio.h>
-#include <string.h>
 
-#include "../../../include/oscore/server/srv_oscore_bind_session.h"
+#include "oscore/internal/common/com_oscore_get_algorithms.h"
+#include "oscore/server/srv_oscore_bind_session.h"
 
 static void bytes_to_hex_string(const uint8_t* bytes, const size_t length,
                                 char* output, const size_t hex_multiplier) {
@@ -77,6 +77,14 @@ coap_session_t* cli_oscore_create_session(coap_context_t* coap_context,
   bytes_to_hex_string(sender_id, sender_id_len, sender_hex, HEX_CHARS_PER_BYTE);
   bytes_to_hex_string(recipient_id, recipient_id_len, recipient_hex,
                       HEX_CHARS_PER_BYTE);
+  const struct srv_oscore_algorithms algorithms =
+      com_oscore_get_algorithms(edhoc_context);
+  if (!algorithms.success) {
+    coap_log_err(
+        "OSCORE Binding: Unsupported cipher suite for OSCORE session "
+        "derivation\n");
+    return NULL;
+  }
 
   char configuration_text[OSCORE_CONFIG_CSV_MAX_SIZE] = {0};
   snprintf(configuration_text, sizeof(configuration_text),

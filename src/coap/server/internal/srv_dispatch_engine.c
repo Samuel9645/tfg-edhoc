@@ -2,12 +2,12 @@
 
 #include <stdlib.h>
 
-#include "../../../../include/oscore/server/srv_oscore_bind_session.h"
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m1.h"
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "edhoc/common/com_edhoc_manage_context.h"
+#include "oscore/server/srv_oscore_bind_session.h"
 
 /**
  * @brief Validate all required dependency function pointers are non-NULL.

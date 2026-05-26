@@ -37,7 +37,7 @@ struct cli_edhoc_suites_negotiation_result {
 /**
  * @brief Checks if the Message 1 response error suggests renegotiation of
  * cipher suites
- * @param encoded_error_buffer View of the error response to Message 1
+ * @param[in] encoded_error_buffer View of the error response to Message 1
  * @return true if error buffer contains cipher suite mismatch error, false
  * otherwise
  */
@@ -47,13 +47,13 @@ bool cli_edhoc_error_suggests_renegotiation(
 /**
  * @brief Negotiates suites based on the initiator supported suites and the
  * given responder suites inside the encoded error buffer.
- * @param own_supported_suites List of cipher suites supported by the
+ * @param[in] own_supported_suites List of cipher suites supported by the
  * initiator.
- * @param own_initial_preferred_suites List of cipher suites preferred by the
- * initiator, in order of preference. This list must be a subset of the
+ * @param[in] own_initial_preferred_suites List of cipher suites preferred by
+ * the initiator, in order of preference. This list must be a subset of the
  * supported suites. They will be prepended to the renegotiation list if the
  * negotiation is successful.
- * @param encoded_error_buffer View of the error response to Message 1
+ * @param[in] encoded_error_buffer View of the error response to Message 1
  * @return Struct containing a status, the list of suites to
  * renegotiate, in order of preference and a reference to the selected suite on
  * success. On failure the list will be empty, the selected suite NULL and the

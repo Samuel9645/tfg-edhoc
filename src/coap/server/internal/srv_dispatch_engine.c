@@ -135,15 +135,14 @@ static coap_pdu_code_t route_and_process_edhoc_message(
 
   const coap_pdu_code_t process_message_3_code =
       deps->process_message_3_result(message_3_result);
+  deps->remove_context_by_cid(&extracted_cid);
   if (process_message_3_code != COAP_RESPONSE_CODE_CHANGED) {
     coap_log_err("EDHOC Message 3 failure: Removing context from dictionary\n");
-    deps->remove_context_by_cid(&extracted_cid);
     srv_edhoc_cleanup_context(edhoc_context);
     return process_message_3_code;
   }
   const enum status_coap bind_status =
       deps->bind_oscore_session(context, edhoc_context);
-  deps->remove_context_by_cid(&extracted_cid);
   srv_edhoc_cleanup_context(edhoc_context);
   if (bind_status != STATUS_COAP_OK) {
     coap_log_err("failed to bind OSCORE session\n");

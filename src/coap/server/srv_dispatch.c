@@ -1,5 +1,6 @@
 #include "coap/server/srv_dispatch.h"
 
+#include "../../../include/oscore/server/srv_oscore_bind_session.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_pdu_helpers.h"
 #include "coap/server/edhoc_message_process/srv_coap_m1_process.h"
@@ -8,7 +9,6 @@
 #include "coap/server/extract_edhoc_message/srv_coap_extract_m3.h"
 #include "coap/server/internal/srv_dispatch_engine.h"
 #include "coap/server/internal/srv_session.h"
-#include "coap/server/oscore/srv_oscore_bind_session.h"
 #include "edhoc/server/handshake/message_3/srv_m3_responder.h"
 
 static const struct srv_coap_dispatch_deps

@@ -6,7 +6,7 @@
  * current CoAP context using EDHOC
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
-#include "coap/server/oscore/srv_oscore_bind_session.h"
+#include "../../../include/oscore/server/srv_oscore_bind_session.h"
 
 #include <stdio.h>
 #include <string.h>

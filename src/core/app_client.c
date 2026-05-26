@@ -2,10 +2,10 @@
 
 #include <coap3/coap.h>
 
+#include "../../include/oscore/client/cli_oscore_create_session.h"
 #include "coap/client/cli_exchange.h"
 #include "coap/client/cli_resources.h"
 #include "coap/client/cli_utils.h"
-#include "coap/client/oscore/cli_oscore_create_session.h"
 #include "coap/coap_config.h"
 #include "coap/common/com_coap_context.h"
 #include "coap/common/com_coap_get_data.h"

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "coap/server/oscore/srv_oscore_bind_session.h"
+#include "../../../include/oscore/server/srv_oscore_bind_session.h"
 
 static void bytes_to_hex_string(const uint8_t* bytes, const size_t length,
                                 char* output, const size_t hex_multiplier) {

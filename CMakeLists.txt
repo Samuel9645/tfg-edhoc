@@ -108,7 +108,7 @@ set(COAP_EXTRACT_MESSAGE_3_SOURCES
 )
 
 set(SERVER_OSCORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/server/oscore/srv_oscore_bind_session.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/oscore/server/srv_oscore_bind_session.c
 )
 
 set(SERVER_SPECIFIC_SOURCES
@@ -133,7 +133,7 @@ set(SERVER_SOURCES
 )
 
 set(CLIENT_OSCORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/client/oscore/cli_oscore_create_session.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/oscore/client/cli_oscore_create_session.c
 )
 
 set(CLIENT_EXCHANGE_SOURCES

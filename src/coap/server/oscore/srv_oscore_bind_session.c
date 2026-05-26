@@ -83,12 +83,11 @@ enum status_coap srv_oscore_bind_session(coap_context_t* coap_context,
            "sender_id,hex,%s\n"
            "recipient_id,hex,%s\n",
            secret_hex, salt_hex, sender_hex, recipient_hex);
-  const coap_str_const_t configuration_data = {
-      .length = strlen(configuration_text),
-      .s = (const uint8_t*)configuration_text};
+  const coap_str_const_t* configuration_data =
+      coap_make_str_const(configuration_text);
 
   coap_oscore_conf_t* oscore_configuration =
-      coap_new_oscore_conf(configuration_data, NULL, NULL, 0);
+      coap_new_oscore_conf(*configuration_data, NULL, NULL, 0);
   if (oscore_configuration == NULL) {
     coap_log_err(
         "OSCORE Binding: libcoap failed to parse generated configuration "

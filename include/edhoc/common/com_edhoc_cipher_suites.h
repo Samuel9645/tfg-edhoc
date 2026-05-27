@@ -21,8 +21,8 @@ struct com_edhoc_cipher_suite_list {
   // WHY ARE WE USING DOUBLE POINTERS?
   // This ensures that only global cipher suites are being used
   // and prevents copying errors
-  const struct com_edhoc_cipher_suite_details* const* suites;
-  const size_t number_of_suites;
+  const struct com_edhoc_cipher_suite_details** suites;
+  size_t number_of_suites;
 };
 
 /**
@@ -33,6 +33,41 @@ struct com_edhoc_cipher_suite_list {
  * @return true if the struct is valid, false otherwise.
  */
 bool com_edhoc_cipher_suites_are_valid(struct com_edhoc_cipher_suite_list list);
+
+struct com_edhoc_create_cipher_suites_result {
+  bool success;
+  struct com_edhoc_cipher_suite_list cipher_suites;
+};
+
+const struct com_edhoc_cipher_suite_details*
+com_edhoc_get_cipher_suite_from_identifier(int identifier);
+
+/**
+ * @brief Creates a list of suites with the given suites identifiers.
+ * @param suites_identifiers Array of suite identifiers to create the list from.
+ * @param number_of_suites Number of suites in the array.
+ * @return A struct containing the cipher suite details for the given
+ * identifiers, or an empty list if any of the identifiers is invalid, with a
+ * success field indicating the result of the operation.
+ * @warning This function uses dynamic memory allocation to create the array of
+ * pointers. On failure this is freed before returning, but on success the
+ * caller is responsible for freeing the data, using
+ * com_edhoc_delete_created_cipher_suite_list.
+ */
+struct com_edhoc_create_cipher_suites_result
+com_edhoc_create_cipher_suites_from(const int* suites_identifiers,
+                                    size_t number_of_suites);
+
+/**
+ * @brief Frees the memory allocated for the list of cipher suites created with
+ * com_edhoc_create_cipher_suites_from.
+ * @param list list containing the data to be deleted
+ * @warning This function should only be used when deleting a list using
+ * com_edhoc_create_cipher_suites_from, as it assumes the data was allocated in
+ * a specific way.
+ */
+void com_edhoc_delete_created_cipher_suite_list(
+    struct com_edhoc_cipher_suite_list* list);
 
 extern const struct com_edhoc_cipher_suite_details COM_EDHOC_SUITE_0;
 extern const struct com_edhoc_cipher_suite_list COM_EDHOC_ONLY_SUITE_0;

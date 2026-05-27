@@ -10,9 +10,8 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
-
+#include "../../../../../include/common/com_logging.h"
 #include "edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.h"
-#include "edhoc/common/com_logging.h"
 
 static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {
   enum edhoc_error_code error;
@@ -57,16 +56,16 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
     struct edhoc_context* edhoc_context,
     const struct com_writable_buffer error_buffer) {
   if (!com_readonly_buffer_has_content(request)) {
-    com_edhoc_log_error("Message 1 Process error: Empty request buffer");
+    com_log_error("Message 1 Process error: Empty request buffer");
     return internal_failure(SRV_EDHOC_MSG1_PROCESS_ERR_EMPTY_REQUEST_BUFFER);
   }
   if (!com_writable_buffer_is_writable(error_buffer)) {
-    com_edhoc_log_error("Message 1 Process error: Invalid error buffer");
+    com_log_error("Message 1 Process error: Invalid error buffer");
     return invalid_error_buffer();
   }
 
   if (edhoc_context == NULL) {
-    com_edhoc_log_error("Message 1 Process error: Null context");
+    com_log_error("Message 1 Process error: Null context");
     return null_context_failure();
   }
 
@@ -76,8 +75,7 @@ struct srv_edhoc_message_1_process_result srv_edhoc_process_message_1(
         error_code_is_suite_mismatch(edhoc_context)
             ? com_edhoc_add_cipher_suite_mismatch_error(edhoc_context,
                                                         error_buffer)
-            : (com_edhoc_log_error(
-                   "Message 1 Process error: Processing failed"),
+            : (com_log_error("Message 1 Process error: Processing failed"),
                (struct com_readonly_buffer){0});
     return suite_mismatch_failure(process_error);
   }

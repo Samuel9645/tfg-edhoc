@@ -13,35 +13,7 @@
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
 #include "edhoc/common/com_edhoc_manage_context.h"
-#include "edhoc/common/com_generate_connection_id.h"
-#include "edhoc/credentials/cred_auth.h"
-#include "edhoc/credentials/cred_cli_key.h"
-#include "edhoc/credentials/cred_pub_data.h"
 #include "oscore/client/cli_oscore_create_session.h"
-
-static int client_credential_fetch(void* user_context,
-                                   struct edhoc_auth_creds* credentials) {
-  return cred_edhoc_auth_fetch(
-      user_context, credentials, CRED_EDHOC_PUB_CLI_PK,
-      CRED_EDHOC_PUB_PK_LENGTH, CRED_EDHOC_CLI_PRIVATE_KEY,
-      CRED_EDHOC_CLI_PRIVATE_KEY_LENGTH, CRED_EDHOC_PUB_CLI_KID);
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef (libedhoc signature
-// forces it)
-static int client_credential_verify(void* user_context,
-                                    struct edhoc_auth_creds* credentials,
-                                    const uint8_t** public_key_reference,
-                                    size_t* public_key_length) {
-  return cred_edhoc_auth_verify(
-      user_context, credentials, CRED_EDHOC_PUB_SRV_KID, CRED_EDHOC_PUB_SRV_PK,
-      CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
-}
-
-static const struct edhoc_credentials CREDENTIALS = {
-    .fetch = client_credential_fetch,
-    .verify = client_credential_verify,
-};
 
 static bool send_message(struct cli_coap_exchange* exchange,
                          const struct com_readonly_buffer payload) {
@@ -162,8 +134,7 @@ static struct cli_edhoc_negotiation_attempt_result
 cli_edhoc_resolve_negotiation(
     struct cli_resources* client_resources,
     const struct com_edhoc_parameters initial_edhoc_parameters,
-    const struct com_edhoc_cipher_suite_list supported_suites,
-    const struct com_edhoc_cipher_suite_list initial_preferred_suites,
+    const struct com_edhoc_cipher_suite_list preferred_suites,
     const struct com_writable_buffer payload_buffer) {
   const struct cli_edhoc_negotiation_attempt_result result =
       cli_edhoc_perform_negotiation_attempt(client_resources, payload_buffer);
@@ -175,8 +146,9 @@ cli_edhoc_resolve_negotiation(
     return result;
   }
   const struct cli_edhoc_suites_negotiation_result negotiation_result =
-      cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
-                                 result.response_payload);
+      cli_edhoc_negotiate_suites(
+          initial_edhoc_parameters.supported_cipher_suites, preferred_suites,
+          result.response_payload);
   if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
     return failure();
   }
@@ -192,7 +164,9 @@ cli_edhoc_resolve_negotiation(
                                                payload_buffer);
 }
 
-enum com_emulation_status core_run_client(void) {
+enum com_emulation_status core_run_client(
+    const struct com_edhoc_parameters edhoc_parameters,
+    const struct com_edhoc_cipher_suite_list preferred_suites) {
   coap_startup();
   coap_set_log_level(COAP_LOG_INFO);
 
@@ -222,22 +196,6 @@ enum com_emulation_status core_run_client(void) {
       .exchange_session = create_session_result.session,
   };
 
-  const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
-  const struct com_edhoc_cipher_suite_list SUPPORTED_SUITES =
-      COM_EDHOC_SUITES_2_0;
-  const struct com_edhoc_cipher_suite_list INITIAL_PREFERRED_SUITES =
-      COM_EDHOC_ONLY_SUITE_0;
-  const struct com_edhoc_parameters edhoc_parameters = {
-      .credentials = &CREDENTIALS,
-      .supported_cipher_suites = INITIAL_PREFERRED_SUITES,
-      .selected_cipher_suite = INITIAL_PREFERRED_SUITES.suites[0],
-      .methods =
-          {
-              .data = SUPPORTED_METHODS,
-              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
-          },
-      .generate_connection_id = com_generate_odd_cid,
-  };
   if (!cli_initialize_edhoc_context_with_parameters(&client_resources,
                                                     edhoc_parameters)) {
     cli_cleanup_resources(&client_resources);
@@ -261,9 +219,9 @@ enum com_emulation_status core_run_client(void) {
   }
 
   const struct cli_edhoc_negotiation_attempt_result
-      message_1_negotiation_attempt_result = cli_edhoc_resolve_negotiation(
-          &client_resources, edhoc_parameters, SUPPORTED_SUITES,
-          INITIAL_PREFERRED_SUITES, payload_buffer);
+      message_1_negotiation_attempt_result =
+          cli_edhoc_resolve_negotiation(&client_resources, edhoc_parameters,
+                                        preferred_suites, payload_buffer);
 
   if (message_1_negotiation_attempt_result.status != CLI_EDHOC_NEGOTIATION_OK) {
     coap_log_err("Handshake failed after all attempts\n");

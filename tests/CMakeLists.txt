@@ -314,6 +314,7 @@ add_unity_test(test_edhoc_negotiate_cipher_suites
     src/edhoc/client/test_edhoc_negotiate_cipher_suites.c
     ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/cli_negotiate_cipher_suites.c
     ${EDHOC_CIPHER_SUITES_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/common/com_logging.c
     ${EDHOC_PROCESS_ERROR_MOCK}
     ${CMAKE_SOURCE_DIR}/src/common/com_data_models.c
 )
@@ -395,6 +396,12 @@ add_unity_test(test_coap_server_dispatch
     ${CMAKE_SOURCE_DIR}/src/edhoc/server/handshake/message_3/internal/srv_m3_responder_result_builders.c
     "-Wl,--wrap=calloc"
     "-Wl,--wrap=com_edhoc_setup_context"
+)
+
+add_unity_test(test_parse_arguments
+    src/common/test_parse_arguments.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_logging.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_parse_arguments.c
 )
 
 add_unity_test(test_integration

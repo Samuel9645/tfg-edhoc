@@ -11,7 +11,7 @@
 #include <edhoc.h>
 #include <edhoc_helpers.h>
 
-#include "edhoc/common/com_logging.h"
+#include "../../../../../include/common/com_logging.h"
 
 static struct cli_edhoc_message_1_compose_result ok(
     const struct com_readonly_buffer message_1) {
@@ -40,14 +40,13 @@ struct cli_edhoc_message_1_compose_result cli_edhoc_compose_message_1(
   if (edhoc_message_1_compose(context, compose_buffer.bytes,
                               compose_buffer.capacity,
                               &message_1_length) != EDHOC_SUCCESS) {
-    com_edhoc_log_error(
-        "Message 1 Compose error: Failed to compose EDHOC message");
+    com_log_error("Message 1 Compose error: Failed to compose EDHOC message");
     return protocol_failure(CLI_EDHOC_MSG1_COMPOSE_ERR_EDHOC_MESSAGE_1_COMPOSE);
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, message_1_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    com_edhoc_log_error("Message 1 Compose error: Empty compose result");
+    com_log_error("Message 1 Compose error: Empty compose result");
     return protocol_failure(CLI_EDHOC_MSG1_COMPOSE_ERR_EMPTY_COMPOSE);
   }
   return ok(conversion_result.buffer);

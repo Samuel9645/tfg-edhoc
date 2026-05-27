@@ -10,7 +10,7 @@
 
 #include "edhoc/server/handshake/message_4/srv_m4_compose.h"
 
-#include "edhoc/common/com_logging.h"
+#include "../../../../../include/common/com_logging.h"
 
 static struct srv_edhoc_message_4_compose_result ok(
     const struct com_readonly_buffer buffer) {
@@ -40,7 +40,7 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
     return invalid_buffer();
   }
   if (context == NULL) {
-    com_edhoc_log_error("Message 4 Compose error: Null context");
+    com_log_error("Message 4 Compose error: Null context");
     return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_NULL_CONTEXT);
   }
 
@@ -48,13 +48,13 @@ struct srv_edhoc_message_4_compose_result srv_edhoc_compose_message_4(
   if (edhoc_message_4_compose(context, compose_buffer.bytes,
                               compose_buffer.capacity,
                               &written_length) != EDHOC_SUCCESS) {
-    com_edhoc_log_error("Message 4 Compose error: Composition failed");
+    com_log_error("Message 4 Compose error: Composition failed");
     return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_COMPOSE_FAILED);
   }
   const struct com_readonly_conversion_result conversion_result =
       com_writable_as_readonly(compose_buffer, written_length);
   if (conversion_result.status != COM_RDONLY_CONV_OK) {
-    com_edhoc_log_error("Message 4 Compose error: Empty compose result");
+    com_log_error("Message 4 Compose error: Empty compose result");
     return failure(SRV_EDHOC_MSG4_COMPOSE_ERR_EMPTY_COMPOSE);
   }
   return ok(conversion_result.buffer);

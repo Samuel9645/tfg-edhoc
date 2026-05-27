@@ -40,7 +40,7 @@ set(EDHOC_GENERATE_CID_SOURCES
 set(EDHOC_CONTEXT_INITIALIZATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_manage_context.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_edhoc_parameters.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/common/com_logging.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_logging.c
     ${EDHOC_CIPHER_SUITES_SOURCES}
 )
 
@@ -66,6 +66,8 @@ set(COMMON_OSCORE_SOURCES
 set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_logging.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_parse_arguments.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c

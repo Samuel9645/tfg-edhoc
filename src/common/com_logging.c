@@ -6,14 +6,19 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "edhoc/common/com_logging.h"
+#include "../../include/common/com_logging.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
-void com_edhoc_log_error(const char* message) {
-  if (message == NULL) {
+void com_log_error(const char* format, ...) {
+  if (format == NULL) {
     fprintf(stderr, "[EDHOC_LOCAL_ERR] NULL error message provided\n");
     return;
   }
-  fprintf(stderr, "[EDHOC_LOCAL_ERR] %s\n", message);
+  fprintf(stderr, "[EDHOC_LOCAL_ERR] ");
+  va_list args = {0};
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
 }

@@ -30,7 +30,9 @@ bool cli_reset_edhoc_context_with_new_suites_data(
       .supported_cipher_suites =
           {
               .number_of_suites = negotiated_suites.number_of_suites,
-              .suites = negotiated_suites.suites,
+              // TODO: maybe look this
+              .suites = (const struct com_edhoc_cipher_suite_details**)
+                            negotiated_suites.suites,
           },
       .selected_cipher_suite = selected_cipher_suite,
       .generate_connection_id = original_parameters.generate_connection_id};

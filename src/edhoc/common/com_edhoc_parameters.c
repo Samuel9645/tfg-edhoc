@@ -8,7 +8,7 @@
 
 #include "edhoc/common/com_edhoc_parameters.h"
 
-#include "edhoc/common/com_logging.h"
+#include "../../../include/common/com_logging.h"
 
 static struct com_edhoc_validate_parameters_result ok(void) {
   return (struct com_edhoc_validate_parameters_result){
@@ -51,38 +51,37 @@ struct com_edhoc_validate_parameters_result com_edhoc_validate_parameters(
   const struct com_edhoc_cipher_suite_list* supported_suites =
       &parameters->supported_cipher_suites;
   if (!com_edhoc_cipher_suites_are_valid(*supported_suites)) {
-    com_edhoc_log_error(
+    com_log_error(
         "EDHOC parameters validation error: Invalid supported cipher suites");
     return failure();
   }
   if (parameters->methods.data == NULL || parameters->methods.size == 0) {
-    com_edhoc_log_error(
-        "EDHOC parameters validation error: Invalid EDHOC methods");
+    com_log_error("EDHOC parameters validation error: Invalid EDHOC methods");
     return failure();
   }
   if (parameters->credentials == NULL) {
-    com_edhoc_log_error("EDHOC parameters validation error: Null credentials");
+    com_log_error("EDHOC parameters validation error: Null credentials");
     return failure();
   }
   if (parameters->selected_cipher_suite == NULL) {
-    com_edhoc_log_error(
+    com_log_error(
         "EDHOC parameters validation error: Invalid selected cipher suite");
     return failure();
   }
   if (parameters->generate_connection_id == NULL) {
-    com_edhoc_log_error(
+    com_log_error(
         "EDHOC parameters validation error: Null connection ID generator");
     return failure();
   }
   if (duplicated_suites_in(supported_suites)) {
-    com_edhoc_log_error(
+    com_log_error(
         "EDHOC parameters validation error: Duplicated cipher suites in "
         "supported list");
     return failure();
   }
   if (!suite_in_suites_list(parameters->selected_cipher_suite,
                             supported_suites)) {
-    com_edhoc_log_error(
+    com_log_error(
         "EDHOC parameters validation error: Selected cipher suite must be one "
         "of the supported ones");
     return failure();

@@ -43,7 +43,7 @@ struct com_coap_get_data_result com_coap_get_data(
   const uint8_t* data = NULL;
   if (!coap_get_data_large(pdu, &length, &data, &offset, &total_length) ||
       data == NULL) {
-    coap_log_err("failed to call coap_get_data \n");
+    coap_log_err("no data in PDU \n");
     return get_data_failure(COM_COAP_GET_DATA_ERR_NO_PAYLOAD);
   }
   if (offset != 0 || length != total_length) {
@@ -62,4 +62,12 @@ struct com_coap_get_data_result com_coap_get_data(
     return get_data_failure(COM_COAP_GET_DATA_ERR_NO_PAYLOAD);
   }
   return get_data_ok(conversion_result.buffer);
+}
+
+bool com_pdu_is_empty(const coap_pdu_t* pdu) {
+  size_t length = 0;
+  size_t offset = 0;
+  size_t total_length = 0;
+  const uint8_t* data = NULL;
+  return coap_get_data_large(pdu, &length, &data, &offset, &total_length) == 0;
 }

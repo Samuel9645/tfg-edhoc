@@ -36,4 +36,6 @@ struct com_coap_get_data_result {
 struct com_coap_get_data_result com_coap_get_data(
     const coap_pdu_t* pdu, struct com_writable_buffer data_buffer);
 
+bool com_pdu_is_empty(const coap_pdu_t* pdu);
+
 #endif  // COAP_COMMON_COAP_GET_DATA_H_

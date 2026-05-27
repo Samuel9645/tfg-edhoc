@@ -8,6 +8,7 @@
 #include "coap/client/cli_log_error.h"
 #include "coap/client/cli_utils.h"
 #include "coap/client/internal/cli_exchange_internal.h"
+#include "coap/common/com_coap_get_data.h"
 #include "coap/common/com_coap_parse_edhoc_request.h"
 #include "coap/common/com_coap_pdu_helpers.h"
 
@@ -38,21 +39,28 @@ static coap_response_t coap_client_coap_response_handler(
     return COAP_RESPONSE_OK;
   }
 
-  const struct com_coap_parse_edhoc_request_result parse_result =
-      com_coap_parse_edhoc_request(received, CONFIG_COAP_CONTENT_EDHOC,
-                                   exchange->incoming_response_buffer);
-  if (parse_result.status != COM_COAP_PARSE_EDHOC_REQ_OK) {
-    coap_log_err("failed to parse EDHOC response\n");
-    return COAP_RESPONSE_FAIL;
+  if (com_pdu_is_empty(received) && exchange->edhoc_exchange_is_complete) {
+    coap_log_info("received Message 3 empty confirmation\n");
+    exchange->internal_parsed_response.bytes = 0;
+    exchange->internal_parsed_response.length = 0;
+  } else {
+    const struct com_coap_parse_edhoc_request_result parse_result =
+        com_coap_parse_edhoc_request(received, CONFIG_COAP_CONTENT_EDHOC,
+                                     exchange->incoming_response_buffer);
+    if (parse_result.status != COM_COAP_PARSE_EDHOC_REQ_OK) {
+      coap_log_err("failed to parse EDHOC response\n");
+      return COAP_RESPONSE_FAIL;
+    }
+    exchange->internal_parsed_response.bytes =
+        parse_result.parsed_request.bytes;
+    exchange->internal_parsed_response.length =
+        parse_result.parsed_request.length;
   }
 
-  exchange->internal_parsed_response.bytes = parse_result.parsed_request.bytes;
-  exchange->internal_parsed_response.length =
-      parse_result.parsed_request.length;
   if (response_code != COAP_RESPONSE_CODE_CHANGED) {
     exchange->response_is_error = true;
     cli_coap_log_received_edhoc_error_response(response_code,
-                                               parse_result.parsed_request);
+                                               get_readonly_buffer(exchange));
   } else {
     exchange->response_is_error = false;
   }
@@ -63,8 +71,6 @@ void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange) {
   if (exchange == NULL) {
     return;
   }
-  coap_session_release(exchange->session_data.session);
-  coap_free_context(exchange->session_data.context);
   free(exchange);
 }
 
@@ -196,7 +202,8 @@ struct cli_coap_wait_and_get_result cli_coap_exchange_wait_and_get(
   }
   const struct com_readonly_buffer response_buffer =
       get_readonly_buffer(exchange);
-  if (!com_readonly_buffer_has_content(response_buffer)) {
+  if (!com_readonly_buffer_has_content(response_buffer) &&
+      !exchange->edhoc_exchange_is_complete) {
     coap_log_err("no response received\n");
     return wait_and_get_failure();
   }
@@ -306,5 +313,10 @@ enum status_coap cli_exchange_send_message_3(
       .buffer = prepended_message,
       .content_format = CONFIG_COAP_CONTENT_CID_EDHOC,
   };
-  return cli_coap_exchange_send(exchange, request_data);
+  const enum status_coap send_status =
+      cli_coap_exchange_send(exchange, request_data);
+  if (send_status == STATUS_COAP_OK) {
+    exchange->edhoc_exchange_is_complete = true;
+  }
+  return send_status;
 }

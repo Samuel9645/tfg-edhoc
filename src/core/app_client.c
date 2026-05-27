@@ -2,7 +2,6 @@
 
 #include <coap3/coap.h>
 
-#include "oscore/client/cli_oscore_create_session.h"
 #include "coap/client/cli_exchange.h"
 #include "coap/client/cli_resources.h"
 #include "coap/client/cli_utils.h"
@@ -18,6 +17,7 @@
 #include "edhoc/credentials/cred_auth.h"
 #include "edhoc/credentials/cred_cli_key.h"
 #include "edhoc/credentials/cred_pub_data.h"
+#include "oscore/client/cli_oscore_create_session.h"
 
 static int client_credential_fetch(void* user_context,
                                    struct edhoc_auth_creds* credentials) {
@@ -74,14 +74,6 @@ static coap_response_t client_temperature_handler(
   (void)session;
   (void)sent;
   (void)id;
-
-  const coap_pdu_code_t received_pdu_code = coap_pdu_get_code(received);
-
-  if (received_pdu_code != COAP_RESPONSE_CODE_CONTENT) {
-    coap_log_debug("Ignoring package with code: %d)\n", received_pdu_code);
-    return COAP_RESPONSE_OK;
-  }
-
   coap_log_info("Response received from server!\n");
   uint8_t response_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
   const struct com_writable_buffer response_data = {
@@ -136,14 +128,8 @@ static struct cli_edhoc_negotiation_attempt_result renegotiation(
 
 static struct cli_edhoc_negotiation_attempt_result
 cli_edhoc_perform_negotiation_attempt(
-    struct cli_resources* resources, const struct com_edhoc_parameters params,
+    struct cli_resources* resources,
     const struct com_writable_buffer payload_buffer) {
-  if (com_edhoc_setup_context(&resources->edhoc_context, params).status !=
-      COM_EDHOC_SETUP_CTX_OK) {
-    coap_log_err("Failed to initialize EDHOC context\n");
-    return failure();
-  }
-
   const struct cli_edhoc_message_1_compose_result compose_result =
       cli_edhoc_compose_message_1(&resources->edhoc_context, payload_buffer);
   if (compose_result.status != CLI_EDHOC_MSG1_COMPOSE_OK) {
@@ -155,32 +141,32 @@ cli_edhoc_perform_negotiation_attempt(
       STATUS_COAP_OK) {
     return failure();
   }
-  const struct cli_coap_wait_and_get_result wait_and_get_result =
+  const struct cli_coap_wait_and_get_result message_1_or_error_response =
       cli_coap_exchange_wait_and_get(exchange);
-  if (wait_and_get_result.status != STATUS_COAP_OK) {
+  if (message_1_or_error_response.status != STATUS_COAP_OK) {
     coap_log_err("Failed get Message 1 response\n");
     return failure();
   }
-  if (wait_and_get_result.response_is_error &&
-      cli_edhoc_error_suggests_renegotiation(wait_and_get_result.response)) {
+  if (message_1_or_error_response.response_is_error &&
+      cli_edhoc_error_suggests_renegotiation(
+          message_1_or_error_response.response)) {
     coap_log_info(
         "Received error response to Message 1, attempting renegotiation\n");
-    return renegotiation(wait_and_get_result);
+    return renegotiation(message_1_or_error_response);
   }
   coap_log_info("Received response to Message 1, proceeding with handshake\n");
-  return ok(wait_and_get_result);
+  return ok(message_1_or_error_response);
 }
 
 static struct cli_edhoc_negotiation_attempt_result
 cli_edhoc_resolve_negotiation(
     struct cli_resources* client_resources,
-    const struct com_edhoc_parameters edhoc_parameters,
+    const struct com_edhoc_parameters initial_edhoc_parameters,
     const struct com_edhoc_cipher_suite_list supported_suites,
     const struct com_edhoc_cipher_suite_list initial_preferred_suites,
     const struct com_writable_buffer payload_buffer) {
   const struct cli_edhoc_negotiation_attempt_result result =
-      cli_edhoc_perform_negotiation_attempt(client_resources, edhoc_parameters,
-                                            payload_buffer);
+      cli_edhoc_perform_negotiation_attempt(client_resources, payload_buffer);
   if (result.status == CLI_EDHOC_NEGOTIATION_ERR) {
     coap_log_err("Failed to perform initial EDHOC M1-M2 exchange\n");
     return result;
@@ -188,26 +174,21 @@ cli_edhoc_resolve_negotiation(
   if (result.status != CLI_EDHOC_NEGOTIATION_RENEGOTIATE) {
     return result;
   }
-  struct cli_edhoc_suites_negotiation_result negotiation_result =
+  const struct cli_edhoc_suites_negotiation_result negotiation_result =
       cli_edhoc_negotiate_suites(supported_suites, initial_preferred_suites,
                                  result.response_payload);
   if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
     return failure();
   }
-  const struct com_edhoc_parameters retry_params = {
-      .credentials = edhoc_parameters.credentials,
-      .methods = edhoc_parameters.methods,
-      .supported_cipher_suites =
-          {
-              .number_of_suites =
-                  negotiation_result.renegotiation_suites.number_of_suites,
-              .suites = negotiation_result.renegotiation_suites.suites,
-          },
-      .selected_cipher_suite = negotiation_result.selected_suite,
-      .generate_connection_id = edhoc_parameters.generate_connection_id};
-  cli_reset_edhoc_context(client_resources);
+  if (!cli_reset_edhoc_context_with_new_suites_data(
+          client_resources, initial_edhoc_parameters,
+          negotiation_result.selected_suite,
+          negotiation_result.renegotiation_suites)) {
+    coap_log_err("Failed to reset EDHOC context with new suites data\n");
+    return failure();
+  }
 
-  return cli_edhoc_perform_negotiation_attempt(client_resources, retry_params,
+  return cli_edhoc_perform_negotiation_attempt(client_resources,
                                                payload_buffer);
 }
 
@@ -236,6 +217,10 @@ enum com_emulation_status core_run_client(void) {
   if (create_session_result.status != CLI_COAP_CREATE_SESSION_OK) {
     return COM_EMULATION_FAILURE;
   }
+  struct cli_resources client_resources = {
+      .coap_context = create_context_result.context,
+      .exchange_session = create_session_result.session,
+  };
 
   const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
   const struct com_edhoc_cipher_suite_list SUPPORTED_SUITES =
@@ -253,8 +238,12 @@ enum com_emulation_status core_run_client(void) {
           },
       .generate_connection_id = com_generate_odd_cid,
   };
+  if (!cli_initialize_edhoc_context_with_parameters(&client_resources,
+                                                    edhoc_parameters)) {
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
 
-  struct cli_resources client_resources = {0};
   const struct com_writable_buffer payload_buffer = {
       .bytes = client_resources.payload, .capacity = CONFIG_COAP_MAX_PDU_SIZE};
   const struct cli_coap_exchange_session_data session_data = {
@@ -267,6 +256,7 @@ enum com_emulation_status core_run_client(void) {
       cli_coap_init_exchange(&session_data, payload_buffer);
   if (client_resources.exchange == NULL) {
     coap_log_err("Failed to initialize CoAP exchange\n");
+    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
@@ -312,6 +302,19 @@ enum com_emulation_status core_run_client(void) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
+  const struct cli_coap_wait_and_get_result message_3_or_error_response =
+      cli_coap_exchange_wait_and_get(exchange);
+  if (message_3_or_error_response.status != STATUS_COAP_OK) {
+    cli_cleanup_resources(&client_resources);
+    coap_log_err("Failed to get Message 3 response\n");
+    return COM_EMULATION_FAILURE;
+  }
+  if (message_3_or_error_response.response_is_error) {
+    coap_log_err("Received error response to Message 3");
+    cli_cleanup_resources(&client_resources);
+    return COM_EMULATION_FAILURE;
+  }
+
   coap_log_info("Handshake finished successfully. Activating OSCORE...\n");
 
   const char CLIENT_TEMPERATURE_URI[] =
@@ -323,11 +326,11 @@ enum com_emulation_status core_run_client(void) {
     return COM_EMULATION_FAILURE;
   }
 
-  coap_session_t* oscore_session = cli_oscore_create_session(
+  client_resources.oscore_session = cli_oscore_create_session(
       create_context_result.context, &client_resources.edhoc_context,
       &parse_temp_uri_result.address);
 
-  if (oscore_session == NULL) {
+  if (client_resources.oscore_session == NULL) {
     coap_log_err("Client failed to establish OSCORE session context\n");
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
@@ -341,32 +344,32 @@ enum com_emulation_status core_run_client(void) {
       .uri = &parse_temp_uri_result.uri,
       .address = &parse_temp_uri_result.address};
   struct cli_coap_prepare_pdu_result prepare_result =
-      cli_coap_prepare_get_request(endpoint_configuration, oscore_session);
+      cli_coap_prepare_get_request(endpoint_configuration,
+                                   client_resources.oscore_session);
 
   if (prepare_result.status != CLI_COAP_PREPARE_PDU_OK) {
-    coap_session_release(oscore_session);
+    coap_session_release(client_resources.oscore_session);
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
   temperature_received = false;
-  if (cli_coap_send_coap_request(oscore_session, prepare_result.pdu) !=
-      STATUS_COAP_OK) {
+  if (cli_coap_send_coap_request(client_resources.oscore_session,
+                                 prepare_result.pdu) != STATUS_COAP_OK) {
     coap_delete_pdu(prepare_result.pdu);
-    coap_session_release(oscore_session);
+    coap_session_release(client_resources.oscore_session);
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
 
-  cli_coap_wait_for_coap_response(create_context_result.context, oscore_session,
+  cli_coap_wait_for_coap_response(create_context_result.context,
+                                  client_resources.oscore_session,
                                   &temperature_received);
+  coap_session_release(client_resources.oscore_session);
+  cli_cleanup_resources(&client_resources);
   if (!temperature_received) {
     coap_log_err("Key Confirmation Failed: No encrypted response received.\n");
-    coap_session_release(oscore_session);
-    cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
   }
-  coap_session_release(oscore_session);
-  cli_cleanup_resources(&client_resources);
   return COM_EMULATION_SUCCESS;
 }

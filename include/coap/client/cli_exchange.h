@@ -68,10 +68,11 @@ struct cli_coap_exchange* cli_coap_init_exchange(
     struct com_writable_buffer response_buffer);
 
 /**
- * @brief Cleans up any CoAP related resources and resets session state.
- * @param exchange exchange containing the CoAP data to clean up
- * @note This function frees the exchange struct and any associated resources.
- * After calling this function, the exchange pointer should not be used.
+ * @brief Deallocates the exchange
+ * @param exchange exchange to deallocate
+ * @warning Resources such as the CoAP session and context are not managed by
+ * this function and should be cleaned up separately. This function only frees
+ * the memory allocated for the exchange struct itself.
  */
 void cli_coap_cleanup_exchange(struct cli_coap_exchange* exchange);
 

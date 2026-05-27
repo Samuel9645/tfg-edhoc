@@ -15,6 +15,11 @@ struct cli_coap_exchange {
   struct cli_coap_exchange_session_data session_data;
   bool have_response;
   bool response_is_error;
+  // This field is used to track the state of the EDHOC exchange, since Message
+  // 4 is optional, the server will respond to Message 3 with an empty PDU, this
+  // field ensures that no empty messages are allowed until the Message 3 is
+  // sent
+  bool edhoc_exchange_is_complete;
   struct com_writable_buffer incoming_response_buffer;
   enum status_coap (*send_data)(struct cli_coap_exchange* exchange,
                                 struct cli_coap_exchange_request request_data);

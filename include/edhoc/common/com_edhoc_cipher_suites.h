@@ -39,9 +39,6 @@ struct com_edhoc_create_cipher_suites_result {
   struct com_edhoc_cipher_suite_list cipher_suites;
 };
 
-const struct com_edhoc_cipher_suite_details*
-com_edhoc_get_cipher_suite_from_identifier(int identifier);
-
 /**
  * @brief Creates a list of suites with the given suites identifiers.
  * @param suites_identifiers Array of suite identifiers to create the list from.

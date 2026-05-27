@@ -38,8 +38,8 @@ bool com_edhoc_cipher_suites_are_valid(
   return true;
 }
 
-const struct com_edhoc_cipher_suite_details*
-com_edhoc_get_cipher_suite_from_identifier(const int identifier) {
+static const struct com_edhoc_cipher_suite_details*
+get_cipher_suite_from_identifier(const int identifier) {
   switch (identifier) {
   case 0:
     return &COM_EDHOC_SUITE_0;
@@ -65,7 +65,7 @@ com_edhoc_create_cipher_suites_from(const int* suites_identifiers,
   }
   for (size_t i = 0; i < number_of_suites; i++) {
     const struct com_edhoc_cipher_suite_details* suite_details =
-        com_edhoc_get_cipher_suite_from_identifier(suites_identifiers[i]);
+        get_cipher_suite_from_identifier(suites_identifiers[i]);
     if (suite_details == NULL) {
       free(suites_buffer);
       com_log_error(

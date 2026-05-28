@@ -1,5 +1,7 @@
 #include "app/app_server.h"
 #include "common/com_parse_arguments.h"
+#include "edhoc/common/com_edhoc_cipher_suites.h"
+#include "edhoc/common/com_edhoc_parameters.h"
 #include "edhoc/common/com_generate_connection_id.h"
 #include "edhoc/credentials/cred_srv.h"
 

@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "app/app_client.h"
 #include "common/com_parse_arguments.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
@@ -11,7 +9,7 @@ int main(const int argc, char* argv[]) {
   const struct com_parse_arguments_result parse_result =
       parse_arguments(argv, argc);
   if (!parse_result.success) {
-    return EXIT_FAILURE;
+    return -1;
   }
   struct com_edhoc_create_cipher_suites_result supported_suites_result =
       com_edhoc_create_cipher_suites_from(
@@ -20,7 +18,7 @@ int main(const int argc, char* argv[]) {
   if (!supported_suites_result.success) {
     com_edhoc_delete_created_cipher_suite_list(
         &supported_suites_result.cipher_suites);
-    return EXIT_FAILURE;
+    return -1;
   }
   struct com_edhoc_create_cipher_suites_result preferred_suites_result =
       com_edhoc_create_cipher_suites_from(
@@ -31,7 +29,7 @@ int main(const int argc, char* argv[]) {
         &supported_suites_result.cipher_suites);
     com_edhoc_delete_created_cipher_suite_list(
         &preferred_suites_result.cipher_suites);
-    return EXIT_FAILURE;
+    return -1;
   }
 
   const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
@@ -53,7 +51,7 @@ int main(const int argc, char* argv[]) {
         &supported_suites_result.cipher_suites);
     com_edhoc_delete_created_cipher_suite_list(
         &preferred_suites_result.cipher_suites);
-    return EXIT_FAILURE;
+    return -1;
   }
 
   const enum com_emulation_status status =
@@ -62,5 +60,5 @@ int main(const int argc, char* argv[]) {
       &supported_suites_result.cipher_suites);
   com_edhoc_delete_created_cipher_suite_list(
       &preferred_suites_result.cipher_suites);
-  return status == COM_EMULATION_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
+  return status == COM_EMULATION_SUCCESS ? 0 : -1;
 }

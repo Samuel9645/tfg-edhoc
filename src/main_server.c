@@ -1,3 +1,61 @@
 #include "app/app_server.h"
+#include "common/com_parse_arguments.h"
+#include "edhoc/common/com_generate_connection_id.h"
+#include "edhoc/credentials/cred_srv.h"
 
-int main(void) { return core_run_server(); }
+int main(const int argc, char* argv[]) {
+  const struct com_parse_arguments_result parse_result =
+      parse_arguments(argv, argc);
+  if (!parse_result.success) {
+    return -1;
+  }
+  struct com_edhoc_create_cipher_suites_result supported_suites_result =
+      com_edhoc_create_cipher_suites_from(
+          parse_result.arguments.supported_suites.identifiers,
+          parse_result.arguments.supported_suites.count);
+  if (!supported_suites_result.success) {
+    com_edhoc_delete_created_cipher_suite_list(
+        &supported_suites_result.cipher_suites);
+    return -1;
+  }
+  struct com_edhoc_create_cipher_suites_result preferred_suites_result =
+      com_edhoc_create_cipher_suites_from(
+          parse_result.arguments.preferred_suites.identifiers,
+          parse_result.arguments.preferred_suites.count);
+  if (!preferred_suites_result.success) {
+    com_edhoc_delete_created_cipher_suite_list(
+        &supported_suites_result.cipher_suites);
+    com_edhoc_delete_created_cipher_suite_list(
+        &preferred_suites_result.cipher_suites);
+    return -1;
+  }
+
+  const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
+  struct com_edhoc_parameters edhoc_parameters = {
+      .credentials = &CRED_EDHOC_SRV,
+      .supported_cipher_suites = supported_suites_result.cipher_suites,
+      .selected_cipher_suite = preferred_suites_result.cipher_suites.suites[0],
+      .methods =
+          {
+              .data = SUPPORTED_METHODS,
+              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
+          },
+      .generate_connection_id = com_generate_odd_cid,
+  };
+  const struct com_edhoc_validate_parameters_result validate_result =
+      com_edhoc_validate_parameters(&edhoc_parameters);
+  if (!validate_result.valid_parameters) {
+    com_edhoc_delete_created_cipher_suite_list(
+        &supported_suites_result.cipher_suites);
+    com_edhoc_delete_created_cipher_suite_list(
+        &preferred_suites_result.cipher_suites);
+    return -1;
+  }
+
+  const enum com_emulation_status status = core_run_server(&edhoc_parameters);
+  com_edhoc_delete_created_cipher_suite_list(
+      &supported_suites_result.cipher_suites);
+  com_edhoc_delete_created_cipher_suite_list(
+      &preferred_suites_result.cipher_suites);
+  return status == COM_EMULATION_SUCCESS ? 0 : -1;
+}

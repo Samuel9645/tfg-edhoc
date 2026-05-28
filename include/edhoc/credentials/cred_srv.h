@@ -12,6 +12,6 @@
 
 #include <edhoc.h>
 
-extern const struct edhoc_credentials CRED_EDHOC_SRV_CRED;
+extern const struct edhoc_credentials CRED_EDHOC_SRV;
 
 #endif  // EDHOC_CREDENTIALS_CRED_SRV_H_

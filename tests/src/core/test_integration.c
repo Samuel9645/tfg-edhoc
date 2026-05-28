@@ -25,7 +25,7 @@ void test_standalone_binaries_handshake(void) {
 
   if (server_pid == 0) {
     // --- CHILD: Use the absolute path provided by CMake ---
-    execl(SERVER_PATH, "server", (char*)NULL);
+    execl(SERVER_PATH, "server", "-p", "2", "-s", "2", NULL);
 
     exit(EXIT_FAILURE);
   }

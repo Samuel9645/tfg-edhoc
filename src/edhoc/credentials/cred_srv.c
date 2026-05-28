@@ -22,7 +22,7 @@ static int server_credential_verify(void* user_context,
       CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
 }
 
-const struct edhoc_credentials CRED_EDHOC_SRV_CRED = {
+const struct edhoc_credentials CRED_EDHOC_SRV = {
     .fetch = server_credential_fetch,
     .verify = server_credential_verify,
 };

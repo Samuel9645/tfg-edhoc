@@ -67,7 +67,7 @@ set(BASE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_data_models.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common/com_session_resources.c
     ${CMAKE_SOURCE_DIR}/src/common/com_logging.c
-    ${CMAKE_SOURCE_DIR}/src/common/com_parse_arguments.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_parse_suites_arguments.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_pub_data.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_auth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/coap/common/com_coap_context.c
@@ -208,7 +208,6 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
 endif ()
 
-option(ENABLE_UNITY_TESTS "Build Unity test binaries" ON)
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   # Production / Emulation Mode: Maximum performance matching libcoap
   set(PROD_OPTIMIZATION_FLAGS "-O3" "-flto" "-fomit-frame-pointer" "-DNDEBUG")
@@ -217,7 +216,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_options(client PRIVATE "-Wall" "-Wextra" "-Wpedantic" ${PROD_OPTIMIZATION_FLAGS})
   target_link_options(server PRIVATE "-flto")
   target_link_options(client PRIVATE "-flto")
-  set(ENABLE_UNITY_TESTS OFF)
 else ()
   # Development / Testing Mode: Your baseline with Sanitizers active
   set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")

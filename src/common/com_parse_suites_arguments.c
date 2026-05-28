@@ -6,7 +6,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "common/com_parse_arguments.h"
+#include "common/com_parse_suites_arguments.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -14,14 +14,6 @@
 #include <string.h>
 
 #include "common/com_logging.h"
-
-static void log_usage(const char* program_name) {
-  com_log_error(
-      "Usage error. Format: %s -p|--preferred [ <id1> <id2> ...] "
-      "-s|--supported [ <id1> <id2> ...]\n"
-      "Max %d identifiers allowed per list.\n",
-      program_name, COM_MAX_SUITES_IDENTIFIERS);
-}
 
 struct com_parse_identifier_result {
   bool success;
@@ -70,15 +62,27 @@ static bool append_suite_identifier(
   return true;
 }
 
-struct com_parse_arguments_result parse_arguments(char* arguments[],
-                                                  const size_t size) {
+void log_usage(void) {
+  com_log_error(
+      "Expected format: -p|--preferred [ <id1> <id2> ...] -s|--supported [ "
+      "<id1> <id2> ...]\n");
+}
+
+void log_error_and_usage(const char* error_message) {
+  com_log_error("%s", error_message);
+  log_usage();
+}
+
+struct com_parse_suites_arguments_result com_parse_suites_arguments(
+    char* arguments[], const size_t size) {
   if (arguments == NULL || size < 3) {
-    log_usage(arguments == NULL ? "ERROR unnamed program" : arguments[0]);
-    return (struct com_parse_arguments_result){.success = false};
+    log_error_and_usage(
+        "Invalid arguments: arguments array is NULL or too small\n");
+    return (struct com_parse_suites_arguments_result){.success = false};
   }
   if (!argument_is_preferred_tag(arguments[1])) {
-    log_usage(arguments[0]);
-    return (struct com_parse_arguments_result){.success = false};
+    log_error_and_usage("First argument must be -p or --preferred\n");
+    return (struct com_parse_suites_arguments_result){.success = false};
   }
   struct com_cipher_suite_identifiers preferred_suites_identifiers = {0};
   struct com_cipher_suite_identifiers supported_suites_identifiers = {0};
@@ -92,14 +96,15 @@ struct com_parse_arguments_result parse_arguments(char* arguments[],
       continue;
     }
     if (argument_is_preferred_tag(current_argument)) {
-      log_usage(arguments[0]);
-      return (struct com_parse_arguments_result){.success = false};
+      log_error_and_usage("Preferred tag cannot appear after supported tag\n");
+      return (struct com_parse_suites_arguments_result){.success = false};
     }
     const struct com_parse_identifier_result parse_result =
         parse_identifier(current_argument);
     if (!parse_result.success) {
       com_log_error("Invalid cipher suite identifier: %s\n", current_argument);
-      return (struct com_parse_arguments_result){.success = false};
+      log_usage();
+      return (struct com_parse_suites_arguments_result){.success = false};
     }
 
     bool append_success = false;
@@ -113,17 +118,19 @@ struct com_parse_arguments_result parse_arguments(char* arguments[],
           "supported");
     }
     if (!append_success) {
-      return (struct com_parse_arguments_result){.success = false};
+      return (struct com_parse_suites_arguments_result){.success = false};
     }
   }
 
   if (preferred_suites_identifiers.count == 0 ||
       supported_suites_identifiers.count == 0) {
-    log_usage(arguments[0]);
-    return (struct com_parse_arguments_result){.success = false};
+    log_error_and_usage(
+        "At least one preferred and one supported suite identifier must be "
+        "provided\n");
+    return (struct com_parse_suites_arguments_result){.success = false};
   }
 
-  return (struct com_parse_arguments_result){
+  return (struct com_parse_suites_arguments_result){
       .success = true,
       .arguments = {
           .preferred_suites = preferred_suites_identifiers,

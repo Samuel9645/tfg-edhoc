@@ -8,14 +8,14 @@
 
 #include <unity.h>
 
-#include "common/com_parse_arguments.h"
+#include "common/com_parse_suites_arguments.h"
 
 void test_ok_on_valid_data(void) {
-  char* arguments[] = {"client", "-p", "2", "-s", "2", "0"};
+  char* arguments[] = {"-p", "2", "-s", "2", "0"};
   const size_t size = sizeof(arguments) / sizeof(arguments[0]);
 
-  const struct com_parse_arguments_result result =
-      parse_arguments(arguments, size);
+  const struct com_parse_suites_arguments_result result =
+      com_parse_suites_arguments(arguments, size);
 
   TEST_ASSERT_TRUE(result.success);
   TEST_ASSERT_EQUAL_size_t(2, result.arguments.supported_suites.count);
@@ -26,11 +26,11 @@ void test_ok_on_valid_data(void) {
 }
 
 void test_fails_on_invalid_data(void) {
-  char* missing_preferred_tag[] = {"client", "2", "-s", "2", "0"};
-  char* missing_supported_tag[] = {"client", "-p", "2", "2", "0"};
-  char* missing_supported[] = {"client", "-p", "2", "-s"};
-  char* missing_preferred[] = {"client", "-p", "-s", "2", "0"};
-  char* non_numeric[] = {"client", "-p", "2", "-s", "2", "x"};
+  char* missing_preferred_tag[] = {"2", "-s", "2", "0"};
+  char* missing_supported_tag[] = {"-p", "2", "2", "0"};
+  char* missing_supported[] = {"-p", "2", "-s"};
+  char* missing_preferred[] = {"-p", "-s", "2", "0"};
+  char* non_numeric[] = {"-p", "2", "-s", "2", "x"};
 
   const struct {
     const char* description;
@@ -55,8 +55,8 @@ void test_fails_on_invalid_data(void) {
   const size_t num_cases = sizeof(test_cases) / sizeof(test_cases[0]);
 
   for (size_t i = 0; i < num_cases; i++) {
-    const struct com_parse_arguments_result result =
-        parse_arguments(test_cases[i].arguments, test_cases[i].size);
+    const struct com_parse_suites_arguments_result result =
+        com_parse_suites_arguments(test_cases[i].arguments, test_cases[i].size);
 
     TEST_ASSERT_FALSE_MESSAGE(result.success, test_cases[i].description);
   }

@@ -398,10 +398,10 @@ add_unity_test(test_coap_server_dispatch
     "-Wl,--wrap=com_edhoc_setup_context"
 )
 
-add_unity_test(test_parse_arguments
-    src/common/test_parse_arguments.c
+add_unity_test(test_parse_suites_arguments
+    src/common/test_parse_suites_arguments.c
     ${CMAKE_SOURCE_DIR}/src/common/com_logging.c
-    ${CMAKE_SOURCE_DIR}/src/common/com_parse_arguments.c
+    ${CMAKE_SOURCE_DIR}/src/common/com_parse_suites_arguments.c
 )
 
 add_unity_test(test_integration

@@ -1,13 +1,13 @@
 #include "app/app_client.h"
-#include "common/com_parse_arguments.h"
+#include "common/com_parse_suites_arguments.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 #include "edhoc/common/com_edhoc_parameters.h"
 #include "edhoc/common/com_generate_connection_id.h"
 #include "edhoc/credentials/cred_cli.h"
 
 int main(const int argc, char* argv[]) {
-  const struct com_parse_arguments_result parse_result =
-      parse_arguments(argv, argc);
+  const struct com_parse_suites_arguments_result parse_result =
+      com_parse_suites_arguments(argv, argc);
   if (!parse_result.success) {
     return -1;
   }

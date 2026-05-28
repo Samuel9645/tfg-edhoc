@@ -1,6 +1,7 @@
 #include "coap/server/srv_utils.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "coap/common/com_coap_status.h"
 
@@ -15,13 +16,15 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
   const uint32_t scheme_hints_bits = coap_get_available_scheme_hint_bits(
       has_pki_psk_info, use_web_sockets, COAP_PROTO_NONE);
 
-  const coap_str_const_t* listen_address =
-      coap_make_str_const(listen_address_string);
+  const coap_str_const_t listen_address = {
+      .length = strlen(listen_address_string),
+      .s = (const uint8_t*)listen_address_string,
+  };
 
   enum { USE_DEFAULT_PORT_DATA = 0, NO_AI_HINT_FLAGS = 0 };
 
   coap_addr_info_t* endpoint_info_list = coap_resolve_address_info(
-      listen_address, USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA,
+      &listen_address, USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA,
       USE_DEFAULT_PORT_DATA, USE_DEFAULT_PORT_DATA, NO_AI_HINT_FLAGS,
       (int)scheme_hints_bits, COAP_RESOLVE_TYPE_LOCAL);
 
@@ -41,7 +44,7 @@ enum status_coap srv_coap_setup_endpoints(coap_context_t* coap_context,
   coap_free_address_info(endpoint_info_list);
   if (!has_endpoint) {
     coap_log_err("No context available for interface '%s'\n",
-                 (const char*)listen_address->s);
+                 (const char*)listen_address.s);
     return STATUS_COAP_ERR;
   }
 
@@ -59,8 +62,10 @@ static enum status_coap add_resource_with_extra_flags(
 
   enum { MEMORY_HANDLING_FLAGS = 0 };
 
-  coap_resource_t* resource = coap_resource_init(
-      coap_make_str_const(resource_path), MEMORY_HANDLING_FLAGS | extra_flags);
+  coap_str_const_t path_data = {.length = strlen(resource_path),
+                                .s = (const uint8_t*)resource_path};
+  coap_resource_t* resource =
+      coap_resource_init(&path_data, MEMORY_HANDLING_FLAGS | extra_flags);
   if (resource == NULL) {
     coap_log_err("cannot create resource\n");
     return STATUS_COAP_ERR;

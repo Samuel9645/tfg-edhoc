@@ -7,6 +7,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 #include <stdio.h>
+#include <string.h>
 
 #include "oscore/internal/common/com_oscore_get_configuration.h"
 #include "oscore/server/srv_oscore_bind_session.h"
@@ -25,11 +26,12 @@ coap_session_t* cli_oscore_create_session(coap_context_t* coap_context,
         "context\n");
     return NULL;
   }
-  const coap_str_const_t* configuration_data =
-      coap_make_str_const(configuration_text);
+  const coap_str_const_t configuration_data = {
+      .length = strlen(configuration_text),
+      .s = (const uint8_t*)configuration_text};
 
   coap_oscore_conf_t* oscore_configuration =
-      coap_new_oscore_conf(*configuration_data, NULL, NULL, 0);
+      coap_new_oscore_conf(configuration_data, NULL, NULL, 0);
   if (oscore_configuration == NULL) {
     coap_log_err(
         "OSCORE Create session Error: libcoap failed to parse generated "

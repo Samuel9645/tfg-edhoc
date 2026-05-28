@@ -38,7 +38,8 @@ static bool send_message(struct cli_coap_exchange* exchange,
   return true;
 }
 
-static bool temperature_received = false;
+static bool response_received = false;
+static bool error_response = false;
 
 static coap_response_t client_temperature_handler(
     // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -48,6 +49,14 @@ static coap_response_t client_temperature_handler(
   (void)sent;
   (void)id;
   coap_log_info("Response received from server!\n");
+  response_received = true;
+  const coap_pdu_code_t pdu_code = coap_pdu_get_code(received);
+  if (pdu_code != COAP_RESPONSE_CODE_CONTENT) {
+    coap_log_err("Received error response from server with PDU: ");
+    error_response = true;
+    coap_show_pdu(COAP_LOG_ERR, received);
+    return COAP_RESPONSE_OK;
+  }
   uint8_t response_buffer[CONFIG_COAP_MAX_PDU_SIZE] = {0};
   const struct com_writable_buffer response_data = {
       .bytes = response_buffer, .capacity = sizeof(response_buffer)};
@@ -55,16 +64,15 @@ static coap_response_t client_temperature_handler(
       com_coap_get_data(received, response_data);
   if (get_data_result.status != COM_COAP_GET_DATA_OK) {
     coap_log_err("Failed to get response data\n");
-    return COAP_RESPONSE_FAIL;
+    return COAP_RESPONSE_OK;
   }
   if (!com_readonly_buffer_has_content(get_data_result.data)) {
     coap_log_err("Response data is empty\n");
-    return COAP_RESPONSE_FAIL;
+    return COAP_RESPONSE_OK;
   }
   coap_log_info("Received response data: %.*s\n",
                 (int)get_data_result.data.length,
                 (const char*)get_data_result.data.bytes);
-  temperature_received = true;
   return COAP_RESPONSE_OK;
 }
 
@@ -165,6 +173,20 @@ cli_edhoc_resolve_negotiation(
                                                payload_buffer);
 }
 
+static bool build_server_uri(char* destination_buffer, const size_t buffer_size,
+                             const char* server_ip, const char* resource_path) {
+  const int bytes_written =
+      snprintf(destination_buffer, buffer_size, "coap://%s:5683/%s", server_ip,
+               resource_path);
+
+  if (bytes_written < 0 || (size_t)bytes_written >= buffer_size) {
+    com_log_error("Error: Server IP address or URI path '%s' is too long.\n",
+                  resource_path);
+    return false;
+  }
+  return true;
+}
+
 enum com_emulation_status core_run_client(
     const struct com_edhoc_parameters edhoc_parameters,
     const struct com_edhoc_cipher_suite_list preferred_suites,
@@ -172,13 +194,15 @@ enum com_emulation_status core_run_client(
   coap_startup();
   coap_set_log_level(COAP_LOG_INFO);
 
-  char server_edhoc_uri[256] = {0};
-  int uri_bytes_written =
-      snprintf(server_edhoc_uri, sizeof(server_edhoc_uri),
-               "coap://%s:5683/.well-known/edhoc", server_ip);
-  if (uri_bytes_written < 0 ||
-      (size_t)uri_bytes_written >= sizeof(server_edhoc_uri)) {
-    com_log_error("Error: Server IP address or URI is too long.\n");
+  enum { SERVER_URI_BUFFER_SIZE = 256 };
+
+  char server_edhoc_uri[SERVER_URI_BUFFER_SIZE] = {0};
+  char server_oscore_resource_uri[SERVER_URI_BUFFER_SIZE] = {0};
+  if (!build_server_uri(server_edhoc_uri, sizeof(server_edhoc_uri), server_ip,
+                        ".well-known/edhoc") ||
+      !build_server_uri(server_oscore_resource_uri,
+                        sizeof(server_oscore_resource_uri), server_ip,
+                        "sensors/temperature")) {
     return COM_EMULATION_FAILURE;
   }
   struct cli_coap_parse_and_resolve_result parse_and_resolve_uri_result =
@@ -284,10 +308,8 @@ enum com_emulation_status core_run_client(
 
   coap_log_info("Handshake finished successfully. Activating OSCORE...\n");
 
-  const char CLIENT_TEMPERATURE_URI[] =
-      "coap://localhost:5683/sensors/temperature";
   struct cli_coap_parse_and_resolve_result parse_temp_uri_result =
-      cli_coap_parse_and_resolve_coap_uri(CLIENT_TEMPERATURE_URI);
+      cli_coap_parse_and_resolve_coap_uri(server_oscore_resource_uri);
   if (parse_temp_uri_result.status != CLI_COAP_PARSE_AND_RESOLVE_OK) {
     cli_cleanup_resources(&client_resources);
     return COM_EMULATION_FAILURE;
@@ -320,7 +342,7 @@ enum com_emulation_status core_run_client(
     return COM_EMULATION_FAILURE;
   }
 
-  temperature_received = false;
+  response_received = false;
   if (cli_coap_send_coap_request(client_resources.oscore_session,
                                  prepare_result.pdu) != STATUS_COAP_OK) {
     coap_delete_pdu(prepare_result.pdu);
@@ -331,10 +353,16 @@ enum com_emulation_status core_run_client(
 
   cli_coap_wait_for_coap_response(create_context_result.context,
                                   client_resources.oscore_session,
-                                  &temperature_received);
+                                  &response_received);
   coap_session_release(client_resources.oscore_session);
   cli_cleanup_resources(&client_resources);
-  if (!temperature_received) {
+  if (error_response) {
+    coap_log_err(
+        "Key Confirmation Failed: Received error response to encrypted "
+        "request.\n");
+    return COM_EMULATION_FAILURE;
+  }
+  if (!response_received) {
     coap_log_err("Key Confirmation Failed: No encrypted response received.\n");
     return COM_EMULATION_FAILURE;
   }

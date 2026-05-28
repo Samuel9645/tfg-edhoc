@@ -26,11 +26,12 @@ enum status_coap srv_oscore_bind_session(coap_context_t* coap_context,
     return STATUS_COAP_ERR;
   }
 
-  const coap_str_const_t* configuration_data =
-      coap_make_str_const(configuration_text);
+  const coap_str_const_t configuration_data = {
+      .s = (const uint8_t*)configuration_text,
+      .length = strlen(configuration_text)};
 
   coap_oscore_conf_t* oscore_configuration =
-      coap_new_oscore_conf(*configuration_data, NULL, NULL, 0);
+      coap_new_oscore_conf(configuration_data, NULL, NULL, 0);
   if (oscore_configuration == NULL) {
     coap_log_err(
         "OSCORE Binding: libcoap failed to parse generated configuration "

@@ -41,7 +41,7 @@ static void temperature_get_handler(coap_resource_t* resource,
 enum com_emulation_status core_run_server(
     struct com_edhoc_parameters* edhoc_parameters) {
   coap_startup();
-  coap_set_log_level(COAP_LOG_INFO);
+  coap_set_log_level(COAP_LOG_DEBUG);
   const struct com_coap_create_context_result initialization_result =
       com_coap_create_context();
   if (initialization_result.status != COM_COAP_INIT_OK) {

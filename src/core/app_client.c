@@ -192,7 +192,7 @@ enum com_emulation_status core_run_client(
     const struct com_edhoc_cipher_suite_list preferred_suites,
     const char* server_ip) {
   coap_startup();
-  coap_set_log_level(COAP_LOG_INFO);
+  coap_set_log_level(COAP_LOG_DEBUG);
 
   enum { SERVER_URI_BUFFER_SIZE = 256 };
 

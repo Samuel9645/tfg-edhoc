@@ -1,64 +1,95 @@
 services:
-  router:
-    image: ubuntu:24.04
+  # =========================================================
+  # AMBIENT TOPOLOGY: The Explicit Router Bridge
+  # =========================================================
+  iiot-router:
+    image: iiot-base-image
     container_name: iiot-router
     privileged: true
     volumes:
-      - ../scripts:/scripts
+      - ../scripts/setup-network:/scripts
     networks:
       client-network:
         ipv4_address: 192.168.10.2
       server-network:
         ipv4_address: 192.168.20.2
     command: >
-      bash -c "apt-get update && apt-get install -y iproute2 &&
-               sysctl -w net.ipv4.ip_forward=1 &&
-               tail -f /dev/null"
+      /bin/bash -c "sysctl -w net.ipv4.ip_forward=1 && tail -f /dev/null"
 
-  server:
-    image: ubuntu:24.04
-    container_name: iiot-server
+  # =========================================================
+  # PHASE 1: libcoap Baseline Testing (IPs end in .10)
+  # =========================================================
+  dtls-server:
+    build: .
+    image: iiot-base-image
+    container_name: iiot-dtls-server
     volumes:
-      - ../../build/bin:/app
-      - ../:/comparison
+      - ../traces:/traces
+      - ./certs/server:/certs
+      - ../scripts/server:/scripts
     networks:
       server-network:
-        ipv4_address: 192.168.20.3
+        ipv4_address: 192.168.20.10  # 🚀 Dedicated IP
     cap_add:
       - NET_ADMIN
-    # 1. Installs tools -> 2. Tweaks routes -> 3. Starts background tcpdump -> 4. Runs server -> 5. Kills tcpdump when server stops
-    command: >
-      bash -c "sleep 10 &&
-               apt-get update && apt-get install -y iproute2 tcpdump && 
-               ip route del default && 
-               ip route add default via 192.168.20.2 && 
-               echo 'Starting background packet capture...' &&
-               tcpdump -i any -w /comparison/captura_automatica.pcap \"udp port 5683 or udp port 5684\" &
-               TCPDUMP_PID=$$! &&
-               sleep 2 &&
-               echo 'Starting Server binary...' &&
-               /app/server -p 2 -s 2 &&
-               echo 'Server stopped. Cleaning up tcpdump...' &&
-               kill $$TCPDUMP_PID &&
-               tail -f /dev/null"
+    command: [
+      "/bin/bash", "/scripts/run.sh",
+      "dtls_${SCENARIO:-A}",
+      "coap-server", "-v", "9", "-A", "0.0.0.0", "-p", "5683", "-c", "/certs/server.crt", "-j", "/certs/server.key", "-R", "/certs/ca.crt"
+    ]
 
-  client:
-    image: ubuntu:24.04
-    container_name: iiot-client
+  dtls-client:
+    image: iiot-base-image
+    container_name: iiot-dtls-client
     volumes:
-      - ../../build/bin:/app
+      - ./certs/client:/certs
+      - ../scripts/client:/scripts
     networks:
       client-network:
-        ipv4_address: 192.168.10.3
+        ipv4_address: 192.168.10.10  # 🚀 Dedicated IP
     cap_add:
       - NET_ADMIN
-    command: >
-      bash -c "sleep 15 &&
-               apt-get update && apt-get install -y iproute2 &&
-               ip route del default &&
-               ip route add default via 192.168.10.2 &&
-               echo 'Starting Client binary...' &&
-               /app/client -p 2 -s 2 192.168.20.3"
+    command: [
+      "/bin/bash", "/scripts/run.sh",
+      "coap-client", "-v", "9", "-m", "get", "-c", "/certs/client.crt", "-j", "/certs/client.key", "-R", "/certs/ca.crt", "coaps://192.168.20.10:5684/"
+    ]
+
+  # =========================================================
+  # PHASE 2: Custom App Testing (IPs end in .20)
+  # =========================================================
+  edhoc-server:
+    image: iiot-base-image
+    container_name: iiot-edhoc-server
+    volumes:
+      - ../../build/bin:/app
+      - ../traces:/traces
+      - ../scripts/server:/scripts
+    networks:
+      server-network:
+        ipv4_address: 192.168.20.20  # 🚀 Dedicated IP
+    cap_add:
+      - NET_ADMIN
+    command: [
+      "/bin/bash", "/scripts/run.sh",
+      "edhoc_${SCENARIO:-A}",
+      "/app/server", "-p", "2", "-s", "2"
+    ]
+
+  edhoc-client:
+    image: iiot-base-image
+    container_name: iiot-edhoc-client
+    volumes:
+      - ../../build/bin:/app
+      - ../scripts/client:/scripts
+    networks:
+      client-network:
+        ipv4_address: 192.168.10.20  # 🚀 Dedicated IP
+    cap_add:
+      - NET_ADMIN
+    command: [
+      "/bin/bash", "/scripts/run.sh",
+      "/app/client", "-p", "2", "-s", "2", "192.168.20.20"
+    ]
 
 networks:
   client-network:

@@ -12,7 +12,6 @@
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
-#include "edhoc/common/com_edhoc_manage_context.h"
 #include "oscore/client/cli_oscore_create_session.h"
 
 static bool send_message(struct cli_coap_exchange* exchange,

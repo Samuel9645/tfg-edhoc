@@ -5,41 +5,7 @@
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 #include "edhoc/common/com_edhoc_parameters.h"
 #include "edhoc/common/com_generate_connection_id.h"
-#include "edhoc/credentials/cred_auth.h"
-#include "edhoc/credentials/cred_cli_key.h"
-#include "edhoc/credentials/cred_pub_data.h"
-
-static int client_credential_fetch(void* user_context,
-                                   struct edhoc_auth_creds* credentials) {
-  return cred_edhoc_auth_fetch(
-      user_context, credentials, CRED_EDHOC_PUB_CLI_PK,
-      CRED_EDHOC_PUB_PK_LENGTH, CRED_EDHOC_CLI_PRIVATE_KEY,
-      CRED_EDHOC_CLI_PRIVATE_KEY_LENGTH, CRED_EDHOC_PUB_CLI_KID);
-}
-
-// ReSharper disable once CppParameterMayBeConstPtrOrRef (libedhoc signature
-// forces it)
-static int client_credential_verify(void* user_context,
-                                    struct edhoc_auth_creds* credentials,
-                                    const uint8_t** public_key_reference,
-                                    size_t* public_key_length) {
-  return cred_edhoc_auth_verify(
-      user_context, credentials, CRED_EDHOC_PUB_SRV_KID, CRED_EDHOC_PUB_SRV_PK,
-      CRED_EDHOC_PUB_PK_LENGTH, public_key_reference, public_key_length);
-}
-
-static const struct edhoc_credentials CREDENTIALS = {
-    .fetch = client_credential_fetch,
-    .verify = client_credential_verify,
-};
-
-static const enum edhoc_method SUPPORTED_METHODS_ARRAY[] = {EDHOC_METHOD_0};
-
-static const struct com_edhoc_methods SUPPORTED_METHODS = {
-    .data = SUPPORTED_METHODS_ARRAY,
-    .size =
-        sizeof(SUPPORTED_METHODS_ARRAY) / sizeof(SUPPORTED_METHODS_ARRAY[0]),
-};
+#include "edhoc/credentials/cred_cli.h"
 
 int main(const int argc, char* argv[]) {
   const struct com_parse_arguments_result parse_result =
@@ -67,11 +33,17 @@ int main(const int argc, char* argv[]) {
         &preferred_suites_result.cipher_suites);
     return EXIT_FAILURE;
   }
+
+  const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
   const struct com_edhoc_parameters edhoc_parameters = {
-      .credentials = &CREDENTIALS,
+      .credentials = &CRED_EDHOC_CLI,
       .supported_cipher_suites = supported_suites_result.cipher_suites,
       .selected_cipher_suite = preferred_suites_result.cipher_suites.suites[0],
-      .methods = SUPPORTED_METHODS,
+      .methods =
+          {
+              .data = SUPPORTED_METHODS,
+              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
+          },
       .generate_connection_id = com_generate_even_cid,
   };
   const struct com_edhoc_validate_parameters_result validate_result =

@@ -152,6 +152,7 @@ set(CLIENT_EXCHANGE_SOURCES
 
 set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/app_client.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/credentials/cred_cli.c
     ${CLIENT_EXCHANGE_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/cli_negotiate_cipher_suites.c

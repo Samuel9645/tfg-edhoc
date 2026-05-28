@@ -12,6 +12,6 @@
 
 #include <edhoc.h>
 
-extern const struct edhoc_credentials CRED_EDHOC_SRV;
+struct edhoc_credentials get_server_credentials(void);
 
 #endif  // EDHOC_CREDENTIALS_CRED_SRV_H_

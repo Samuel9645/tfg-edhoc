@@ -12,6 +12,6 @@
 
 #include <edhoc.h>
 
-extern const struct edhoc_credentials CRED_EDHOC_CLI;
+struct edhoc_credentials get_client_credentials(void);
 
 #endif  // EDHOC_CREDENTIALS_CRED_CLI_H_

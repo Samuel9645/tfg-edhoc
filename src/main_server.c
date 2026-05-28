@@ -32,18 +32,20 @@ int main(const int argc, char* argv[]) {
     return -1;
   }
 
-  const enum edhoc_method SUPPORTED_METHODS[] = {EDHOC_METHOD_0};
+  const enum edhoc_method supported_methods[] = {EDHOC_METHOD_0};
+  const struct edhoc_credentials credentials = get_server_credentials();
   struct com_edhoc_parameters edhoc_parameters = {
-      .credentials = &CRED_EDHOC_SRV,
+      .credentials = &credentials,
       .supported_cipher_suites = supported_suites_result.cipher_suites,
       .selected_cipher_suite = preferred_suites_result.cipher_suites.suites[0],
       .methods =
           {
-              .data = SUPPORTED_METHODS,
-              .size = sizeof(SUPPORTED_METHODS) / sizeof(SUPPORTED_METHODS[0]),
+              .data = supported_methods,
+              .size = sizeof(supported_methods) / sizeof(supported_methods[0]),
           },
       .generate_connection_id = com_generate_odd_cid,
   };
+
   const struct com_edhoc_validate_parameters_result validate_result =
       com_edhoc_validate_parameters(&edhoc_parameters);
   if (!validate_result.valid_parameters) {

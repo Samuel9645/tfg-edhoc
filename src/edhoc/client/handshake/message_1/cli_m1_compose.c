@@ -11,7 +11,7 @@
 #include <edhoc.h>
 #include <edhoc_helpers.h>
 
-#include "../../../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static struct cli_edhoc_message_1_compose_result ok(
     const struct com_readonly_buffer message_1) {

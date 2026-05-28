@@ -10,7 +10,7 @@
 
 #include "edhoc/server/handshake/message_2/srv_m2_compose.h"
 
-#include "../../../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static struct srv_edhoc_message_2_compose_result ok(
     const struct com_readonly_buffer buffer) {

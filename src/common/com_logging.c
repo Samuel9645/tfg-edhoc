@@ -6,7 +6,7 @@
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 
-#include "../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 #include <stdarg.h>
 #include <stdio.h>

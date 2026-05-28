@@ -8,7 +8,7 @@
 
 #include "edhoc/common/com_edhoc_parameters.h"
 
-#include "../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static struct com_edhoc_validate_parameters_result ok(void) {
   return (struct com_edhoc_validate_parameters_result){

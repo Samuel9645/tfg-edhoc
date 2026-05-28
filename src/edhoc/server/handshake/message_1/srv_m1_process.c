@@ -10,7 +10,7 @@
 
 #include "edhoc/server/handshake/message_1/srv_m1_process.h"
 
-#include "../../../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 #include "edhoc/common/add_error/com_edhoc_add_cipher_suite_mismatch_error.h"
 
 static bool error_code_is_suite_mismatch(const struct edhoc_context* context) {

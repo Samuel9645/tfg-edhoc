@@ -13,7 +13,7 @@
 #include <edhoc_cipher_suite_2.h>
 #include <stdlib.h>
 
-#include "../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static bool suites_details_are_valid(
     const struct com_edhoc_cipher_suite_details* details) {

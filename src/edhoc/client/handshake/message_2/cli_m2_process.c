@@ -8,7 +8,7 @@
 
 #include "edhoc/client/handshake/message_2/cli_m2_process.h"
 
-#include "../../../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static struct cli_edhoc_message_2_process_result ok(void) {
   return (struct cli_edhoc_message_2_process_result){

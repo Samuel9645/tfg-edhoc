@@ -12,7 +12,7 @@
 
 #include <edhoc.h>
 
-#include "../../../../../include/common/com_logging.h"
+#include "common/com_logging.h"
 
 static struct srv_edhoc_message_3_process_result ok(void) {
   return (struct srv_edhoc_message_3_process_result){

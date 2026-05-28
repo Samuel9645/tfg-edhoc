@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
- * @since 12/05/2026
+ * @sincecommon/com_parse_suites_arguments.c05/2026
  * @brief Declarations for the srv_coap_m1_parse_result_builders module.
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */

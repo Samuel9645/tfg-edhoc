@@ -75,12 +75,12 @@ void log_error_and_usage(const char* error_message) {
 
 struct com_parse_suites_arguments_result com_parse_suites_arguments(
     char* arguments[], const size_t size) {
-  if (arguments == NULL || size < 3) {
+  if (arguments == NULL || size < 4) {
     log_error_and_usage(
         "Invalid arguments: arguments array is NULL or too small\n");
     return (struct com_parse_suites_arguments_result){.success = false};
   }
-  if (!argument_is_preferred_tag(arguments[1])) {
+  if (!argument_is_preferred_tag(arguments[0])) {
     log_error_and_usage("First argument must be -p or --preferred\n");
     return (struct com_parse_suites_arguments_result){.success = false};
   }
@@ -89,14 +89,14 @@ struct com_parse_suites_arguments_result com_parse_suites_arguments(
 
   enum { MODE_PREFERRED, MODE_SUPPORTED } current_mode = MODE_PREFERRED;
 
-  for (size_t i = 2; i < size; i++) {
+  for (size_t i = 1; i < size; i++) {
     const char* current_argument = arguments[i];
     if (argument_is_supported_tag(current_argument)) {
       current_mode = MODE_SUPPORTED;
       continue;
     }
     if (argument_is_preferred_tag(current_argument)) {
-      log_error_and_usage("Preferred tag cannot appear after supported tag\n");
+      log_error_and_usage("Duplicated preferred tag\n");
       return (struct com_parse_suites_arguments_result){.success = false};
     }
     const struct com_parse_identifier_result parse_result =

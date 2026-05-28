@@ -1,4 +1,5 @@
 #include "app/app_client.h"
+#include "common/com_logging.h"
 #include "common/com_parse_suites_arguments.h"
 #include "edhoc/common/com_edhoc_cipher_suites.h"
 #include "edhoc/common/com_edhoc_parameters.h"
@@ -6,8 +7,16 @@
 #include "edhoc/credentials/cred_cli.h"
 
 int main(const int argc, char* argv[]) {
+  if (argc < 4) {
+    com_log_error("Error: Missing server IP address argument.\n");
+    com_log_error(
+        "Usage: %s -p|--preferred [ <id1> <id2> ...] "
+        "-s|--supported [ <id1> <id2> ...] <server_ip>\n",
+        argv[0]);
+    return -1;
+  }
   const struct com_parse_suites_arguments_result parse_result =
-      com_parse_suites_arguments(argv, argc);
+      com_parse_suites_arguments(argv + 1, argc - 2);
   if (!parse_result.success) {
     return -1;
   }
@@ -54,9 +63,9 @@ int main(const int argc, char* argv[]) {
         &preferred_suites_result.cipher_suites);
     return -1;
   }
-
-  const enum com_emulation_status status =
-      core_run_client(edhoc_parameters, preferred_suites_result.cipher_suites);
+  const char* server_ip = argv[argc - 1];
+  const enum com_emulation_status status = core_run_client(
+      edhoc_parameters, preferred_suites_result.cipher_suites, server_ip);
   com_edhoc_delete_created_cipher_suite_list(
       &supported_suites_result.cipher_suites);
   com_edhoc_delete_created_cipher_suite_list(

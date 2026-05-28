@@ -1,6 +1,7 @@
 #include "app/app_client.h"
 
 #include <coap3/coap.h>
+#include <stdio.h>
 
 #include "coap/client/cli_exchange.h"
 #include "coap/client/cli_resources.h"
@@ -9,6 +10,7 @@
 #include "coap/common/com_coap_context.h"
 #include "coap/common/com_coap_get_data.h"
 #include "common/com_emulation.h"
+#include "common/com_logging.h"
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
 #include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
@@ -165,14 +167,22 @@ cli_edhoc_resolve_negotiation(
 
 enum com_emulation_status core_run_client(
     const struct com_edhoc_parameters edhoc_parameters,
-    const struct com_edhoc_cipher_suite_list preferred_suites) {
+    const struct com_edhoc_cipher_suite_list preferred_suites,
+    const char* server_ip) {
   coap_startup();
   coap_set_log_level(COAP_LOG_INFO);
 
-  static const char CLIENT_COAP_URI[] =
-      "coap://localhost:5683/.well-known/edhoc";
+  char server_edhoc_uri[256] = {0};
+  int uri_bytes_written =
+      snprintf(server_edhoc_uri, sizeof(server_edhoc_uri),
+               "coap://%s:5683/.well-known/edhoc", server_ip);
+  if (uri_bytes_written < 0 ||
+      (size_t)uri_bytes_written >= sizeof(server_edhoc_uri)) {
+    com_log_error("Error: Server IP address or URI is too long.\n");
+    return COM_EMULATION_FAILURE;
+  }
   struct cli_coap_parse_and_resolve_result parse_and_resolve_uri_result =
-      cli_coap_parse_and_resolve_coap_uri(CLIENT_COAP_URI);
+      cli_coap_parse_and_resolve_coap_uri(server_edhoc_uri);
   if (parse_and_resolve_uri_result.status != CLI_COAP_PARSE_AND_RESOLVE_OK) {
     return COM_EMULATION_FAILURE;
   }

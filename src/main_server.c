@@ -7,7 +7,7 @@
 
 int main(const int argc, char* argv[]) {
   const struct com_parse_suites_arguments_result parse_result =
-      com_parse_suites_arguments(argv, argc);
+      com_parse_suites_arguments(argv + 1, argc - 1);
   if (!parse_result.success) {
     return -1;
   }

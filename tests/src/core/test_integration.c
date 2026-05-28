@@ -34,7 +34,8 @@ void test_standalone_binaries_handshake(void) {
 
   // Construct the system command using the absolute path
   char client_cmd[512];
-  snprintf(client_cmd, sizeof(client_cmd), "\"%s\" -p 0 -s 0 2", CLIENT_PATH);
+  snprintf(client_cmd, sizeof(client_cmd), "\"%s\" -p 0 -s 0 2 localhost",
+           CLIENT_PATH);
 
   const int client_status = system(client_cmd);
 

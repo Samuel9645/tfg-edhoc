@@ -2,6 +2,7 @@ build
 TODO.md
 .idea
 .vscode
+comparison/app
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,clion,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,clion,visualstudiocode

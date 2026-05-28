@@ -199,15 +199,32 @@ target_include_directories(client SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ext
 set_target_properties(server PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+
 set_target_properties(client PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
-set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
-set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" "-Werror" ${MEMORY_CHECK_FLAGS})
 
-target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS})
-target_compile_options(client PRIVATE ${CUSTOM_COMPILE_FLAGS})
-target_link_options(server PRIVATE ${MEMORY_CHECK_FLAGS})
-target_link_options(client PRIVATE ${MEMORY_CHECK_FLAGS})
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+endif ()
 
-include(cmake_configs/testing_config.cmake)
+option(ENABLE_UNITY_TESTS "Build Unity test binaries" ON)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+  # Production / Emulation Mode: Maximum performance matching libcoap
+  set(PROD_OPTIMIZATION_FLAGS "-O3" "-flto" "-fomit-frame-pointer" "-DNDEBUG")
+
+  target_compile_options(server PRIVATE "-Wall" "-Wextra" "-Wpedantic" ${PROD_OPTIMIZATION_FLAGS})
+  target_compile_options(client PRIVATE "-Wall" "-Wextra" "-Wpedantic" ${PROD_OPTIMIZATION_FLAGS})
+  target_link_options(server PRIVATE "-flto")
+  target_link_options(client PRIVATE "-flto")
+  set(ENABLE_UNITY_TESTS OFF)
+else ()
+  # Development / Testing Mode: Your baseline with Sanitizers active
+  set(MEMORY_CHECK_FLAGS "-fsanitize=address" "-fsanitize=undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
+  set(CUSTOM_COMPILE_FLAGS "-g" "-Wall" "-Wextra" "-Wpedantic" "-Werror" ${MEMORY_CHECK_FLAGS})
+
+  target_compile_options(server PRIVATE ${CUSTOM_COMPILE_FLAGS})
+  target_compile_options(client PRIVATE ${CUSTOM_COMPILE_FLAGS})
+  target_link_options(server PRIVATE ${MEMORY_CHECK_FLAGS})
+  target_link_options(client PRIVATE ${MEMORY_CHECK_FLAGS})
+endif ()

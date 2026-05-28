@@ -1,0 +1,71 @@
+services:
+  router:
+    image: ubuntu:24.04
+    container_name: iiot-router
+    privileged: true
+    volumes:
+      - ../scripts:/scripts
+    networks:
+      client-network:
+        ipv4_address: 192.168.10.2
+      server-network:
+        ipv4_address: 192.168.20.2
+    command: >
+      bash -c "apt-get update && apt-get install -y iproute2 &&
+               sysctl -w net.ipv4.ip_forward=1 &&
+               tail -f /dev/null"
+
+  server:
+    image: ubuntu:24.04
+    container_name: iiot-server
+    volumes:
+      - ../../build/bin:/app
+      - ../:/comparison
+    networks:
+      server-network:
+        ipv4_address: 192.168.20.3
+    cap_add:
+      - NET_ADMIN
+    # 1. Installs tools -> 2. Tweaks routes -> 3. Starts background tcpdump -> 4. Runs server -> 5. Kills tcpdump when server stops
+    command: >
+      bash -c "sleep 10 &&
+               apt-get update && apt-get install -y iproute2 tcpdump && 
+               ip route del default && 
+               ip route add default via 192.168.20.2 && 
+               echo 'Starting background packet capture...' &&
+               tcpdump -i any -w /comparison/captura_automatica.pcap \"udp port 5683 or udp port 5684\" &
+               TCPDUMP_PID=$$! &&
+               sleep 2 &&
+               echo 'Starting Server binary...' &&
+               /app/server -p 2 -s 2 &&
+               echo 'Server stopped. Cleaning up tcpdump...' &&
+               kill $$TCPDUMP_PID &&
+               tail -f /dev/null"
+
+  client:
+    image: ubuntu:24.04
+    container_name: iiot-client
+    volumes:
+      - ../../build/bin:/app
+    networks:
+      client-network:
+        ipv4_address: 192.168.10.3
+    cap_add:
+      - NET_ADMIN
+    command: >
+      bash -c "sleep 15 &&
+               apt-get update && apt-get install -y iproute2 &&
+               ip route del default &&
+               ip route add default via 192.168.10.2 &&
+               echo 'Starting Client binary...' &&
+               /app/client -p 2 -s 2 192.168.20.3"
+
+networks:
+  client-network:
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+  server-network:
+    ipam:
+      config:
+        - subnet: 192.168.20.0/24

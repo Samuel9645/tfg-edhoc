@@ -51,7 +51,7 @@ rm -f ../scripts/{client,server}/*.{session,cache} 2>/dev/null
 # 🚧 TEST MATRIX: SCENARIO B (Restricted network)
 # =======================================================
 echo "=== Running Scenario B Matrix (DTLS & EDHOC) ==="
-SCENARIO=B docker compose up -d
+SCENARIO=B docker compose up --build -d
 echo "⏳ Waiting for Scenario B clients to finish execution..."
 wait_for_clients
 save_logs "B"

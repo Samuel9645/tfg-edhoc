@@ -9,8 +9,7 @@ TRACE_NAME="$1"
 shift
 
 echo "📸 Starting packet capture: /traces/${TRACE_NAME}.pcap"
-# Using administrative write context directly
-tcpdump -Z root -U -i any -w "/traces/${TRACE_NAME}.pcap" "udp port 5683 or udp port 5684" &
+tcpdump -U -i any -w "/traces/${TRACE_NAME}.pcap" "udp port 5683 or udp port 5684" &
 TCP_DUMP_PID=$!
 
 sleep 2

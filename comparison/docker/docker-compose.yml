@@ -9,14 +9,14 @@ services:
     volumes:
       - ../traces:/traces
       - ./certs/server:/certs
-      - ../scripts/server:/scripts/app               # 🚀 Mapeo único
-      - ../scripts/setup-network:/scripts/setup       # 🚀 Mapeo único
+      - ../scripts/capture-packets:/scripts/capture
+      - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
     command: >
       /bin/bash -c "
-      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/app/run.sh dtls_${SCENARIO:-A} coap-server -v 9 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
+      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/capture/capture-and-run.sh dtls_server_${SCENARIO} coap-server -v 9 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
       "
 
   dtls-client:
@@ -24,8 +24,9 @@ services:
     image: iiot-base-image
     container_name: iiot-dtls-client
     volumes:
+      - ../traces:/traces
       - ./certs/client:/certs
-      - ../scripts/client:/scripts/app
+      - ../scripts/capture-packets:/scripts/capture
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
@@ -33,8 +34,8 @@ services:
       - dtls-server
     command: >
       /bin/bash -c "
-      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/app/run.sh coap-client -v 9 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
+      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh dtls_client_${SCENARIO} coap-client -v 9 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
       "
 
   # =========================================================
@@ -47,14 +48,14 @@ services:
     volumes:
       - ../../build/bin:/app
       - ../traces:/traces
-      - ../scripts/server:/scripts/app
+      - ../scripts/capture-packets:/scripts/capture
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
     command: >
       /bin/bash -c "
-      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/app/run.sh edhoc_${SCENARIO:-A} /app/server -p 2 -s 2
+      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/capture/capture-and-run.sh edhoc_server_${SCENARIO} /app/server -p 2 -s 2
       "
 
   edhoc-client:
@@ -63,7 +64,8 @@ services:
     container_name: iiot-edhoc-client
     volumes:
       - ../../build/bin:/app
-      - ../scripts/client:/scripts/app
+      - ../traces:/traces
+      - ../scripts/capture-packets:/scripts/capture
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
@@ -71,6 +73,6 @@ services:
       - edhoc-server
     command: >
       /bin/bash -c "
-      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/app/run.sh /app/client -p 2 -s 2 iiot-edhoc-server
+      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh edhoc_client_${SCENARIO} /app/client -p 2 -s 2 iiot-edhoc-server
       "

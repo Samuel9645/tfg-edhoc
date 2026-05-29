@@ -1,23 +1,6 @@
 services:
   # =========================================================
-  # AMBIENT TOPOLOGY: The Explicit Router Bridge
-  # =========================================================
-  iiot-router:
-    image: iiot-base-image
-    container_name: iiot-router
-    privileged: true
-    volumes:
-      - ../scripts/setup-network:/scripts
-    networks:
-      client-network:
-        ipv4_address: 192.168.10.2
-      server-network:
-        ipv4_address: 192.168.20.2
-    command: >
-      /bin/bash -c "sysctl -w net.ipv4.ip_forward=1 && tail -f /dev/null"
-
-  # =========================================================
-  # PHASE 1: libcoap Baseline Testing (IPs end in .10)
+  # PHASE 1: libcoap Baseline Testing (Puerto 5684)
   # =========================================================
   dtls-server:
     build: .
@@ -26,77 +9,68 @@ services:
     volumes:
       - ../traces:/traces
       - ./certs/server:/certs
-      - ../scripts/server:/scripts
-    networks:
-      server-network:
-        ipv4_address: 192.168.20.10  # 🚀 Dedicated IP
+      - ../scripts/server:/scripts/app               # 🚀 Mapeo único
+      - ../scripts/setup-network:/scripts/setup       # 🚀 Mapeo único
     cap_add:
       - NET_ADMIN
-    command: [
-      "/bin/bash", "/scripts/run.sh",
-      "dtls_${SCENARIO:-A}",
-      "coap-server", "-v", "9", "-A", "0.0.0.0", "-p", "5683", "-c", "/certs/server.crt", "-j", "/certs/server.key", "-R", "/certs/ca.crt"
-    ]
+    command: >
+      /bin/bash -c "
+      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/app/run.sh dtls_${SCENARIO:-A} coap-server -v 9 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
+      "
 
   dtls-client:
+    build: .
     image: iiot-base-image
     container_name: iiot-dtls-client
     volumes:
       - ./certs/client:/certs
-      - ../scripts/client:/scripts
-    networks:
-      client-network:
-        ipv4_address: 192.168.10.10  # 🚀 Dedicated IP
+      - ../scripts/client:/scripts/app
+      - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
-    command: [
-      "/bin/bash", "/scripts/run.sh",
-      "coap-client", "-v", "9", "-m", "get", "-c", "/certs/client.crt", "-j", "/certs/client.key", "-R", "/certs/ca.crt", "coaps://192.168.20.10:5684/"
-    ]
+    depends_on:
+      - dtls-server
+    command: >
+      /bin/bash -c "
+      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/app/run.sh coap-client -v 9 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
+      "
 
   # =========================================================
-  # PHASE 2: Custom App Testing (IPs end in .20)
+  # PHASE 2: Custom App Testing (Puerto 8080 o el tuyo)
   # =========================================================
   edhoc-server:
+    build: .
     image: iiot-base-image
     container_name: iiot-edhoc-server
     volumes:
       - ../../build/bin:/app
       - ../traces:/traces
-      - ../scripts/server:/scripts
-    networks:
-      server-network:
-        ipv4_address: 192.168.20.20  # 🚀 Dedicated IP
+      - ../scripts/server:/scripts/app
+      - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
-    command: [
-      "/bin/bash", "/scripts/run.sh",
-      "edhoc_${SCENARIO:-A}",
-      "/app/server", "-p", "2", "-s", "2"
-    ]
+    command: >
+      /bin/bash -c "
+      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/app/run.sh edhoc_${SCENARIO:-A} /app/server -p 2 -s 2
+      "
 
   edhoc-client:
+    build: .
     image: iiot-base-image
     container_name: iiot-edhoc-client
     volumes:
       - ../../build/bin:/app
-      - ../scripts/client:/scripts
-    networks:
-      client-network:
-        ipv4_address: 192.168.10.20  # 🚀 Dedicated IP
+      - ../scripts/client:/scripts/app
+      - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
-    command: [
-      "/bin/bash", "/scripts/run.sh",
-      "/app/client", "-p", "2", "-s", "2", "192.168.20.20"
-    ]
-
-networks:
-  client-network:
-    ipam:
-      config:
-        - subnet: 192.168.10.0/24
-  server-network:
-    ipam:
-      config:
-        - subnet: 192.168.20.0/24
+    depends_on:
+      - edhoc-server
+    command: >
+      /bin/bash -c "
+      if [ '${SCENARIO:-A}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
+      exec /bin/bash /scripts/app/run.sh /app/client -p 2 -s 2 iiot-edhoc-server
+      "

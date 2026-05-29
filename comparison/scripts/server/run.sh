@@ -24,6 +24,9 @@ cleanup() {
 # Trap SIGTERM (sent by docker compose down/stop)
 trap cleanup SIGTERM SIGINT
 
-echo "🚀 Launching engine in foreground: $*"
-# 🚀 THE CRITICAL FIX: Removed the '&' so OpenSSL runs natively in the script's foreground path
-exec "$@"
+# Lanzar servidor en background
+"$@" &
+APP_PID=$!
+
+# Esperar a que termine o reciba señal
+wait $APP_PID

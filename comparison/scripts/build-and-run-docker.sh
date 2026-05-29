@@ -24,31 +24,36 @@ save_logs() {
         docker logs iiot-${service} > ../traces/logs/${service//-/_}_"${scenario}".txt 2>&1 || true
     done
 }
+wait_for_clients() {
+    echo "⏳ Waiting for clients to finish execution..."
+    # Bucle que comprueba si iiot-dtls-client o iiot-edhoc-client siguen corriendo
+    while docker ps --format '{{.Names}}' | grep -qE "iiot-dtls-client|iiot-edhoc-client"; do
+        sleep 1
+    done
+    echo "✅ Clients finished."
+}
 
 # =======================================================
 # 🚀 TEST MATRIX: SCENARIO A (Stable network)
 # =======================================================
 echo "=== Running Scenario A Matrix (DTLS & EDHOC) ==="
 SCENARIO=A docker compose up --build -d
-echo "⚙️ Injecting Scenario A parameters into router..."
-docker exec iiot-router /bin/bash /scripts/regular-network.sh
 echo "⏳ Waiting for Scenario A clients to finish execution..."
-docker compose wait dtls-client edhoc-client
+wait_for_clients
 save_logs "A"
 echo "📥 Flushing packet buffers to disk..."
 sleep 2
 docker compose down -v --remove-orphans
 sleep 2
 
+rm -f ../scripts/{client,server}/*.{session,cache} 2>/dev/null
 # =======================================================
 # 🚧 TEST MATRIX: SCENARIO B (Restricted network)
 # =======================================================
 echo "=== Running Scenario B Matrix (DTLS & EDHOC) ==="
 SCENARIO=B docker compose up -d
-echo "⚙️ Injecting Scenario B constraints into router..."
-docker exec iiot-router /bin/bash /scripts/limited-network.sh
 echo "⏳ Waiting for Scenario B clients to finish execution..."
-docker compose wait dtls-client edhoc-client
+wait_for_clients
 save_logs "B"
 echo "📥 Flushing packet buffers to disk..."
 sleep 2

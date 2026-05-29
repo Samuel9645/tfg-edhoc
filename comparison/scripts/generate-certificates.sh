@@ -21,7 +21,7 @@ openssl req -new -x509 -days 365 -key "$BASE_DIR/ca/ca.key" -out "$BASE_DIR/ca/c
 echo "-> Generating IIoT Server Certificate..."
 openssl ecparam -name prime256v1 -genkey -noout -out "$BASE_DIR/server/server.key"
 openssl req -new -key "$BASE_DIR/server/server.key" -out "$BASE_DIR/server/server.csr" \
-    -subj "/CN=10.0.20.3/O=University/ST=Thesis"
+    -subj "/CN=${DTLS_SERVER_IP}/O=University/ST=Thesis"
 # Root CA signs the Server CSR
 openssl x509 -req -days 365 -in "$BASE_DIR/server/server.csr" \
     -CA "$BASE_DIR/ca/ca.crt" -CAkey "$BASE_DIR/ca/ca.key" \
@@ -33,7 +33,7 @@ rm "$BASE_DIR/server/server.csr"
 echo "-> Generating IIoT Client Certificate..."
 openssl ecparam -name prime256v1 -genkey -noout -out "$BASE_DIR/client/client.key"
 openssl req -new -key "$BASE_DIR/client/client.key" -out "$BASE_DIR/client/client.csr" \
-    -subj "/CN=10.0.10.3/O=University/ST=Thesis"
+    -subj "/CN=${DTLS_CLIENT_IP}/O=University/ST=Thesis"
 # Root CA signs the Client CSR
 openssl x509 -req -days 365 -in "$BASE_DIR/client/client.csr" \
     -CA "$BASE_DIR/ca/ca.crt" -CAkey "$BASE_DIR/ca/ca.key" \

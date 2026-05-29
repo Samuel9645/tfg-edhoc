@@ -9,7 +9,7 @@ This project uses submodules to handle external libraries. To clone and
 initialize the repository with its submodules, use the following command:
 
 ```bash
-git clone --recurse-submodules <URL_DEL_REPOSITORIO>
+git clone --recurse-submodules <REPOSITORY_URL>
 ```
 
 If you have already cloned the repository without the `--recurse-submodules`

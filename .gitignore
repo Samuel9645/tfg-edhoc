@@ -3,6 +3,8 @@ TODO.md
 .idea
 .vscode
 comparison/app
+comparison/docker/certs
+comparison/traces
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,clion,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,clion,visualstudiocode

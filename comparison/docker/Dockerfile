@@ -10,11 +10,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libssl-dev \
     libssl3 \
     iproute2 \
-    iptables \
     iputils-ping \
     tcpdump \
-    tshark \
-    bash \
     git \
     && rm -rf /var/lib/apt/lists/*
 

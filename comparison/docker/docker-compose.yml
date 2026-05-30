@@ -16,7 +16,7 @@ services:
     command: >
       /bin/bash -c "
       if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/capture/capture-and-run.sh dtls_server_${SCENARIO} coap-server -v 9 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
+      exec /bin/bash /scripts/capture/capture-and-run.sh dtls_server_${SCENARIO} coap-server -v 8 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
       "
 
   dtls-client:
@@ -35,7 +35,7 @@ services:
     command: >
       /bin/bash -c "
       if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh dtls_client_${SCENARIO} coap-client -v 9 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
+      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh dtls_client_${SCENARIO} coap-client -v 8 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
       "
 
   # =========================================================

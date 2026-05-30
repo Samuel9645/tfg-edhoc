@@ -2,8 +2,7 @@
  * @file
  * @author Samuel Rodríguez <alu0101545714@ull.edu.es>
  * @since 31/03/2026
- * @brief Static fixed credentials for EDHOC server and related credential
- * fetch/verify
+ * @brief Declarations for the module to get the credentials of the server
  * @see [Github Repository](https://github.com/Samuel9645/tfg-edhoc)
  */
 

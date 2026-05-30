@@ -30,9 +30,8 @@ static const struct srv_coap_dispatch_deps
         .bind_oscore_session = srv_oscore_bind_session};
 
 void srv_coap_dispatch_edhoc_post(
-    const coap_pdu_t* request,
-    const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response,
-    coap_context_t* context) {
+    coap_context_t* context, const coap_pdu_t* request,
+    const struct com_edhoc_parameters edhoc_parameters, coap_pdu_t* response) {
   srv_coap_dispatch_post_with_dependencies(
       request, edhoc_parameters, response,
       &COAP_SERVER_EDHOC_DISPATCH_DEFAULT_DEPS, context);

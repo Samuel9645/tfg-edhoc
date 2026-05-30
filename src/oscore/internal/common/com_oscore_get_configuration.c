@@ -21,7 +21,7 @@ struct srv_oscore_algorithms {
 /**
  * @brief Extract the algorithms to use for OSCORE session derivation from the
  * EDHOC context, based on the selected cipher suite.
- * @param context EDHOC context to extract the selected cipher suite and
+ * @param[in] context EDHOC context to extract the selected cipher suite and
  * determine the algorithms to use for OSCORE session derivation
  * @return Struct containing the names of the algorithms to use for the OSCORE
  * session and a status of the operation

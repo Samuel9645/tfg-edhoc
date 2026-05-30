@@ -22,8 +22,8 @@ void cli_cleanup_resources(struct cli_resources* resources);
 /**
  * @brief Initializes the EDHOC context in the given resources struct with the
  * parameters provided
- * @param resources Resources struct
- * @param parameters New parameters to initialize the EDHOC context with.
+ * @param[in] resources Resources struct
+ * @param[in] parameters New parameters to initialize the EDHOC context with.
  * @return true on success, false on failure
  * @warning This function does not clean up any existing context before
  * initializing a new one.
@@ -34,12 +34,12 @@ bool cli_initialize_edhoc_context_with_parameters(
 /**
  * @brief Resets and creates a new EDHOC context using the original parameters
  * and the new cipher suites data, this is used in suite negotiation.
- * @param resources Resources struct containing the EDHOC context to reset and
+ * @param[in] resources Resources struct containing the EDHOC context to reset and
  * re-initialize with new parameters
- * @param original_parameters Original parameters (used to copy the common data
+ * @param[in] original_parameters Original parameters (used to copy the common data
  * such as credentials, methods...)
- * @param selected_cipher_suite New selected cipher suite
- * @param negotiated_suites New supported cipher suites list
+ * @param[in] selected_cipher_suite New selected cipher suite
+ * @param[in] negotiated_suites New supported cipher suites list
  * @return true on success, false on failure
  */
 bool cli_reset_edhoc_context_with_new_suites_data(

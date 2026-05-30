@@ -17,8 +17,8 @@
 /**
  * @brief Protects the current context with OSCORE using the session derived
  * from the provided EDHOC context, and binds it to the current CoAP context.
- * @param coap_context Active CoAP context.
- * @param edhoc_context Active EDHOC context with a successfully completed
+ * @param[in] coap_context Active CoAP context.
+ * @param[in] edhoc_context Active EDHOC context with a successfully completed
  * handshake, ready to export the OSCORE session.
  * @return Status indicating the result of the operation
  */

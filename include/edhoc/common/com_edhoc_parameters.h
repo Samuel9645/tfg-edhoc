@@ -40,7 +40,7 @@ struct com_edhoc_validate_parameters_result {
 /**
  * @brief Validates the given parameters for setting up an EDHOC context,
  * logging the error locally if they are invalid.
- * @param parameters Pointer to the parameters struct to validate
+ * @param[in] parameters Pointer to the parameters struct to validate
  * @return Struct containing valid_parameters as true on success and false on
  * failure.
  */

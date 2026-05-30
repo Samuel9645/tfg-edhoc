@@ -33,7 +33,7 @@ struct com_edhoc_cipher_suite_list {
 /**
  * @brief Check if the cipher suites struct is not NULL and if it contains at
  * least one valid cipher suite details struct.
- * @param list Struct containing the cipher suites details to
+ * @param[in] list Struct containing the cipher suites details to
  * check.
  * @return true if the struct is valid, false otherwise.
  */
@@ -46,8 +46,9 @@ struct com_edhoc_create_cipher_suites_result {
 
 /**
  * @brief Creates a list of suites with the given suites identifiers.
- * @param suites_identifiers Array of suite identifiers to create the list from.
- * @param number_of_suites Number of suites in the array.
+ * @param[in] suites_identifiers Array of suite identifiers to create the list
+ * from.
+ * @param[in] number_of_suites Number of suites in the array.
  * @return A struct containing the cipher suite details for the given
  * identifiers, or an empty list if any of the identifiers is invalid, with a
  * success field indicating the result of the operation.
@@ -63,7 +64,7 @@ com_edhoc_create_cipher_suites_from(const int* suites_identifiers,
 /**
  * @brief Frees the memory allocated for the list of cipher suites created with
  * com_edhoc_create_cipher_suites_from.
- * @param list list containing the data to be deleted
+ * @param[in] list list containing the data to be deleted
  * @warning This function should only be used when deleting a list using
  * com_edhoc_create_cipher_suites_from, as it assumes the data was allocated in
  * a specific way.

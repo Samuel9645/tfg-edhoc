@@ -6,9 +6,9 @@
 
 /**
  * @brief Executes EDHOC client handshake and send encrypted message to server
- * @param edhoc_parameters Parameters to use in the EDHOC handshake
- * @param preferred_suites Array of preferred suites to use
- * @param server_ip Ip of the server to communicate to
+ * @param[in] edhoc_parameters Parameters to use in the EDHOC handshake
+ * @param[in] preferred_suites Array of preferred suites to use
+ * @param[in] server_ip Ip of the server to communicate to
  * @return COM_EMULATION_SUCCESS on success, COM_EMULATION_FAILURE on failure
  */
 enum com_emulation_status core_run_client(

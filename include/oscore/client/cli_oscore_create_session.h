@@ -14,10 +14,10 @@
 
 /**
  * @brief Create a new CoAP session protected with OSCORE using the previous one
- * @param coap_context Active CoAP context.
- * @param edhoc_context Active EDHOC context with a successfully completed
+ * @param[in] coap_context Active CoAP context.
+ * @param[in] edhoc_context Active EDHOC context with a successfully completed
  * handshake, ready to export the OSCORE session.
- * @param destination_address Address of the remote endpoint to which the
+ * @param[in] destination_address Address of the remote endpoint to which the
  * session will be bound.
  * @return Pointer to the session on success, NULL on failure
  */

@@ -18,10 +18,10 @@
 /**
  * @brief Compose and write an EDHOC error message payload for a cipher suite
  * mismatch error, writing the necessary details such as the supported suites.
- * @param context Context from which to extract the cipher suites for the error
- * message
- * @param response_data Metadata of the buffer (pointer and capacity) to write
- * into com_writable_buffer
+ * @param[in] context Context from which to extract the cipher suites for the
+ * error message
+ * @param[in] response_data Metadata of the buffer (pointer and capacity) to
+ * write into com_writable_buffer
  * @return View of the buffer containing the error
  * @see [RFC
  * 9528 6.3](https://datatracker.ietf.org/doc/html/rfc9528#name-wrong-selected-cipher-suite)

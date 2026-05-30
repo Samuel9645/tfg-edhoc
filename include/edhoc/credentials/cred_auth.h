@@ -17,7 +17,7 @@
 /**
  * @brief Fetch and setup authentication credentials
  * @param[in] credentials Pointer to credentials structure to populate
- * @param own_key_bindings
+ * @param[in] own_key_bindings Pointer to specific suite keys
  * @param[in] own_public_credentials Struct containing the public credentials
  * data (public key, key identifier...)
  * @param[in] own_private_key Own private key bytes

@@ -20,8 +20,8 @@ static void edhoc_post_handler(coap_resource_t* resource,
   (void)query;
   const struct com_edhoc_parameters* edhoc_parameters =
       coap_context_get_app_data(coap_session_get_context(session));
-  srv_coap_dispatch_edhoc_post(request, *edhoc_parameters, response,
-                               coap_session_get_context(session));
+  srv_coap_dispatch_edhoc_post(coap_session_get_context(session), request,
+                               *edhoc_parameters, response);
 }
 
 static void temperature_get_handler(coap_resource_t* resource,

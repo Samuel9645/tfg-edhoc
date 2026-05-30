@@ -11,7 +11,7 @@ struct com_session_resources {
  * @brief Cleanup all resources allocated during a CoAP session, including the
  * EDHOC context.
  *
- * @param resources Pointer to the struct com_session_resources structure
+ * @param[in] resources Pointer to the struct com_session_resources structure
  * containing all resources to be cleaned up.
  *
  * @note The function will check each resource for NULL before attempting to

@@ -65,7 +65,7 @@ enum srv_edhoc_cleanup_context_status {
 
 /**
  * @brief Deinitializes and frees the memory associated with the given context
- * @param context pointer to the context to clean up.
+ * @param[in] context pointer to the context to clean up.
  * @note On NULL pointer does nothing
  */
 enum srv_edhoc_cleanup_context_status srv_edhoc_cleanup_context(

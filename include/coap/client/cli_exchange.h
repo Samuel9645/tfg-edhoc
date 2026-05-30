@@ -69,7 +69,7 @@ struct cli_coap_exchange* cli_coap_init_exchange(
 
 /**
  * @brief Deallocates the exchange
- * @param exchange exchange to deallocate
+ * @param[in] exchange exchange to deallocate
  * @warning Resources such as the CoAP session and context are not managed by
  * this function and should be cleaned up separately. This function only frees
  * the memory allocated for the exchange struct itself.

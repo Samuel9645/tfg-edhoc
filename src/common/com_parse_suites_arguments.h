@@ -30,8 +30,8 @@ struct com_parse_suites_arguments_result {
 /**
  * @brief Parses arguments with the following format:
  * -p|--preferred [ <id1> <id2> ...] -s|--supported [ <id1> <id2> ...]
- * @param arguments Array of strings with the arguments to parse
- * @param size Size of the arguments array
+ * @param[in] arguments Array of strings with the arguments to parse
+ * @param[in] size Size of the arguments array
  * @return Struct containing the result of the parsing, including a success flag
  * and the parsed arguments if successful, or an empty arguments struct with
  * success false on failure.

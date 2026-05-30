@@ -11,6 +11,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+enum com_edhoc_cipher_suite_identifier {
+  COM_EDHOC_CIPHER_SUITE_0_IDENTIFIER = 0,
+  COM_EDHOC_CIPHER_SUITE_2_IDENTIFIER = 2
+};
+
 struct com_edhoc_cipher_suite_details {
   const struct edhoc_cipher_suite* metadata;
   const struct edhoc_keys* (*get_keys)(void);

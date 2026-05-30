@@ -41,9 +41,9 @@ bool com_edhoc_cipher_suites_are_valid(
 static const struct com_edhoc_cipher_suite_details*
 get_cipher_suite_from_identifier(const int identifier) {
   switch (identifier) {
-  case 0:
+  case COM_EDHOC_CIPHER_SUITE_0_IDENTIFIER:
     return &COM_EDHOC_SUITE_0;
-  case 2:
+  case COM_EDHOC_CIPHER_SUITE_2_IDENTIFIER:
     return &COM_EDHOC_SUITE_2;
   default:
     return NULL;

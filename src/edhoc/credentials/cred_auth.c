@@ -16,7 +16,8 @@
 #include "edhoc/credentials/cred_auth.h"
 
 int cred_edhoc_auth_fetch(
-    void* user_context, struct edhoc_auth_creds* credentials,
+    struct edhoc_auth_creds* credentials,
+    const struct edhoc_keys* own_key_bindings,
     const struct cred_public_credentials_data own_public_credentials,
     const uint8_t* own_private_key, const size_t own_private_key_length) {
   if (credentials == NULL) {
@@ -30,10 +31,9 @@ int cred_edhoc_auth_fetch(
   credentials->key_id.encode_type = EDHOC_ENCODE_TYPE_INTEGER;
   credentials->key_id.key_id_int = own_public_credentials.key_id;
 
-  const struct edhoc_keys* keys = user_context;
-  if (keys->import_key(user_context, EDHOC_KT_SIGNATURE, own_private_key,
-                       own_private_key_length,
-                       credentials->priv_key_id) != EDHOC_SUCCESS) {
+  if (own_key_bindings->import_key(NULL, EDHOC_KT_SIGNATURE, own_private_key,
+                                   own_private_key_length,
+                                   credentials->priv_key_id) != EDHOC_SUCCESS) {
     return EDHOC_ERROR_CREDENTIALS_FAILURE;
   }
 
@@ -41,10 +41,9 @@ int cred_edhoc_auth_fetch(
 }
 
 int cred_edhoc_auth_verify(
-    const void* user_context, struct edhoc_auth_creds* credentials,
+    struct edhoc_auth_creds* credentials,
     const struct cred_public_credentials_data expected_peer_credentials,
     const uint8_t** public_key_reference, size_t* public_key_length) {
-  (void)user_context;
   if (credentials == NULL) {
     return EDHOC_ERROR_INVALID_ARGUMENT;
   }

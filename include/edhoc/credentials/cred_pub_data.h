@@ -13,6 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "edhoc/common/com_edhoc_cipher_suites.h"
+
 struct cred_public_credentials_data {
   const struct {
     const uint8_t* const key;
@@ -27,8 +29,10 @@ struct cred_get_edhoc_public_data_result {
   struct cred_public_credentials_data public_credentials;
 };
 
-struct cred_get_edhoc_public_data_result cred_get_client_public_data(void);
+struct cred_get_edhoc_public_data_result cred_get_client_public_data(
+    enum com_edhoc_cipher_suite_identifier cipher_suite_identifier);
 
-struct cred_get_edhoc_public_data_result cred_get_server_public_data(void);
+struct cred_get_edhoc_public_data_result cred_get_server_public_data(
+    enum com_edhoc_cipher_suite_identifier cipher_suite_identifier);
 
 #endif  // EDHOC_CREDENTIALS_CRED_PUB_DATA_H_

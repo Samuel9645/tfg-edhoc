@@ -16,8 +16,8 @@
 
 /**
  * @brief Fetch and setup authentication credentials
- * @param[in] user_context User context (typically NULL)
  * @param[in] credentials Pointer to credentials structure to populate
+ * @param own_key_bindings
  * @param[in] own_public_credentials Struct containing the public credentials
  * data (public key, key identifier...)
  * @param[in] own_private_key Own private key bytes
@@ -25,13 +25,13 @@
  * @return EDHOC_SUCCESS on success, error code otherwise
  */
 int cred_edhoc_auth_fetch(
-    void* user_context, struct edhoc_auth_creds* credentials,
+    struct edhoc_auth_creds* credentials,
+    const struct edhoc_keys* own_key_bindings,
     struct cred_public_credentials_data own_public_credentials,
     const uint8_t* own_private_key, size_t own_private_key_length);
 
 /**
  * @brief Verify peer's authentication credentials
- * @param[in] user_context User context (typically NULL)
  * @param[in] credentials Peer's credential structure to verify
  * @param[in] expected_peer_credentials Struct containing peer's public
  * credentials data (public key, key identifier...)
@@ -41,7 +41,7 @@ int cred_edhoc_auth_fetch(
  *
  */
 int cred_edhoc_auth_verify(
-    const void* user_context, struct edhoc_auth_creds* credentials,
+    struct edhoc_auth_creds* credentials,
     struct cred_public_credentials_data expected_peer_credentials,
     const uint8_t** public_key_reference, size_t* public_key_length);
 

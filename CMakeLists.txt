@@ -157,7 +157,7 @@ set(CLIENT_SPECIFIC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_1/cli_m1_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/cli_negotiate_cipher_suites.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_process.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_initiator.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_responder.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_3/cli_m3_compose.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/edhoc/client/handshake/message_4/cli_m4_process.c
     ${CLIENT_OSCORE_SOURCES}

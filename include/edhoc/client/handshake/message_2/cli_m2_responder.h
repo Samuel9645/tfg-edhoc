@@ -17,7 +17,7 @@
 #include "edhoc/client/handshake/message_2/cli_m2_initiator_result.h"
 
 struct cli_edhoc_message_2_initiator_request {
-  struct com_readonly_buffer raw_payload;
+  struct com_readonly_buffer message_2;
   struct edhoc_context* edhoc_context;
 };
 
@@ -29,7 +29,7 @@ struct cli_edhoc_message_2_initiator_request {
  * @return The result of processing Message 2 and composing Message 3, including
  * status and buffers with the composed message or error information.
  */
-struct cli_edhoc_message_2_initiator_result cli_edhoc_respond_to_message_2(
+struct cli_edhoc_message_2_responder_result cli_edhoc_respond_to_message_2(
     struct cli_edhoc_message_2_initiator_request request,
     struct com_writable_buffer response_buffer);
 

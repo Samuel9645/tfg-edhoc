@@ -13,7 +13,7 @@
 #include "common/com_logging.h"
 #include "edhoc/client/handshake/cli_negotiate_cipher_suites.h"
 #include "edhoc/client/handshake/message_1/cli_m1_compose.h"
-#include "edhoc/client/handshake/message_2/cli_m2_initiator.h"
+#include "edhoc/client/handshake/message_2/cli_m2_responder.h"
 #include "oscore/client/cli_oscore_create_session.h"
 
 static bool send_message(struct cli_coap_exchange* exchange,
@@ -264,10 +264,10 @@ enum com_emulation_status core_run_client(
 
   const struct cli_edhoc_message_2_initiator_request
       message_2_initiator_request = {
-          .raw_payload = message_1_negotiation_attempt_result.response_payload,
+          .message_2 = message_1_negotiation_attempt_result.response_payload,
           .edhoc_context = &client_resources.edhoc_context,
       };
-  const struct cli_edhoc_message_2_initiator_result message_2_initiator_result =
+  const struct cli_edhoc_message_2_responder_result message_2_initiator_result =
       cli_edhoc_respond_to_message_2(message_2_initiator_request,
                                      payload_buffer);
 

@@ -20,7 +20,7 @@ enum cli_edhoc_message_2_initiator_status {
   CLI_EDHOC_MSG2_INITIATOR_ERR_MESSAGE_3_COMPOSE,
 };
 
-struct cli_edhoc_message_2_initiator_result {
+struct cli_edhoc_message_2_responder_result {
   const enum cli_edhoc_message_2_initiator_status status;
   const struct com_readonly_buffer buffer;
 };

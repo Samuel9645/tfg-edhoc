@@ -377,7 +377,7 @@ add_unity_test(test_edhoc_message_4_process
 
 add_unity_test(test_edhoc_message_2_initiator
     src/edhoc/client/handshake/message_2/test_edhoc_message_2_initiator.c
-    ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_initiator.c
+    ${CMAKE_SOURCE_DIR}/src/edhoc/client/handshake/message_2/cli_m2_responder.c
     ${CLIENT_MESSAGE_2_PROCESS_SOURCES}
     ${CLIENT_MESSAGE_2_PROCESS_MOCKS}
     ${CLIENT_MESSAGE_3_COMPOSE_SOURCES}

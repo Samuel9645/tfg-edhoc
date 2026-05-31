@@ -1,7 +1,4 @@
 services:
-  # =========================================================
-  # PHASE 1: libcoap Baseline Testing (Puerto 5684)
-  # =========================================================
   dtls-server:
     build: .
     image: iiot-base-image
@@ -13,11 +10,16 @@ services:
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
+    environment:
+      - RUN_TIMESTAMP=${RUN_TIMESTAMP}
     command: >
-      /bin/bash -c "
-      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/capture/capture-and-run.sh dtls_server_${SCENARIO} coap-server -v 8 -A 0.0.0.0 -p 5683 -c /certs/server.crt -j /certs/server.key -R /certs/ca.crt
-      "
+      /scripts/capture/capture-and-run.sh
+        ${SCENARIO}
+        dtls_server
+        coap-server -v 8 -A 0.0.0.0 
+          -c /certs/server.crt
+          -j /certs/server.key
+          -R /certs/ca.crt
 
   dtls-client:
     build: .
@@ -30,17 +32,21 @@ services:
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
+    environment:
+      - RUN_TIMESTAMP=${RUN_TIMESTAMP}
     depends_on:
       - dtls-server
+    entrypoint: /bin/bash -c "sleep 5 && exec \"$$@\"" --
     command: >
-      /bin/bash -c "
-      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh dtls_client_${SCENARIO} coap-client -v 8 -m get -c /certs/client.crt -j /certs/client.key -R /certs/ca.crt coaps://iiot-dtls-server:5684/
-      "
+      /scripts/capture/capture-and-run.sh
+        ${SCENARIO}
+        dtls_client
+        coap-client -v 8 -m get 
+          -c /certs/client.crt
+          -j /certs/client.key
+          -R /certs/ca.crt
+          coaps://${DTLS_SERVER_IP}:5684/
 
-  # =========================================================
-  # PHASE 2: Custom App Testing (Puerto 8080 o el tuyo)
-  # =========================================================
   edhoc-server:
     build: .
     image: iiot-base-image
@@ -52,11 +58,13 @@ services:
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
+    environment:
+      - RUN_TIMESTAMP=${RUN_TIMESTAMP}
     command: >
-      /bin/bash -c "
-      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      exec /bin/bash /scripts/capture/capture-and-run.sh edhoc_server_${SCENARIO} /app/server -p 2 -s 2
-      "
+      /scripts/capture/capture-and-run.sh
+        ${SCENARIO}
+        edhoc_server
+        /app/server -p 2 -s 2
 
   edhoc-client:
     build: .
@@ -69,10 +77,13 @@ services:
       - ../scripts/setup-network:/scripts/setup
     cap_add:
       - NET_ADMIN
+    environment:
+      - RUN_TIMESTAMP=${RUN_TIMESTAMP}
     depends_on:
       - edhoc-server
+    entrypoint: /bin/bash -c "sleep 5 && exec \"$$@\"" --
     command: >
-      /bin/bash -c "
-      if [ '${SCENARIO}' = 'B' ]; then /bin/bash /scripts/setup/limited-network.sh; fi &&
-      sleep 5 && exec /bin/bash /scripts/capture/capture-and-run.sh edhoc_client_${SCENARIO} /app/client -p 2 -s 2 iiot-edhoc-server
-      "
+      /scripts/capture/capture-and-run.sh
+        ${SCENARIO}
+        edhoc_client
+        /app/client -p 2 -s 2 iiot-edhoc-server

@@ -23,22 +23,23 @@ LOGS_DIR="${BASE_DIR}/logs"
 
 mkdir -p "${NETWORK_DIR}"
 mkdir -p "${LOGS_DIR}"
+chmod -R 777 "${BASE_DIR}"
 
 if [ "${SCENARIO}" = 'B' ]; then
     /scripts/setup/limited-network.sh;
 fi
 
-tcpdump -Z root -U -i any -w "${NETWORK_DIR}/${TRACE_NAME}.pcap" "udp port 5683 or udp port 5684" &
+tcpdump -U -i any -w "${NETWORK_DIR}/${TRACE_NAME}.pcap" "udp port 5683 or udp port 5684" &
 TCP_DUMP_PID=$!
 sleep 2
 
 cleanup() {
     echo "Stopping packet capture and flushing to disk..."
-    kill -2 $TCP_DUMP_PID 2>/dev/null || true
+    kill -2 $TCP_DUMP_PID 2>/dev/null
     sleep 1
     exit 0
 }
 trap cleanup SIGTERM SIGINT
-"$@" > "${LOGS_DIR}/${TRACE_NAME}_${SCENARIO}.txt" 2>&1
+"$@"
 sleep 3
 cleanup

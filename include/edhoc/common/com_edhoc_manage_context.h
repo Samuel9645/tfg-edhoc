@@ -47,9 +47,10 @@ struct com_edhoc_setup_context_result {
  * with the responder, since the order of the responder suites is irrelevant in
  * that process.
  * @note In order for the credential related functions to access the proper
- * cipher suite import or destroy key methods, a pointer to the edhoc_keys
- * struct is saved in the EDHOC user context, allowing the usage in the
- * cred_edhoc_auth_fetch function
+ * cipher suite import or destroy key methods, as well as dynamically selecting
+ * a sample key that works with the selected suite a pointer to its details
+ * (struct com_edhoc_cipher_suite_details*) is saved in the EDHOC user context,
+ * allowing the usage in the credential related functions.
  * @see [RFC
  * 9528 6.3](https://datatracker.ietf.org/doc/html/rfc9528#name-wrong-selected-cipher-suite)
  */

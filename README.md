@@ -51,6 +51,12 @@ Then, execute the `build-and-run-docker.sh` script:
 ./build-and-run-docker.sh
 ```
 
+Once the project is built, in order to run the comparison without building the project again, you can execute the `run-docker.sh` script:
+
+```bash
+./run-docker.sh
+```
+
 Network traces will be saved in the `comparison/traces` directory.
 The traces are grouped by scenarios.
 

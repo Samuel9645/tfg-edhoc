@@ -21,6 +21,11 @@ This project uses the following libraries:
 The project was developed and tested on a Linux environment (WSL 2 on Windows
 11). It is recommended to use a similar environment for development and testing.
 
+For the comparison, Docker desktop needs to be installed and running on the
+machine. Some additional configuration is needed to be able to run the
+comparison on WSL 2, as described in
+the [Docker documentation](https://docs.docker.com/desktop/features/wsl/).
+
 This project uses submodules to handle external libraries. To clone and
 initialize the repository with its submodules, use the following command:
 

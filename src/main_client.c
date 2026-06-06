@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "app/app_client.h"
 #include "common/com_logging.h"
 #include "common/com_parse_suites_arguments.h"
@@ -8,36 +10,27 @@
 
 int main(const int argc, char* argv[]) {
   if (argc < 4) {
-    com_log_error("Error: Missing server IP address argument.\n");
+    com_log_error("Usage: %s -s|--supported [ <id1> <id2> ...] <server_ip>\n",
+                  argv[0]);
+    return -1;
+  }
+  if (strcmp(argv[1], "-s") != 0 && strcmp(argv[1], "--supported") != 0) {
     com_log_error(
-        "Usage: %s -p|--preferred [ <id1> <id2> ...] "
-        "-s|--supported [ <id1> <id2> ...] <server_ip>\n",
-        argv[0]);
+        "Invalid arguments: expected '-s' or '--supported' as the first "
+        "argument\n");
     return -1;
   }
   const struct com_parse_suites_arguments_result parse_result =
-      com_parse_suites_arguments(argv + 1, argc - 2);
+      com_parse_suites_arguments(argv + 2, argc - 3);
   if (!parse_result.success) {
     return -1;
   }
   struct com_edhoc_create_cipher_suites_result supported_suites_result =
-      com_edhoc_create_cipher_suites_from(
-          parse_result.arguments.supported_suites.identifiers,
-          parse_result.arguments.supported_suites.count);
+      com_edhoc_create_cipher_suites_from(parse_result.suites.identifiers,
+                                          parse_result.suites.count);
   if (!supported_suites_result.success) {
     com_edhoc_delete_created_cipher_suite_list(
         &supported_suites_result.cipher_suites);
-    return -1;
-  }
-  struct com_edhoc_create_cipher_suites_result preferred_suites_result =
-      com_edhoc_create_cipher_suites_from(
-          parse_result.arguments.preferred_suites.identifiers,
-          parse_result.arguments.preferred_suites.count);
-  if (!preferred_suites_result.success) {
-    com_edhoc_delete_created_cipher_suite_list(
-        &supported_suites_result.cipher_suites);
-    com_edhoc_delete_created_cipher_suite_list(
-        &preferred_suites_result.cipher_suites);
     return -1;
   }
 
@@ -46,7 +39,7 @@ int main(const int argc, char* argv[]) {
   const struct com_edhoc_parameters edhoc_parameters = {
       .credentials = &credentials,
       .supported_cipher_suites = supported_suites_result.cipher_suites,
-      .selected_cipher_suite = preferred_suites_result.cipher_suites.suites[0],
+      .selected_cipher_suite = supported_suites_result.cipher_suites.suites[0],
       .methods =
           {
               .data = supported_methods,
@@ -59,16 +52,12 @@ int main(const int argc, char* argv[]) {
   if (!validate_result.valid_parameters) {
     com_edhoc_delete_created_cipher_suite_list(
         &supported_suites_result.cipher_suites);
-    com_edhoc_delete_created_cipher_suite_list(
-        &preferred_suites_result.cipher_suites);
     return -1;
   }
   const char* server_ip = argv[argc - 1];
-  const enum com_emulation_status status = core_run_client(
-      edhoc_parameters, preferred_suites_result.cipher_suites, server_ip);
+  const enum com_emulation_status status =
+      core_run_client(edhoc_parameters, server_ip);
   com_edhoc_delete_created_cipher_suite_list(
       &supported_suites_result.cipher_suites);
-  com_edhoc_delete_created_cipher_suite_list(
-      &preferred_suites_result.cipher_suites);
   return status == COM_EMULATION_SUCCESS ? 0 : -1;
 }

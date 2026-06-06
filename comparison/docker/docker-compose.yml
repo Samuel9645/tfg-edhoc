@@ -64,7 +64,7 @@ services:
       /scripts/capture/capture-and-run.sh
         ${SCENARIO}
         edhoc_server
-        /app/server -p 2 -s 2
+        /app/server -s 2
 
   edhoc-client:
     build: .
@@ -86,4 +86,4 @@ services:
       /scripts/capture/capture-and-run.sh
         ${SCENARIO}
         edhoc_client
-        /app/client -p 2 -s 2 iiot-edhoc-server
+        /app/client -s 2 iiot-edhoc-server

@@ -16,7 +16,6 @@ enum cli_edhoc_suites_negotiation_status {
   CLI_EDHOC_NEGOTIATE_SUITES_NO_COMMON_SUITES,
   CLI_EDHOC_NEGOTIATE_SUITES_ERR_EMPTY_ERROR_BUFFER,
   CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_SUPPORTED_SUITES,
-  CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES,
   CLI_EDHOC_NEGOTIATE_SUITES_ERR_INTERNAL_BUFFER_TOO_SMALL,
   CLI_EDHOC_NEGOTIATE_SUITES_ERR_PROCESSING_ERROR,
 };
@@ -48,11 +47,7 @@ bool cli_edhoc_error_suggests_renegotiation(
  * @brief Negotiates suites based on the initiator supported suites and the
  * given responder suites inside the encoded error buffer.
  * @param[in] own_supported_suites List of cipher suites supported by the
- * initiator.
- * @param[in] own_initial_preferred_suites List of cipher suites preferred by
- * the initiator, in order of preference. This list must be a subset of the
- * supported suites. They will be prepended to the renegotiation list if the
- * negotiation is successful.
+ * initiator. They must be like in other cases in order of preference.
  * @param[in] encoded_error_buffer View of the error response to Message 1
  * @return Struct containing a status, the list of suites to
  * renegotiate, in order of preference and a reference to the selected suite on
@@ -61,7 +56,6 @@ bool cli_edhoc_error_suggests_renegotiation(
  */
 struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     struct com_edhoc_cipher_suite_list own_supported_suites,
-    struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
     struct com_readonly_buffer encoded_error_buffer);
 
 #endif  // EDHOC_CLIENT_HANDSHAKE_MESSAGE_2_CLI_M2_GET_RESPONDER_PREFERRED_SUITES_H_

@@ -22,6 +22,7 @@
 // with the help of https://cbor.me/
 enum {
   TST_PREF_SUITES_ERR_CODE_2 = 0x2,
+  TST_PREF_SUITES_CBOR_ARRAY_2 = 0x82,
   TST_PREF_SUITES_CBOR_ARRAY_3 = 0x83,
   TST_PREF_SUITES_SUITE_0 = 0x0,
   TST_PREF_SUITES_SUITE_3 = 0x3,
@@ -29,8 +30,8 @@ enum {
 };
 
 // WHY DO WE NEED THIS?
-// libedhoc (v3.16) only supports cipher suites 0 and 2. Since we want to verify order
-// preservation so we need a dummy suite just for testing the behavior
+// libedhoc (v3.16) only supports cipher suites 0 and 2. Since we want to verify
+// order preservation so we need a dummy suite just for testing the behavior
 static const struct edhoc_cipher_suite DUMMY_SUITE = {
     .value = 4,
     .aead_key_length = 16,
@@ -81,41 +82,16 @@ void assert_suite_details_are_equal(
   TEST_ASSERT_EQUAL_PTR(current_suite, expected_suite);
 }
 
-static void assert_renegotiation_contains_initial_preferences(
-    const struct com_edhoc_cipher_suite_list initial_preferred_suites,
-    const struct com_edhoc_cipher_suite_details* const* renegotiation_suites) {
-  for (size_t j = 0; j < initial_preferred_suites.number_of_suites; j++) {
-    assert_suite_details_are_equal(initial_preferred_suites.suites[j],
-                                   renegotiation_suites[j]);
-  }
-}
-
-static void assert_last_suite_is_the_preferred_suite(
-    const struct cli_edhoc_suites_negotiation_result result,
-    const struct com_edhoc_cipher_suite_details* expected_suite) {
-  TEST_ASSERT_GREATER_THAN_size_t(0,
-                                  result.renegotiation_suites.number_of_suites);
-  const size_t last_index = result.renegotiation_suites.number_of_suites - 1;
-  assert_suite_details_are_equal(
-      expected_suite, result.renegotiation_suites.suites[last_index]);
-}
-static const struct com_edhoc_cipher_suite_list PREFER_DUMMY_CIPHER_SUITE =
-    DUMMY_SUITE_LIST;
-
 /**
  * @see [RFC 9529
  * 3](https://datatracker.ietf.org/doc/html/rfc9529#name-authentication-with-static-)
  */
 void test_gets_preferred_suites_from_valid_buffers(void) {
-  const struct com_edhoc_cipher_suite_list PREFER_CIPHER_SUITE_0 =
-      COM_EDHOC_ONLY_SUITE_0;
+  const struct com_edhoc_cipher_suite_list own_supported_suites =
+      get_cipher_suites_0_2_dummy_list();
+
   const uint8_t ONLY_SUITE_2[] = {TST_PREF_SUITES_ERR_CODE_2,
                                   TST_PREF_SUITES_SUITE_2};
-  const struct com_edhoc_cipher_suite_list PREFER_CIPHER_SUITE_2_DUMMY = {
-      .suites =
-          (const struct com_edhoc_cipher_suite_details*[]){&COM_EDHOC_SUITE_2},
-
-      .number_of_suites = 1};
 
   const uint8_t ONLY_SUITE_0[] = {TST_PREF_SUITES_ERR_CODE_2,
                                   TST_PREF_SUITES_SUITE_0};
@@ -125,68 +101,74 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
       TST_PREF_SUITES_SUITE_3, TST_PREF_SUITES_SUITE_0,
       TST_PREF_SUITES_SUITE_2};
 
-  // Extracted from [RFC
-  // 9529 3.2](https://datatracker.ietf.org/doc/html/rfc9529#name-error)
   const struct {
     const uint8_t* data;
     const size_t written_length;
-    const struct com_edhoc_cipher_suite_list own_initial_preferred_suites;
-    const struct com_edhoc_cipher_suite_details* expected_preferred_suite;
-  } test_cases[] = {{ONLY_SUITE_2, sizeof(ONLY_SUITE_2), PREFER_CIPHER_SUITE_0,
-                     &COM_EDHOC_SUITE_2},
-                    {ONLY_SUITE_0, sizeof(ONLY_SUITE_0),
-                     PREFER_CIPHER_SUITE_2_DUMMY, &COM_EDHOC_SUITE_0},
-                    {SUITES_0_2_3, sizeof(SUITES_0_2_3),
-                     PREFER_DUMMY_CIPHER_SUITE, &COM_EDHOC_SUITE_0}};
+    const struct com_edhoc_cipher_suite_details* expected_selected_suite;
+    const struct com_edhoc_cipher_suite_details*
+        expected_renegotiated_suites[3];
+    const size_t expected_renegotiation_length;
+  } test_cases[] = {
+      {
+          ONLY_SUITE_2,
+          sizeof(ONLY_SUITE_2),
+          &COM_EDHOC_SUITE_2,
+          {&COM_EDHOC_SUITE_0, &COM_EDHOC_SUITE_2},
+          2,
+      },
+      {
+          ONLY_SUITE_0,
+          sizeof(ONLY_SUITE_0),
+          &COM_EDHOC_SUITE_0,
+          {&COM_EDHOC_SUITE_0},
+          1,
+      },
+      {
+          SUITES_0_2_3,
+          sizeof(SUITES_0_2_3),
+          &COM_EDHOC_SUITE_0,
+          {&COM_EDHOC_SUITE_0},
+          1,
+      },
+  };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
+
   for (size_t i = 0; i < test_length; i++) {
     const struct com_readonly_buffer test_buffer = {
         .bytes = test_cases[i].data, .length = test_cases[i].written_length};
-    const struct com_edhoc_cipher_suite_list initial_preferred_suites =
-        test_cases[i].own_initial_preferred_suites;
 
     const struct cli_edhoc_suites_negotiation_result result =
-        cli_edhoc_negotiate_suites(get_cipher_suites_0_2_dummy_list(),
-                                   initial_preferred_suites, test_buffer);
+        cli_edhoc_negotiate_suites(own_supported_suites, test_buffer);
 
     TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_OK, result.status);
-    TEST_ASSERT_EQUAL_size_t(initial_preferred_suites.number_of_suites + 1,
+    assert_suite_details_are_equal(test_cases[i].expected_selected_suite,
+                                   result.selected_suite);
+    TEST_ASSERT_EQUAL_size_t(test_cases[i].expected_renegotiation_length,
                              result.renegotiation_suites.number_of_suites);
-    assert_renegotiation_contains_initial_preferences(
-        initial_preferred_suites, result.renegotiation_suites.suites);
-    assert_last_suite_is_the_preferred_suite(
-        result, test_cases[i].expected_preferred_suite);
-    TEST_ASSERT_EQUAL_PTR(test_cases[i].expected_preferred_suite,
-                          result.selected_suite);
+    TEST_ASSERT_EQUAL_PTR_ARRAY(test_cases[i].expected_renegotiated_suites,
+                                result.renegotiation_suites.suites,
+                                test_cases[i].expected_renegotiation_length);
   }
 }
 
-void test_prioritize_initiator_suite_preference(void) {
-  // This case seems imposible but since libedhoc (v3.16) only support cipher suites 0
-  // and 2, and we are only checking that the order is preserved, is valid
-  const uint8_t SUITES_3_2_0[] = {
-      TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_3,
-      TST_PREF_SUITES_SUITE_3, TST_PREF_SUITES_SUITE_2,
-      TST_PREF_SUITES_SUITE_0};
-  const struct com_readonly_buffer test_buffer = {
-      .bytes = SUITES_3_2_0, .length = sizeof(SUITES_3_2_0)};
+void test_prioritize_initiator_suite_preference_over_responder(void) {
   const struct com_edhoc_cipher_suite_list own_supported_suites =
       get_cipher_suites_0_2_dummy_list();
-  const struct com_edhoc_cipher_suite_list initial_preferred_suites =
-      PREFER_DUMMY_CIPHER_SUITE;
+  const uint8_t SUITES_2_0[] = {
+      TST_PREF_SUITES_ERR_CODE_2, TST_PREF_SUITES_CBOR_ARRAY_2,
+      TST_PREF_SUITES_SUITE_2, TST_PREF_SUITES_SUITE_0};
+  const struct com_readonly_buffer test_error_buffer = {
+      .bytes = SUITES_2_0, .length = sizeof(SUITES_2_0)};
 
   const struct cli_edhoc_suites_negotiation_result result =
-      cli_edhoc_negotiate_suites(own_supported_suites, initial_preferred_suites,
-                                 test_buffer);
+      cli_edhoc_negotiate_suites(own_supported_suites, test_error_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_OK, result.status);
-  TEST_ASSERT_EQUAL_size_t(initial_preferred_suites.number_of_suites + 1,
-                           result.renegotiation_suites.number_of_suites);
-  assert_renegotiation_contains_initial_preferences(
-      initial_preferred_suites, result.renegotiation_suites.suites);
-  assert_last_suite_is_the_preferred_suite(result, &COM_EDHOC_SUITE_0);
   TEST_ASSERT_EQUAL_PTR(&COM_EDHOC_SUITE_0, result.selected_suite);
+  TEST_ASSERT_EQUAL_size_t(1, result.renegotiation_suites.number_of_suites);
+  TEST_ASSERT_EQUAL_PTR(&COM_EDHOC_SUITE_0,
+                        result.renegotiation_suites.suites[0]);
 }
 
 void assert_result_empty(
@@ -202,7 +184,6 @@ static const struct com_readonly_buffer ONLY_SUITE_3_BUFFER = {
 void test_gives_no_suites_when_negotiation_cannot_be_made(void) {
   const struct cli_edhoc_suites_negotiation_result result =
       cli_edhoc_negotiate_suites(get_cipher_suites_0_2_dummy_list(),
-                                 PREFER_DUMMY_CIPHER_SUITE,
                                  ONLY_SUITE_3_BUFFER);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_NO_COMMON_SUITES, result.status);
@@ -246,32 +227,12 @@ void test_fails_on_invalid_data(void) {
        .initial_preferred_suites = DUMMY_SUITE_LIST,
        .expected_status =
            CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_SUPPORTED_SUITES},
-      {.buffer = ONLY_SUITE_3_BUFFER,
-       .initial_preferred_suites = INVALID_SUITES,
-       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
-       .expected_status =
-           CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
-
-      {.buffer = ONLY_SUITE_3_BUFFER,
-       .initial_preferred_suites = {.number_of_suites = 1, .suites = NULL},
-       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
-       .expected_status =
-           CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
-
-      {.buffer = ONLY_SUITE_3_BUFFER,
-       .initial_preferred_suites =
-           {.number_of_suites = 1,
-            .suites = (const struct com_edhoc_cipher_suite_details*[]){NULL}},
-       .supported_suites = COM_EDHOC_ONLY_SUITE_0,
-       .expected_status =
-           CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES},
   };
 
   const size_t test_length = sizeof(test_cases) / sizeof(test_cases[0]);
   for (size_t i = 0; i < test_length; i++) {
     const struct cli_edhoc_suites_negotiation_result result =
         cli_edhoc_negotiate_suites(test_cases[i].supported_suites,
-                                   test_cases[i].initial_preferred_suites,
                                    test_cases[i].buffer);
 
     TEST_ASSERT_EQUAL(test_cases[i].expected_status, result.status);
@@ -283,8 +244,7 @@ void test_fails_when_error_process_fails(void) {
   tst_cli_edhoc_set_process_error_failure();
 
   const struct cli_edhoc_suites_negotiation_result result =
-      cli_edhoc_negotiate_suites(COM_EDHOC_ONLY_SUITE_0, DUMMY_SUITE_LIST,
-                                 ONLY_SUITE_3_BUFFER);
+      cli_edhoc_negotiate_suites(COM_EDHOC_ONLY_SUITE_0, ONLY_SUITE_3_BUFFER);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_ERR_PROCESSING_ERROR,
                     result.status);

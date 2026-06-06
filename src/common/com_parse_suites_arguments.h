@@ -20,21 +20,16 @@ struct com_cipher_suite_identifiers {
 
 struct com_parse_suites_arguments_result {
   bool success;
-
-  const struct {
-    struct com_cipher_suite_identifiers supported_suites;
-    struct com_cipher_suite_identifiers preferred_suites;
-  } arguments;
+  struct com_cipher_suite_identifiers suites;
 };
 
 /**
- * @brief Parses arguments with the following format:
- * -p|--preferred [ <id1> <id2> ...] -s|--supported [ <id1> <id2> ...]
+ * @brief Parses suite identifiers from the given buffer.
  * @param[in] arguments Array of strings with the arguments to parse
  * @param[in] size Size of the arguments array
  * @return Struct containing the result of the parsing, including a success flag
- * and the parsed arguments if successful, or an empty arguments struct with
- * success false on failure.
+ * and the parsed arguments if successful, or an empty identifiers struct with
+ * success set as false on failure.
  */
 struct com_parse_suites_arguments_result com_parse_suites_arguments(
     char* arguments[], size_t size);

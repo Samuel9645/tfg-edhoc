@@ -34,14 +34,14 @@ static struct cli_edhoc_suites_negotiation_result failure(
 enum { CLI_GET_RESPONDER_SUITES_ERROR_SIZE = 100 };
 
 static struct cli_edhoc_renegotiation_list merge_suite_list(
-    const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
-    const struct com_edhoc_cipher_suite_details* preferred_suite) {
+    const struct com_edhoc_cipher_suite_list own_preferred_suites,
+    const struct com_edhoc_cipher_suite_details* new_selected_suite) {
   struct cli_edhoc_renegotiation_list result = {0};
   size_t i = 0;
-  for (; i < own_initial_preferred_suites.number_of_suites; i++) {
-    result.suites[i] = own_initial_preferred_suites.suites[i];
+  for (; i < own_preferred_suites.number_of_suites; i++) {
+    result.suites[i] = own_preferred_suites.suites[i];
   }
-  result.suites[i] = preferred_suite;
+  result.suites[i] = new_selected_suite;
   result.number_of_suites = i + 1;
   return result;
 }
@@ -58,7 +58,6 @@ static bool suite_identifier_in_error_info(
 
 struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     const struct com_edhoc_cipher_suite_list own_supported_suites,
-    const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
     const struct com_readonly_buffer encoded_error_buffer) {
   if (!com_readonly_buffer_has_content(encoded_error_buffer)) {
     return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_EMPTY_ERROR_BUFFER);
@@ -66,12 +65,7 @@ struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
   if (!com_edhoc_cipher_suites_are_valid(own_supported_suites)) {
     return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_SUPPORTED_SUITES);
   }
-  if (!com_edhoc_cipher_suites_are_valid(own_initial_preferred_suites)) {
-    return failure(
-        CLI_EDHOC_NEGOTIATE_SUITES_ERR_INVALID_INITIAL_PREFERRED_SUITES);
-  }
-  if (own_initial_preferred_suites.number_of_suites + 1 >
-      MAX_RENEGOTIATION_SIZE) {
+  if (own_supported_suites.number_of_suites > MAX_RENEGOTIATION_SIZE) {
     return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_INTERNAL_BUFFER_TOO_SMALL);
   }
 
@@ -89,7 +83,11 @@ struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
         own_supported_suites.suites[i];
     if (suite_identifier_in_error_info(received_info,
                                        current_suite->metadata->value))
-      return ok(merge_suite_list(own_initial_preferred_suites, current_suite),
+      return ok(merge_suite_list(
+                    (struct com_edhoc_cipher_suite_list){
+                        .suites = &own_supported_suites.suites[0],
+                        .number_of_suites = i},
+                    current_suite),
                 current_suite);
   }
   return no_common_suites();

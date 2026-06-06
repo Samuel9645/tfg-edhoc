@@ -143,7 +143,6 @@ static struct cli_edhoc_negotiation_attempt_result
 cli_edhoc_resolve_negotiation(
     struct cli_resources* client_resources,
     const struct com_edhoc_parameters initial_edhoc_parameters,
-    const struct com_edhoc_cipher_suite_list preferred_suites,
     const struct com_writable_buffer payload_buffer) {
   const struct cli_edhoc_negotiation_attempt_result result =
       cli_edhoc_perform_negotiation_attempt(client_resources, payload_buffer);
@@ -156,7 +155,7 @@ cli_edhoc_resolve_negotiation(
   }
   const struct cli_edhoc_suites_negotiation_result negotiation_result =
       cli_edhoc_negotiate_suites(
-          initial_edhoc_parameters.supported_cipher_suites, preferred_suites,
+          initial_edhoc_parameters.supported_cipher_suites,
           result.response_payload);
   if (negotiation_result.status != CLI_EDHOC_NEGOTIATE_SUITES_OK) {
     return failure();
@@ -188,9 +187,7 @@ static bool build_server_uri(char* destination_buffer, const size_t buffer_size,
 }
 
 enum com_emulation_status core_run_client(
-    const struct com_edhoc_parameters edhoc_parameters,
-    const struct com_edhoc_cipher_suite_list preferred_suites,
-    const char* server_ip) {
+    const struct com_edhoc_parameters edhoc_parameters, const char* server_ip) {
   coap_startup();
   coap_set_log_level(COAP_LOG_DEBUG);
 
@@ -252,9 +249,8 @@ enum com_emulation_status core_run_client(
   }
 
   const struct cli_edhoc_negotiation_attempt_result
-      message_1_negotiation_attempt_result =
-          cli_edhoc_resolve_negotiation(&client_resources, edhoc_parameters,
-                                        preferred_suites, payload_buffer);
+      message_1_negotiation_attempt_result = cli_edhoc_resolve_negotiation(
+          &client_resources, edhoc_parameters, payload_buffer);
 
   if (message_1_negotiation_attempt_result.status != CLI_EDHOC_NEGOTIATION_OK) {
     coap_log_err("Handshake failed after all attempts\n");

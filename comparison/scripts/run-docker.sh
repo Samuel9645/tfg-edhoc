@@ -1,3 +1,5 @@
+set -e
+
 cd ../docker
 DTLS_SERVER_NAME=$(grep -v '^#' .env | grep 'DTLS_SERVER_IP' | cut -d= -f2 | tr -d '\r')
 DTLS_CLIENT_NAME=$(grep -v '^#' .env | grep 'DTLS_CLIENT_IP' | cut -d= -f2 | tr -d '\r')

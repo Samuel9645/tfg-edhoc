@@ -46,6 +46,16 @@ static struct cli_edhoc_renegotiation_list merge_suite_list(
   return result;
 }
 
+static bool suite_identifier_in_error_info(
+    const struct edhoc_error_info error_info, const int32_t suite_identifier) {
+  for (size_t i = 0; i < error_info.written_entries; i++) {
+    if (error_info.cipher_suites[i] == suite_identifier) {
+      return true;
+    }
+  }
+  return false;
+}
+
 struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     const struct com_edhoc_cipher_suite_list own_supported_suites,
     const struct com_edhoc_cipher_suite_list own_initial_preferred_suites,
@@ -74,16 +84,13 @@ struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
                                   &received_info) != EDHOC_SUCCESS) {
     return failure(CLI_EDHOC_NEGOTIATE_SUITES_ERR_PROCESSING_ERROR);
   }
-  for (size_t j = 0; j < own_supported_suites.number_of_suites; j++) {
+  for (size_t i = 0; i < own_supported_suites.number_of_suites; i++) {
     const struct com_edhoc_cipher_suite_details* current_suite =
-        own_supported_suites.suites[j];
-    const int32_t own_suite_value = current_suite->metadata->value;
-    for (size_t i = 0; i < received_info.written_entries; i++) {
-      if (received_info.cipher_suites[i] == own_suite_value) {
-        return ok(merge_suite_list(own_initial_preferred_suites, current_suite),
-                  current_suite);
-      }
-    }
+        own_supported_suites.suites[i];
+    if (suite_identifier_in_error_info(received_info,
+                                       current_suite->metadata->value))
+      return ok(merge_suite_list(own_initial_preferred_suites, current_suite),
+                current_suite);
   }
   return no_common_suites();
 }

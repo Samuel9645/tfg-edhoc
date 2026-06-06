@@ -38,14 +38,12 @@ bool cli_initialize_edhoc_context_with_parameters(
  * re-initialize with new parameters
  * @param[in] original_parameters Original parameters (used to copy the common data
  * such as credentials, methods...)
- * @param[in] selected_cipher_suite New selected cipher suite
  * @param[in] negotiated_suites New supported cipher suites list
  * @return true on success, false on failure
  */
 bool cli_reset_edhoc_context_with_new_suites_data(
     struct cli_resources* resources,
     struct com_edhoc_parameters original_parameters,
-    const struct com_edhoc_cipher_suite_details* selected_cipher_suite,
     struct cli_edhoc_renegotiation_list negotiated_suites);
 
 #endif  // COAP_CLIENT_CLI_RESOURCES_H_

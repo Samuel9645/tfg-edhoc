@@ -162,7 +162,6 @@ cli_edhoc_resolve_negotiation(
   }
   if (!cli_reset_edhoc_context_with_new_suites_data(
           client_resources, initial_edhoc_parameters,
-          negotiation_result.selected_suite,
           negotiation_result.renegotiation_suites)) {
     coap_log_err("Failed to reset EDHOC context with new suites data\n");
     return failure();

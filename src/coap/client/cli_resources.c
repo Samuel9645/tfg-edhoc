@@ -18,7 +18,6 @@ static bool reset_edhoc_context(struct cli_resources* resources) {
 bool cli_reset_edhoc_context_with_new_suites_data(
     struct cli_resources* resources,
     const struct com_edhoc_parameters original_parameters,
-    const struct com_edhoc_cipher_suite_details* selected_cipher_suite,
     const struct cli_edhoc_renegotiation_list negotiated_suites) {
   if (!reset_edhoc_context(resources)) {
     coap_log_err("Failed to reset EDHOC context\n");
@@ -34,7 +33,8 @@ bool cli_reset_edhoc_context_with_new_suites_data(
               .suites = (const struct com_edhoc_cipher_suite_details**)
                             negotiated_suites.suites,
           },
-      .selected_cipher_suite = selected_cipher_suite,
+      .selected_cipher_suite =
+          negotiated_suites.suites[negotiated_suites.number_of_suites - 1],
       .generate_connection_id = original_parameters.generate_connection_id};
   return cli_initialize_edhoc_context_with_parameters(resources,
                                                       new_parameters);

@@ -30,7 +30,6 @@ struct cli_edhoc_renegotiation_list {
 struct cli_edhoc_suites_negotiation_result {
   const enum cli_edhoc_suites_negotiation_status status;
   struct cli_edhoc_renegotiation_list renegotiation_suites;
-  const struct com_edhoc_cipher_suite_details* const selected_suite;
 };
 
 /**
@@ -49,10 +48,9 @@ bool cli_edhoc_error_suggests_renegotiation(
  * @param[in] own_supported_suites List of cipher suites supported by the
  * initiator. They must be like in other cases in order of preference.
  * @param[in] encoded_error_buffer View of the error response to Message 1
- * @return Struct containing a status, the list of suites to
- * renegotiate, in order of preference and a reference to the selected suite on
- * success. On failure the list will be empty, the selected suite NULL and the
- * status will indicate the error.
+ * @return Struct containing a status and the new list of suites, in order of
+ * preference, with the last one being the selected. On failure the
+ * list will be empty, and the status will indicate the error.
  */
 struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     struct com_edhoc_cipher_suite_list own_supported_suites,

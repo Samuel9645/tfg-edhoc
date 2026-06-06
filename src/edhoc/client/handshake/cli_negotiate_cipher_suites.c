@@ -12,12 +12,10 @@
 #include <edhoc.h>
 
 static struct cli_edhoc_suites_negotiation_result ok(
-    const struct cli_edhoc_renegotiation_list renegotiation_suites,
-    const struct com_edhoc_cipher_suite_details* const selected_suite) {
+    const struct cli_edhoc_renegotiation_list renegotiation_suites) {
   return (struct cli_edhoc_suites_negotiation_result){
       .status = CLI_EDHOC_NEGOTIATE_SUITES_OK,
       .renegotiation_suites = renegotiation_suites,
-      .selected_suite = selected_suite,
   };
 }
 
@@ -82,13 +80,11 @@ struct cli_edhoc_suites_negotiation_result cli_edhoc_negotiate_suites(
     const struct com_edhoc_cipher_suite_details* current_suite =
         own_supported_suites.suites[i];
     if (suite_identifier_in_error_info(received_info,
-                                       current_suite->metadata->value))
-      return ok(merge_suite_list(
-                    (struct com_edhoc_cipher_suite_list){
-                        .suites = &own_supported_suites.suites[0],
-                        .number_of_suites = i},
-                    current_suite),
-                current_suite);
+                                       current_suite->metadata->value)) {
+      const struct com_edhoc_cipher_suite_list preferred_suites = {
+          .suites = &own_supported_suites.suites[0], .number_of_suites = i};
+      return ok(merge_suite_list(preferred_suites, current_suite));
+    }
   }
   return no_common_suites();
 }

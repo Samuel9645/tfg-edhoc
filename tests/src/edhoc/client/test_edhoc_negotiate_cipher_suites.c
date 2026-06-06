@@ -142,8 +142,6 @@ void test_gets_preferred_suites_from_valid_buffers(void) {
         cli_edhoc_negotiate_suites(own_supported_suites, test_buffer);
 
     TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_OK, result.status);
-    assert_suite_details_are_equal(test_cases[i].expected_selected_suite,
-                                   result.selected_suite);
     TEST_ASSERT_EQUAL_size_t(test_cases[i].expected_renegotiation_length,
                              result.renegotiation_suites.number_of_suites);
     TEST_ASSERT_EQUAL_PTR_ARRAY(test_cases[i].expected_renegotiated_suites,
@@ -165,7 +163,6 @@ void test_prioritize_initiator_suite_preference_over_responder(void) {
       cli_edhoc_negotiate_suites(own_supported_suites, test_error_buffer);
 
   TEST_ASSERT_EQUAL(CLI_EDHOC_NEGOTIATE_SUITES_OK, result.status);
-  TEST_ASSERT_EQUAL_PTR(&COM_EDHOC_SUITE_0, result.selected_suite);
   TEST_ASSERT_EQUAL_size_t(1, result.renegotiation_suites.number_of_suites);
   TEST_ASSERT_EQUAL_PTR(&COM_EDHOC_SUITE_0,
                         result.renegotiation_suites.suites[0]);

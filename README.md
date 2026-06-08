@@ -40,6 +40,74 @@ flag, you can initialize and update the submodules with the following commands:
 git submodule update --init --recursive
 ```
 
+## Code structure
+
+The project is structured in the following way:
+
+```
+text
+.
+├── CMakeLists.txt # main CMake configuration file
+|-- cmake_configs  # Specific external CMake configuration files for the libraries used in the project
+├── comparison/    # scripts and resources to run DTLS vs EDHOC tests
+│   ├── scripts/
+|   |-- docker/    # Dockerfiles and docker-compose files to run the comparison
+│   └── traces/
+├── externals/     # included third-party libraries as submodules
+│   ├── libcoap/
+│   ├── libedhoc/
+│   └── unity/
+├── include/                
+│   ├── app/
+│   ├── coap/
+│   ├── common/
+│   ├── edhoc/
+│   └── oscore/
+├── src/                    
+│   ├── main_client.c
+│   ├── main_server.c
+│   ├── coap/
+│   ├── common/
+│   ├── core/
+│   ├── edhoc/
+│   └── oscore/
+├── tests/        # unit tests and test helpers
+└── README.md
+```
+
+The code is structured by modules, the `common` folder contains code that is
+shared between different modules.
+
+## Compilation
+
+The project uses CMake as build system. To compile the project, create a build
+directory and run CMake from there:
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+This will create two important folders:
+
+- `bin` which contains the compiled binaries for the client and server.
+- `tests` which contains the compiled unit tests.
+
+In order to run the unit test, execute the following command from the `build`
+directory:
+
+```bash
+ctest
+```
+
+For more details on the usage of the binaries use the `-h` or `--help` flags:
+
+```bash
+./bin/client --help
+```
+
 ## Comparison
 
 To run the comparison between DTLS (using libcoap precompiled client and server
@@ -56,7 +124,8 @@ Then, execute the `build-and-run-docker.sh` script:
 ./build-and-run-docker.sh
 ```
 
-Once the project is built, in order to run the comparison without building the project again, you can execute the `run-docker.sh` script:
+Once the project is built, in order to run the comparison without building the
+project again, you can execute the `run-docker.sh` script:
 
 ```bash
 ./run-docker.sh

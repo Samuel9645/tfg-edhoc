@@ -105,7 +105,13 @@ ctest
 For more details on the usage of the binaries use the `-h` or `--help` flags:
 
 ```bash
-./bin/client --help
+client --help
+```
+
+or
+
+```bash
+server --help
 ```
 
 ## Comparison

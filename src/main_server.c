@@ -18,11 +18,14 @@ static void log_usage(const char* program_name) {
 
 int main(const int argc, char* argv[]) {
   const char* program_name = argv[0];
-  if (argc < 3) {
+  const char* first_argument = argv[1];
+  if (argc < 3 || strcmp(first_argument, "-h") == 0 ||
+      strcmp(first_argument, "--help") == 0) {
     log_usage(program_name);
     return -1;
   }
-  if (strcmp(argv[1], "-s") != 0 && strcmp(argv[1], "--supported") != 0) {
+  if (strcmp(first_argument, "-s") != 0 &&
+      strcmp(first_argument, "--supported") != 0) {
     com_log_error(
         "Invalid arguments: expected '-s' or '--supported' as the first "
         "argument\n");

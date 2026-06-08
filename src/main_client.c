@@ -19,7 +19,9 @@ static void log_usage(const char* program_name) {
 
 int main(const int argc, char* argv[]) {
   const char* program_name = argv[0];
-  if (argc < 4) {
+  const char* first_argument = argv[1];
+  if (argc < 4 || strcmp(first_argument, "-h") == 0 ||
+      strcmp(first_argument, "--help") == 0) {
     log_usage(program_name);
     return -1;
   }
